@@ -3,10 +3,17 @@ schema {
     mutation: Mutation
 }
 
+enum UserRole {
+    USER,
+    ADMIN
+}
+
 type User {
     id: ID!
     first_name: String!
     last_name: String!
+    email: String!
+    role: UserRole!
     created_at: String!
 }
 

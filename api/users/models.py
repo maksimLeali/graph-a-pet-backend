@@ -1,4 +1,9 @@
+from enum import Enum
 from data import db
+
+class UsersRole(Enum):
+     USER = "USER"
+     RED = "ADMIN"
 
 class User(db.Model):
     __tablename__ = 'users'
@@ -9,6 +14,7 @@ class User(db.Model):
     salt = db.Column(db.String)
     password = db.Column(db.String)
     created_at = db.Column(db.Date)
+    role = db.Column(db.String)
     def to_dict(self):
         return {
             "id": self.id,
