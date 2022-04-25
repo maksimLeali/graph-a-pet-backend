@@ -2,21 +2,31 @@
 from datetime import date
 from ariadne import convert_kwargs_to_snake_case
 from data import db
-from .models import Post
+from .models import User
+import bcrypt
+import uuid
 
 @convert_kwargs_to_snake_case
-def create_post_resolver(obj, info, title, description):
-    print('*********')
+def create_user_resolver(obj, info, data):
     try:
+        print(data)
         today = date.today()
-        post = Post(
-            title=title, description=description, created_at=today.strftime("%b-%d-%Y")
+        salt = bcrypt.gensalt()
+        user = User(
+            id = uuid.uuid4(),
+            first_name = data["first_name"], 
+            last_name = data["last_name"], 
+            email=data["email"], 
+            salt=salt, 
+            password=bcrypt.hashpw(bytes(data["password"], encoding='utf-8'), salt),  
+            created_at=today.strftime("%b-%d-%Y")
         )
-        db.session.add(post)
+        print(user)
+        db.session.add(user)
         db.session.commit()
         payload = {
             "success": True,
-            "post": post.to_dict()
+            "user": user.to_dict()
         }
     except ValueError:  # date format errors
         payload = {
@@ -27,16 +37,16 @@ def create_post_resolver(obj, info, title, description):
     return payload
 
 @convert_kwargs_to_snake_case
-def update_post_resolver(obj, info, id, data):
+def update_user_resolver(obj, info, id, data):
     try:
-        post = Post.query.get(id)
-        if post:
-            post= {**post, **data}
-        db.session.add(post)
+        user = User.query.get(id)
+        if user:
+            user= {**user, **data}
+        db.session.add(user)
         db.session.commit()
         payload = {
             "success": True,
-            "post": post.to_dict()
+            "user": user.to_dict()
         }
     except AttributeError:  # todo not found
         payload = {

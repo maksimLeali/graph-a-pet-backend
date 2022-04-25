@@ -1,12 +1,12 @@
 from ariadne import convert_kwargs_to_snake_case
-from .models import Post
-def list_posts_resolver(obj, info):
+from .models import User
+def list_users_resolver(obj, info):
     try:
-        posts = [post.to_dict() for post in Post.query.all()]
-        print(posts)
+        user = [user.to_dict() for user in User.query.all()]
+        print(user)
         payload = {
             "success": True,
-            "posts": posts
+            "user": user
         }
     except Exception as error:
         payload = {
@@ -16,16 +16,16 @@ def list_posts_resolver(obj, info):
     return payload
 
 @convert_kwargs_to_snake_case
-def get_post_resolver(obj, info, id):
+def get_user_resolver(obj, info, id):
     try:
-        post = Post.query.get(id)
+        user = User.query.get(id)
         payload = {
             "success": True,
-            "post": post.to_dict()
+            "user": user.to_dict()
         }
     except AttributeError:  # todo not found
         payload = {
             "success": False,
-            "errors": ["Post item matching {id} not found"]
+            "errors": ["User item matching {id} not found"]
         }
     return payload

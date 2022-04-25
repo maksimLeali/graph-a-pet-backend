@@ -3,38 +3,46 @@ schema {
     mutation: Mutation
 }
 
-type Post {
+type User {
     id: ID!
-    title: String!
-    description: String!
+    first_name: String!
+    last_name: String!
     created_at: String!
 }
 
-input PostUpdate {
-    title: String
-    description: String
+input UserUpdate {
+    first_name: String
+    last_name: String
     created_at: String
+    email: String
 }
 
-type PostResult {
-    success: Boolean!
-    errors: [String]
-    post: Post
+input UserCreate {
+    first_name: String!
+    last_name: String!
+    email: String!
+    password: String!
 }
 
-type PostsResult {
+type UserResult {
     success: Boolean!
     errors: [String]
-    posts: [Post]
+    User: User
+}
+
+type UsersResult {
+    success: Boolean!
+    errors: [String]
+    Users: [User]
 }
 
 type Query {
-    listPosts: PostsResult!
-    getPost(id: ID!): PostResult!
+    listUsers: UsersResult!
+    getUser(id: ID!): UserResult!
 }
 
 
 type Mutation {
-    createPost(title: String!, description: String!, created_at: String): PostResult!
-    updatePost(id: ID!, data: PostUpdate!): PostResult!
+    createUser(data: UserCreate!): UserResult!
+    updateUser(id: ID!, data: UserUpdate!): UserResult!
 }
