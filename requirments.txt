@@ -21,6 +21,7 @@ platformdirs==2.5.0
 psycopg2-binary==2.9.3
 pycparser==2.21
 pydash==5.1.0
+PyYAML==5.4.1
 six==1.16.0
 sniffio==1.2.0
 SQLAlchemy==1.4.35
