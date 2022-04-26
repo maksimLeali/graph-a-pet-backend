@@ -1,2 +1,2 @@
-from .posts.queries import *
-from .posts.mutations import *
+from .users.queries import *
+from .users.mutations import *
