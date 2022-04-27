@@ -6,7 +6,7 @@ def list_users_resolver(obj, info):
         print(user)
         payload = {
             "success": True,
-            "user": user
+            "users": user
         }
     except Exception as error:
         payload = {
