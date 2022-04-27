@@ -23,5 +23,6 @@ class User(db.Model):
             "email": self.email,
             "salt": self.salt,
             "password": self.password,
+            "role": self.role,
             "created_at": str(self.created_at.strftime('%d-%m-%Y'))
         }
