@@ -1,3 +1,4 @@
+aniso8601==9.0.1
 anyio==3.5.0
 ariadne==0.15.0
 bcrypt==3.2.0
@@ -9,7 +10,9 @@ filelock==3.6.0
 Flask==2.1.1
 Flask-Cors==3.0.10
 Flask-SQLAlchemy==2.5.1
-graphql-core==3.2.1
+graphene==3.0
+graphql-core==3.1.7
+graphql-relay==3.1.5
 greenlet==1.1.2
 idna==3.3
 importlib-metadata==4.11.3
