@@ -1,8 +1,10 @@
 from ariadne import convert_kwargs_to_snake_case
-from data.models import User
+import domain.users as users_domain
+
+@convert_kwargs_to_snake_case
 def list_users_resolver(obj, info):
     try:
-        user = [user.to_dict() for user in User.query.all()]
+        user = users_domain.get_users()
         
         payload = {
             "success": True,
@@ -18,7 +20,7 @@ def list_users_resolver(obj, info):
 @convert_kwargs_to_snake_case
 def get_user_resolver(obj, info, id):
     try:
-        user = User.query.get(id)
+        user = users_domain.get_user(id)
         payload = {
             "success": True,
             "user": user.to_dict()

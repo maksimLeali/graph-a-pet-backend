@@ -3,3 +3,4 @@ pyvenv.cfg
 include/
 lib
 venv 
+bin

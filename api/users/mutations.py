@@ -1,30 +1,13 @@
 # mutations.py
-from datetime import date
 from ariadne import convert_kwargs_to_snake_case
-from data import db
-from data.models import User, UserRole
-import bcrypt
-import uuid
+from domain.users import create_user, update_user
+
 
 @convert_kwargs_to_snake_case
 def create_user_resolver(obj, info, data):
+    print('************+**')
     try:
-        print(data)
-        today = date.today()
-        salt = bcrypt.gensalt()
-        user = User(
-            id = uuid.uuid4(),
-            first_name = data["first_name"], 
-            last_name = data["last_name"], 
-            email=data["email"], 
-            salt=salt, 
-            role= UserRole.USER.name,
-            password=bcrypt.hashpw(bytes(data["password"], encoding='utf-8'), salt),  
-            created_at=today.strftime("%b-%d-%Y")
-        )
-        print(user)
-        db.session.add(user)
-        db.session.commit()
+        user = create_user(data)
         payload = {
             "success": True,
             "user": user.to_dict()
@@ -40,11 +23,7 @@ def create_user_resolver(obj, info, data):
 @convert_kwargs_to_snake_case
 def update_user_resolver(obj, info, id, data):
     try:
-        user = User.query.get(id)
-        if user:
-            user= {**user, **data}
-        db.session.add(user)
-        db.session.commit()
+        user = update_user(id, data)
         payload = {
             "success": True,
             "user": user.to_dict()
