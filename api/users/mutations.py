@@ -5,7 +5,6 @@ from domain.users import create_user, update_user
 
 @convert_kwargs_to_snake_case
 def create_user_resolver(obj, info, data):
-    print('************+**')
     try:
         user = create_user(data)
         payload = {
@@ -34,3 +33,7 @@ def update_user_resolver(obj, info, id, data):
             "errors": ["item matching id {id} not found"]
         }
     return payload
+
+@convert_kwargs_to_snake_case
+def login_resolver(obj, info, data):
+    

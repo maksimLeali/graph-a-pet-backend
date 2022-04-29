@@ -2,5 +2,6 @@ pyvenv.cfg
 **/__pycache__*
 include/
 lib
+config.yml
 venv 
 bin/

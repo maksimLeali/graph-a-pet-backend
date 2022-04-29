@@ -89,6 +89,7 @@ type Query {
     getUser(id: ID!): UserResult!
     listPets: UsersResult!
     getPet(id: ID!): UserResult!
+    isAuthenticated: Boolean!
 }
 
 type Mutation {
@@ -96,4 +97,7 @@ type Mutation {
     updateUser(id: ID!, data: UserUpdate!): UserResult!
     createPet(data: PetCreate!): PetResult!
     updatePet(id: ID!, data: PetUpdate!): PetResult!
+    login(username: String!, password: String!): Boolean!
+    logout: Boolean!
 }
+
