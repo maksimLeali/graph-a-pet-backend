@@ -1,5 +1,5 @@
 from ariadne import convert_kwargs_to_snake_case
-from .models import User
+from data.models import User
 def list_users_resolver(obj, info):
     try:
         user = [user.to_dict() for user in User.query.all()]

@@ -2,7 +2,7 @@
 from datetime import date
 from ariadne import convert_kwargs_to_snake_case
 from data import db
-from .models import User, UsersRole
+from data.models import User, UserRole
 import bcrypt
 import uuid
 
@@ -18,7 +18,7 @@ def create_user_resolver(obj, info, data):
             last_name = data["last_name"], 
             email=data["email"], 
             salt=salt, 
-            role= UsersRole.USER.name,
+            role= UserRole.USER.name,
             password=bcrypt.hashpw(bytes(data["password"], encoding='utf-8'), salt),  
             created_at=today.strftime("%b-%d-%Y")
         )
@@ -55,4 +55,3 @@ def update_user_resolver(obj, info, id, data):
             "errors": ["item matching id {id} not found"]
         }
     return payload
-

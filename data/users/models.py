@@ -1,9 +1,10 @@
 from enum import Enum
 from data import db
+from data.ownerships.models import Ownership
 
-class UsersRole(Enum):
+class UserRole(Enum):
      USER = "USER"
-     RED = "ADMIN"
+     ADMIN = "ADMIN"
 
 class User(db.Model):
     __tablename__ = 'users'
@@ -14,7 +15,9 @@ class User(db.Model):
     salt = db.Column(db.String)
     password = db.Column(db.String)
     created_at = db.Column(db.Date)
-    role = db.Column(db.String)
+    role = db.Column(db.Enum(UserRole))
+    ownerships = db.relationship("Ownership", uselist=True, backref='users')
+    ownership_ids = db.Column(db.ARRAY(db.String))
     def to_dict(self):
         return {
             "id": self.id,
@@ -24,5 +27,6 @@ class User(db.Model):
             "salt": self.salt,
             "password": self.password,
             "role": self.role,
-            "created_at": str(self.created_at.strftime('%d-%m-%Y'))
+            "created_at": str(self.created_at.strftime('%d-%m-%Y')),
+            "ownerships": self.ownership_ids
         }

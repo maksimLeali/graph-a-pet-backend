@@ -8,6 +8,12 @@ enum UserRole {
     ADMIN
 }
 
+enum CustodyRole {
+    SUB_OWNER,
+    OWNER,
+    PET_SITTER,
+}
+
 type User {
     id: ID!
     first_name: String!
@@ -15,6 +21,20 @@ type User {
     email: String!
     role: UserRole!
     created_at: String!
+    ownerships: [Ownership]!
+}
+
+type Pet {
+    id: ID!
+    name: String!
+    race: !String
+    ownerships: [Ownership]!
+}
+
+type Ownership {
+    id: ID!
+    user: User!
+    pet: Pet!
 }
 
 input UserUpdate {
@@ -34,13 +54,13 @@ input UserCreate {
 type UserResult {
     success: Boolean!
     errors: [String]
-    User: User
+    user: User
 }
 
 type UsersResult {
     success: Boolean!
     errors: [String]
-    Users: [User]
+    users: [User]
 }
 
 type Query {
