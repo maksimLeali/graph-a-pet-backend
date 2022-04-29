@@ -1,8 +1,8 @@
 import data.users as users_data
 
-def get_first_name(obj, info):
-    return 'pippo'
 
+def get_user_ownerships(obj, info):
+    return []
 
 def create_user(data):
     
@@ -16,3 +16,6 @@ def get_users():
 
 def get_user(id): 
     return users_data.get_user(id)
+
+def add_dog(user_id, dog):
+    return "ok"

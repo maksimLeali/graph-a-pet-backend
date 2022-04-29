@@ -40,7 +40,6 @@ type Ownership {
 input UserUpdate {
     first_name: String
     last_name: String
-    created_at: String
     email: String
 }
 
@@ -60,16 +59,41 @@ type UserResult {
 type UsersResult {
     success: Boolean!
     errors: [String]
-    users: [User]
+    users: [User]!
+}
+
+input PetUpdate {
+    name: String
+    race: String
+}
+
+input PetCreate {
+    name: String!
+    race: String!
+}
+
+type PetResult {
+    success: Boolean!
+    errors: [String]
+    pet: Pet
+}
+
+type PetsResult {
+    success: Boolean!
+    errors: [String]
+    pets: [Pet]!
 }
 
 type Query {
     listUsers: UsersResult!
     getUser(id: ID!): UserResult!
+    listPets: UsersResult!
+    getPet(id: ID!): UserResult!
 }
-
 
 type Mutation {
     createUser(data: UserCreate!): UserResult!
     updateUser(id: ID!, data: UserUpdate!): UserResult!
+    createPet(data: PetCreate!): PetResult!
+    updatePet(id: ID!, data: PetUpdate!): PetResult!
 }

@@ -9,14 +9,13 @@ def create_user(data):
     today = date.today()
     salt = bcrypt.gensalt()
     user = User(
-        id = uuid.uuid4(),
+        id = f"{uuid.uuid4()}",
         first_name = data["first_name"], 
         last_name = data["last_name"], 
         email=data["email"], 
         salt=salt, 
         role= UserRole.USER.name,
         password=bcrypt.hashpw(bytes(data["password"], encoding='utf-8'), salt),  
-        ownerships_id=[],
         created_at=today.strftime("%b-%d-%Y")
     )
     db.session.add(user)

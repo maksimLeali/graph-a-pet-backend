@@ -1,6 +1,6 @@
 from ariadne import ObjectType
-from domain.users import get_first_name
+from domain.users import  get_user_ownerships
 
 
 user = ObjectType("User")
-user.set_field("first_name", get_first_name)
+user.set_field("ownerships", get_user_ownerships)

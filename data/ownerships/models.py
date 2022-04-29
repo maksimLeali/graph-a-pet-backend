@@ -1,6 +1,6 @@
 from enum import Enum
 from data import db
-
+from data.models import *
 class CustodyRole(Enum):
     OWNER = "OWNER"
     SUB_OWNER = "SUB_OWNER"
@@ -11,9 +11,9 @@ class Ownership(db.Model):
     __tablename__ = 'ownerships'
     id = db.Column(db.String, primary_key=True)
     user_id = db.Column(db.String, db.ForeignKey('users.id'))
-    user = db.relationship("User", backref="ownership")
+    user = db.relationship("User")
     pet_id= db.Column(db.String, db.ForeignKey('pets.id'))
-    pet = db.relationship("Pet", backref="ownership")
+    pet = db.relationship("Pet")
     custody_role= db.Column(db.Enum(CustodyRole))
     def to_dict(self):
         return {
