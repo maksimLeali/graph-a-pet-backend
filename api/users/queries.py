@@ -3,7 +3,7 @@ from data.models import User
 def list_users_resolver(obj, info):
     try:
         user = [user.to_dict() for user in User.query.all()]
-        print(user)
+        
         payload = {
             "success": True,
             "users": user

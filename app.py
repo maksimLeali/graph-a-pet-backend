@@ -5,10 +5,14 @@ from ariadne import load_schema_from_path, make_executable_schema, \
 from ariadne.constants import PLAYGROUND_HTML
 from flask import request, jsonify
 from api.operations import *
+from domain.users.resolvers import resolve_name
 
 query = ObjectType("Query")
 query.set_field("listUsers", list_users_resolver)
 query.set_field("getUser", get_user_resolver)
+
+user = ObjectType("User")
+user.set_field("first_name", resolve_name)
 
 mutation = ObjectType("Mutation")
 mutation.set_field('createUser', create_user_resolver)
@@ -16,7 +20,7 @@ mutation.set_field('updateUser', update_user_resolver)
 
 type_defs = load_schema_from_path("schema.graphql")
 schema = make_executable_schema(
-    type_defs, query, mutation, snake_case_fallback_resolvers
+    type_defs, query, mutation, user, snake_case_fallback_resolvers
 )
 
 @app.route("/graphql", methods=["GET"])
