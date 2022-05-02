@@ -1,6 +1,0 @@
-db:
-  host: localhost
-  user: postgres
-  port: 5433
-  password: 147852makso
-  table: pet-finder
