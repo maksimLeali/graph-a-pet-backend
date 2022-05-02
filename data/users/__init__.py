@@ -30,18 +30,12 @@ def update_user(data):
     return user 
 
 def get_users():
-    users= [user.to_dict() for user in User.query.all()]
-    print(users)
-    return users
+    return [user.to_dict() for user in User.query.all()]
+
 
 def get_user(id):
     return User.query.get(id)
 
 def get_user_from_email_password(email, password):
-    user= User.query.filter(User.email==email).first().to_dict()
-    print('!"£"£!"£!"!"!"!"!"!"!"!"!"!"!"!')
-    print('!"£"£!"£!"!"!"!"!"!"!"!"!"!"!"!')
-    print(user)
-    print('!"£"£!"£!"!"!"!"!"!"!"!"!"!"!"!')
-    print('!"£"£!"£!"!"!"!"!"!"!"!"!"!"!"!')
-    return user
+    return User.query.filter(User.email==email).first().to_dict()
+    

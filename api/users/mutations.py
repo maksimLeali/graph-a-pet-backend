@@ -39,11 +39,6 @@ def update_user_resolver(obj, info, id, data):
 
 def login_resolver(_, info, email, password):
     try :
-        print('^^^^^^^^^^^^^^')
-        print('^^^^^^^^^^^^^^')
-        print('^^^^^^^^^^^^^^')
-        print('^^^^^^^^^^^^^^')
-        print('^^^^^^^^^^^^^^')
         user = get_user_from_email_password(email, password)
         token = jwt.encode(user,cfg['jwt']['secret'], algorithm="HS256" )
         payload = {

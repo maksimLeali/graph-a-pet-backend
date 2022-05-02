@@ -3,12 +3,9 @@ import domain.users as users_domain
 from api.middlewares import auth_middleware
 
 @convert_kwargs_to_snake_case
+@auth_middleware
 def list_users_resolver(obj, info):
     try:
-        print('**************************')
-        print('**************************')
-        print('**************************')
-        print('**************************')
         user = users_domain.get_users()
         payload = {
             "success": True,
@@ -22,6 +19,7 @@ def list_users_resolver(obj, info):
     return payload
 
 @convert_kwargs_to_snake_case
+@auth_middleware
 def get_user_resolver(obj, info, id):
     try:
         user = users_domain.get_user(id)
