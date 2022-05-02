@@ -2,7 +2,7 @@ import bcrypt
 import uuid
 from datetime import date
 
-from .models import User, UserRole
+from data.users.models import User, UserRole
 from data import db 
 
 def create_user(data):

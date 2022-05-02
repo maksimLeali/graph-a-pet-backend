@@ -34,6 +34,11 @@ def update_user_resolver(obj, info, id, data):
         }
     return payload
 
-@convert_kwargs_to_snake_case
-def login_resolver(obj, info, data):
-    
+
+def resolve_login(_, info, username, password):
+    request = info.context["request"]
+    user = auth.authenticate(username, password)
+    if user:
+        auth.login(request, user)
+        return True
+    return False

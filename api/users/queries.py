@@ -1,11 +1,12 @@
 from ariadne import convert_kwargs_to_snake_case
 import domain.users as users_domain
+from api.middlewares import auth_middleware
 
 @convert_kwargs_to_snake_case
+@auth_middleware
 def list_users_resolver(obj, info):
     try:
         user = users_domain.get_users()
-        
         payload = {
             "success": True,
             "users": user
