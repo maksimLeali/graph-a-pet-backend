@@ -37,5 +37,4 @@ def get_user(id):
     return User.query.get(id)
 
 def get_user_from_email_password(email, password):
-    return User.query.filter(User.email==email).first().to_dict()
-    
+    return User.query.filter(User.email==email, User.password==pbkdf2_sha256.hash(password) ).first().to_dict()
