@@ -62,6 +62,12 @@ type UsersResult {
     users: [User]!
 }
 
+type LoginResult {
+    success: Boolean!
+    errors: [String]
+    token: String!
+}
+
 input PetUpdate {
     name: String
     race: String
@@ -97,7 +103,7 @@ type Mutation {
     updateUser(id: ID!, data: UserUpdate!): UserResult!
     createPet(data: PetCreate!): PetResult!
     updatePet(id: ID!, data: PetUpdate!): PetResult!
-    login(username: String!, password: String!): Boolean!
+    login(email: String!, password: String!):LoginResult!
     logout: Boolean!
 }
 

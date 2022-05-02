@@ -1,21 +1,19 @@
-import bcrypt
+from passlib.hash import pbkdf2_sha256 
 import uuid
 from datetime import date
 
 from data.users.models import User, UserRole
-from data import db 
+from data import db
 
 def create_user(data):
     today = date.today()
-    salt = bcrypt.gensalt()
     user = User(
         id = f"{uuid.uuid4()}",
         first_name = data["first_name"], 
         last_name = data["last_name"], 
         email=data["email"], 
-        salt=salt, 
         role= UserRole.USER.name,
-        password=bcrypt.hashpw(bytes(data["password"], encoding='utf-8'), salt),  
+        password= pbkdf2_sha256.hash(data["password"]),
         created_at=today.strftime("%b-%d-%Y")
     )
     db.session.add(user)
@@ -32,7 +30,18 @@ def update_user(data):
     return user 
 
 def get_users():
-    return [user.to_dict() for user in User.query.all()]
+    users= [user.to_dict() for user in User.query.all()]
+    print(users)
+    return users
 
 def get_user(id):
     return User.query.get(id)
+
+def get_user_from_email_password(email, password):
+    user= User.query.filter(User.email==email).first().to_dict()
+    print('!"£"£!"£!"!"!"!"!"!"!"!"!"!"!"!')
+    print('!"£"£!"£!"!"!"!"!"!"!"!"!"!"!"!')
+    print(user)
+    print('!"£"£!"£!"!"!"!"!"!"!"!"!"!"!"!')
+    print('!"£"£!"£!"!"!"!"!"!"!"!"!"!"!"!')
+    return user

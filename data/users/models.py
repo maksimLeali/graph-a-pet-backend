@@ -12,7 +12,6 @@ class User(db.Model):
     first_name = db.Column(db.String)
     last_name = db.Column(db.String)
     email = db.Column(db.String)
-    salt = db.Column(db.String)
     password = db.Column(db.String)
     created_at = db.Column(db.Date)
     role = db.Column(db.Enum(UserRole))
@@ -23,9 +22,8 @@ class User(db.Model):
             "first_name": self.first_name,
             "last_name": self.last_name,
             "email": self.email,
-            "salt": self.salt,
             "password": self.password,
-            "role": self.role,
+            "role": self.role.name,
             "created_at": str(self.created_at.strftime('%d-%m-%Y')),
             "ownerships": self.ownerships
         }

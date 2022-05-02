@@ -1,6 +1,8 @@
 # mutations.py
 from ariadne import convert_kwargs_to_snake_case
-from domain.users import create_user, update_user
+from domain.users import create_user, update_user, get_user_from_email_password
+import jwt
+from config import cfg 
 
 
 @convert_kwargs_to_snake_case
@@ -35,10 +37,22 @@ def update_user_resolver(obj, info, id, data):
     return payload
 
 
-def resolve_login(_, info, username, password):
-    request = info.context["request"]
-    user = auth.authenticate(username, password)
-    if user:
-        auth.login(request, user)
-        return True
-    return False
+def login_resolver(_, info, email, password):
+    try :
+        print('^^^^^^^^^^^^^^')
+        print('^^^^^^^^^^^^^^')
+        print('^^^^^^^^^^^^^^')
+        print('^^^^^^^^^^^^^^')
+        print('^^^^^^^^^^^^^^')
+        user = get_user_from_email_password(email, password)
+        token = jwt.encode(user,cfg['jwt']['secret'], algorithm="HS256" )
+        payload = {
+            "success": True,
+            "token": token
+        }
+    except AttributeError:  # todo not found
+        payload = {
+            "success": False,
+            "errors": ["item matching id {id} not found"]
+        }
+    return payload

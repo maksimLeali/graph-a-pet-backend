@@ -16,6 +16,7 @@ query.set_field("getPet", get_pet_resolver)
 mutation = ObjectType("Mutation")
 mutation.set_field('createUser', create_user_resolver)
 mutation.set_field('updateUser', update_user_resolver)
+mutation.set_field('login', login_resolver)
 mutation.set_field('createPet', create_pet_resolver)
 mutation.set_field('updatePet', update_pet_resolver)
 

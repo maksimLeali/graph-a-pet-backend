@@ -19,3 +19,6 @@ def get_user(id):
 
 def add_dog(user_id, dog):
     return "ok"
+
+def get_user_from_email_password(email, password):
+    return users_data.get_user_from_email_password(email, password)

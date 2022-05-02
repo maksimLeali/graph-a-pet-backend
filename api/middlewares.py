@@ -1,9 +1,5 @@
 from domain.users import get_user
-import yaml
-import jwt
-
-with open("config.yml", "r") as ymlfile:
-    cfg = yaml.safe_load(ymlfile)
+from config import cfg 
 
 
 def auth_middleware(f):
