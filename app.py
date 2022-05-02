@@ -26,9 +26,6 @@ def graphql_server():
         context_value=request,
         debug=app.debug
     )
-    print('+*+*+§§§++§§*ùùù*§§')
-    print(success)
-    print('+*+*+§§§++§§*ùùù*§§')
-    print(result)
+
     status_code = 200 if success else 400
     return jsonify(result), status_code

@@ -15,7 +15,7 @@ def get_users():
     return users_data.get_users()
 
 def get_user(id): 
-    return users_data.get_user(id)
+    return users_data.get_user(id).to_dict()
 
 def add_dog(user_id, dog):
     return "ok"

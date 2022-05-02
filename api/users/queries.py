@@ -24,7 +24,7 @@ def get_user_resolver(obj, info, id):
         user = users_domain.get_user(id)
         payload = {
             "success": True,
-            "user": user.to_dict()
+            "user": user
         }
     except AttributeError:  # todo not found
         payload = {
