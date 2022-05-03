@@ -19,13 +19,13 @@ def get_users():
 def get_user(id): 
     return users_data.get_user(id).to_dict()
 
-def add_dog(user_id, dog):
+def create_dog_to_user(user_id, dog):
     return "ok"
 
-def login(email, password):
-    user= users_data.get_user_from_email(email)
+async def login(email, password) -> str:
+    user= await users_data.get_user_from_email(email)
     if(pbkdf2_sha256.verify(password, user['password'])):
-        return jwt.encode(user,cfg['jwt']['secret'], algorithm="HS256" )
+        return jwt.encode({"user" : user},cfg['jwt']['secret'], algorithm="HS256" )
     raise Exception('Credentials error')
     
     

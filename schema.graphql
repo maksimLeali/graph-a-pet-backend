@@ -105,5 +105,7 @@ type Mutation {
     updatePet(id: ID!, data: PetUpdate!): PetResult!
     login(email: String!, password: String!):LoginResult!
     logout: Boolean!
+    addPet(pet: PetCreate!): PetResult!
+    createPetPetUser(pet: PetCreate!, userId: string!): PetResult
 }
 

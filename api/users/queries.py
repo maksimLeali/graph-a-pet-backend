@@ -33,3 +33,8 @@ def get_user_resolver(obj, info, id):
             "errors": ["User item matching {id} not found"]
         }
     return payload
+
+@convert_kwargs_to_snake_case
+@auth_middleware
+def me_resolver(obj, info):
+    return "ok"
