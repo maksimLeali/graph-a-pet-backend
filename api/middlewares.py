@@ -1,6 +1,6 @@
 from domain.users import get_user
 from config import cfg 
-
+import jwt
 
 def auth_middleware(f):
     def function_wrapper(obj, info):

@@ -25,6 +25,5 @@ class User(db.Model):
             "password": self.password,
             "role": self.role.name,
             "created_at": str(self.created_at.strftime('%d-%m-%Y')),
-            "ownerships": self.ownerships
         }
         

@@ -1,5 +1,7 @@
 import data.users as users_data
-
+from passlib.hash import pbkdf2_sha256 
+import jwt
+from config import cfg
 
 def get_user_ownerships(obj, info):
     return []
@@ -20,5 +22,11 @@ def get_user(id):
 def add_dog(user_id, dog):
     return "ok"
 
-def get_user_from_email_password(email, password):
-    return users_data.get_user_from_email_password(email, password)
+def login(email, password):
+    user= users_data.get_user_from_email(email)
+    if(pbkdf2_sha256.verify(password, user['password'])):
+        return jwt.encode(user,cfg['jwt']['secret'], algorithm="HS256" )
+    raise Exception('Credentials error')
+    
+    
+    

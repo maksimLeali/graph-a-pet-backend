@@ -1,6 +1,6 @@
 # mutations.py
 from ariadne import convert_kwargs_to_snake_case
-from domain.users import create_user, update_user, get_user_from_email_password
+from domain.users import create_user, update_user, login
 import jwt
 from config import cfg 
 
@@ -37,10 +37,9 @@ def update_user_resolver(obj, info, id, data):
     return payload
 
 
-def login_resolver(_, info, email, password):
+def login_resolver(obj, info, email, password):
     try :
-        user = get_user_from_email_password(email, password)
-        token = jwt.encode(user,cfg['jwt']['secret'], algorithm="HS256" )
+        token =  login(email, password)
         payload = {
             "success": True,
             "token": token
