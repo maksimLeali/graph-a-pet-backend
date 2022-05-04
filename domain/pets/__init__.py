@@ -1,8 +1,9 @@
 import data.pets as pets_data
+import domain.ownerships as ownerships_domain
 
+def get_ownerships(obj, info):    
+    return ownerships_domain.get_filtered_ownerships({"pet_id": obj['id']})
 
-def get_pet_ownerships(obj, info):
-    return []
 
 def create_pet(data):
     

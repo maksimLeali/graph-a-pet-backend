@@ -11,9 +11,7 @@ class Ownership(db.Model):
     __tablename__ = 'ownerships'
     id = db.Column(db.String, primary_key=True)
     user_id = db.Column(db.String, db.ForeignKey('users.id'))
-    user = db.relationship("User")
     pet_id= db.Column(db.String, db.ForeignKey('pets.id'))
-    pet = db.relationship("Pet")
     custody_role= db.Column(db.Enum(CustodyRole))
     created_at = db.Column(db.Date)
     def to_dict(self):

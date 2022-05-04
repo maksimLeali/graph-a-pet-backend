@@ -1,6 +1,6 @@
 from ariadne import ObjectType
-from domain.pets import  get_pet_ownerships
+from domain.pets import  get_ownerships
 
 
 pet = ObjectType("Pet")
-pet.set_field("ownerships", get_pet_ownerships)
+pet.set_field("ownerships", get_ownerships)

@@ -6,8 +6,8 @@ from passlib.hash import pbkdf2_sha256
 import jwt
 from config import cfg
 
-def get_user_ownerships(obj, info):
-    return []
+def get_ownerships(obj, info):    
+    return ownerships_domain.get_filtered_ownerships({"user_id": obj['id']})
 
 def create_user(data):
     

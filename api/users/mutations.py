@@ -43,10 +43,10 @@ async def login_resolver(obj, info, email, password):
             "success": True,
             "token": token
         }
-    except AttributeError:  # todo not found
+    except Exception as e:  # todo not found
         payload = {
             "success": False,
-            "errors": ["item matching id {id} not found"]
+            "errors": [e]
         }
     return payload
 
