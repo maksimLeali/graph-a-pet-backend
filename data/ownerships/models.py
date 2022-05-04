@@ -12,13 +12,13 @@ class Ownership(db.Model):
     id = db.Column(db.String, primary_key=True)
     user_id = db.Column(db.String, db.ForeignKey('users.id'))
     pet_id= db.Column(db.String, db.ForeignKey('pets.id'))
-    custody_role= db.Column(db.Enum(CustodyRole))
+    custody_level= db.Column(db.Enum(CustodyRole))
     created_at = db.Column(db.Date)
     def to_dict(self):
         return {
             "id": self.id,
             "user_id": self.user_id,
             "pet_id": self.pet_id,
-            "custody_role": self.custody_role.name,
+            "custody_level": self.custody_level.name,
             "created_at": self.created_at
         }

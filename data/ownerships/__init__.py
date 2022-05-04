@@ -23,7 +23,7 @@ def create_ownership(data):
         id = f"{uuid.uuid4()}",
         user_id=data["user_id"], 
         pet_id=data["pet_id"], 
-        custody_role= data['custody_role'],
+        custody_level= data['custody_level'],
         created_at=today.strftime("%b-%d-%Y")
     )
     db.session.add(ownership)

@@ -30,7 +30,7 @@ def add_pet_to_user(user_id, pet):
     ownership = {
         "user_id" : user['id'],
         "pet_id": new_pet['id'],
-        "custody_role": CustodyRole.OWNER.name
+        "custody_level": CustodyRole.OWNER.name
     }
     new_ownership = ownerships_domain.create_ownership(ownership)
     return (new_pet, new_ownership)
