@@ -1,8 +1,7 @@
 # mutations.py
 from ariadne import convert_kwargs_to_snake_case
-from domain.users import create_user, update_user, login, 
-import jwt
-from config import cfg 
+from domain.users import create_user, update_user, login, add_pet_to_user
+from api.middlewares import auth_middleware
 
 
 @convert_kwargs_to_snake_case
@@ -11,7 +10,7 @@ def create_user_resolver(obj, info, data):
         user = create_user(data)
         payload = {
             "success": True,
-            "user": user.to_dict()
+            "user": user
         }
     except ValueError:  # date format errors
         payload = {
@@ -27,7 +26,7 @@ def update_user_resolver(obj, info, id, data):
         user = update_user(id, data)
         payload = {
             "success": True,
-            "user": user.to_dict()
+            "user": user
         }
     except AttributeError:  # todo not found
         payload = {
@@ -52,12 +51,20 @@ async def login_resolver(obj, info, email, password):
     return payload
 
 @convert_kwargs_to_snake_case
-async def add_pet_to_user(obj, info, pet, user_id):
+@auth_middleware
+async def add_pet_to_user_resolver(obj, info, pet, user_id):
+    print('**+***********')
+    print(user_id)
+    print(pet)
     try: 
-        pet
+        new_pet, new_ownership = add_pet_to_user(user_id, pet)
+        print('*****')
         payload= {
             "succes": True,
-            "pet": pet
+            "data": {
+                "pet" : new_pet,
+                "ownership": new_ownership
+            }
         }
     except Exception:
         payload = {

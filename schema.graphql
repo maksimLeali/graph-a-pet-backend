@@ -35,6 +35,7 @@ type Ownership {
     id: ID!
     user: User!
     pet: Pet!
+    custodyRole: CustodyRole!
 }
 
 input UserUpdate {
@@ -89,6 +90,16 @@ type PetsResult {
     errors: [String]
     pets: [Pet]!
 }
+type NewOwnership {
+    pet: Pet!
+    ownership: Ownership!
+}
+
+type PetAddedResult {
+    success: Boolean!
+    errors: [String]
+    data: NewOwnership!
+}
 
 type Query {
     listUsers: UsersResult!
@@ -106,6 +117,6 @@ type Mutation {
     login(email: String!, password: String!):LoginResult!
     logout: Boolean!
     addPet(pet: PetCreate!): PetResult!
-    createPetPetUser(pet: PetCreate!, userId: string!): PetResult
+    addPetToUser(pet: PetCreate!, userId: String!): PetAddedResult!
 }
 

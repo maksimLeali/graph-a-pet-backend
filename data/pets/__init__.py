@@ -15,7 +15,7 @@ def create_pet(data):
     )
     db.session.add(pet)
     db.session.commit()
-    return pet
+    return pet.to_dict()
     
 def update_pet(data):
 
@@ -24,7 +24,7 @@ def update_pet(data):
         pet= {**pet, **data}
     db.session.add(pet)
     db.session.commit()
-    return pet 
+    return pet
 
 def get_pets():
     return [pet.to_dict() for pet in Pet.query.all()]

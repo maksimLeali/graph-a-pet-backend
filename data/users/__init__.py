@@ -18,9 +18,9 @@ def create_user(data):
     )
     db.session.add(user)
     db.session.commit()
-    return user
+    return user.to_dict()
     
-def update_user(data):
+def update_user(data, id):
 
     user = User.query.get(id)
     if user:
@@ -34,7 +34,7 @@ def get_users():
 
 
 def get_user(id):
-    return User.query.get(id)
+    return User.query.get(id).to_dict()
 
 async def get_user_from_email(email) -> User:
      return User.query.filter(User.email==email).first().to_dict()

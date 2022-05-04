@@ -15,10 +15,12 @@ class Ownership(db.Model):
     pet_id= db.Column(db.String, db.ForeignKey('pets.id'))
     pet = db.relationship("Pet")
     custody_role= db.Column(db.Enum(CustodyRole))
+    created_at = db.Column(db.Date)
     def to_dict(self):
         return {
             "id": self.id,
             "user_id": self.user_id,
             "pet_id": self.pet_id,
-            "custody_role": self.custody_role
+            "custody_role": self.custody_role,
+            "created_at": self.created_at
         }

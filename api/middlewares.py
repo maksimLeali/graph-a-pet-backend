@@ -3,7 +3,7 @@ from config import cfg
 import jwt
 
 def auth_middleware(f):
-    def function_wrapper(obj, info):
+    def function_wrapper(obj, info, **args):
         try :
             print(info.context.headers['authorization'].split('Bearer ')[1])
             bearer = info.context.headers['authorization'].split('Bearer ')[1]
@@ -13,5 +13,5 @@ def auth_middleware(f):
         except :
             raise Exception('unauthorized')      
             
-        return f(obj, info)
+        return f(obj, info, **args)
     return function_wrapper
