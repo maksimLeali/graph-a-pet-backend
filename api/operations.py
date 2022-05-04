@@ -1,13 +1,13 @@
 from ariadne import ObjectType
+from api.users.resolvers import user
 from api.users.queries import *
 from api.users.mutations import *
-from api.pets.mutations import *
-from api.ownerships.mutations import *
-from api.pets.queries import *
-from api.ownerships.queries import *
-from api.users.resolvers import user
 from api.pets.resolvers import pet
+from api.pets.queries import *
+from api.pets.mutations import *
 from api.ownerships.resolvers import ownership
+from api.ownerships.queries import *
+from api.ownerships.mutations import *
 
 
 query = ObjectType("Query")

@@ -1,5 +1,5 @@
 import data.users as users_data
-from data.ownerships.models import Ownership, CustodyRole
+from data.ownerships.models import Ownership, CustodyLevel
 import domain.pets as pets_domain
 import domain.ownerships as ownerships_domain
 from passlib.hash import pbkdf2_sha256 
@@ -30,16 +30,19 @@ def add_pet_to_user(user_id, pet):
     ownership = {
         "user_id" : user['id'],
         "pet_id": new_pet['id'],
-        "custody_level": CustodyRole.OWNER.name
+        "custody_level": CustodyLevel.OWNER.name
     }
     new_ownership = ownerships_domain.create_ownership(ownership)
     return (new_pet, new_ownership)
 
 async def login(email, password) -> str:
-    user= await users_data.get_user_from_email(email)
-    if(pbkdf2_sha256.verify(password, user['password'])):
-        return jwt.encode({"user" : user},cfg['jwt']['secret'], algorithm="HS256" )
-    raise Exception('Credentials error')
+    try:
+        user= await users_data.get_user_from_email(email)
+        if(pbkdf2_sha256.verify(password, user['password'])):
+            return jwt.encode({"user" : user},cfg['jwt']['secret'], algorithm="HS256" )
+        raise Exception
+    except:
+        raise Exception('Credentials error')
     
     
     

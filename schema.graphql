@@ -8,7 +8,7 @@ enum UserRole {
     ADMIN
 }
 
-enum CustodyRole {
+enum CustodyLevel {
     SUB_OWNER,
     OWNER,
     PET_SITTER,
@@ -35,7 +35,7 @@ type Ownership {
     id: ID!
     user: User!
     pet: Pet!
-    custodyLevel: CustodyRole!
+    custody_level: CustodyLevel!
 }
 
 input UserUpdate {
@@ -52,7 +52,7 @@ input UserCreate {
 }
 
 input OwnershipUpdate {
-    custodyLevel: CustodyRole!
+    custody_level: CustodyLevel!
 }
 
 type UserResult {
