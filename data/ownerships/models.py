@@ -21,6 +21,6 @@ class Ownership(db.Model):
             "id": self.id,
             "user_id": self.user_id,
             "pet_id": self.pet_id,
-            "custody_role": self.custody_role,
+            "custody_role": self.custody_role.name,
             "created_at": self.created_at
         }

@@ -53,19 +53,15 @@ async def login_resolver(obj, info, email, password):
 @convert_kwargs_to_snake_case
 @auth_middleware
 async def add_pet_to_user_resolver(obj, info, pet, user_id):
-    print('**+***********')
-    print(user_id)
-    print(pet)
     try: 
         new_pet, new_ownership = add_pet_to_user(user_id, pet)
-        print('*****')
         payload= {
-            "succes": True,
+            "success": True,
             "data": {
                 "pet" : new_pet,
                 "ownership": new_ownership
             }
-        }
+        }        
     except Exception:
         payload = {
             "success": False,

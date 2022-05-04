@@ -30,4 +30,4 @@ def get_pets():
     return [pet.to_dict() for pet in Pet.query.all()]
 
 def get_pet(id):
-    return Pet.query.get(id)
+    return Pet.query.get(id).to_dict()

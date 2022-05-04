@@ -51,6 +51,10 @@ input UserCreate {
     password: String!
 }
 
+input OwnershipUpdate {
+    custodyRole: CustodyRole!
+}
+
 type UserResult {
     success: Boolean!
     errors: [String]
@@ -90,6 +94,18 @@ type PetsResult {
     errors: [String]
     pets: [Pet]!
 }
+
+type OwnershipResult {
+    success: Boolean!
+    errors: [String]
+    ownership: Ownership
+}
+
+type OwnershipsResult {
+    success: Boolean!
+    errors: [String]
+    ownerships: [Ownership]!
+}
 type NewOwnership {
     pet: Pet!
     ownership: Ownership!
@@ -107,6 +123,8 @@ type Query {
     listPets: UsersResult!
     getPet(id: ID!): UserResult!
     isAuthenticated: Boolean!
+    getOwnership: OwnershipResult!
+    listOwnerships: OwnershipsResult!
 }
 
 type Mutation {
@@ -114,6 +132,7 @@ type Mutation {
     updateUser(id: ID!, data: UserUpdate!): UserResult!
     createPet(data: PetCreate!): PetResult!
     updatePet(id: ID!, data: PetUpdate!): PetResult!
+    updateOwnership(id:ID!, data: OwnershipUpdate!): OwnershipResult!
     login(email: String!, password: String!):LoginResult!
     logout: Boolean!
     addPet(pet: PetCreate!): PetResult!

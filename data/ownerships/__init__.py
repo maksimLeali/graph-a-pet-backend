@@ -30,6 +30,6 @@ def get_ownerships():
 
 
 def get_ownership(id):
-    return Ownership.query.get(id)
+    return Ownership.query.get(id).to_dict()
 
     

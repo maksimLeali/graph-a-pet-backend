@@ -1,6 +1,9 @@
 import data.ownerships as ownerships_data
 
-def get_owenrship_user():
+def get_pet(obj,info):
+    return 'pet'
+
+def get_user(obj, info):
     return "ok"
 
 def create_ownership(data):
