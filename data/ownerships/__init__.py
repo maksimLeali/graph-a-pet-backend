@@ -1,9 +1,10 @@
 import uuid
-from datetime import date
+from datetime import datetime
 import pydash as py_
+from sqlalchemy import select, text
+
 from data.ownerships.models import Ownership
 from data import db
-from sqlalchemy import select, text
 from libs.utils import camel_to_snake
 
 def build_where(filters) -> str: 
@@ -18,7 +19,7 @@ def build_query(filters, pagination, ordering ):
     
 
 def create_ownership(data):
-    today = date.today()
+    today = datetime.today()
     ownership = Ownership(
         id = f"{uuid.uuid4()}",
         user_id=data["user_id"], 

@@ -1,12 +1,12 @@
 from passlib.hash import pbkdf2_sha256 
 import uuid
-from datetime import date
+from datetime import datetime
 
 from data.users.models import User, UserRole
 from data import db
 
 def create_user(data):
-    today = date.today()
+    today = datetime.today()
     user = User(
         id = f"{uuid.uuid4()}",
         first_name = data["first_name"], 

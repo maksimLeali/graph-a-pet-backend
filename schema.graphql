@@ -14,6 +14,26 @@ enum CustodyLevel {
     PET_SITTER,
 }
 
+enum CoatLength {
+    SHORT,
+    MEDIUM,
+    LENGHT,
+    HAIRLESS
+}
+
+enum CoatPattern{
+    MERLE,
+    BRINDLE,
+    HARLEQUIN,
+    TICKED,
+    SPOTTED
+    ROAN,
+    TRICOLOR,
+    BICOLOR,
+    SOLID,
+    COLORPOINT
+}
+
 type User {
     id: ID!
     first_name: String!
@@ -24,11 +44,22 @@ type User {
     ownerships: [Ownership]!
 }
 
+type Coat {
+    id: ID!
+    length: CoatLength!
+    colors: [String]!
+    pattern: CoatPattern!
+}
+
 type Pet {
     id: ID!
     name: String!
     race: String!
     ownerships: [Ownership]!
+    coat: Coat!
+    birthday: String!
+    neutered: Boolean!
+
 }
 
 type Ownership {
@@ -36,6 +67,12 @@ type Ownership {
     user: User!
     pet: Pet!
     custody_level: CustodyLevel!
+}
+
+input CoatCreate{
+    length: CoatLength!
+    colors: [String]!
+    pattern: CoatPattern!
 }
 
 input UserUpdate {
@@ -81,6 +118,9 @@ input PetUpdate {
 input PetCreate {
     name: String!
     race: String!
+    coat: CoatCreate!
+    birthday: String!
+    neutered: Boolean!
 }
 
 type PetResult {
