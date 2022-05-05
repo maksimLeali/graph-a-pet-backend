@@ -8,11 +8,6 @@ def get_ownerships(obj, info):
 
 def create_pet(data):
     coat = coats_domain.create_coat(data['coat'])
-    print('*********************')
-    print('*********************')
-    print(coat)
-    print('*********************')
-    print('*********************')
     data['coat_id'] = coat['id']
     return pets_data.create_pet(data)
 
