@@ -3,8 +3,10 @@ import domain.ownerships as ownerships_domain
 import domain.coats as coats_domain
 
 def get_ownerships(obj, info):    
-    return ownerships_domain.get_filtered_ownerships({"pet_id": obj['id']})
+    return ownerships_domain.get_filtered_ownerships({"lists": None, "ranges": None, "fixeds": {"user_id": obj['id']}})
 
+def get_coat(obj, info):
+    return coats_domain.get_coat(obj['coat_id'])
 
 def create_pet(data):
     coat = coats_domain.create_coat(data['coat'])

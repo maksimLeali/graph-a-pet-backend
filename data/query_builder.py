@@ -23,7 +23,7 @@ def format_range_filters(filters: Dict[str, Dict[str, str ]]) -> str :
                 f"{(' < '+ quote + str(filters[key]['max']) ) + quote if  'max' in filters[key] else '' }" \
                 f"{' AND ' if i < len(filters.keys()) else '' }"
     except Exception as e:
-        print(e)            
+        pass       
     return formatted_filters
 
 def format_fixed_filters(filters: Dict[str,str]) -> str :
@@ -32,7 +32,7 @@ def format_fixed_filters(filters: Dict[str,str]) -> str :
         for i, key in enumerate(filters.keys(), start=1):
             formatted_filters += f"{camel_to_snake(key)} = '{filters[key]}' {'AND' if i < len(filters.keys()) else '' }"
     except Exception as e:
-        print(e)            
+        pass           
     return formatted_filters
 
 def format_list_filters(filters: Dict[str, list]) -> str:
@@ -42,23 +42,18 @@ def format_list_filters(filters: Dict[str, list]) -> str:
             separetor= "', '"
             formatted_filters += f"{camel_to_snake(key)} in ('{ separetor.join(filters[key])}') {'AND' if i < len(filters.keys()) else '' }"
     except Exception as e:
-        print(e)            
+        pass           
     return formatted_filters
     
 
 def build_where(filters: Dict[str, dict] = { "fixeds" : None, "lists": None, "ranges": None}, search: str = "", search_fields: list= []) -> str:
-    print(filters)
     filters_to_format= []
     formatted_fixed_filters= format_fixed_filters(filters["fixeds"])
-    print('ééééééé')
     formatted_list_filters= format_list_filters(filters["lists"])
     formatted_range_filters= format_range_filters(filters['ranges'])
     formatted_search = ""
     search_list = []
     
-    print(formatted_fixed_filters)
-    print(formatted_list_filters)
-    print(formatted_range_filters)
     if len(formatted_fixed_filters) > 0 :
         filters_to_format.append(formatted_fixed_filters)
     if len(formatted_list_filters) > 0 :
@@ -67,7 +62,7 @@ def build_where(filters: Dict[str, dict] = { "fixeds" : None, "lists": None, "ra
         filters_to_format.append(formatted_range_filters)
     formatted_filters = ' AND '.join(filters_to_format)
     
-    print(formatted_filters)
+ 
     
     if len(search) > 0:
         to_permutate= search.split(' ')

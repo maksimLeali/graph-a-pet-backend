@@ -35,8 +35,8 @@ class Coat(db.Model):
     def to_dict(self):
         return {
             "id": self.id,
-            "colora": self.colors,
-            "pattenr": self.pattern,
-            "length": self.length,
+            "colors": self.colors,
+            "pattern": self.pattern.name,
+            "length": self.length.name,
             "created_at": str(self.created_at)
         }
