@@ -46,11 +46,12 @@ def format_list_filters(filters: Dict[str, list]) -> str:
     return formatted_filters
     
 
-def build_where(filters: Dict[str, dict], search: str, search_fields: list) -> str:
-    
+def build_where(filters: Dict[str, dict] = { "fixeds" : None, "lists": None, "ranges": None}, search: str = "", search_fields: list= []) -> str:
+    print(filters)
     filters_to_format= []
-    formatted_list_filters= format_list_filters(filters["lists"])
     formatted_fixed_filters= format_fixed_filters(filters["fixeds"])
+    print('ééééééé')
+    formatted_list_filters= format_list_filters(filters["lists"])
     formatted_range_filters= format_range_filters(filters['ranges'])
     formatted_search = ""
     search_list = []

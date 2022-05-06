@@ -7,7 +7,7 @@ import jwt
 from config import cfg
 
 def get_ownerships(obj, info):    
-    return ownerships_domain.get_filtered_ownerships({"user_id": obj['id']})
+    return ownerships_domain.get_filtered_ownerships({"lists": None, "ranges": None, "fixeds": {"user_id": obj['id']}})
 
 def create_user(data):
     

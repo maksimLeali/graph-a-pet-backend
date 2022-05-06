@@ -1,22 +1,11 @@
 import uuid
 from datetime import datetime
-import pydash as py_
 from sqlalchemy import select, text
 
 from data.ownerships.models import Ownership
 from data import db
-from libs.utils import camel_to_snake
+from data.query_builder import build_where
 
-def build_where(filters) -> str: 
-    keys= py_.keys(filters)
-    formatted_values=""
-    for i, key in enumerate(keys, start=1):
-        formatted_values+= (f"{camel_to_snake(key)} = '{filters[key]}' {'AND' if i < len(filters) else '' }") 
-    return f"WHERE { formatted_values }"
-
-def build_query(filters, pagination, ordering ):
-    return "ok"
-    
 
 def create_ownership(data):
     today = datetime.today()
