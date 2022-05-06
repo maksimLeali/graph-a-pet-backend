@@ -15,11 +15,12 @@ def format_range_filters(filters: Dict[str, Dict[str, str ]]) -> str :
     formatted_filters= ""
     try :
         for i, key in enumerate(filters.keys(), start=1):
+            quote= "'"
             formatted_filters += \
                 f"{camel_to_snake(key)}" \
-                f"{(' > ' + str(filters[key]['min']) ) if  'min' in filters[key] else '' } " \
+                f"{(' > ' + quote + str(filters[key]['min']) )+ quote if  'min' in filters[key] else '' }" \
                 f"{' AND ' + camel_to_snake(key) if len(filters[key]) > 1 else '' }" \
-                f"{(' < ' + str(filters[key]['max']) ) if  'max' in filters[key] else '' } " \
+                f"{(' < '+ quote + str(filters[key]['max']) ) + quote if  'max' in filters[key] else '' }" \
                 f"{' AND ' if i < len(filters.keys()) else '' }"
     except Exception as e:
         print(e)            
@@ -29,7 +30,7 @@ def format_fixed_filters(filters: Dict[str,str]) -> str :
     formatted_filters= ""
     try :
         for i, key in enumerate(filters.keys(), start=1):
-            formatted_filters += f"{camel_to_snake(key)} = '{filters[key]}' {'AND' if i < len(filters.keys()) else '' } "
+            formatted_filters += f"{camel_to_snake(key)} = '{filters[key]}' {'AND' if i < len(filters.keys()) else '' }"
     except Exception as e:
         print(e)            
     return formatted_filters
@@ -39,7 +40,7 @@ def format_list_filters(filters: Dict[str, list]) -> str:
     try :
         for i, key in enumerate(filters.keys(), start=1):
             separetor= "', '"
-            formatted_filters += f"{camel_to_snake(key)} in ('{ separetor.join(filters[key])}') {'AND' if i < len(filters.keys()) else '' } "
+            formatted_filters += f"{camel_to_snake(key)} in ('{ separetor.join(filters[key])}') {'AND' if i < len(filters.keys()) else '' }"
     except Exception as e:
         print(e)            
     return formatted_filters
@@ -78,7 +79,7 @@ def build_where(filters: Dict[str, dict], search: str, search_fields: list) -> s
                 f"LOWER({camel_to_snake(field)}) LIKE LOWER('%{value}%') "  \
                 f"{'OR' if i <  len(search_list) or k < len(search_fields) else ')'} "
     return f"{'WHERE ' if filters or search else ''}{ formatted_filters}"  \
-            f"{'AND' if len(formatted_filters) > 0 and len(formatted_search) > 0  else ''} {formatted_search}"
+            f"{' AND ' if len(formatted_filters) > 0 and len(formatted_search) > 0  else ''}{formatted_search}"
 
 
 def build_simple_query(table: str, search, search_fields, pagination: Dict[str, int], ordering: Dict[str, str], filters: dict = {"fixeds" : None, "lists": None, "ranges": None} ):
