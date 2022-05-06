@@ -3,6 +3,37 @@ schema {
     mutation: Mutation
 }
 
+type Query {
+    listUsers(commonSearch: CommonSearch): UsersResult!
+    getUser(id: ID!): UserResult!
+    listPets(commonSearch: CommonSearch): UsersResult!
+    getPet(id: ID!): UserResult!
+    isAuthenticated(commonSearch: CommonSearch): Boolean!
+    getOwnership(id: ID!): OwnershipResult!
+    listOwnerships(commonSearch: CommonSearch): OwnershipsResult!
+}
+
+type Mutation {
+    createUser(data: UserCreate!): UserResult!
+    updateUser(id: ID!, data: UserUpdate!): UserResult!
+    createPet(data: PetCreate!): PetResult!
+    updatePet(id: ID!, data: PetUpdate!): PetResult!
+    updateOwnership(id:ID!, data: OwnershipUpdate!): OwnershipResult!
+    login(email: String!, password: String!):LoginResult!
+    logout: Boolean!
+    addPet(pet: PetCreate!): PetResult!
+    addPetToUser(pet: PetCreate!, userId: String!): PetAddedResult!
+}
+
+input CommonSearch {
+    page: Number = 0
+    page_size: Number = 20
+    order_by: String = "created_at"
+    order_direction: String = "desc"
+    search: String = ""
+    search_fieds: [String] = []
+}
+
 enum UserRole {
     USER,
     ADMIN
@@ -155,27 +186,5 @@ type PetAddedResult {
     success: Boolean!
     errors: [String]
     data: NewOwnership!
-}
-
-type Query {
-    listUsers: UsersResult!
-    getUser(id: ID!): UserResult!
-    listPets: UsersResult!
-    getPet(id: ID!): UserResult!
-    isAuthenticated: Boolean!
-    getOwnership(id: ID!): OwnershipResult!
-    listOwnerships: OwnershipsResult!
-}
-
-type Mutation {
-    createUser(data: UserCreate!): UserResult!
-    updateUser(id: ID!, data: UserUpdate!): UserResult!
-    createPet(data: PetCreate!): PetResult!
-    updatePet(id: ID!, data: PetUpdate!): PetResult!
-    updateOwnership(id:ID!, data: OwnershipUpdate!): OwnershipResult!
-    login(email: String!, password: String!):LoginResult!
-    logout: Boolean!
-    addPet(pet: PetCreate!): PetResult!
-    addPetToUser(pet: PetCreate!, userId: String!): PetAddedResult!
 }
 
