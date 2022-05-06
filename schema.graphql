@@ -25,13 +25,38 @@ type Mutation {
     addPetToUser(pet: PetCreate!, userId: String!): PetAddedResult!
 }
 
+input FixedFilter {
+    key: String!
+}
+
+input ListFilter {
+    key: [String]!
+}
+
+input RangeFilterValue {
+    min: String
+    max: String
+}
+
+input RangeFilter {
+    key: RangeFilterValue
+}
+
+input Filters {
+    fixeds: [FixedFilter]!
+    ranges: [RangeFilter]!
+    lists: [ListFilter]!
+}
+
+
 input CommonSearch {
-    page: Number = 0
-    page_size: Number = 20
+    page: Int = 0
+    page_size: Int = 20
     order_by: String = "created_at"
     order_direction: String = "desc"
     search: String = ""
     search_fieds: [String] = []
+    filters: Filters
 }
 
 enum UserRole {
