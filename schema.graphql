@@ -7,7 +7,7 @@ type Query {
     listUsers(commonSearch: CommonSearch): UsersResult!
     getUser(id: ID!): UserResult!
     listPets(commonSearch: CommonSearch): UsersResult!
-    getPet(id: ID!): UserResult!
+    getPet(id: ID!): PetResult!
     isAuthenticated(commonSearch: CommonSearch): Boolean!
     getOwnership(id: ID!): OwnershipResult!
     listOwnerships(commonSearch: CommonSearch): OwnershipsResult!
