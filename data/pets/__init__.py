@@ -17,42 +17,27 @@ def build_where(filters) -> str:
     return f"WHERE { formatted_values }"
 
 
-def create_pet(data):
+def create_pet(data: dict):
     today = datetime.today()
-    print('?????????????')
-    print('?????????????')
-    print('?????????????')
-    print('?????????????')
-    print('?????????????')
-    print('?????????????')
-    print(data)
 
-    try :
-        pet = Pet(
-            id=f"{uuid.uuid4()}",
-            name=data["name"] if data["name"] else None,
-            birthday=data["birthday"] if data["birthday"] else None,
-            neutered=data["neutered"] if data["neutered"] else False,
-            body_id=data["body_id"] if data["body_id"] else None,
-            gender=data["gender"] if data["gender"] else Gender.MALE.name,
-            disciplines=data['disciplines'] if data['disciplines'] else [],
-            temperament=data['temperament'] if data['temperament'] else "",
-            weight_kg=data["weight_kg"] if data["weight_kg"] else 0,
-            chip_code=data["chip_code"] if data["chip_code"] else "",
-            diet=data['diet'] if data['diet'] else [],
-            intollerance=data["intollerance"] if data["intollerance"] else [] ,
-            created_at=today.strftime("%b-%d-%Y")
-        )
-        print('***+ùùù§§§§§§§§§§§§§§§')
-        db.session.add(pet)
-        db.session.commit()
-    except Exception as e: 
-        print(e)
-    print('§§§§§§§§§§§§§§§§§§§')
-    print('§§§§§§§§§§§§§§§§§§§')
-    print(pet)
-    print('§§§§§§§§§§§§§§§§§§§')
-    print('§§§§§§§§§§§§§§§§§§§')
+    pet = Pet(
+        id=f"{uuid.uuid4()}",
+        name=data.get("name"),
+        birthday=data.get("birthday") ,
+        neutered=data.get("neutered") ,
+        body_id=data.get("body_id") ,
+        gender=data.get("gender") ,
+        disciplines=data.get('disciplines') ,
+        temperament=data.get('temperament') ,
+        weight_kg=data.get("weight_kg") ,
+        chip_code=data.get("chip_code") ,
+        diet=data.get('diet'),
+        intollerance=data.get("intollerance") ,
+        created_at=today.strftime("%b-%d-%Y")
+    )
+    db.session.add(pet)
+    db.session.commit()
+
     return pet.to_dict()
 
 

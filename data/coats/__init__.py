@@ -12,11 +12,6 @@ def create_coat(data):
         colors= data['colors'],
         created_at=today.strftime("%b-%d-%Y")
     )
-    print('^^^+++')
-    print('^^^+++')
-    print('^^^+++')
-    print('^^^+++')
-    print('^^^+++')
     db.session.add(coat)
     db.session.commit()
     return coat.to_dict()

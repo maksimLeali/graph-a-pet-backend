@@ -21,7 +21,7 @@ class Pet(db.Model):
     body_id= db.Column(db.String, db.ForeignKey('pet_bodies.id'))
     chip_code=db.Column(db.String)
     gender= db.Column(db.Enum(Gender), default = Gender.NOT_SAID.name)
-    weigth_kg= db.Column(db.Float)
+    weight_kg= db.Column(db.Float)
     temperament= db.Column(db.String)
     diet= db.Column(db.ARRAY(db.String), default=[])
     intollerance= db.Column(db.ARRAY(db.String), default= [])
@@ -37,7 +37,7 @@ class Pet(db.Model):
             "body_id": self.body_id,
             "gender": self.gender.name,        
             "chip_code": self.chip_code,        
-            "weigth_kg": self.weigth_kg,        
+            "weight_kg": self.weight_kg,        
             "temperament": self.temperament,        
             "diet": self.diet,        
             "intollerance": self.intollerance,        

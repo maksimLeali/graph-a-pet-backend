@@ -5,11 +5,6 @@ from data import db
 
 def create_pet_body(data):
     today = datetime.today()
-
-    print('////////')
-    print('////////')
-    print('////////')
-    print(data)
     pet_body = PetBody(
         id = f"{uuid.uuid4()}",
         breed=data["breed"], 
@@ -19,8 +14,6 @@ def create_pet_body(data):
     )
     db.session.add(pet_body)
     db.session.commit()
-
-    print(pet_body.to_dict())
     return pet_body.to_dict()
     
 def update_pet_body(data):
