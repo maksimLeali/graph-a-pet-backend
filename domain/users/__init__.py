@@ -23,6 +23,12 @@ def get_user(id):
     return users_data.get_user(id)
 
 def add_pet_to_user(user_id, pet):
+    print('#######################')
+    print('#######################')
+    print('#######################')
+    print('#######################')
+    print('#######################')
+    print('#######################')
     user= users_data.get_user(user_id)
     if(not user):
         raise Exception(f"no user found with id: {user_id}")

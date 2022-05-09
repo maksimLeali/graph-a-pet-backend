@@ -70,10 +70,35 @@ enum CustodyLevel {
     PET_SITTER,
 }
 
+enum Gender {
+    MALE,
+    FEMALE,
+    NOT_SAID
+}
+
+enum CoatName {
+    FUR,
+    SCALES,
+    FEATHERS,
+    SKIN,
+    SHED,
+    COAT
+}
+
+enum PetFamily {
+    CANINE,
+    FELINE, 
+    SERPENTES,
+    BIRDS,
+    ARACNIDE,
+    INSECT,
+    LIZARD
+}
+
 enum CoatLength {
     SHORT,
     MEDIUM,
-    LENGHT,
+    LONG,
     HAIRLESS
 }
 
@@ -102,20 +127,52 @@ type User {
 
 type Coat {
     id: ID!
+    name: String!
     length: CoatLength!
     colors: [String]!
     pattern: CoatPattern!
 }
 
+type PetBody {
+    id: ID!
+    coat: Coat!
+    image: Media!
+    tags: [Tag]!
+    family: PetFamily!
+    breed: String!
+}
+
+input PetBodyCreate {
+    family: PetFamily!
+    breed: String!
+    coat: CoatCreate!
+}
+
+type Tag {
+    id: ID!
+    text: String!
+}
+
 type Pet {
     id: ID!
     name: String!
-    race: String!
     ownerships: [Ownership]!
-    coat: Coat!
+    body: PetBody!
     birthday: String!
     neutered: Boolean!
+    gender: Gender!
+    chip_code: String
+    weigth_kg: Float
+    temperament: String
+    diet: [String]
+    intollerance: [String]
+    disciplines: [String]
+}
 
+type Media {
+    id: ID!
+    src: String
+    type: String!
 }
 
 type Ownership {
@@ -168,22 +225,29 @@ type LoginResult {
 
 input PetUpdate {
     name: String
-    race: String
+    breed: String
 }
 
 input PetCreate {
     name: String!
-    race: String!
-    coat: CoatCreate!
+    body: PetBodyCreate!
     birthday: String!
     neutered: Boolean!
+    gender: Gender!
+    chip_code: String
+    weigth_kg: Float
+    temperament: String
+    diet: [String]
+    intollerance: [String]
+    disciplines: [String]
+
 }
 
 type PetResult {
     success: Boolean!
     errors: [String]
     pet: Pet
-}
+} 
 
 type PetsResult {
     success: Boolean!

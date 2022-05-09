@@ -5,7 +5,7 @@ from itertools import permutations
 
 deafult_search_columns: dict = {
     "users": ['first_name', 'last_name', 'email', ],
-    "pets": ["name", "race"],
+    "pets": ["name", "breed"],
     "coats": ['pattern'],
     "ownerships": ['role']
 }
