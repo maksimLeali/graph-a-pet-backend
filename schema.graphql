@@ -25,6 +25,8 @@ type Mutation {
     addPetToUser(pet: PetCreate!, userId: String!): PetAddedResult!
 }
 
+scalar Upload
+
 input FixedFilter {
     key: String!
 }
@@ -131,6 +133,7 @@ type Coat {
     length: CoatLength!
     colors: [String]!
     pattern: CoatPattern!
+    texture: String!
 }
 
 type PetBody {
