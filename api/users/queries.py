@@ -4,7 +4,8 @@ from api.middlewares import auth_middleware
 
 @convert_kwargs_to_snake_case
 @auth_middleware
-def list_users_resolver(obj, info):
+def list_users_resolver(obj, info, commonSearch):
+    print(commonSearch)
     try:
         user = users_domain.get_users()
         payload = {

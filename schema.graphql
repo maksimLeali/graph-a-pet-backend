@@ -27,43 +27,14 @@ type Mutation {
 
 scalar Upload
 
-input FixedFilter {
-    key: String!
-}
-
-input ListFilter {
-    key: [String]!
-}
-
-input RangeFilterValue {
-    min: String
-    max: String
-}
-
-input RangeFilter {
-    key: RangeFilterValue
-}
-
-input Filters {
-    fixeds: [FixedFilter]!
-    ranges: [RangeFilter]!
-    lists: [ListFilter]!
-}
-
-
-input CommonSearch {
-    page: Int = 0
-    page_size: Int = 20
-    order_by: String = "created_at"
-    order_direction: String = "desc"
-    search: String = ""
-    search_fieds: [String] = []
-    filters: Filters
-}
-
 enum UserRole {
     USER,
     ADMIN
+}
+enum TreatmentType {
+    VACCINE,
+    ANTIPARASITE,
+    OPERATION
 }
 
 enum CustodyLevel {
@@ -145,12 +116,6 @@ type PetBody {
     breed: String!
 }
 
-input PetBodyCreate {
-    family: PetFamily!
-    breed: String!
-    coat: CoatCreate!
-}
-
 type Tag {
     id: ID!
     text: String!
@@ -164,6 +129,7 @@ type Pet {
     birthday: String!
     neutered: Boolean!
     gender: Gender!
+    health_card: HealthCard
     chip_code: String
     weigth_kg: Float
     temperament: String
@@ -185,28 +151,6 @@ type Ownership {
     custody_level: CustodyLevel!
 }
 
-input CoatCreate{
-    length: CoatLength!
-    colors: [String]!
-    pattern: CoatPattern!
-}
-
-input UserUpdate {
-    first_name: String
-    last_name: String
-    email: String
-}
-
-input UserCreate {
-    first_name: String!
-    last_name: String!
-    email: String!
-    password: String!
-}
-
-input OwnershipUpdate {
-    custody_level: CustodyLevel!
-}
 
 type UserResult {
     success: Boolean!
@@ -220,31 +164,18 @@ type UsersResult {
     users: [User]!
 }
 
+type PaginatedUsers {
+    success: Boolean
+    errors: [String]
+    item12
+}
+
 type LoginResult {
     success: Boolean!
     errors: [String]
     token: String!
 }
 
-input PetUpdate {
-    name: String
-    breed: String
-}
-
-input PetCreate {
-    name: String!
-    body: PetBodyCreate!
-    birthday: String!
-    neutered: Boolean!
-    gender: Gender!
-    chip_code: String
-    weigth_kg: Float
-    temperament: String
-    diet: [String]
-    intollerance: [String]
-    disciplines: [String]
-
-}
 
 type PetResult {
     success: Boolean!
@@ -280,3 +211,101 @@ type PetAddedResult {
     data: NewOwnership!
 }
 
+type HealthCard {
+    id: ID!
+    logs: [String]!
+    events: [Treatment]!
+}
+
+type Treatment {
+    id: ID!
+    name: String!
+    created_at: String!
+    type: TreatmentType!
+    date: String!
+    notes: String
+    booster_date: String
+}
+
+input FixedFilter {
+    key: String!
+}
+
+input ListFilter {
+    key: [String]!
+}
+
+input RangeFilterValue {
+    min: String
+    max: String
+}
+
+input RangeFilter {
+    key: RangeFilterValue
+}
+
+input Filters {
+    fixeds: [FixedFilter]!
+    ranges: [RangeFilter]!
+    lists: [ListFilter]!
+}
+
+
+input CommonSearch {
+    page: Int = 0
+    page_size: Int = 20
+    order_by: String = "created_at"
+    order_direction: String = "desc"
+    search: String = ""
+    search_fieds: [String] = []
+    filters: Filters
+}
+
+input PetBodyCreate {
+    family: PetFamily!
+    breed: String!
+    coat: CoatCreate!
+}
+
+input CoatCreate{
+    length: CoatLength!
+    colors: [String]!
+    pattern: CoatPattern!
+}
+
+input UserUpdate {
+    first_name: String
+    last_name: String
+    email: String
+}
+
+input UserCreate {
+    first_name: String!
+    last_name: String!
+    email: String!
+    password: String!
+}
+
+input OwnershipUpdate {
+    custody_level: CustodyLevel!
+}
+
+input PetUpdate {
+    name: String
+    breed: String
+}
+
+input PetCreate {
+    name: String!
+    body: PetBodyCreate!
+    birthday: String!
+    neutered: Boolean!
+    gender: Gender!
+    chip_code: String
+    weigth_kg: Float
+    temperament: String
+    diet: [String]
+    intollerance: [String]
+    disciplines: [String]
+
+}
