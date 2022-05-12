@@ -167,7 +167,7 @@ type UsersResult {
 type PaginatedUsers {
     success: Boolean
     errors: [String]
-    item12
+  
 }
 
 type LoginResult {
@@ -229,10 +229,12 @@ type Treatment {
 
 input FixedFilter {
     key: String!
+    value: String!
 }
 
 input ListFilter {
-    key: [String]!
+    key: String,
+    value: [String]!
 }
 
 input RangeFilterValue {
@@ -241,13 +243,14 @@ input RangeFilterValue {
 }
 
 input RangeFilter {
-    key: RangeFilterValue
+    key: String!
+    value: RangeFilterValue
 }
 
 input Filters {
-    fixeds: [FixedFilter]!
-    ranges: [RangeFilter]!
-    lists: [ListFilter]!
+    fixeds: [FixedFilter] = []
+    ranges: [RangeFilter] = []
+    lists: [ListFilter] = []
 }
 
 
@@ -257,8 +260,8 @@ input CommonSearch {
     order_by: String = "created_at"
     order_direction: String = "desc"
     search: String = ""
-    search_fieds: [String] = []
-    filters: Filters
+    search_fields: [String] = []
+    filters: Filters = { fixeds: [] , ranges: [], lists: []}
 }
 
 input PetBodyCreate {

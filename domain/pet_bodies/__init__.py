@@ -9,14 +9,7 @@ def get_coat(obj, info):
     return coats_domain.get_coat(obj['coat_id'])
 
 def create_pet_body(data):
-    print('+++++++++++++++++**+++')
-    print('+++++++++++++++++**+++')
-    print('+++++++++++++++++**+++')
     coat = coats_domain.create_coat(data['coat'])
-    print('coat_created')
-    print(coat)
-    print('+++++++++++++++++**+++')
-    print('+++++++++++++++++**+++')
     data['coat_id'] = coat['id']
     return pet_bodies_data.create_pet_body(data)
 

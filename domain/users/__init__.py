@@ -1,4 +1,5 @@
 import data.users as users_data
+from libs.logger import logger
 from data.ownerships.models import Ownership, CustodyLevel
 import domain.pets as pets_domain
 import domain.ownerships as ownerships_domain
@@ -16,19 +17,13 @@ def create_user(data):
 def update_user(id, data):
     return users_data.update_user(id, data)
 
-def get_users():
-    return users_data.get_users()
+def get_users(common_search):
+    return users_data.get_users(common_search)
 
 def get_user(id): 
     return users_data.get_user(id)
 
 def add_pet_to_user(user_id, pet):
-    print('#######################')
-    print('#######################')
-    print('#######################')
-    print('#######################')
-    print('#######################')
-    print('#######################')
     user= users_data.get_user(user_id)
     if(not user):
         raise Exception(f"no user found with id: {user_id}")

@@ -1,13 +1,15 @@
 from ariadne import convert_kwargs_to_snake_case
 import domain.users as users_domain
 from api.middlewares import auth_middleware
+from libs.logger import logger
+from libs.utils import format_common_search
 
 @convert_kwargs_to_snake_case
 @auth_middleware
-def list_users_resolver(obj, info, commonSearch):
-    print(commonSearch)
+def list_users_resolver(obj, info, common_search):
+    common_search= format_common_search(common_search)
     try:
-        user = users_domain.get_users()
+        user = users_domain.get_users(common_search)
         payload = {
             "success": True,
             "users": user

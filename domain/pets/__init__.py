@@ -9,14 +9,7 @@ def get_body(obj, info):
     return pet_bodies_domain.get_pet_body(obj['body_id'])
 
 def create_pet(data):
-    print('((()()()(()()()(()99))))')
-    print('((()()()(()()()(()99))))')
-    print('((()()()(()()()(()99))))')
-    print('((()()()(()()()(()99))))')
     body = pet_bodies_domain.create_pet_body(data['body'])
-    print('body_created')
-    print('((()()()(()()()(()99))))')
-    print('((()()()(()()()(()99))))')
     data['body_id'] = body['id']
     return pets_data.create_pet(data)
 

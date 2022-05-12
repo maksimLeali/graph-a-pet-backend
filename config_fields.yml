@@ -8,3 +8,5 @@ jwt:
   secret: ~
 firbase:
   buket_storage: ~
+logging: 
+  level: ~

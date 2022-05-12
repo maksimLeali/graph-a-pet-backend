@@ -1,6 +1,11 @@
+from typing import Dict
 from passlib.hash import pbkdf2_sha256 
 import uuid
 from datetime import datetime
+from data.query_builder import build_simple_query
+from libs.logger import logger
+from sqlalchemy import select, text
+
 
 from data.users.models import User, UserRole
 from data import db
@@ -29,8 +34,19 @@ def update_user(data, id):
     db.session.commit()
     return user 
 
-def get_users():
-    return [user.to_dict() for user in User.query.all()]
+# def get_users():
+#     return [user.to_dict() for user in User.query.all()]
+
+
+def get_users(common_search):
+    try:
+        query = build_simple_query(table="users",search= common_search['search'],search_fields=common_search['search_fields'] ,ordering=common_search["ordering"],filters= common_search['filters'], pagination=common_search['pagination'] )
+        manager = select(User).from_statement(text(query))
+        users = db.session.execute(manager).scalars()
+        return [user.to_dict() for user in users]
+    except Exception as e: 
+        logger.error(e)
+        
 
 
 def get_user(id):

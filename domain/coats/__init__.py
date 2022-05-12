@@ -5,13 +5,6 @@ def get_pet(obj,info):
     return pets_domain.get_pet(obj['pet_id'])
 
 def create_coat(data):
-    print('[[[[[[[[[[[[[[[')
-    print('[[[[[[[[[[[[[[[')
-    print('[[[[[[[[[[[[[[[')
-    print('[[[[[[[[[[[[[[[')
-    print('[[[[[[[[[[[[[[[')
-    print(data)
-    
     return coats_data.create_coat(data)
 
 def update_coat(id, data):
