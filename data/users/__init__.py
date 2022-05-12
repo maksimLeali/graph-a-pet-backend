@@ -34,9 +34,6 @@ def update_user(data, id):
     db.session.commit()
     return user 
 
-# def get_users():
-#     return [user.to_dict() for user in User.query.all()]
-
 
 def get_users(common_search):
     try:
