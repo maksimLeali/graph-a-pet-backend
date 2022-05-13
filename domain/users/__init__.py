@@ -13,12 +13,8 @@ from libs.utils import format_common_search
 @convert_kwargs_to_snake_case
 def get_ownerships(obj, info, common_search):
     common_search= format_common_search(common_search)
-    logger.info(common_search)
-    logger.debug('')
     common_search['filters']['fixeds']['user_id'] = obj['id']
     ownerships, pagination = ownerships_domain.get_paginated_ownerships(common_search)
-    logger.warning(ownerships)
-    logger.warning(pagination)
     return { "items": ownerships, "pagination": pagination}
 
 
@@ -33,7 +29,6 @@ def update_user(id, data):
 
 def get_paginated_users(common_search):
     pagination = get_pagination(common_search)
-    logger.info(pagination)
     users = get_users(common_search)
 
     return (users, pagination)
@@ -50,7 +45,6 @@ def get_user(id):
 def get_pagination(common_search):
     try: 
         total_items = users_data.get_total_items(common_search)
-        logger.info(total_items)
         page_size = common_search['pagination']['page_size']
         total_pages = ceil(total_items /page_size)
         current_page = common_search['pagination']['page']

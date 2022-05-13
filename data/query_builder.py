@@ -79,7 +79,7 @@ def build_where(filters: Dict[str, dict] = {"fixeds": None, "lists": None, "rang
         f"{' AND ' if len(formatted_filters) > 0 and len(formatted_search) > 0  else ''}{formatted_search}"
 
 
-def build_simple_query(table: str, search, search_fields, pagination: Dict[str, int], ordering: Dict[str, str], filters: dict = {"fixeds": [], "lists": [], "ranges": []}):
+def build_simple_query(table: str, search, search_fields, pagination: Dict[str, int], ordering: Dict[str, str], filters: dict = {"fixeds": {}, "lists": {}, "ranges": {}}):
     return f"SELECT * " \
         f"FROM {table}" \
         f" {build_where( filters,search,  search_fields if len(search_fields)> 0 else deafult_search_columns[table]) }" \

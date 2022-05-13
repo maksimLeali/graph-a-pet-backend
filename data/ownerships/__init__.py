@@ -32,7 +32,6 @@ def update_ownership(data):
 def get_ownerships(common_search):
     try:
         query = build_simple_query(table="ownerships",search= common_search['search'],search_fields=common_search['search_fields'] ,ordering=common_search["ordering"],filters= common_search['filters'], pagination=common_search['pagination'] )
-        logger.warning(query)
         manager = select(Ownership).from_statement(text(query))
         ownershps = db.session.execute(manager).scalars()
         return [pet.to_dict() for pet in ownershps]

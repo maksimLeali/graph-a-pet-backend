@@ -1,11 +1,18 @@
+from ariadne import convert_kwargs_to_snake_case
 import data.pets as pets_data
 import domain.ownerships as ownerships_domain
 import domain.pet_bodies as pet_bodies_domain
 from libs.logger import logger
+from libs.utils import format_common_search
 from math import ceil
 
-def get_ownerships(obj, info):    
-    return ownerships_domain.get_filtered_ownerships({"lists": None, "ranges": None, "fixeds": {"user_id": obj['id']}})
+@convert_kwargs_to_snake_case
+def get_ownerships(obj, info, common_search):
+    common_search= format_common_search(common_search)
+    common_search['filters']['fixeds']['user_id'] = obj['id']
+    ownerships, pagination = ownerships_domain.get_paginated_ownerships(common_search)
+    return { "items": ownerships, "pagination": pagination}
+
 
 def get_body(obj, info):
     return pet_bodies_domain.get_pet_body(obj['body_id'])
