@@ -9,7 +9,7 @@ from math import ceil
 @convert_kwargs_to_snake_case
 def get_ownerships(obj, info, common_search):
     common_search= format_common_search(common_search)
-    common_search['filters']['fixeds']['user_id'] = obj['id']
+    common_search['filters']['fixeds']['pet_id'] = obj['id']
     ownerships, pagination = ownerships_domain.get_paginated_ownerships(common_search)
     return { "items": ownerships, "pagination": pagination}
 
