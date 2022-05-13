@@ -86,7 +86,7 @@ def build_simple_query(table: str, search, search_fields, pagination: Dict[str, 
         f"ORDER BY {ordering['order_by']} {ordering['order_direction'].upper()}, id ASC " \
         f"LIMIT {pagination['page_size']} OFFSET {pagination['page_size'] * pagination['page']}"
 
-def build_simple_count(table: str, search, search_fields, pagination: Dict[str, int], ordering: Dict[str, str], filters: dict = {"fixeds": [], "lists": [], "ranges": []}):
+def build_simple_count(table: str, search, search_fields, filters: dict = {"fixeds": [], "lists": [], "ranges": []}):
     return f"SELECT COUNT(*) " \
         f"FROM {table}" \
         f" {build_where( filters,search,  search_fields if len(search_fields)> 0 else deafult_search_columns[table]) }" \

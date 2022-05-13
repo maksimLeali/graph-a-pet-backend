@@ -4,9 +4,9 @@ schema {
 }
 
 type Query {
-    listUsers(commonSearch: CommonSearch): UsersResult!
+    listUsers(commonSearch: CommonSearch):PaginatedUsers!
     getUser(id: ID!): UserResult!
-    listPets(commonSearch: CommonSearch): UsersResult!
+    listPets(commonSearch: CommonSearch): PetsResult!
     getPet(id: ID!): PetResult!
     isAuthenticated(commonSearch: CommonSearch): Boolean!
     getOwnership(id: ID!): OwnershipResult!
@@ -88,6 +88,13 @@ enum CoatPattern{
     COLORPOINT
 }
 
+type Pagination{
+    total_items: Int
+    total_pages: Int
+    current_page: Int
+    page_size: Int
+}
+
 type User {
     id: ID!
     first_name: String!
@@ -167,7 +174,8 @@ type UsersResult {
 type PaginatedUsers {
     success: Boolean
     errors: [String]
-  
+    items: [User]!
+    pagination: Pagination!
 }
 
 type LoginResult {

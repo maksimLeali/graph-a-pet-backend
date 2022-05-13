@@ -9,10 +9,11 @@ from libs.utils import format_common_search
 def list_users_resolver(obj, info, common_search):
     common_search= format_common_search(common_search)
     try:
-        user = users_domain.get_users(common_search)
+        users, pagination = users_domain.get_paginated_users(common_search)
         payload = {
             "success": True,
-            "users": user
+            "items": users,
+            "pagination": pagination
         }
     except Exception as error:
         payload = {

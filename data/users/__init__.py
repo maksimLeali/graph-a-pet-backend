@@ -2,7 +2,7 @@ from typing import Dict
 from passlib.hash import pbkdf2_sha256 
 import uuid
 from datetime import datetime
-from data.query_builder import build_simple_query
+from data.query_builder import build_simple_query, build_simple_count
 from libs.logger import logger
 from sqlalchemy import select, text
 
@@ -43,9 +43,17 @@ def get_users(common_search):
         return [user.to_dict() for user in users]
     except Exception as e: 
         logger.error(e)
+        raise Exception(e)
         
-
-
+def get_total_items(common_search):
+    try:
+        query = build_simple_count(table="users",search= common_search['search'],search_fields=common_search['search_fields'] ,filters= common_search['filters'] )
+        result = db.session.execute(query)
+        return result.first()[0]
+    except Exception as e:
+        logger.error(e)
+        raise Exception(e)
+    
 def get_user(id):
     return User.query.get(id).to_dict()
 
