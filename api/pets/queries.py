@@ -1,14 +1,18 @@
 from ariadne import convert_kwargs_to_snake_case
 import domain.pets as pets_domain
+from libs.logger import logger
+from libs.utils import format_common_search
 
 @convert_kwargs_to_snake_case
-def list_pets_resolver(obj, info):
+def list_pets_resolver(obj, info, common_search):
     try:
-        pet = pets_domain.get_pets()
-        
+        common_search= format_common_search(common_search)
+        pets, pagination = pets_domain.get_paginated_pets(common_search)
+        logger.info(pets)
         payload = {
             "success": True,
-            "pets": pet
+            "items": pets,
+            "pagination": pagination
         }
     except Exception as error:
         payload = {

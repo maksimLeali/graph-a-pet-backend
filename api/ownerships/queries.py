@@ -1,14 +1,18 @@
 from ariadne import convert_kwargs_to_snake_case
 import domain.ownerships as ownerships_domain
+from libs.logger import logger
+from libs.utils import format_common_search
 
 @convert_kwargs_to_snake_case
-def list_ownerships_resolver(obj, info):
+def list_ownerships_resolver(obj, info, common_search):
     try:
-        ownerships =ownerships_domain.get_ownerships()
-        
+        common_search= format_common_search(common_search)
+        ownerships, pagination = ownerships_domain.get_paginated_ownerships(common_search)
+        logger.info(ownerships)
         payload = {
             "success": True,
-            "ownerships": ownerships
+            "items": ownerships,
+            "pagination": pagination
         }
     except Exception as error:
         payload = {

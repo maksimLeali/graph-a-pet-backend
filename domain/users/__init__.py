@@ -1,3 +1,4 @@
+from ariadne import convert_kwargs_to_snake_case
 import data.users as users_data
 from math import ceil
 from libs.logger import logger
@@ -7,10 +8,18 @@ import domain.ownerships as ownerships_domain
 from passlib.hash import pbkdf2_sha256
 import jwt
 from config import cfg
+from libs.utils import format_common_search
 
-
-def get_ownerships(obj, info):
-    return ownerships_domain.get_filtered_ownerships({"lists": None, "ranges": None, "fixeds": {"user_id": obj['id']}})
+@convert_kwargs_to_snake_case
+def get_ownerships(obj, info, common_search):
+    common_search= format_common_search(common_search)
+    logger.info(common_search)
+    logger.debug('')
+    common_search['filters']['fixeds']['user_id'] = obj['id']
+    ownerships, pagination = ownerships_domain.get_paginated_ownerships(common_search)
+    logger.warning(ownerships)
+    logger.warning(pagination)
+    return { "items": ownerships, "pagination": pagination}
 
 
 def create_user(data):
