@@ -5,15 +5,17 @@ from datetime import datetime
 
 
 class PetFamily(Enum) :
-    CANINE="CANINE"
-    FELINE="FELINE",
-    SERPENTES="SERPENTES"
-    BIRDS="BIRDS"
-    ARACNIDE="ARACNIDE"
-    INSECT="INSECT"
-    LIZARD="LIZARD"
+    REPTILE= "REPTILE"
+    CANINE= "CANINE"
+    FELINE= "FELINE"
+    BIRDS= "BIRDS"
+    FISH= "FISH"
 
     
+
+
+
+
 
 
 class PetBody(db.Model):

@@ -1,6 +1,5 @@
 from ariadne import ObjectType
-from domain.coats import  get_pet
+from domain.coats import  get_body
 
 
 coat = ObjectType("Coat")
-coat.set_field("pet", get_pet)

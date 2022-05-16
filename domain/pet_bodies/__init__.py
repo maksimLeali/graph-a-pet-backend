@@ -1,6 +1,7 @@
 import data.pet_bodies as pet_bodies_data
 import domain.pets as pets_domain
 import domain.coats as coats_domain
+from libs.logger import logger
 
 def get_pet(obj,info):
     return pets_domain.get_pet(obj['pet_id'])

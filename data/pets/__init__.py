@@ -56,7 +56,6 @@ def update_pet(data):
 def get_pets(common_search):
     try:
         query = build_simple_query(table="pets",search= common_search['search'],search_fields=common_search['search_fields'] ,ordering=common_search["ordering"],filters= common_search['filters'], pagination=common_search['pagination'] )
-        logger.warning(query)
         manager = select(Pet).from_statement(text(query))
         pets = db.session.execute(manager).scalars()
         return [pet.to_dict() for pet in pets]

@@ -1,8 +1,9 @@
 import data.coats as coats_data
-import domain.pets as pets_domain
+import domain.pet_bodies as pet_bodies_domain
+from libs.logger import logger
 
-def get_pet(obj,info):
-    return pets_domain.get_pet(obj['pet_id'])
+def get_body(obj,info):
+    return pet_bodies_domain.get_pet_body(obj['pet_body_id'])
 
 def create_coat(data):
     return coats_data.create_coat(data)

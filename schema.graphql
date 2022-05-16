@@ -59,14 +59,12 @@ enum CoatName {
 }
 
 enum PetFamily {
-    CANINE,
-    FELINE, 
-    SERPENTES,
-    BIRDS,
-    ARACNIDE,
-    INSECT,
-    LIZARD
-}
+    REPTILE
+    CANINE
+    FELINE
+    BIRDS
+    FISH 
+    }
 
 enum CoatLength {
     SHORT,
@@ -80,7 +78,7 @@ enum CoatPattern{
     BRINDLE,
     HARLEQUIN,
     TICKED,
-    SPOTTED
+    SPOTTED,
     ROAN,
     TRICOLOR,
     BICOLOR,

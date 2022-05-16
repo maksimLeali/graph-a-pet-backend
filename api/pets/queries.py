@@ -8,7 +8,6 @@ def list_pets_resolver(obj, info, common_search):
     try:
         common_search= format_common_search(common_search)
         pets, pagination = pets_domain.get_paginated_pets(common_search)
-        logger.info(pets)
         payload = {
             "success": True,
             "items": pets,

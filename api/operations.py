@@ -8,6 +8,12 @@ from api.pets.mutations import *
 from api.ownerships.resolvers import ownership
 from api.ownerships.queries import *
 from api.ownerships.mutations import *
+from api.pet_bodies.resolvers import pet_body
+from api.pet_bodies.queries import *
+from api.pet_bodies.mutations import *
+from api.coats.resolvers import coat
+from api.coats.queries import *
+from api.coats.mutations import *
 
 
 query = ObjectType("Query")
@@ -27,4 +33,4 @@ mutation.set_field('updatePet', update_pet_resolver)
 mutation.set_field('addPetToUser', add_pet_to_user_resolver)
 mutation.set_field('updateOwnership', update_ownership_resolver)
 
-object_types = [query, mutation, user, pet, ownership]
+object_types = [query, mutation, user, pet, ownership, pet_body, coat]

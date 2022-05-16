@@ -14,7 +14,7 @@ class CoatPattern(Enum) :
     BRINDLE = "BRINDLE"
     HARLEQUIN = "HARLEQUIN"
     TICKED = "TICKED"
-    SPOTTE = "SPOTTE"
+    SPOTTED = "SPOTTED"
     ROAN = "ROAN"
     TRICOLOR = "TRICOLOR"
     BICOLOR = "BICOLOR"

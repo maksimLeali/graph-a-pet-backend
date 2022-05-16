@@ -19,7 +19,6 @@ def get_body(obj, info):
 
 def get_paginated_pets(common_search):
     pagination = get_pagination(common_search)
-    logger.info(pagination)
     pets = get_pets(common_search)
 
     return (pets, pagination)
@@ -41,7 +40,6 @@ def get_pet(id):
 def get_pagination(common_search):
     try: 
         total_items = pets_data.get_total_items(common_search)
-        logger.info(total_items)
         page_size = common_search['pagination']['page_size']
         total_pages = ceil(total_items /page_size)
         current_page = common_search['pagination']['page']

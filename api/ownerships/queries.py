@@ -8,7 +8,6 @@ def list_ownerships_resolver(obj, info, common_search):
     try:
         common_search= format_common_search(common_search)
         ownerships, pagination = ownerships_domain.get_paginated_ownerships(common_search)
-        logger.info(ownerships)
         payload = {
             "success": True,
             "items": ownerships,
