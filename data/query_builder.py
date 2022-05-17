@@ -51,14 +51,17 @@ def build_join(parent: str, join: dict):
         logger.info(f"JOIN {key} AS {join_alias} ON {parent_alias}.{tables_common_properties[key]['other_table_ref']} = {join_alias}.id ")
         for f_key in filter_keys :
             if f_key == "lists" :
-                logger.warning(format_list_filters(alias= join_alias, filters=join[key][f_key] ))
-                filters.append(f" {format_list_filters(alias= join_alias, filters=join[key][f_key] )} ")
+                lists = format_list_filters(alias= join_alias, filters=join[key][f_key] )
+                if len(lists)> 0:
+                    filters.append(f" {lists} ")
             if f_key == "ranges" :
-                logger.warning(format_range_filters(alias= join_alias, filters=join[key][f_key] ))
-                filters.append(f" {format_range_filters(alias= join_alias, filters=join[key][f_key] )} ")
+                ranges = format_range_filters(alias= join_alias, filters=join[key][f_key] )
+                if len(ranges)> 0:
+                    filters.append(f" {ranges} ")
             if f_key == "fixeds" :
-                logger.warning(format_fixed_filters(alias= join_alias, filters=join[key][f_key] ))
-                filters.append(f" {format_fixed_filters(alias= join_alias, filters=join[key][f_key] )} ")
+                fixeds=format_fixed_filters(alias= join_alias, filters=join[key][f_key] )
+                if len(fixeds)> 0:
+                    filters.append(f" {fixeds} ")
             if f_key == "join" :
                 join_result = build_join(parent=key, join=join[key][f_key])
                 for join_filter in join_result[1]:
