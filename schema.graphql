@@ -266,10 +266,16 @@ input RangeFilter {
     value: RangeFilterValue
 }
 
+input Join {
+    key: String
+    value: Filters
+}
+
 input Filters {
     fixeds: [FixedFilter] = []
     ranges: [RangeFilter] = []
     lists: [ListFilter] = []
+    join: [Join] = []
 }
 
 
