@@ -5,7 +5,7 @@ from sqlalchemy import select, text
 from data.ownerships.models import Ownership
 from data import db
 from libs.logger import logger
-from data.query_builder import build_simple_query, build_simple_count, build_where
+from data.query_builder import build_query, build_count, build_where
 
 
 def create_ownership(data):
@@ -31,7 +31,7 @@ def update_ownership(data):
 
 def get_ownerships(common_search):
     try:
-        query = build_simple_query(table="ownerships",search= common_search['search'],search_fields=common_search['search_fields'] ,ordering=common_search["ordering"],filters= common_search['filters'], pagination=common_search['pagination'] )
+        query = build_query(table="ownerships",search= common_search['search'],search_fields=common_search['search_fields'] ,ordering=common_search["ordering"],filters= common_search['filters'], pagination=common_search['pagination'] )
         manager = select(Ownership).from_statement(text(query))
         ownershps = db.session.execute(manager).scalars()
         return [pet.to_dict() for pet in ownershps]
@@ -51,7 +51,7 @@ def get_filtered_ownerships(filters,):
 
 def get_total_items(common_search):
     try:
-        query = build_simple_count(table="ownerships",search= common_search['search'],search_fields=common_search['search_fields'] ,filters= common_search['filters'] )
+        query = build_count(table="ownerships",search= common_search['search'],search_fields=common_search['search_fields'] ,filters= common_search['filters'] )
         result = db.session.execute(query)
         return result.first()[0]
     except Exception as e:

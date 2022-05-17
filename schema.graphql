@@ -286,7 +286,7 @@ input CommonSearch {
     order_direction: String = "desc"
     search: String = ""
     search_fields: [String] = []
-    filters: Filters = { fixeds: [] , ranges: [], lists: []}
+    filters: Filters = { fixeds: [] , ranges: [], lists: [], join: []}
 }
 
 input PetBodyCreate {

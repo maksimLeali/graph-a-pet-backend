@@ -2,7 +2,7 @@ from typing import Dict
 from passlib.hash import pbkdf2_sha256 
 import uuid
 from datetime import datetime
-from data.query_builder import build_simple_query, build_simple_count
+from data.query_builder import build_query, build_count
 from libs.logger import logger
 from sqlalchemy import select, text
 
@@ -37,7 +37,7 @@ def update_user(data, id):
 
 def get_users(common_search):
     try:
-        query = build_simple_query(table="users",search= common_search['search'],search_fields=common_search['search_fields'] ,ordering=common_search["ordering"],filters= common_search['filters'], pagination=common_search['pagination'] )
+        query = build_query(table="users",search= common_search['search'],search_fields=common_search['search_fields'] ,ordering=common_search["ordering"],filters= common_search['filters'], pagination=common_search['pagination'] )
         logger.warning(query)
         manager = select(User).from_statement(text(query))
         users = db.session.execute(manager).scalars()
@@ -48,7 +48,7 @@ def get_users(common_search):
         
 def get_total_items(common_search):
     try:
-        query = build_simple_count(table="users",search= common_search['search'],search_fields=common_search['search_fields'] ,filters= common_search['filters'] )
+        query = build_count(table="users",search= common_search['search'],search_fields=common_search['search_fields'] ,filters= common_search['filters'] )
         logger.warning(query)
         result = db.session.execute(query)
         return result.first()[0]
