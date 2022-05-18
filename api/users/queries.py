@@ -1,11 +1,12 @@
 from ariadne import convert_kwargs_to_snake_case
 import domain.users as users_domain
-from api.middlewares import auth_middleware
+from data.users.models import UserRole
+from api.middlewares import auth_middleware, min_role
 from libs.logger import logger
-from libs.utils import format_common_search
+from libs.utils import format_common_search, get_request_user
 
 @convert_kwargs_to_snake_case
-@auth_middleware
+@min_role(UserRole.ADMIN.name)
 def list_users_resolver(obj, info, common_search):
     common_search= format_common_search(common_search)
     try:
@@ -23,7 +24,7 @@ def list_users_resolver(obj, info, common_search):
     return payload
 
 @convert_kwargs_to_snake_case
-@auth_middleware
+@min_role(UserRole.ADMIN.name)
 def get_user_resolver(obj, info, id):
     try:
         user = users_domain.get_user(id)
@@ -41,4 +42,16 @@ def get_user_resolver(obj, info, id):
 @convert_kwargs_to_snake_case
 @auth_middleware
 def me_resolver(obj, info):
-    return "ok"
+    try:
+        token =  info.context.headers['authorization']
+        user = get_request_user(token)
+        payload = {
+            "success": True,
+            "user": user
+        }
+    except AttributeError:  # todo not found
+        payload = {
+            "success": False,
+            "errors": ["User item matching {id} not found"]
+        }
+    return payload

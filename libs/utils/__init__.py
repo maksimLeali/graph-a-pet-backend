@@ -1,5 +1,7 @@
 import re
 import pydash as py_
+import jwt
+from config import cfg
 from libs.logger import logger
 
 def camel_to_snake(text: str) -> str:
@@ -43,3 +45,9 @@ def format_common_search(common_search):
         "search": common_search['search'],
         "search_fields": common_search['search_fields']
     }
+
+def get_request_user(token : str):
+    logger.info(token)
+    bearer = token.split('Bearer ')[1]
+    decoded_bearer= jwt.decode(bearer,cfg['jwt']['secret'],algorithms=["HS256"] )
+    return decoded_bearer['user']

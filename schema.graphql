@@ -8,6 +8,7 @@ type Query {
     getUser(id: ID!): UserResult!
     listPets(commonSearch: CommonSearch={}): PaginatedPets!
     getPet(id: ID!): PetResult!
+    me: UserResult!
     isAuthenticated(commonSearch: CommonSearch={}): Boolean!
     getOwnership(id: ID!): OwnershipResult!
     listOwnerships(commonSearch: CommonSearch= {}):PaginatedOwnerships!

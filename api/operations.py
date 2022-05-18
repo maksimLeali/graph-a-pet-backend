@@ -21,6 +21,7 @@ query.set_field("listUsers", list_users_resolver)
 query.set_field("getUser", get_user_resolver)
 query.set_field("listPets", list_pets_resolver)
 query.set_field("getPet", get_pet_resolver)
+query.set_field("me", me_resolver)
 query.set_field("getOwnership", get_ownership_resolver)
 query.set_field("listOwnerships", list_ownerships_resolver)
 
