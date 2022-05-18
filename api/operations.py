@@ -32,6 +32,7 @@ mutation.set_field('login', login_resolver)
 mutation.set_field('createPet', create_pet_resolver)
 mutation.set_field('updatePet', update_pet_resolver)
 mutation.set_field('addPetToUser', add_pet_to_user_resolver)
+mutation.set_field('addPetToMe', add_pet_to_me_resolver)
 mutation.set_field('updateOwnership', update_ownership_resolver)
 
 object_types = [query, mutation, user, pet, ownership, pet_body, coat]

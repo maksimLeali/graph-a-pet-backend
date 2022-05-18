@@ -63,6 +63,7 @@ def add_pet_to_user(user_id, pet):
     if(not user):
         raise Exception(f"no user found with id: {user_id}")
     new_pet = pets_domain.create_pet(pet)
+    logger.info('+++++++++++')
     ownership = {
         "user_id": user['id'],
         "pet_id": new_pet['id'],

@@ -24,6 +24,7 @@ type Mutation {
     logout: Boolean!
     addPet(pet: PetCreate!): PetResult!
     addPetToUser(pet: PetCreate!, userId: String!): PetAddedResult!
+    addPetToMe(pet: PetCreate!): PetAddedResult!
 }
 
 scalar Upload
