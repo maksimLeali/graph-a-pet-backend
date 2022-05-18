@@ -48,7 +48,6 @@ def build_join(parent: str, join: dict):
         join_alias=tables_common_properties[key]['alias']
         join_string += f"JOIN {key} AS {join_alias} ON {parent_alias}.{tables_common_properties[key]['other_table_ref']} = {join_alias}.id "
         filter_keys = py_.keys(join[key])
-        logger.info(f"JOIN {key} AS {join_alias} ON {parent_alias}.{tables_common_properties[key]['other_table_ref']} = {join_alias}.id ")
         for f_key in filter_keys :
             if f_key == "lists" :
                 lists = format_list_filters(alias= join_alias, filters=join[key][f_key] )
@@ -172,27 +171,8 @@ def build_where(table: str ,filters: Dict[str, dict] = {"fixeds": None, "lists":
         f"{' AND ' if ( (len(formatted_filters) > 0 and len(join_filters))  or ( len(formatted_search) > 0 and len(join_filters)> 0 ))  else ''}{'AND'.join(join_filters)}"
 
 
-def build_simple_query(table: str, search, search_fields, pagination: Dict[str, int], ordering: Dict[str, str], filters: dict = {"fixeds": {}, "lists": {}, "ranges": {}}):
-    alias = tables_common_properties[table]['alias']
-    logger.warning(alias)
-    return f"SELECT {alias}.* " \
-        f"FROM {table} AS {alias}" \
-        f" {build_simple_where(alias, filters,search,  search_fields if len(search_fields)> 0 else tables_common_properties[table]['search_columns']) }" \
-        f"ORDER BY {alias}.{ordering['order_by']} {ordering['order_direction'].upper()}, {alias}.id ASC " \
-        f"LIMIT {pagination['page_size']} OFFSET {pagination['page_size'] * pagination['page']}"
-
-def build_simple_count(table: str, search, search_fields, filters: dict = {"fixeds": [], "lists": [], "ranges": []}):
-    alias = tables_common_properties[table]['alias']
-    logger.warning(alias)
-    return f"SELECT COUNT({alias}.*) " \
-        f"FROM {table} AS {alias}" \
-        f" {build_simple_where(alias, filters,search,  search_fields if len(search_fields)> 0 else tables_common_properties[table]['search_columns']) }"
-        
-
 def build_query(table: str, search, search_fields, pagination: Dict[str, int], ordering: Dict[str, str], filters: dict = {"fixeds": {}, "lists": {}, "ranges": {},"join": {}} ):
     alias = tables_common_properties[table]['alias']
-    logger.warning(alias)
-    
     return f"SELECT {alias}.* " \
         f"FROM {table} AS {alias} " \
         f" {build_where(table, filters,search,  search_fields if len(search_fields)> 0 else tables_common_properties[table]['search_columns']) } " \
@@ -201,7 +181,6 @@ def build_query(table: str, search, search_fields, pagination: Dict[str, int], o
         
 def build_count(table: str, search, search_fields, filters: dict = {"fixeds": [], "lists": [], "ranges": []}):
     alias = tables_common_properties[table]['alias']
-    logger.warning(alias)
     return f"SELECT COUNT({alias}.*) " \
         f"FROM {table} AS {alias}" \
         f" {build_where(table, filters,search,  search_fields if len(search_fields)> 0 else tables_common_properties[table]['search_columns']) }"

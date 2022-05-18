@@ -5,7 +5,7 @@ from sqlalchemy import select, text
 
 from .models import Pet, Gender
 from data import db
-from data.query_builder import build_simple_query, build_simple_count
+from data.query_builder import build_query, build_count
 from libs.utils import camel_to_snake
 from libs.logger import logger
 
@@ -55,7 +55,7 @@ def update_pet(data):
 
 def get_pets(common_search):
     try:
-        query = build_simple_query(table="pets",search= common_search['search'],search_fields=common_search['search_fields'] ,ordering=common_search["ordering"],filters= common_search['filters'], pagination=common_search['pagination'] )
+        query = build_query(table="pets",search= common_search['search'],search_fields=common_search['search_fields'] ,ordering=common_search["ordering"],filters= common_search['filters'], pagination=common_search['pagination'] )
         manager = select(Pet).from_statement(text(query))
         pets = db.session.execute(manager).scalars()
         return [pet.to_dict() for pet in pets]
@@ -65,7 +65,7 @@ def get_pets(common_search):
     
 def get_total_items(common_search):
     try:
-        query = build_simple_count(table="pets",search= common_search['search'],search_fields=common_search['search_fields'] ,filters= common_search['filters'] )
+        query = build_count(table="pets",search= common_search['search'],search_fields=common_search['search_fields'] ,filters= common_search['filters'] )
         result = db.session.execute(query)
         return result.first()[0]
     except Exception as e:

@@ -18,9 +18,7 @@ def format_join(to_format):
     for entity in to_format : 
         key= entity['key']
         join[key]= {}
-        logger.info(entity)
         filter_keys = py_.keys(entity['value'])
-        logger.warning(filter_keys)
         for f_key in filter_keys:
             if f_key!="join": 
                 join[key][f_key]= format_filters(to_format=entity['value'][f_key])

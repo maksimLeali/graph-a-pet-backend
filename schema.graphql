@@ -4,13 +4,13 @@ schema {
 }
 
 type Query {
-    listUsers(commonSearch: CommonSearch):PaginatedUsers!
+    listUsers(commonSearch: CommonSearch={}):PaginatedUsers!
     getUser(id: ID!): UserResult!
-    listPets(commonSearch: CommonSearch): PaginatedPets!
+    listPets(commonSearch: CommonSearch={}): PaginatedPets!
     getPet(id: ID!): PetResult!
-    isAuthenticated(commonSearch: CommonSearch): Boolean!
+    isAuthenticated(commonSearch: CommonSearch={}): Boolean!
     getOwnership(id: ID!): OwnershipResult!
-    listOwnerships(commonSearch: CommonSearch):PaginatedOwnerships!
+    listOwnerships(commonSearch: CommonSearch= {}):PaginatedOwnerships!
 }
 
 type Mutation {
@@ -100,7 +100,7 @@ type User {
     email: String!
     role: UserRole!
     created_at: String!
-    ownerships(commonSearch: CommonSearch!): PaginatedOwnerships!
+    ownerships(commonSearch: CommonSearch = {}): PaginatedOwnerships!
 }
 
 type Coat {
@@ -129,7 +129,7 @@ type Tag {
 type Pet {
     id: ID!
     name: String!
-    ownerships(commonSearch: CommonSearch): PaginatedOwnerships
+    ownerships(commonSearch: CommonSearch= {}): PaginatedOwnerships
     body: PetBody!
     birthday: String!
     neutered: Boolean!
