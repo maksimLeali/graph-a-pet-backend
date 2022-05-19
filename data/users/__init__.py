@@ -57,6 +57,6 @@ def get_total_items(common_search):
 def get_user(id):
     return User.query.get(id).to_dict()
 
-async def get_user_from_email(email) -> User:
+def get_user_from_email(email) -> User:
      return User.query.filter(User.email==email).first().to_dict()
     

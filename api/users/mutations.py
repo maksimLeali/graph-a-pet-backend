@@ -56,9 +56,9 @@ def update_user_resolver(obj, info, id, data):
     return payload
 
 @convert_kwargs_to_snake_case
-async def login_resolver(obj, info, email, password):
+def login_resolver(obj, info, email, password):
     try :
-        token = await login(email, password)
+        token = login(email, password)
         payload = {
             "success": True,
             "token": token
@@ -72,7 +72,7 @@ async def login_resolver(obj, info, email, password):
 
 @convert_kwargs_to_snake_case
 @min_role(UserRole.ADMIN.name)
-async def add_pet_to_user_resolver(obj, info, pet, user_id):
+def add_pet_to_user_resolver(obj, info, pet, user_id):
     try: 
         new_pet, new_ownership = add_pet_to_user(user_id, pet)
         payload= {
@@ -92,7 +92,7 @@ async def add_pet_to_user_resolver(obj, info, pet, user_id):
 
 @convert_kwargs_to_snake_case
 @auth_middleware
-async def add_pet_to_me_resolver(obj, info, pet):
+def add_pet_to_me_resolver(obj, info, pet):
     try: 
         token =  info.context.headers['authorization']
         user = get_request_user(token)

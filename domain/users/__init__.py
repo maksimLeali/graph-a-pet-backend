@@ -63,7 +63,6 @@ def add_pet_to_user(user_id, pet):
     if(not user):
         raise Exception(f"no user found with id: {user_id}")
     new_pet = pets_domain.create_pet(pet)
-    logger.info('+++++++++++')
     ownership = {
         "user_id": user['id'],
         "pet_id": new_pet['id'],
@@ -73,9 +72,9 @@ def add_pet_to_user(user_id, pet):
     return (new_pet, new_ownership)
 
 
-async def login(email, password) -> str:
+def login(email, password) -> str:
     try:
-        user = await users_data.get_user_from_email(email)
+        user = users_data.get_user_from_email(email)
         if(pbkdf2_sha256.verify(password, user['password'])):
             return jwt.encode({"user": user}, cfg['jwt']['secret'], algorithm="HS256")
         raise Exception
