@@ -26,10 +26,11 @@ def list_pets_resolver(obj, info, common_search):
 @min_role(RoleLevel.ADMIN.name)
 def get_pet_resolver(obj, info, id):
     try:
+        logger.info(f'{id}tua madre troia')
         pet = pets_domain.get_pet(id)
         payload = {
             "success": True,
-            "pet": pet.to_dict()
+            "pet": pet
         }
     except AttributeError:  # todo not found
         payload = {

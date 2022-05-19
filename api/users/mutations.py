@@ -24,6 +24,22 @@ def create_user_resolver(obj, info, data):
     return payload
 
 @convert_kwargs_to_snake_case
+def signup_resolver(obj, info, data):
+    try:
+        user = create_user(data)
+        payload = {
+            "success": True,
+            "user": user
+        }
+    except ValueError:  # date format errors
+        payload = {
+            "success": False,
+            "errors": [f"Incorrect date format provided. Date should be in "
+                       f"the format dd-mm-yyyy"]
+        }
+    return payload
+
+@convert_kwargs_to_snake_case
 @min_role(UserRole.ADMIN.name)
 def update_user_resolver(obj, info, id, data):
     try:

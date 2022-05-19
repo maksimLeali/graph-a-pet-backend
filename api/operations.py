@@ -27,6 +27,7 @@ query.set_field("listOwnerships", list_ownerships_resolver)
 
 mutation = ObjectType("Mutation")
 mutation.set_field('createUser', create_user_resolver)
+mutation.set_field('signUp', signup_resolver)
 mutation.set_field('updateUser', update_user_resolver)
 mutation.set_field('login', login_resolver)
 mutation.set_field('createPet', create_pet_resolver)
