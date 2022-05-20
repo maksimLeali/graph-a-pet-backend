@@ -3,17 +3,310 @@ schema {
     mutation: Mutation
 }
 
+type Query {
+    listUsers(commonSearch: CommonSearch={}):PaginatedUsers!
+    getUser(id: ID!): UserResult!
+    listPets(commonSearch: CommonSearch={}): PaginatedPets!
+    getPet(id: ID!): PetResult!
+    me: UserResult!
+    isAuthenticated(commonSearch: CommonSearch={}): Boolean!
+    getOwnership(id: ID!): OwnershipResult!
+    listOwnerships(commonSearch: CommonSearch= {}):PaginatedOwnerships!
+}
+
+type Mutation {
+    createUser(data: UserCreate!): UserResult!
+    signUp(data: UserCreate!): UserResult!
+    updateUser(id: ID!, data: UserUpdate!): UserResult!
+    createPet(data: PetCreate!): PetResult!
+    updatePet(id: ID!, data: PetUpdate!): PetResult!
+    updateOwnership(id:ID!, data: OwnershipUpdate!): OwnershipResult!
+    login(email: String!, password: String!):LoginResult!
+    logout: Boolean!
+    addPet(pet: PetCreate!): PetResult!
+    addPetToUser(pet: PetCreate!, userId: String!): PetAddedResult!
+    addPetToMe(pet: PetCreate!): PetAddedResult!
+}
+
+scalar Upload
+
+enum UserRole {
+    USER,
+    ADMIN
+}
+enum TreatmentType {
+    VACCINE,
+    ANTIPARASITE,
+    OPERATION
+}
+
+enum CustodyLevel {
+    SUB_OWNER,
+    OWNER,
+    PET_SITTER,
+}
+
+enum Gender {
+    MALE,
+    FEMALE,
+    NOT_SAID
+}
+
+enum CoatName {
+    FUR,
+    SCALES,
+    FEATHERS,
+    SKIN,
+    SHED,
+    COAT
+}
+
+enum PetFamily {
+    REPTILE
+    CANINE
+    FELINE
+    BIRDS
+    FISH 
+    }
+
+enum CoatLength {
+    SHORT,
+    MEDIUM,
+    LONG,
+    HAIRLESS
+}
+
+enum CoatPattern{
+    MERLE,
+    BRINDLE,
+    HARLEQUIN,
+    TICKED,
+    SPOTTED,
+    ROAN,
+    TRICOLOR,
+    BICOLOR,
+    SOLID,
+    COLORPOINT
+}
+
+type Pagination{
+    total_items: Int
+    total_pages: Int
+    current_page: Int
+    page_size: Int
+}
+
 type User {
     id: ID!
     first_name: String!
     last_name: String!
+    email: String!
+    role: UserRole!
     created_at: String!
+    ownerships(commonSearch: CommonSearch = {}): PaginatedOwnerships!
+}
+
+type Coat {
+    id: ID!
+    name: String!
+    length: CoatLength!
+    colors: [String]!
+    pattern: CoatPattern!
+    texture: String!
+}
+
+type PetBody {
+    id: ID!
+    coat: Coat!
+    image: Media!
+    tags: [Tag]!
+    family: PetFamily!
+    breed: String!
+}
+
+type Tag {
+    id: ID!
+    text: String!
+}
+
+type Pet {
+    id: ID!
+    name: String!
+    ownerships(commonSearch: CommonSearch= {}): PaginatedOwnerships
+    body: PetBody!
+    birthday: String!
+    neutered: Boolean!
+    gender: Gender!
+    health_card: HealthCard
+    chip_code: String
+    weigth_kg: Float
+    temperament: String
+    diet: [String]
+    intollerance: [String]
+    disciplines: [String]
+}
+
+type Media {
+    id: ID!
+    src: String
+    type: String!
+}
+
+type Ownership {
+    id: ID!
+    user: User!
+    pet: Pet!
+    custody_level: CustodyLevel!
+}
+
+
+type UserResult {
+    success: Boolean!
+    errors: [String]
+    user: User
+}
+
+type UsersResult {
+    success: Boolean!
+    errors: [String]
+    users: [User]!
+}
+
+type PaginatedUsers {
+    success: Boolean
+    errors: [String]
+    items: [User]!
+    pagination: Pagination!
+}
+type PaginatedOwnerships {
+    success: Boolean
+    errors: [String]
+    items: [Ownership]!
+    pagination: Pagination!
+}
+
+type LoginResult {
+    success: Boolean!
+    errors: [String]
+    token: String!
+}
+
+
+type PetResult {
+    success: Boolean!
+    errors: [String]
+    pet: Pet
+} 
+
+type PetsResult {
+    success: Boolean!
+    errors: [String]
+    pets: [Pet]!
+}
+
+type PaginatedPets {
+    succes: Boolean!
+    errors: [String]
+    items: [Pet]!
+    pagination: Pagination!
+}
+
+type OwnershipResult {
+    success: Boolean!
+    errors: [String]
+    ownership: Ownership
+}
+
+type OwnershipsResult {
+    success: Boolean!
+    errors: [String]
+    ownerships: [Ownership]!
+}
+type NewOwnership {
+    pet: Pet!
+    ownership: Ownership!
+}
+
+type PetAddedResult {
+    success: Boolean!
+    errors: [String]
+    data: NewOwnership!
+}
+
+type HealthCard {
+    id: ID!
+    logs: [String]!
+    events: [Treatment]!
+}
+
+type Treatment {
+    id: ID!
+    name: String!
+    created_at: String!
+    type: TreatmentType!
+    date: String!
+    notes: String
+    booster_date: String
+}
+
+input FixedFilter {
+    key: String!
+    value: String!
+}
+
+input ListFilter {
+    key: String,
+    value: [String]!
+}
+
+input RangeFilterValue {
+    min: String
+    max: String
+}
+
+input RangeFilter {
+    key: String!
+    value: RangeFilterValue
+}
+
+input Join {
+    key: String
+    value: Filters
+}
+
+input Filters {
+    fixeds: [FixedFilter] = []
+    ranges: [RangeFilter] = []
+    lists: [ListFilter] = []
+    join: [Join] = []
+}
+
+
+input CommonSearch {
+    page: Int = 0
+    page_size: Int = 20
+    order_by: String = "created_at"
+    order_direction: String = "desc"
+    search: String = ""
+    search_fields: [String] = []
+    filters: Filters = { fixeds: [] , ranges: [], lists: [], join: []}
+}
+
+input PetBodyCreate {
+    family: PetFamily!
+    breed: String!
+    coat: CoatCreate!
+}
+
+input CoatCreate{
+    length: CoatLength!
+    colors: [String]!
+    pattern: CoatPattern!
 }
 
 input UserUpdate {
     first_name: String
     last_name: String
-    created_at: String
     email: String
 }
 
@@ -24,25 +317,26 @@ input UserCreate {
     password: String!
 }
 
-type UserResult {
-    success: Boolean!
-    errors: [String]
-    User: User
+input OwnershipUpdate {
+    custody_level: CustodyLevel!
 }
 
-type UsersResult {
-    success: Boolean!
-    errors: [String]
-    Users: [User]
+input PetUpdate {
+    name: String
+    breed: String
 }
 
-type Query {
-    listUsers: UsersResult!
-    getUser(id: ID!): UserResult!
-}
+input PetCreate {
+    name: String!
+    body: PetBodyCreate!
+    birthday: String!
+    neutered: Boolean!
+    gender: Gender!
+    chip_code: String
+    weigth_kg: Float
+    temperament: String
+    diet: [String]
+    intollerance: [String]
+    disciplines: [String]
 
-
-type Mutation {
-    createUser(data: UserCreate!): UserResult!
-    updateUser(id: ID!, data: UserUpdate!): UserResult!
 }

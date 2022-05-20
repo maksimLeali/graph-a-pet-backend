@@ -2,4 +2,8 @@ pyvenv.cfg
 **/__pycache__*
 include/
 lib
-bin
+config.yml
+venv 
+bin/
+serviceAccountKey.json
+**/__log__*

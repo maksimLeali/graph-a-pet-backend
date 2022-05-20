@@ -1,0 +1,12 @@
+db:
+  host: ~
+  user: ~
+  port: ~
+  password: ~
+  table: ~
+jwt:
+  secret: ~
+firbase:
+  buket_storage: ~
+logging: 
+  level: ~

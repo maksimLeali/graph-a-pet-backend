@@ -1,32 +1,19 @@
 # mutations.py
-from datetime import date
 from ariadne import convert_kwargs_to_snake_case
-from data import db
-from .models import User
-import bcrypt
-import uuid
+from domain.users import create_user, update_user, login, add_pet_to_user
+from api.middlewares import auth_middleware, min_role
+from data.users.models import UserRole
+from libs.utils import get_request_user
+from libs.logger import logger
 
 @convert_kwargs_to_snake_case
+@min_role(UserRole.ADMIN.name)
 def create_user_resolver(obj, info, data):
     try:
-        print(data)
-        today = date.today()
-        salt = bcrypt.gensalt()
-        user = User(
-            id = uuid.uuid4(),
-            first_name = data["first_name"], 
-            last_name = data["last_name"], 
-            email=data["email"], 
-            salt=salt, 
-            password=bcrypt.hashpw(bytes(data["password"], encoding='utf-8'), salt),  
-            created_at=today.strftime("%b-%d-%Y")
-        )
-        print(user)
-        db.session.add(user)
-        db.session.commit()
+        user = create_user(data)
         payload = {
             "success": True,
-            "user": user.to_dict()
+            "user": user
         }
     except ValueError:  # date format errors
         payload = {
@@ -37,16 +24,29 @@ def create_user_resolver(obj, info, data):
     return payload
 
 @convert_kwargs_to_snake_case
-def update_user_resolver(obj, info, id, data):
+def signup_resolver(obj, info, data):
     try:
-        user = User.query.get(id)
-        if user:
-            user= {**user, **data}
-        db.session.add(user)
-        db.session.commit()
+        user = create_user(data)
         payload = {
             "success": True,
-            "user": user.to_dict()
+            "user": user
+        }
+    except ValueError:  # date format errors
+        payload = {
+            "success": False,
+            "errors": [f"Incorrect date format provided. Date should be in "
+                       f"the format dd-mm-yyyy"]
+        }
+    return payload
+
+@convert_kwargs_to_snake_case
+@min_role(UserRole.ADMIN.name)
+def update_user_resolver(obj, info, id, data):
+    try:
+        user = update_user(id, data)
+        payload = {
+            "success": True,
+            "user": user
         }
     except AttributeError:  # todo not found
         payload = {
@@ -54,3 +54,61 @@ def update_user_resolver(obj, info, id, data):
             "errors": ["item matching id {id} not found"]
         }
     return payload
+
+@convert_kwargs_to_snake_case
+def login_resolver(obj, info, email, password):
+    try :
+        token = login(email, password)
+        payload = {
+            "success": True,
+            "token": token
+        }
+    except Exception as e:  # todo not found
+        payload = {
+            "success": False,
+            "errors": [e]
+        }
+    return payload
+
+@convert_kwargs_to_snake_case
+@min_role(UserRole.ADMIN.name)
+def add_pet_to_user_resolver(obj, info, pet, user_id):
+    try: 
+        new_pet, new_ownership = add_pet_to_user(user_id, pet)
+        payload= {
+            "success": True,
+            "data": {
+                "pet" : new_pet,
+                "ownership": new_ownership
+            }
+        }        
+    except Exception:
+        payload = {
+            "success": False,
+            "errors": [f"Incorrect date format provided. Date should be in "
+                       f"the format dd-mm-yyyy"]
+        }
+    return payload
+
+@convert_kwargs_to_snake_case
+@auth_middleware
+def add_pet_to_me_resolver(obj, info, pet):
+    try: 
+        token =  info.context.headers['authorization']
+        user = get_request_user(token)
+        new_pet, new_ownership = add_pet_to_user(user['id'], pet)
+        payload= {
+            "success": True,
+            "data": {
+                "pet" : new_pet,
+                "ownership": new_ownership
+            }
+        }        
+    except Exception:
+        payload = {
+            "success": False,
+            "errors": [f"Incorrect date format provided. Date should be in "
+                       f"the format dd-mm-yyyy"]
+        }
+    return payload
+
