@@ -1,12 +1,14 @@
 from ariadne import convert_kwargs_to_snake_case
 import data.users as users_data
 from math import ceil
+from time import time
 from libs.logger import logger
 from data.ownerships.models import Ownership, CustodyLevel
 import domain.pets as pets_domain
 import domain.ownerships as ownerships_domain
 from passlib.hash import pbkdf2_sha256
 import jwt
+import pydash as py_
 from config import cfg
 from libs.utils import format_common_search
 
@@ -76,7 +78,12 @@ def login(email, password) -> str:
     try:
         user = users_data.get_user_from_email(email)
         if(pbkdf2_sha256.verify(password, user['password'])):
-            return jwt.encode({"user": user}, cfg['jwt']['secret'], algorithm="HS256")
+            return jwt.encode(
+                        {"user": py_.omit(user, "password"),
+                         "iat": int(time()),
+                         "exp": int(time()) + 1 * 24*60*60
+                        }, 
+                    cfg['jwt']['secret'], algorithm="HS256")
         raise Exception
     except:
         raise Exception('Credentials error')
