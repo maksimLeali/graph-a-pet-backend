@@ -189,6 +189,7 @@ type LoginResult {
     success: Boolean!
     errors: [String]
     token: String!
+    user: User!
 }
 
 

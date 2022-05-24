@@ -83,7 +83,7 @@ def login(email, password) -> str:
                          "iat": int(time()),
                          "exp": int(time()) + 1 * 24*60*60
                         }, 
-                    cfg['jwt']['secret'], algorithm="HS256")
+                    cfg['jwt']['secret'], algorithm="HS256"), user
         raise Exception
     except:
         raise Exception('Credentials error')

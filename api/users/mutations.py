@@ -58,10 +58,11 @@ def update_user_resolver(obj, info, id, data):
 @convert_kwargs_to_snake_case
 def login_resolver(obj, info, email, password):
     try :
-        token = login(email, password)
+        token, user = login(email, password)
         payload = {
             "success": True,
-            "token": token
+            "token": token,
+            "user": user
         }
     except Exception as e:  # todo not found
         payload = {
