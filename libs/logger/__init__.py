@@ -4,7 +4,7 @@ from config import cfg
 
 
 class CustomFormatter(logging.Formatter):
-
+    custom_path= '/'
     logging.CHECK = logging.INFO +5
     logging.addLevelName(logging.CHECK, "CHECK")
     grey = "\x1b[38;20m"
@@ -14,7 +14,7 @@ class CustomFormatter(logging.Formatter):
     blue = "\u001b[36m"
     bold_red = "\x1b[31;1m"
     reset = "\x1b[0m"
-    format = "%(levelname)s | %(message)s  \n(%(pathname)s:%(lineno)d ->  %(funcName)s)"
+    format = "%(levelname)s | %(message)s  \n(%(pathname)s:%(lineno)d ->  %(funcName)s)\n"
 
     FORMATS = {
         logging.DEBUG: grey+ "⚪  " + format + reset,

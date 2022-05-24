@@ -19,7 +19,9 @@ def list_users_resolver(obj, info, common_search):
     except Exception as error:
         payload = {
             "success": False,
-            "errors": [str(error)]
+            "errors": [str(error)],
+            "items": [],
+            "pagination": {}
         }
     return payload
 
@@ -35,23 +37,28 @@ def get_user_resolver(obj, info, id):
     except AttributeError:  # todo not found
         payload = {
             "success": False,
-            "errors": ["User item matching {id} not found"]
+            "errors": ["User item matching {id} not found"],
+            "user": None
         }
     return payload
 
 @convert_kwargs_to_snake_case
 @auth_middleware
 def me_resolver(obj, info):
+    logger.info("API | USERS | queries.py | me ")
     try:
         token =  info.context.headers['authorization']
         user = get_request_user(token)
         payload = {
             "success": True,
-            "user": user
+            "user": user,
         }
-    except AttributeError:  # todo not found
+        logger.check(f"ME resolved: {payload}")
+    except Exception as e:  # todo not found
+        logger.error(f"ME not resolved: {e}")
         payload = {
             "success": False,
-            "errors": ["User item matching {id} not found"]
+            "errors": ["no user found"],
+            "user": None
         }
     return payload

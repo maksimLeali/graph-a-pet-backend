@@ -46,5 +46,3 @@ def min_role(role: UserRole):
             return fn(obj, info, **args)
         return wrapper
     return decorate
-        
-        

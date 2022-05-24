@@ -21,11 +21,12 @@ type Mutation {
     createPet(data: PetCreate!): PetResult!
     updatePet(id: ID!, data: PetUpdate!): PetResult!
     updateOwnership(id:ID!, data: OwnershipUpdate!): OwnershipResult!
-    login(email: String!, password: String!):LoginResult!
+    login(email: String!, password: String!):NewTokenResult!
     logout: Boolean!
     addPet(pet: PetCreate!): PetResult!
     addPetToUser(pet: PetCreate!, userId: String!): PetAddedResult!
     addPetToMe(pet: PetCreate!): PetAddedResult!
+    refreshToken: NewTokenResult!
 }
 
 scalar Upload
@@ -185,7 +186,7 @@ type PaginatedOwnerships {
     pagination: Pagination!
 }
 
-type LoginResult {
+type NewTokenResult {
     success: Boolean!
     errors: [String]
     token: String!
@@ -196,12 +197,14 @@ type PetResult {
     success: Boolean!
     errors: [String]
     pet: Pet
+    
 } 
 
 type PetsResult {
     success: Boolean!
     errors: [String]
     pets: [Pet]!
+    
 }
 
 type PaginatedPets {
@@ -209,27 +212,32 @@ type PaginatedPets {
     errors: [String]
     items: [Pet]!
     pagination: Pagination!
+    
 }
 
 type OwnershipResult {
     success: Boolean!
     errors: [String]
     ownership: Ownership
+    
 }
 
 type OwnershipsResult {
     success: Boolean!
     errors: [String]
     ownerships: [Ownership]!
+    
 }
 type NewOwnership {
     pet: Pet!
     ownership: Ownership!
+    
 }
 
 type PetAddedResult {
     success: Boolean!
     errors: [String]
+    
     data: NewOwnership!
 }
 
