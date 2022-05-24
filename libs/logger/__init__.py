@@ -19,14 +19,15 @@ class CustomFormatter(logging.Formatter):
     bold_red = "\x1b[31;1m"
     purple = "\x1b[1;35m"
     reset = "\x1b[0m"
-    format = "%(levelname)s \n%(message)s \n"
-    out_putformat = "%(message)s \n%(levelname)s \n"
+    format = "%(levelname)s | %(message)s \n"
+    input_format = "%(levelname)s \n%(message)s \n"
+    output_format = "%(message)s \n%(levelname)s \n"
     extended_format = "%(levelname)s | %(message)s  \n(%(pathname)s:%(lineno)d ->  %(funcName)s)\n"
 
     FORMATS = {
         logging.DEBUG: grey+ "⚪  " + format + reset, #10
-        logging.INPUT: purple + "🔻\n " + format + reset, #11
-        logging.OUTPUT: purple + format + "🔺  \n" + reset, #12
+        logging.INPUT: purple + "🔻\n " + input_format + reset, #11
+        logging.OUTPUT: purple + output_format + "🔺  \n" + reset, #12
         logging.INFO: blue+ "ℹ️  " + format + reset, #20
         logging.CHECK: green + "✅  " + format + reset, #25
         logging.WARNING: yellow + "🟡  " + extended_format + reset, #30
