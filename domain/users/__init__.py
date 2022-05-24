@@ -2,7 +2,7 @@ from ariadne import convert_kwargs_to_snake_case
 import data.users as users_data
 from math import ceil
 from time import time
-from libs.logger import logger
+from libs.logger import logger, stringify
 from data.ownerships.models import Ownership, CustodyLevel
 import domain.pets as pets_domain
 import domain.ownerships as ownerships_domain
@@ -81,7 +81,7 @@ def login(email, password) -> str:
             return jwt.encode(
                         {"user": py_.omit(user, "password"),
                          "iat": int(time()),
-                         "exp": int(time()) + 1 * 24*60*60
+                         "exp": int(time()) + 7 * 24*60*60
                         }, 
                     cfg['jwt']['secret'], algorithm="HS256"), user
         raise Exception
