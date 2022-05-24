@@ -35,7 +35,6 @@ def min_role(role: UserRole):
             level = { UserRole.ADMIN.name : 3, UserRole.USER.name: 2}
             try :
                 bearer = info.context.headers['authorization'].split('Bearer ')[1]
-                logger.check(bearer)
                 decoded_bearer= jwt.decode(bearer,cfg['jwt']['secret'],algorithms=["HS256"] )
                 user = get_user(decoded_bearer['user']['id'])
             except jwt.ExpiredSignatureError as e : 
