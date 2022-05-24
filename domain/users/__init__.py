@@ -81,7 +81,7 @@ def login(email, password) -> str:
             return jwt.encode(
                         {"user": py_.omit(user, "password"),
                          "iat": int(time()),
-                         "exp": int(time()) + 1 * 24*60*60
+                         "exp": int(time()) + 7 * 24*60*60
                         }, 
                     cfg['jwt']['secret'], algorithm="HS256")
         raise Exception
