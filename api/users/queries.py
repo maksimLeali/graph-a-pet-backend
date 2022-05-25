@@ -2,7 +2,7 @@ from ariadne import convert_kwargs_to_snake_case
 import domain.users as users_domain
 from data.users.models import UserRole
 from api.middlewares import auth_middleware, min_role
-from libs.logger import logger, formatPath
+from libs.logger import logger
 from libs.utils import format_common_search, get_request_user
 from inspect import currentframe
 
@@ -29,8 +29,7 @@ def list_users_resolver(obj, info, common_search):
 @convert_kwargs_to_snake_case
 @min_role(UserRole.ADMIN.name)
 def get_user_resolver(obj, info, id):
-    logger.info(
-        f'{formatPath(__file__, currentframe())}  \n'\
+    logger.error(
         f"id: {id}"
     )
     try:
