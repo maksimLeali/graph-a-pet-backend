@@ -59,5 +59,5 @@ def stringify(obj: dict)-> str:
     return dumps(obj, separators=(',',':'), indent=2)
 
 def formatPath(path, frame):
-    parts = re.sub(str(pathlib.Path().resolve()), '', str(path)).split('/')
-    return f" {' | '.join(map_(parts, lambda part, i: part.upper() if(i < len(parts) -1) else part.lower()))} | {frame.f_code.co_name}\n"
+    parts = re.sub(f"{str(pathlib.Path().resolve())}/", '', str(path)).split('/')
+    return f" {' | '.join(map_(parts, lambda part, i: part.upper() if(i < len(parts) -1) else part.lower()))} | {frame.f_code.co_name}"

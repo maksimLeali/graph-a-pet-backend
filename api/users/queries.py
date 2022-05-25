@@ -4,7 +4,6 @@ from data.users.models import UserRole
 from api.middlewares import auth_middleware, min_role
 from libs.logger import logger, formatPath
 from libs.utils import format_common_search, get_request_user
-from pathlib import Path
 from inspect import currentframe
 
 @convert_kwargs_to_snake_case
@@ -31,7 +30,7 @@ def list_users_resolver(obj, info, common_search):
 @min_role(UserRole.ADMIN.name)
 def get_user_resolver(obj, info, id):
     logger.info(
-        f'{formatPath(__file__, currentframe())}'\
+        f'{formatPath(__file__, currentframe())}  \n'\
         f"id: {id}"
     )
     try:
