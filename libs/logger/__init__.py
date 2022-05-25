@@ -28,8 +28,8 @@ class CustomFormatter(logging.Formatter):
 
     FORMATS = {
         logging.DEBUG: grey+ "⚪  " + format + reset, #10
-        logging.INPUT: purple + "🔻\n " + input_format + reset, #11
-        logging.OUTPUT: purple + output_format + "🔺  \n" + reset, #12
+        logging.INPUT: purple + "🔻\n " + format + reset, #11
+        logging.OUTPUT: purple + format + "🔺  \n" + reset, #12
         logging.INFO: blue+ "ℹ️  " + format + reset, #20
         logging.CHECK: green + "✅  " + format + reset, #25
         logging.WARNING: yellow + "🟡  " + extended_format + reset, #30
@@ -40,8 +40,9 @@ class CustomFormatter(logging.Formatter):
     def format(self, record):
         log_fmt = self.FORMATS.get(record.levelno)
         formatter = logging.Formatter(log_fmt, datefmt="%Y-%m-%dT%H:%M:%S.00Z")
-        formatted_record = re.sub(f"{str(pathlib.Path().resolve())}/", '',  formatter.format(record) )
-        return re.sub("(§-§.*§-§)", format_path(re.search("(§-§.*§-§)", formatted_record).group(0)), formatted_record )
+        formatted_record = re.sub(f"{str(pathlib.Path().resolve())}".replace('\\','/'), '',  formatter.format(record) )
+
+        return re.sub("(§-§.*§-§)", format_path(re.search('(§-§.*§-§)'.replace('\\', '/'), formatted_record).group(0)), formatted_record ).replace("§-§","")
     
 level= cfg['logging']['level']
 logger = logging.getLogger('pet-finder')
@@ -60,5 +61,6 @@ def stringify(obj: dict)-> str:
     return dumps(obj, separators=(',',':'), indent=2)
 
 def format_path(path):
-    parts = re.sub(f"{str(pathlib.Path().resolve())}/", '', str(path)).split('/')
-    return f"{'| '.join(map_(parts, lambda part, i: part.upper() if(i < len(parts) -1) else part.lower()))} "
+    parts = re.sub(f"{str(pathlib.Path().resolve())}\\".replace('\\','/'), '', str(path.replace('\\', '/'))).split('/')
+    to_return = f"{' | '.join(map_(parts, lambda part, i: part.upper() if(i < len(parts) -1) else part.lower()))} "
+    return to_return
