@@ -4,6 +4,7 @@ from data.users.models import UserRole
 from api.middlewares import auth_middleware, min_role
 from libs.logger import logger
 from libs.utils import format_common_search, get_request_user
+from inspect import currentframe
 
 @convert_kwargs_to_snake_case
 @min_role(UserRole.ADMIN.name)
@@ -28,16 +29,23 @@ def list_users_resolver(obj, info, common_search):
 @convert_kwargs_to_snake_case
 @min_role(UserRole.ADMIN.name)
 def get_user_resolver(obj, info, id):
+    logger.error(
+        f"id: {id}"
+    )
     try:
         user = users_domain.get_user(id)
         payload = {
             "success": True,
             "user": user
         }
-    except AttributeError:  # todo not found
+        logger.check(
+            'API | USERS | queries.py | get_user_resolver \n'\
+            f"user: {user}"
+        )
+    except Exception as e:  # todo not found
         payload = {
             "success": False,
-            "errors": ["User item matching {id} not found"],
+            "errors": [str(e)],
             "user": None
         }
     return payload
@@ -53,9 +61,8 @@ def me_resolver(obj, info):
             "success": True,
             "user": user,
         }
-        logger.check(f"ME resolved: {payload}")
-    except Exception as e:  # todo not found
-        logger.error(f"ME not resolved: {e}")
+    except Exception as e:  
+        logger.error(f"errors: {e}")
         payload = {
             "success": False,
             "errors": ["no user found"],
