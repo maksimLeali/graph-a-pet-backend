@@ -42,7 +42,14 @@ def min_role(role: UserRole):
             except Exception as e:
                 raise Exception('unauthorized')      
             if level[user['role']] < level[role] :
+                logger.error(
+                    'API | middleware.py | min_role \n'\
+                    f"{user['id']} with role {user['role']} doesn't have access to resource"    
+                )
                 raise Exception('insufficent role')
+            logger.info('API | middleware.py | min_role \n'\
+                f"{user['id']} with role {user['role']} can access resource"    
+            )
             return fn(obj, info, **args)
         return wrapper
     return decorate

@@ -1,6 +1,9 @@
 import logging
 from config import cfg
 from json import dumps
+from pydash import map_
+import pathlib
+import re
 
 
 class CustomFormatter(logging.Formatter):
@@ -19,10 +22,10 @@ class CustomFormatter(logging.Formatter):
     bold_red = "\x1b[31;1m"
     purple = "\x1b[1;35m"
     reset = "\x1b[0m"
-    format = "%(levelname)s | %(message)s \n"
+    format = "%(levelname)s: %(message)s\n "
     input_format = "%(levelname)s \n%(message)s \n"
     output_format = "%(message)s \n%(levelname)s \n"
-    extended_format = "%(levelname)s | %(message)s  \n(%(pathname)s:%(lineno)d ->  %(funcName)s)\n"
+    extended_format = "%(levelname)s: %(message)s  \n(%(pathname)s:%(lineno)d ->  %(funcName)s)\n"
 
     FORMATS = {
         logging.DEBUG: grey+ "⚪  " + format + reset, #10
@@ -54,3 +57,7 @@ logger.addHandler(ch)
 
 def stringify(obj: dict)-> str:
     return dumps(obj, separators=(',',':'), indent=2)
+
+def formatPath(path, frame):
+    parts = re.sub(str(pathlib.Path().resolve()), '', str(path)).split('/')
+    return f" {' | '.join(map_(parts, lambda part, i: part.upper() if(i < len(parts) -1) else part.lower()))} | {frame.f_code.co_name}\n"
