@@ -2,22 +2,28 @@ from ariadne import convert_kwargs_to_snake_case
 import domain.users as users_domain
 from data.users.models import UserRole
 from api.middlewares import auth_middleware, min_role
-from libs.logger import logger
+from libs.logger import logger, stringify
 from libs.utils import format_common_search, get_request_user
 from inspect import currentframe
 
 @convert_kwargs_to_snake_case
 @min_role(UserRole.ADMIN.name)
 def list_users_resolver(obj, info, common_search):
+    logger.api(f"common_search: {stringify(common_search)}")
     common_search= format_common_search(common_search)
     try:
         users, pagination = users_domain.get_paginated_users(common_search)
+        logger.check(
+            f"users: {stringify(users)}\n"\
+            f"pafination: {stringify(pagination)}"
+        )
         payload = {
             "success": True,
             "items": users,
             "pagination": pagination
         }
     except Exception as error:
+        logger.error(error)
         payload = {
             "success": False,
             "errors": [str(error)],
@@ -29,20 +35,16 @@ def list_users_resolver(obj, info, common_search):
 @convert_kwargs_to_snake_case
 @min_role(UserRole.ADMIN.name)
 def get_user_resolver(obj, info, id):
-    logger.error(
-        f"id: {id}"
-    )
+    logger.api(f"id: {id}")
     try:
         user = users_domain.get_user(id)
         payload = {
             "success": True,
             "user": user
         }
-        logger.check(
-            'API | USERS | queries.py | get_user_resolver \n'\
-            f"user: {user}"
-        )
+        logger.check(f"user: {stringify(user)}")
     except Exception as e:  # todo not found
+        logger.error(e)
         payload = {
             "success": False,
             "errors": [str(e)],
@@ -53,7 +55,7 @@ def get_user_resolver(obj, info, id):
 @convert_kwargs_to_snake_case
 @auth_middleware
 def me_resolver(obj, info):
-    logger.info("API | USERS | queries.py | me ")
+    logger.api("me")
     try:
         token =  info.context.headers['authorization']
         user = get_request_user(token)
@@ -61,6 +63,7 @@ def me_resolver(obj, info):
             "success": True,
             "user": user,
         }
+        logger.check(f"me: {user}")
     except Exception as e:  
         logger.error(f"errors: {e}")
         payload = {

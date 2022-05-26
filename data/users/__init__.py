@@ -4,6 +4,7 @@ import uuid
 from datetime import datetime
 from data.query_builder import build_query, build_count
 from libs.logger import logger
+from api.errors import InternalError
 from sqlalchemy import select, text
 
 
@@ -43,7 +44,7 @@ def get_users(common_search):
         return [user.to_dict() for user in users]
     except Exception as e: 
         logger.error(e)
-        raise Exception(e)
+        raise InternalError(str(e))
         
 def get_total_items(common_search):
     try:
@@ -52,7 +53,7 @@ def get_total_items(common_search):
         return result.first()[0]
     except Exception as e:
         logger.error(e)
-        raise Exception(e)
+        raise InternalError(str(e))
     
 def get_user(id):
     return User.query.get(id).to_dict()

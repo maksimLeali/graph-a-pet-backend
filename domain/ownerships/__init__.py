@@ -1,6 +1,7 @@
 import data.ownerships as ownerships_data
 import domain.users as users_domain
 import domain.pets as pets_domain
+from api.errors import InternalError
 from libs.logger import logger
 from math import ceil
 
@@ -11,11 +12,14 @@ def get_user(obj, info):
     return users_domain.get_user(obj['user_id'])
 
 def get_paginated_ownerships(common_search):
-    pagination = get_pagination(common_search)
-    ownerships = get_ownerships(common_search)
+    try:
+        pagination = get_pagination(common_search)
+        ownerships = get_ownerships(common_search)
 
-    return (ownerships, pagination)
-
+        return (ownerships, pagination)
+    except Exception as e:
+        logger.error(e)
+        raise InternalError(e) 
 
 def create_ownership(data):
     return ownerships_data.create_ownership(data)
@@ -24,8 +28,12 @@ def update_ownership(id, data):
     return ownerships_data.update_ownership(id, data)
 
 def get_ownerships(common_search):
-    return ownerships_data.get_ownerships(common_search)
-
+    try: 
+        return ownerships_data.get_ownerships(common_search)
+    except Exception as e:
+        logger.error(e)
+        raise InternalError(e)
+    
 def get_ownership(id): 
     return ownerships_data.get_ownership(id)
 
@@ -46,4 +54,4 @@ def get_pagination(common_search):
         }
     except Exception as e:
         logger.error(e)
-        raise Exception(e)
+        raise InternalError(e)

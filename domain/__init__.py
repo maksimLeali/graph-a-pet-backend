@@ -8,7 +8,7 @@ import pydash as py_
 
 
 def refresh_token(token):
-    logger.info(f"DOMAIN | refresh_token | {token}")
+    logger.domain(f"token:  {token}")
     request_user = get_request_user(token)
     refreshed_token = jwt.encode(
         {

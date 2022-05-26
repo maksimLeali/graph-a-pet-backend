@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 from sqlalchemy import select, text
-
+from api.errors import InternalError
 from data.ownerships.models import Ownership
 from data import db
 from libs.logger import logger
@@ -37,7 +37,7 @@ def get_ownerships(common_search):
         return [pet.to_dict() for pet in ownershps]
     except Exception as e: 
         logger.error(e)
-        raise Exception(e)
+        raise InternalError(str(e))
 
 def get_filtered_ownerships(filters,):
     results = select(Ownership).from_statement(text(
@@ -56,7 +56,7 @@ def get_total_items(common_search):
         return result.first()[0]
     except Exception as e:
         logger.error(e)
-        raise Exception(e)
+        raise InternalError(str(e))
 
 def get_ownership(id):
     return Ownership.query.get(id).to_dict()    

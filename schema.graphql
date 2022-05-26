@@ -189,8 +189,8 @@ type PaginatedOwnerships {
 type NewTokenResult {
     success: Boolean!
     errors: [String]
-    token: String!
-    user: User!
+    token: String
+    user: User
 }
 
 

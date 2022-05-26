@@ -1,6 +1,7 @@
 
 from typing import Dict
 import pydash as py_
+from api.errors import InternalError
 from libs.utils import camel_to_snake
 from itertools import permutations
 from libs.logger import logger, stringify
@@ -41,43 +42,47 @@ tables_common_properties = {
 }
 
 def build_join(parent: str, join: dict):
-    logger.input(
-        "DATA | query_builder.py | build_join" \
-        f"\nparent: {parent} " \
-        f"\njoin: {stringify(join)}"
-    )
-    join_string = ""
-    filters= []
-    parent_alias= tables_common_properties[parent]['alias']
-    join_keys= py_.keys(join)
-    for key in join_keys:
-        join_alias=tables_common_properties[key]['alias']
-        join_string += f"JOIN {key} AS {join_alias} ON {parent_alias}.{tables_common_properties[key]['other_table_ref']} = {join_alias}.id "
-        filter_keys = py_.keys(join[key])
-        for f_key in filter_keys :
-            if f_key == "lists" :
-                lists = format_list_filters(alias= join_alias, filters=join[key][f_key] )
-                if len(lists)> 0:
-                    filters.append(f" {lists} ")
-            if f_key == "ranges" :
-                ranges = format_range_filters(alias= join_alias, filters=join[key][f_key] )
-                if len(ranges)> 0:
-                    filters.append(f" {ranges} ")
-            if f_key == "fixeds" :
-                fixeds=format_fixed_filters(alias= join_alias, filters=join[key][f_key] )
-                if len(fixeds)> 0:
-                    filters.append(f" {fixeds} ")
-            if f_key == "join" :
-                join_result = build_join(parent=key, join=join[key][f_key])
-                for join_filter in join_result[1]:
-                    filters.append(join_filter)
-                join_string+= join_result[0]
-    logger.output(
-        "DATA | query_builder.py | build_join\n" \
-        f"join_string: {join_string} \n" \
-        f"filters: {stringify(filters)}"
-    )
-    return join_string, filters
+    try: 
+        logger.input(
+            "DATA | query_builder.py | build_join" \
+            f"\nparent: {parent} " \
+            f"\njoin: {stringify(join)}"
+        )
+        join_string = ""
+        filters= []
+        parent_alias= tables_common_properties[parent]['alias']
+        join_keys= py_.keys(join)
+        for key in join_keys:
+            join_alias=tables_common_properties[key]['alias']
+            join_string += f"JOIN {key} AS {join_alias} ON {parent_alias}.{tables_common_properties[key]['other_table_ref']} = {join_alias}.id "
+            filter_keys = py_.keys(join[key])
+            for f_key in filter_keys :
+                if f_key == "lists" :
+                    lists = format_list_filters(alias= join_alias, filters=join[key][f_key] )
+                    if len(lists)> 0:
+                        filters.append(f" {lists} ")
+                if f_key == "ranges" :
+                    ranges = format_range_filters(alias= join_alias, filters=join[key][f_key] )
+                    if len(ranges)> 0:
+                        filters.append(f" {ranges} ")
+                if f_key == "fixeds" :
+                    fixeds=format_fixed_filters(alias= join_alias, filters=join[key][f_key] )
+                    if len(fixeds)> 0:
+                        filters.append(f" {fixeds} ")
+                if f_key == "join" :
+                    join_result = build_join(parent=key, join=join[key][f_key])
+                    for join_filter in join_result[1]:
+                        filters.append(join_filter)
+                    join_string+= join_result[0]
+        logger.output(
+            "DATA | query_builder.py | build_join\n" \
+            f"join_string: {join_string} \n" \
+            f"filters: {stringify(filters)}"
+        )
+        return join_string, filters
+    except Exception as e: 
+        logger.error(e)
+        raise InternalError(e)
 
 
 def format_range_filters(alias,filters: Dict[str, Dict[str, str]]) -> str:
@@ -101,6 +106,7 @@ def format_range_filters(alias,filters: Dict[str, Dict[str, str]]) -> str:
             f"formatted_filters: {stringify(formatted_filters)}"
         )
     except Exception as e:
+        logger.warning(e)
         pass
     return formatted_filters
 
@@ -120,6 +126,7 @@ def format_fixed_filters(alias,filters: Dict[str, str]) -> str:
             f"formatted_filters: {stringify(formatted_filters)}"
         )
     except Exception as e:
+        logger.warning(e)
         pass
     return formatted_filters
 
@@ -140,6 +147,7 @@ def format_list_filters(alias,filters: Dict[str, list]) -> str:
             f"formatted_filters: {stringify(formatted_filters)}"
         )
     except Exception as e:
+        logger.warning(e)
         pass
     return formatted_filters
 
