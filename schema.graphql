@@ -9,7 +9,6 @@ type Query {
     listPets(commonSearch: CommonSearch={}): PaginatedPets!
     getPet(id: ID!): PetResult!
     me: UserResult!
-    isAuthenticated(commonSearch: CommonSearch={}): Boolean!
     getOwnership(id: ID!): OwnershipResult!
     listOwnerships(commonSearch: CommonSearch= {}):PaginatedOwnerships!
 }
@@ -89,6 +88,10 @@ enum CoatPattern{
     SOLID,
     COLORPOINT
 }
+type Error{
+    code: String!,
+    message: String!
+}
 
 type Pagination{
     total_items: Int
@@ -163,7 +166,7 @@ type Ownership {
 
 type UserResult {
     success: Boolean!
-    errors: [String]
+    errors: Error
     user: User
 }
 
@@ -209,7 +212,7 @@ type PetsResult {
 }
 
 type PaginatedPets {
-    succes: Boolean!
+    success: Boolean!
     errors: [String]
     items: [Pet]!
     pagination: Pagination!

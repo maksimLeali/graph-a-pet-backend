@@ -82,7 +82,7 @@ def build_join(parent: str, join: dict):
         return join_string, filters
     except Exception as e: 
         logger.error(e)
-        raise InternalError(e)
+        raise e
 
 
 def format_range_filters(alias,filters: Dict[str, Dict[str, str]]) -> str:

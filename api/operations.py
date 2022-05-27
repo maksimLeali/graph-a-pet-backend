@@ -1,6 +1,6 @@
 from tkinter import E
 from libs.logger import logger
-from ariadne import ObjectType
+from ariadne import QueryType, MutationType
 from api.users.resolvers import user
 from api.users.queries import *
 from api.users.mutations import *
@@ -16,6 +16,7 @@ from api.pet_bodies.mutations import *
 from api.coats.resolvers import coat
 from api.coats.queries import *
 from api.coats.mutations import *
+
 from domain import refresh_token
 from api.middlewares import auth_middleware
 
@@ -40,7 +41,7 @@ def refresh_token_resolver(obj, info):
     return payload
 
 
-query = ObjectType("Query")
+query = QueryType()
 query.set_field("listUsers", list_users_resolver)
 query.set_field("getUser", get_user_resolver)
 query.set_field("listPets", list_pets_resolver)
@@ -49,7 +50,7 @@ query.set_field("me", me_resolver)
 query.set_field("getOwnership", get_ownership_resolver)
 query.set_field("listOwnerships", list_ownerships_resolver)
 
-mutation = ObjectType("Mutation")
+mutation = MutationType()
 mutation.set_field('createUser', create_user_resolver)
 mutation.set_field('signUp', signup_resolver)
 mutation.set_field('updateUser', update_user_resolver)

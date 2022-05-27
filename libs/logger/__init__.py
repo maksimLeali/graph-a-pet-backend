@@ -67,7 +67,7 @@ logger.output = lambda msg, *args: logger._log(logging.OUTPUT, msg, args)
 logger.middleware = lambda msg, *args: logger._log(logging.MIDDLEWARE, msg, args)
 logger.api = lambda msg, *args: logger._log(logging.API, msg, args)
 logger.domain = lambda msg, *args: logger._log(logging.DOMAIN, msg, args)
-logger.DATA = lambda msg, *args: logger._log(logging.DATA, msg, args)
+logger.data = lambda msg, *args: logger._log(logging.DATA, msg, args)
 logger.setLevel(level)
 ch = logging.StreamHandler()
 

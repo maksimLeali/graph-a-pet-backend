@@ -7,7 +7,7 @@ from .models import Pet, Gender
 from data import db
 from data.query_builder import build_query, build_count
 from libs.utils import camel_to_snake
-from libs.logger import logger
+from libs.logger import logger, stringify
 
 
 def build_where(filters) -> str:
@@ -54,11 +54,15 @@ def update_pet(data):
 
 
 def get_pets(common_search):
+    logger.data(f"commons_search: {stringify(common_search)}")
     try:
         query = build_query(table="pets",search= common_search['search'],search_fields=common_search['search_fields'] ,ordering=common_search["ordering"],filters= common_search['filters'], pagination=common_search['pagination'] )
+        logger.check(f"query: {query}")
         manager = select(Pet).from_statement(text(query))
-        pets = db.session.execute(manager).scalars()
-        return [pet.to_dict() for pet in pets]
+        pets_model = db.session.execute(manager).scalars()
+        pets = [pet.to_dict() for pet in pets_model]
+        logger.check(f"pets found {len(pets)}")
+        return pets
     except Exception as e: 
         logger.error(e)
         raise Exception(e)

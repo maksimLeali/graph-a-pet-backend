@@ -2,6 +2,8 @@ import uuid
 from datetime import datetime
 from data.coats.models import Coat
 from data import db
+from api.errors import InternalError, NotFoundError
+from libs.logger import logger, stringify
 
 def create_coat(data):
     today = datetime.today()
@@ -28,4 +30,14 @@ def get_coats():
     return [coat.to_dict() for coat in Coat.query.all()]
 
 def get_coat(id):
-    return Coat.query.get(id).to_dict() 
+    logger.data(f"id: {id}")
+    try:
+        coat_model = Coat.query.get(id)
+        if not coat_model:
+            raise  
+        coat = coat_model.to_dict()
+        logger.check(f"coat: {stringify(coat)}")
+        return coat
+    except Exception as e: 
+        logger.error(e)
+        raise e

@@ -3,8 +3,8 @@ from passlib.hash import pbkdf2_sha256
 import uuid
 from datetime import datetime
 from data.query_builder import build_query, build_count
-from libs.logger import logger
-from api.errors import InternalError
+from libs.logger import logger,stringify
+from api.errors import InternalError, NotFoundError
 from sqlalchemy import select, text
 
 
@@ -44,7 +44,7 @@ def get_users(common_search):
         return [user.to_dict() for user in users]
     except Exception as e: 
         logger.error(e)
-        raise InternalError(str(e))
+        raise e
         
 def get_total_items(common_search):
     try:
@@ -53,11 +53,22 @@ def get_total_items(common_search):
         return result.first()[0]
     except Exception as e:
         logger.error(e)
-        raise InternalError(str(e))
+        raise e
     
 def get_user(id):
-    return User.query.get(id).to_dict()
-
+    logger.data(f"id {id}")
+    try: 
+        user_model= User.query.get(id)
+        logger.warning(user_model)
+        if not user_model:  
+            raise Exception(f"No user found with id {id}") 
+        user= user_model.to_dict()
+        logger.check(f"user: {stringify(user)}")
+        return user
+    except Exception as e:
+        logger.error(e)
+        raise e
+    
 def get_user_from_email(email) -> User:
      return User.query.filter(User.email==email).first().to_dict()
     

@@ -32,7 +32,7 @@ def signup_resolver(obj, info, data):
             "success": True,
             "user": user
         }
-        logger.chek(f"user: {stringify(user)}")
+        logger.check(f"user: {stringify(user)}")
     except ValueError:  # date format errors
         payload = {
             "success": False,

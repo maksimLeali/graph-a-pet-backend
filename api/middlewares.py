@@ -1,5 +1,8 @@
 from enum import Enum
 from functools import wraps
+from typing import Any
+
+from graphql import GraphQLResolveInfo
 from api.errors import AuthenticationError, ForbiddenError
 from domain.users import get_user
 from time import time
@@ -14,7 +17,7 @@ class RoleLevel(Enum):
     
 
 def auth_middleware(f):
-    def function_wrapper(obj, info, **args):
+    def function_wrapper(obj: Any, info: GraphQLResolveInfo, **args):
         logger.middleware("check if user is authorized")
         try :
             bearer = info.context.headers['authorization'].split('Bearer ')[1]
@@ -34,7 +37,7 @@ def auth_middleware(f):
 def min_role(role: UserRole):
     def decorate(fn):
         @wraps(fn)
-        def wrapper(obj, info ,**args):
+        def wrapper(obj: Any, info: GraphQLResolveInfo ,**args):
             level = { UserRole.ADMIN.name : 3, UserRole.USER.name: 2}
             logger.middleware(f"min role: {role}")
             try :

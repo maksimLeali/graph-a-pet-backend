@@ -1,14 +1,15 @@
 from ariadne import convert_kwargs_to_snake_case
+from graphql import GraphQLResolveInfo
 import domain.users as users_domain
 from data.users.models import UserRole
+from api.errors import format_error
 from api.middlewares import auth_middleware, min_role
 from libs.logger import logger, stringify
 from libs.utils import format_common_search, get_request_user
-from inspect import currentframe
 
 @convert_kwargs_to_snake_case
 @min_role(UserRole.ADMIN.name)
-def list_users_resolver(obj, info, common_search):
+def list_users_resolver(obj, info: GraphQLResolveInfo, common_search):
     logger.api(f"common_search: {stringify(common_search)}")
     common_search= format_common_search(common_search)
     try:
@@ -44,10 +45,14 @@ def get_user_resolver(obj, info, id):
         }
         logger.check(f"user: {stringify(user)}")
     except Exception as e:  # todo not found
+        error=format_error(e)
         logger.error(e)
         payload = {
             "success": False,
-            "errors": [str(e)],
+            "errors": {
+                "message": str(error),
+                "code": error.extension['code']
+                },
             "user": None
         }
     return payload

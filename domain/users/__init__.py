@@ -3,27 +3,25 @@ import data.users as users_data
 from math import ceil
 from time import time
 from libs.logger import logger, stringify
-from api.errors import AuthenticationError, InternalError, error_pagination
-from data.ownerships.models import Ownership, CustodyLevel
+from api.errors import AuthenticationError, InternalError
+from data.ownerships.models import CustodyLevel
 import domain.pets as pets_domain
 import domain.ownerships as ownerships_domain
 from passlib.hash import pbkdf2_sha256
 import jwt
 import pydash as py_
 from config import cfg
-from libs.utils import format_common_search
 
 @convert_kwargs_to_snake_case
-def get_ownerships(obj, info, common_search):
+def get_ownerships(common_search):
     logger.domain(f"common_search: {stringify(common_search)}")
     try:
-        common_search= format_common_search(common_search)
-        common_search['filters']['fixeds']['user_id'] = obj['id']
         ownerships, pagination = ownerships_domain.get_paginated_ownerships(common_search)
-        return { "items": ownerships, "pagination": pagination, "success": True}
+        logger.check(f"response: {stringify({'ownerships' : ownerships , 'pagination': pagination}) }")
+        return (ownerships, pagination)
     except Exception as e : 
         logger.error(e)
-        return { "items":[], "pagination": error_pagination , "errors": [str(e)], "success": False }
+        raise e
 
 def create_user(data):
     return users_data.create_user(data)
@@ -41,17 +39,20 @@ def get_paginated_users(common_search):
         return (users, pagination)
     except Exception as e: 
         logger.error(e)
-        raise InternalError(e)
+        raise e
 
 def get_users(common_search):
     try: 
         return users_data.get_users(common_search)
     except Exception as e:
-        raise InternalError(e)
+        raise e
 
 def get_user(id):
-    return users_data.get_user(id)
-
+    try:
+        return users_data.get_user(id)
+    except Exception as e:
+        logger.error(e)
+        raise e
 
 def get_pagination(common_search):
     try: 
@@ -67,7 +68,7 @@ def get_pagination(common_search):
         }
     except Exception as e:
         logger.error(e)
-        raise InternalError(e)
+        raise e
 
 def add_pet_to_user(user_id, pet):
     user = users_data.get_user(user_id)
@@ -98,5 +99,5 @@ def login(email, password) -> str:
                     cfg['jwt']['secret'], algorithm="HS256"), user
         raise AuthenticationError('Credentials error')
     except Exception as e:
-        logger.error("Credential errprs")
-        raise AuthenticationError('Credentials error')
+        logger.error("Credential errors")
+        raise e

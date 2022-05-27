@@ -18,7 +18,7 @@ def list_pets_resolver(obj, info, common_search):
             "items": pets,
             "pagination": pagination,
         }
-        logger.chek(f"pets: {stringify(pets)}")
+        logger.check(f"pets found: {len(pets)}")
     except Exception as error:
         payload = {
             "success": False,
