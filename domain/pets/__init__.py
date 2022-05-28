@@ -38,9 +38,13 @@ def get_paginated_pets(common_search):
         raise e
 
 def create_pet(data):
-    body = pet_bodies_domain.create_pet_body(data['body'])
-    data['body_id'] = body['id']
-    return pets_data.create_pet(data)
+    try:
+        body = pet_bodies_domain.create_pet_body(data['body'])
+        data['body_id'] = body['id']
+        return pets_data.create_pet(data)
+    except Exception as e:
+        logger.error(e)
+        raise e
 
 def update_pet(id, data):
     return pets_data.update_pet(id, data)

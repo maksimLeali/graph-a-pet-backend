@@ -12,19 +12,26 @@ from data.users.models import User, UserRole
 from data import db
 
 def create_user(data):
-    today = datetime.today()
-    user = User(
-        id = f"{uuid.uuid4()}",
-        first_name = data["first_name"], 
-        last_name = data["last_name"], 
-        email=data["email"], 
-        role= UserRole.USER.name,
-        password= pbkdf2_sha256.hash(data["password"]),
-        created_at=today.strftime("%b-%d-%Y")
-    )
-    db.session.add(user)
-    db.session.commit()
-    return user.to_dict()
+    logger.data(f"data: {stringify(data)}")
+    try: 
+        today = datetime.today()
+        user_model = User(
+            id = f"{uuid.uuid4()}",
+            first_name = data["first_name"], 
+            last_name = data["last_name"], 
+            email=data["email"], 
+            role= UserRole.USER.name,
+            password= pbkdf2_sha256.hash(data["password"]),
+            created_at=today.strftime("%b-%d-%Y")
+        )
+        db.session.add(user_model)
+        db.session.commit()
+        user= user_model.to_dict()
+        logger.check(f"user: {stringify(user)}")
+        return user
+    except Exception as e:
+        logger.error(e)
+        raise e
     
 def update_user(data, id):
 
@@ -59,9 +66,8 @@ def get_user(id):
     logger.data(f"id {id}")
     try: 
         user_model= User.query.get(id)
-        logger.warning(user_model)
         if not user_model:  
-            raise Exception(f"No user found with id {id}") 
+            raise NotFoundError(f"No user found with id {id}") 
         user= user_model.to_dict()
         logger.check(f"user: {stringify(user)}")
         return user

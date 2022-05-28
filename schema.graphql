@@ -166,32 +166,32 @@ type Ownership {
 
 type UserResult {
     success: Boolean!
-    errors: Error
+    error: Error
     user: User
 }
 
 type UsersResult {
     success: Boolean!
-    errors: [String]
+    error: Error
     users: [User]!
 }
 
 type PaginatedUsers {
     success: Boolean
-    errors: [String]
+    error: Error
     items: [User]!
     pagination: Pagination!
 }
 type PaginatedOwnerships {
     success: Boolean
-    errors: [String]
+    error: Error
     items: [Ownership]!
     pagination: Pagination!
 }
 
 type NewTokenResult {
     success: Boolean!
-    errors: [String]
+    error: Error
     token: String
     user: User
 }
@@ -199,21 +199,21 @@ type NewTokenResult {
 
 type PetResult {
     success: Boolean!
-    errors: [String]
+    error: Error
     pet: Pet
     
 } 
 
 type PetsResult {
     success: Boolean!
-    errors: [String]
+    error: Error
     pets: [Pet]!
     
 }
 
 type PaginatedPets {
     success: Boolean!
-    errors: [String]
+    error: Error
     items: [Pet]!
     pagination: Pagination!
     
@@ -221,14 +221,14 @@ type PaginatedPets {
 
 type OwnershipResult {
     success: Boolean!
-    errors: [String]
+    error: Error
     ownership: Ownership
     
 }
 
 type OwnershipsResult {
     success: Boolean!
-    errors: [String]
+    error: Error
     ownerships: [Ownership]!
     
 }
@@ -240,9 +240,9 @@ type NewOwnership {
 
 type PetAddedResult {
     success: Boolean!
-    errors: [String]
+    error: Error
     
-    data: NewOwnership!
+    data: NewOwnership
 }
 
 type HealthCard {

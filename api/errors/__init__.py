@@ -1,4 +1,7 @@
 from libs.logger import logger
+class BadRequest(Exception):
+    extension= {"code": "400"}
+
 class AuthenticationError(Exception):
     extensions = {"code": "401"}
 
@@ -11,7 +14,8 @@ class NotFoundError(Exception):
 class InternalError(Exception):
     extension ={"code": "500"}
 
-errors_types=[AuthenticationError, ForbiddenError, NotFoundError, InternalError]
+
+errors_types=[AuthenticationError, ForbiddenError, NotFoundError, InternalError, BadRequest]
 
 error_pagination = {
     "page": 0,
@@ -21,10 +25,12 @@ error_pagination = {
 }
 
 def format_error (e): 
+    logger.warning(type(e))
     if not type(e) in errors_types :
         logger.critical(
             "Exception not handled properly\n"\
             f"{e}"
         )
-        return InternalError(str(e))
-    return e
+        e= InternalError(str(e))
+    logger.warning(type(e))
+    return { "message" : str(e), "code": e.extension['code']}

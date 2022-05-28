@@ -10,9 +10,13 @@ def get_coat(obj, info):
     return coats_domain.get_coat(obj['coat_id'])
 
 def create_pet_body(data):
-    coat = coats_domain.create_coat(data['coat'])
-    data['coat_id'] = coat['id']
-    return pet_bodies_data.create_pet_body(data)
+    try: 
+        coat = coats_domain.create_coat(data['coat'])
+        data['coat_id'] = coat['id']
+        return pet_bodies_data.create_pet_body(data)
+    except Exception as e: 
+        logger.error(e);
+        raise e
 
 def update_pet_body(id, data):
     return pet_bodies_data.update_pet_body(id, data)

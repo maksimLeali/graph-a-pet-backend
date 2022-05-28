@@ -43,9 +43,9 @@ def min_role(role: UserRole):
             try :
                 bearer = info.context.headers['authorization'].split('Bearer ')[1]
                 decoded_bearer= jwt.decode(bearer,cfg['jwt']['secret'],algorithms=["HS256"] )
-                user = get_user(decoded_bearer['user']['id'])
+                user = decoded_bearer['user']
             except jwt.ExpiredSignatureError as e : 
-                logger.error(f"Token expired for user {decoded_bearer['user']['id']} ")
+                logger.error(f"Token expired")
                 raise AuthenticationError("Token expired")
             except Exception as e:
                 logger.error('unauthorized') 

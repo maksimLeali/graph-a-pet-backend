@@ -2,21 +2,26 @@ import uuid
 from datetime import datetime
 from data.coats.models import Coat
 from data import db
-from api.errors import InternalError, NotFoundError
+from api.errors import InternalError, NotFoundError, BadRequest
 from libs.logger import logger, stringify
 
 def create_coat(data):
-    today = datetime.today()
-    coat = Coat(
-        id = f"{uuid.uuid4()}",
-        length=data["length"], 
-        pattern=data["pattern"], 
-        colors= data['colors'],
-        created_at=today.strftime("%b-%d-%Y")
-    )
-    db.session.add(coat)
-    db.session.commit()
-    return coat.to_dict()
+    logger.data(f"data: {stringify(data)}")
+    try:
+        today = datetime.today()
+        coat = Coat(
+            id = f"{uuid.uuid4()}",
+            length=data["length"], 
+            pattern=data["pattern"], 
+            colors= data['colors'],
+            created_at=today.strftime("%b-%d-%Y")
+        )
+        db.session.add(coat)
+        db.session.commit()
+        return coat.to_dict()
+    except Exception as e:
+        logger.error(e)
+        raise BadRequest(e)
     
 def update_coat(data):
     coat = Coat.query.get(id)

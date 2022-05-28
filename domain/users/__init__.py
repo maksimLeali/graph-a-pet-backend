@@ -3,7 +3,7 @@ import data.users as users_data
 from math import ceil
 from time import time
 from libs.logger import logger, stringify
-from api.errors import AuthenticationError, InternalError
+from api.errors import AuthenticationError, InternalError, NotFoundError
 from data.ownerships.models import CustodyLevel
 import domain.pets as pets_domain
 import domain.ownerships as ownerships_domain
@@ -24,65 +24,88 @@ def get_ownerships(common_search):
         raise e
 
 def create_user(data):
-    return users_data.create_user(data)
-
+    logger.domain(f'data: {stringify(data)}')
+    try: 
+        user= users_data.create_user(data)
+        return user
+    except Exception as e:
+        logger.error(e)
+        raise e
 
 def update_user(id, data):
     return users_data.update_user(id, data)
 
 
 def get_paginated_users(common_search):
+    logger.domain(f"common_search: {stringify(common_search)}")
     try:
         pagination = get_pagination(common_search)
         users = get_users(common_search)
-
+        logger.check(f"pagination: {stringify(pagination)}")
         return (users, pagination)
     except Exception as e: 
         logger.error(e)
         raise e
 
 def get_users(common_search):
+    logger.input(f"common_search: {stringify(common_search)}")
     try: 
-        return users_data.get_users(common_search)
+        users= users_data.get_users(common_search)
+        logger.output(f"users: {len(users)}")
+        return users
     except Exception as e:
+        logger.error(e)
         raise e
 
 def get_user(id):
+    logger.domain(f"id: {id}")
     try:
-        return users_data.get_user(id)
+        user= users_data.get_user(id)
+        logger.check(f"user: {stringify(user)}")
+        return user
     except Exception as e:
         logger.error(e)
         raise e
 
 def get_pagination(common_search):
+    logger.input(f"common_search: {stringify(common_search)}")
     try: 
         total_items = users_data.get_total_items(common_search)
         page_size = common_search['pagination']['page_size']
         total_pages = ceil(total_items /page_size)
         current_page = common_search['pagination']['page']
-        return {
+        pagination= {
             "total_items": total_items,
             "total_pages": total_pages,
             "current_page": current_page,
             "page_size": page_size
         }
+        logger.output(f"pagination: {stringify(pagination)}")
+        return pagination
     except Exception as e:
         logger.error(e)
         raise e
 
 def add_pet_to_user(user_id, pet):
-    user = users_data.get_user(user_id)
-    if(not user):
-        raise Exception(f"no user found with id: {user_id}")
-    new_pet = pets_domain.create_pet(pet)
-    ownership = {
-        "user_id": user['id'],
-        "pet_id": new_pet['id'],
-        "custody_level": CustodyLevel.OWNER.name
-    }
-    new_ownership = ownerships_domain.create_ownership(ownership)
-    return (new_pet, new_ownership)
-
+    logger.domain(
+        f"user_id: {user_id}\n"\
+        f"pet: {stringify(pet)}"
+    )
+    try:
+        user = users_data.get_user(user_id)
+        if(not user):
+            raise NotFoundError(f"no user found with id: {user_id}")
+        new_pet = pets_domain.create_pet(pet)
+        ownership = {
+            "user_id": user['id'],
+            "pet_id": new_pet['id'],
+            "custody_level": CustodyLevel.OWNER.name
+        }
+        new_ownership = ownerships_domain.create_ownership(ownership)
+        return (new_pet, new_ownership)
+    except Exception as e:
+        logger.error(e)
+        raise e
 
 def login(email, password) -> str:
     logger.domain(f"email: {email}, password: {password}")

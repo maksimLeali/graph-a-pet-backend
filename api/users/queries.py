@@ -2,7 +2,7 @@ from ariadne import convert_kwargs_to_snake_case
 from graphql import GraphQLResolveInfo
 import domain.users as users_domain
 from data.users.models import UserRole
-from api.errors import format_error
+from api.errors import format_error, error_pagination
 from api.middlewares import auth_middleware, min_role
 from libs.logger import logger, stringify
 from libs.utils import format_common_search, get_request_user
@@ -14,22 +14,19 @@ def list_users_resolver(obj, info: GraphQLResolveInfo, common_search):
     common_search= format_common_search(common_search)
     try:
         users, pagination = users_domain.get_paginated_users(common_search)
-        logger.check(
-            f"users: {stringify(users)}\n"\
-            f"pafination: {stringify(pagination)}"
-        )
+        logger.check(f"pafination: {stringify(pagination)}")
         payload = {
             "success": True,
             "items": users,
             "pagination": pagination
         }
-    except Exception as error:
-        logger.error(error)
+    except Exception as e:
+        logger.error(e)
         payload = {
             "success": False,
-            "errors": [str(error)],
+            "error": format_error(e),
             "items": [],
-            "pagination": {}
+            "pagination": error_pagination
         }
     return payload
 
@@ -45,14 +42,10 @@ def get_user_resolver(obj, info, id):
         }
         logger.check(f"user: {stringify(user)}")
     except Exception as e:  # todo not found
-        error=format_error(e)
         logger.error(e)
         payload = {
             "success": False,
-            "errors": {
-                "message": str(error),
-                "code": error.extension['code']
-                },
+            "error": format_error(e),
             "user": None
         }
     return payload
@@ -70,10 +63,10 @@ def me_resolver(obj, info):
         }
         logger.check(f"me: {user}")
     except Exception as e:  
-        logger.error(f"errors: {e}")
+        logger.error(e)
         payload = {
             "success": False,
-            "errors": ["no user found"],
+            "error": format_error(e),
             "user": None
         }
     return payload

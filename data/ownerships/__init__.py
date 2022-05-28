@@ -1,7 +1,8 @@
 import uuid
 from datetime import datetime
+from sqlalchemy.exc import ProgrammingError
 from sqlalchemy import select, text
-from api.errors import InternalError
+from api.errors import InternalError, BadRequest
 from data.ownerships.models import Ownership
 from data import db
 from libs.logger import logger
@@ -54,6 +55,9 @@ def get_total_items(common_search):
         query = build_count(table="ownerships",search= common_search['search'],search_fields=common_search['search_fields'] ,filters= common_search['filters'] )
         result = db.session.execute(query)
         return result.first()[0]
+    except ProgrammingError as e: 
+        logger.error(e)
+        raise BadRequest('malformed variables_fields')
     except Exception as e:
         logger.error(e)
         raise e

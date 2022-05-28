@@ -2,6 +2,7 @@
 from ariadne import convert_kwargs_to_snake_case
 from domain.users import create_user, update_user, login, add_pet_to_user
 from api.middlewares import auth_middleware, min_role
+from api.errors import format_error
 from data.users.models import UserRole
 from libs.utils import get_request_user
 from libs.logger import logger, stringify
@@ -9,17 +10,18 @@ from libs.logger import logger, stringify
 @convert_kwargs_to_snake_case
 @min_role(UserRole.ADMIN.name)
 def create_user_resolver(obj, info, data):
+    logger.api(f"data {stringify(data)}")
     try:
         user = create_user(data)
         payload = {
             "success": True,
             "user": user
         }
-    except ValueError:  # date format errors
+    except Exception as e:
+        logger.error(e)  # date format errors
         payload = {
             "success": False,
-            "errors": [f"Incorrect date format provided. Date should be in "
-                       f"the format dd-mm-yyyy"]
+            "error": format_error(e)
         }
     return payload
 
@@ -33,11 +35,12 @@ def signup_resolver(obj, info, data):
             "user": user
         }
         logger.check(f"user: {stringify(user)}")
-    except ValueError:  # date format errors
+    except Exception as e:
+        logger.error(e)  # date format errors
         payload = {
             "success": False,
-            "errors": [f"Incorrect date format provided. Date should be in "
-                       f"the format dd-mm-yyyy"]
+            "user": None,
+            "error": format_error(e)
         }
     return payload
 
@@ -50,10 +53,11 @@ def update_user_resolver(obj, info, id, data):
             "success": True,
             "user": user
         }
-    except AttributeError:  # todo not found
+    except Exception as e:  # todo not found
         payload = {
             "success": False,
-            "errors": ["item matching id {id} not found"]
+            "user": None,
+            "error": format_error(e)
         }
     return payload
 
@@ -74,13 +78,17 @@ def login_resolver(obj, info, email, password):
             "success": False,
             "token": None,
             "user": None,
-            "errors": [str(e)]
+            "errors": format_error(e)
         }
     return payload
 
 @convert_kwargs_to_snake_case
 @min_role(UserRole.ADMIN.name)
 def add_pet_to_user_resolver(obj, info, pet, user_id):
+    logger.api(
+        f"user_id: {user_id}\n"\
+        f"pet: {stringify(pet)}"
+    )
     try: 
         new_pet, new_ownership = add_pet_to_user(user_id, pet)
         payload= {
@@ -90,18 +98,19 @@ def add_pet_to_user_resolver(obj, info, pet, user_id):
                 "ownership": new_ownership
             }
         }        
-    except Exception:
+    except Exception as e:
+        logger.error(e)
         payload = {
             "success": False,
-            "errors": [f"Incorrect date format provided. Date should be in "
-                       f"the format dd-mm-yyyy"]
+            "data": None,
+            "error": format_error(e)
         }
     return payload
 
 @convert_kwargs_to_snake_case
 @auth_middleware
 def add_pet_to_me_resolver(obj, info, pet):
-    logger.info(f"pet: {stringify(pet)}")
+    logger.api(f"pet: {stringify(pet)}")
     try: 
         token =  info.context.headers['authorization']
         user = get_request_user(token)
@@ -113,7 +122,8 @@ def add_pet_to_me_resolver(obj, info, pet):
                 "ownership": new_ownership
             }
         }        
-    except Exception:
+    except Exception as e:
+        logger.error(e)
         payload = {
             "success": False,
             "errors": [f"Incorrect date format provided. Date should be in "
