@@ -1,10 +1,11 @@
 from typing import Dict
 from passlib.hash import pbkdf2_sha256 
 import uuid
+from sqlalchemy.exc import InvalidRequestError
 from datetime import datetime
 from data.query_builder import build_query, build_count
 from libs.logger import logger,stringify
-from api.errors import InternalError, NotFoundError
+from api.errors import InternalError, NotFoundError, BadRequest
 from sqlalchemy import select, text
 
 
@@ -33,15 +34,24 @@ def create_user(data):
         logger.error(e)
         raise e
     
-def update_user(data, id):
-
-    user = User.query.get(id)
-    if user:
+def update_user(id, data):
+    logger.data(
+        f"id: {id}\n"\
+        f"data: {stringify(data)}"
+    )
+    try: 
+        user = get_user(id)
+        if not user:
+            raise NotFoundError(f"no user found with id: {id}")
         user= {**user, **data}
-    db.session.add(user)
-    db.session.commit()
-    return user 
-
+        db.session.commit()
+        return user
+    except InvalidRequestError as e:
+        logger.error(e) 
+        raise BadRequest(e)
+    except Exception as e:
+        logger.error(e)
+        raise e
 
 def get_users(common_search):
     try:

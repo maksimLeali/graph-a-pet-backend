@@ -47,13 +47,19 @@ def signup_resolver(obj, info, data):
 @convert_kwargs_to_snake_case
 @min_role(UserRole.ADMIN.name)
 def update_user_resolver(obj, info, id, data):
+    logger.api(
+        f"id: {id}\n"\
+        f"data: {stringify(data)}"
+    )
     try:
         user = update_user(id, data)
         payload = {
             "success": True,
             "user": user
         }
-    except Exception as e:  # todo not found
+        logger.check(f'user: {stringify(user)}')
+    except Exception as e:  
+        logger.error(e)
         payload = {
             "success": False,
             "user": None,

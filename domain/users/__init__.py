@@ -33,7 +33,17 @@ def create_user(data):
         raise e
 
 def update_user(id, data):
-    return users_data.update_user(id, data)
+    logger.domain(
+        f"id: {id}\n"\
+        f"data: {stringify(data)}"
+    )
+    try: 
+        user= users_data.update_user(id, data)
+        logger.check(f"user: {stringify(user)}")
+        return user
+    except Exception as e:
+        logger.error(e)
+        raise e
 
 
 def get_paginated_users(common_search):
