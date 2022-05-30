@@ -12,3 +12,4 @@ logging:
   level: ~
 telegram: 
   token: ~
+  admin_id: ~
