@@ -29,6 +29,6 @@ def user_ownerships_resolver(obj, info, common_search):
             "items": [],
             "pagination": error_pagination,
             "success": False,
-            "error": format_error(e)
+            "error": format_error(e,info.context.headers['authorization']) 
         }
     return resolved

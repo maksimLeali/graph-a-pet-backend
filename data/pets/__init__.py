@@ -8,6 +8,7 @@ from data import db
 from data.query_builder import build_query, build_count
 from libs.utils import camel_to_snake
 from libs.logger import logger, stringify
+from api.errors import NotFoundError
 
 
 def build_where(filters) -> str:
@@ -89,4 +90,13 @@ def get_filtered_ownerships(filters,):
 
 
 def get_pet(id):
-    return Pet.query.get(id).to_dict()
+    logger.data(f"id: {id}")
+    try:
+        pet_model = Pet.query.get(id)
+        if not pet_model:
+            raise NotFoundError(f"no pet found with id: {id}")
+        pet= pet_model.to_dict()
+        return pet
+    except Exception as e:
+        logger.error(e)
+        raise e

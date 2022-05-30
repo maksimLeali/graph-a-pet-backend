@@ -10,3 +10,5 @@ firbase:
   buket_storage: ~
 logging: 
   level: ~
+telegram: 
+  token: ~

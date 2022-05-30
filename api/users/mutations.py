@@ -21,7 +21,7 @@ def create_user_resolver(obj, info, data):
         logger.error(e)  # date format errors
         payload = {
             "success": False,
-            "error": format_error(e)
+            "error": format_error(e,info.context.headers['authorization']) 
         }
     return payload
 
@@ -40,7 +40,7 @@ def signup_resolver(obj, info, data):
         payload = {
             "success": False,
             "user": None,
-            "error": format_error(e)
+            "error": format_error(e,info.context.headers['authorization']) 
         }
     return payload
 
@@ -63,7 +63,7 @@ def update_user_resolver(obj, info, id, data):
         payload = {
             "success": False,
             "user": None,
-            "error": format_error(e)
+            "error": format_error(e,info.context.headers['authorization']) 
         }
     return payload
 
@@ -84,7 +84,7 @@ def login_resolver(obj, info, email, password):
             "success": False,
             "token": None,
             "user": None,
-            "errors": format_error(e)
+            "errors": format_error(e,info.context.headers['authorization']) 
         }
     return payload
 
@@ -109,7 +109,7 @@ def add_pet_to_user_resolver(obj, info, pet, user_id):
         payload = {
             "success": False,
             "data": None,
-            "error": format_error(e)
+            "error": format_error(e,info.context.headers['authorization']) 
         }
     return payload
 

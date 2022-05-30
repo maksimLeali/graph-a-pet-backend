@@ -2,7 +2,7 @@ from ariadne import convert_kwargs_to_snake_case
 import domain.pets as pets_domain
 from libs.logger import logger, stringify
 from libs.utils import format_common_search
-from api.errors import InternalError, error_pagination
+from api.errors import InternalError, error_pagination, format_error
 from api.middlewares import min_role, RoleLevel
 
 
@@ -19,10 +19,11 @@ def list_pets_resolver(obj, info, common_search):
             "pagination": pagination,
         }
         logger.check(f"pets found: {len(pets)}")
-    except Exception as error:
+    except Exception as e:
+        logger.error(e)
         payload = {
             "success": False,
-            "errors": [str(error)],
+            "error": format_error(e,info.context.headers['authorization']) ,
             "items": [],
             "pagination": error_pagination 
         }
@@ -32,15 +33,18 @@ def list_pets_resolver(obj, info, common_search):
 @convert_kwargs_to_snake_case
 @min_role(RoleLevel.ADMIN.name)
 def get_pet_resolver(obj, info, id):
+    logger.api(f"id: {id}")
     try:
         pet = pets_domain.get_pet(id)
         payload = {
             "success": True,
             "pet": pet
         }
-    except AttributeError:  # todo not found
+    except Exception as e:
+        logger.error(e)
         payload = {
             "success": False,
-            "errors": ["pet item matching {id} not found"]
+            "pet":None, 
+            "error": format_error(e,info.context.headers['authorization']) 
         }
     return payload

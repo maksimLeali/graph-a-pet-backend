@@ -24,7 +24,7 @@ def list_users_resolver(obj, info: GraphQLResolveInfo, common_search):
         logger.error(e)
         payload = {
             "success": False,
-            "error": format_error(e),
+            "error": format_error(e,info.context.headers['authorization']) ,
             "items": [],
             "pagination": error_pagination
         }
@@ -45,7 +45,7 @@ def get_user_resolver(obj, info, id):
         logger.error(e)
         payload = {
             "success": False,
-            "error": format_error(e),
+            "error": format_error(e,info.context.headers['authorization']),
             "user": None
         }
     return payload
@@ -66,7 +66,7 @@ def me_resolver(obj, info):
         logger.error(e)
         payload = {
             "success": False,
-            "error": format_error(e),
+            "error": format_error(e, token),
             "user": None
         }
     return payload
