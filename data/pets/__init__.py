@@ -2,13 +2,13 @@ import uuid
 from datetime import datetime
 import pydash as py_
 from sqlalchemy import select, text
-
+from sqlalchemy.exc import ProgrammingError
 from .models import Pet, Gender
 from data import db
 from data.query_builder import build_query, build_count
 from libs.utils import camel_to_snake
 from libs.logger import logger, stringify
-from api.errors import NotFoundError
+from api.errors import NotFoundError, BadRequest
 
 
 def build_where(filters) -> str:
@@ -44,14 +44,24 @@ def create_pet(data: dict):
     return pet.to_dict()
 
 
-def update_pet(data):
-
-    pet = Pet.query.get(id)
-    if pet:
-        pet = {**pet, **data}
-    db.session.add(pet)
-    db.session.commit()
-    return pet
+def update_pet(id, data):
+    logger.data(
+        f"id: {id}\n"\
+        f"dta: {stringify(data)}"
+    )
+    try: 
+        pet_model= Pet.query.get(id)
+        if not pet:
+            raise NotFoundError("no pet found with id: {id}")
+        pet= pet_model.to_dict()
+        pet_model = {**pet, **data}
+        # db.session.add(pet)
+        db.session.commit()
+        logger.check("pet")
+        return pet
+    except Exception as e:
+        logger.error(e)
+        raise e
 
 
 def get_pets(common_search):
@@ -64,9 +74,14 @@ def get_pets(common_search):
         pets = [pet.to_dict() for pet in pets_model]
         logger.check(f"pets found {len(pets)}")
         return pets
+    except ProgrammingError as e:
+        logger.error(e)
+        exception = BadRequest("The fields provided may contains syntax errors")
+        exception.extension['extra'] = str(e)
+        raise exception
     except Exception as e: 
         logger.error(e)
-        raise Exception(e)
+        raise e
     
 def get_total_items(common_search):
     try:
@@ -75,7 +90,7 @@ def get_total_items(common_search):
         return result.first()[0]
     except Exception as e:
         logger.error(e)
-        raise Exception(e)
+        raise e
     
 
 def get_filtered_ownerships(filters,):

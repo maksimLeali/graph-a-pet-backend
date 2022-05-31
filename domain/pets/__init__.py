@@ -47,7 +47,17 @@ def create_pet(data):
         raise e
 
 def update_pet(id, data):
-    return pets_data.update_pet(id, data)
+    logger.domain(
+        f"id: {id}\n"\
+        f"data: {data}"
+    )
+    try:
+        pet= pets_data.update_pet(id, data)
+        logger.check(f"pet {stringify(pet)}")
+        return pet
+    except Exception as e:
+        logger.error(e)
+        raise e
 
 def get_pets(common_search):
     logger.domain(f"common_search: {stringify(common_search)}")

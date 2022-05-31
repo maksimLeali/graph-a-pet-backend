@@ -11,5 +11,6 @@ firbase:
 logging: 
   level: ~
 telegram: 
+  active: ~
   token: ~
   admin_id: ~

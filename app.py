@@ -1,4 +1,3 @@
-from graphql import GraphQLError
 from api import app
 from ariadne import graphql_sync, load_schema_from_path, make_executable_schema, \
     snake_case_fallback_resolvers
