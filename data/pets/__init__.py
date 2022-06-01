@@ -50,15 +50,15 @@ def update_pet(id, data):
         f"dta: {stringify(data)}"
     )
     try: 
-        pet_model= Pet.query.get(id)
-        if not pet:
-            raise NotFoundError("no pet found with id: {id}")
-        pet= pet_model.to_dict()
-        pet_model = {**pet, **data}
-        # db.session.add(pet)
+        pet_model = db.session.query(Pet).filter(Pet.id== id)
+        if not pet_model:
+            raise NotFoundError(f"no pet found with id: {id}")
+        pet_old = pet_model.first().to_dict()
+        pet_model.update(data)
         db.session.commit()
-        logger.check("pet")
-        return pet
+        pet= {**pet_old, **pet_model.first().to_dict()}
+        logger.check(f'pet: {stringify(pet)}')
+        return  pet
     except Exception as e:
         logger.error(e)
         raise e

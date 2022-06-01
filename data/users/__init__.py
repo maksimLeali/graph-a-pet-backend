@@ -40,19 +40,14 @@ def update_user(id, data):
         f"data: {stringify(data)}"
     )
     try: 
-        user_model = User.query.filter(id =id)
-        logger.info(user_model)
+        user_model = db.session.query(User).filter(User.id== id)
         if not user_model:
             raise NotFoundError(f"no user found with id: {id}")
-        logger.warning(f'@@@@@@@@@@@@@{type(user_model)}')
-        user_old = user_model.to_dict()
-        logger.warning(f'@@@@@@@@@@@@@{type(user_model)}')
-        user_model.update({**user_old, **data})
-        logger.warning(f'@@@@@@@@@@@@@{type(user_model)}')
-        db.session.add(user_model)
-        logger.warning(f'@@@@@@@@@@@@@{type(user_model)}')
+        user_old = user_model.first().to_dict()
+        user_model.update(data)
         db.session.commit()
-        user= {**user_old, ** data}
+        user= {**user_old, **user_model.first().to_dict()}
+        logger.check(f'user: {stringify(user)}')
         return  user
     except InvalidRequestError as e:
         logger.error(e) 
