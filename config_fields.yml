@@ -10,3 +10,7 @@ firbase:
   buket_storage: ~
 logging: 
   level: ~
+telegram: 
+  active: ~
+  token: ~
+  admin_id: ~

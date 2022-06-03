@@ -1,7 +1,8 @@
 import data.ownerships as ownerships_data
 import domain.users as users_domain
 import domain.pets as pets_domain
-from libs.logger import logger
+from api.errors import InternalError
+from libs.logger import logger, stringify
 from math import ceil
 
 def get_pet(obj,info):
@@ -11,21 +12,39 @@ def get_user(obj, info):
     return users_domain.get_user(obj['user_id'])
 
 def get_paginated_ownerships(common_search):
-    pagination = get_pagination(common_search)
-    ownerships = get_ownerships(common_search)
+    logger.domain(f"common_search: {stringify(common_search)}")
+    try:
+        pagination = get_pagination(common_search)
+        ownerships = get_ownerships(common_search)
 
-    return (ownerships, pagination)
-
+        return (ownerships, pagination)
+    except Exception as e:
+        logger.error(e)
+        raise e
 
 def create_ownership(data):
     return ownerships_data.create_ownership(data)
 
 def update_ownership(id, data):
-    return ownerships_data.update_ownership(id, data)
+    logger.domain(
+        f"id: {id}\n"\
+        f"data: {stringify(data)}"
+    )
+    try: 
+        ownership= ownerships_data.update_ownership(id, data)
+        logger.check(f'ownership: {ownership}')
+        return ownership
+    except Exception as e: 
+        logger.error(e)
+        raise e
 
 def get_ownerships(common_search):
-    return ownerships_data.get_ownerships(common_search)
-
+    try: 
+        return ownerships_data.get_ownerships(common_search)
+    except Exception as e:
+        logger.error(e)
+        raise e
+    
 def get_ownership(id): 
     return ownerships_data.get_ownership(id)
 
@@ -46,4 +65,4 @@ def get_pagination(common_search):
         }
     except Exception as e:
         logger.error(e)
-        raise Exception(e)
+        raise e

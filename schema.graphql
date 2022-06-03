@@ -9,7 +9,6 @@ type Query {
     listPets(commonSearch: CommonSearch={}): PaginatedPets!
     getPet(id: ID!): PetResult!
     me: UserResult!
-    isAuthenticated(commonSearch: CommonSearch={}): Boolean!
     getOwnership(id: ID!): OwnershipResult!
     listOwnerships(commonSearch: CommonSearch= {}):PaginatedOwnerships!
 }
@@ -20,12 +19,13 @@ type Mutation {
     updateUser(id: ID!, data: UserUpdate!): UserResult!
     createPet(data: PetCreate!): PetResult!
     updatePet(id: ID!, data: PetUpdate!): PetResult!
-    updateOwnership(id:ID!, data: OwnershipUpdate!): OwnershipResult!
-    login(email: String!, password: String!):LoginResult!
+    updateOwnership(id: ID!, data: OwnershipUpdate!): OwnershipResult!
+    login(email: String!, password: String!):NewTokenResult!
     logout: Boolean!
     addPet(pet: PetCreate!): PetResult!
     addPetToUser(pet: PetCreate!, userId: String!): PetAddedResult!
-    addPetToMe(pet: PetCreate!): PetAddedResult!
+    addPetToMe(pet: PetCreate!, custodyLevel:CustodyLevel ): PetAddedResult!
+    refreshToken: NewTokenResult!
 }
 
 scalar Upload
@@ -87,6 +87,11 @@ enum CoatPattern{
     BICOLOR,
     SOLID,
     COLORPOINT
+}
+type Error{
+    code: String!
+    message: String!
+    extra: String
 }
 
 type Pagination{
@@ -162,75 +167,83 @@ type Ownership {
 
 type UserResult {
     success: Boolean!
-    errors: [String]
+    error: Error
     user: User
 }
 
 type UsersResult {
     success: Boolean!
-    errors: [String]
+    error: Error
     users: [User]!
 }
 
 type PaginatedUsers {
     success: Boolean
-    errors: [String]
+    error: Error
     items: [User]!
     pagination: Pagination!
 }
 type PaginatedOwnerships {
     success: Boolean
-    errors: [String]
+    error: Error
     items: [Ownership]!
     pagination: Pagination!
 }
 
-type LoginResult {
+type NewTokenResult {
     success: Boolean!
-    errors: [String]
-    token: String!
+    error: Error
+    token: String
+    user: User
 }
 
 
 type PetResult {
     success: Boolean!
-    errors: [String]
+    error: Error
     pet: Pet
+    
 } 
 
 type PetsResult {
     success: Boolean!
-    errors: [String]
+    error: Error
     pets: [Pet]!
+    
 }
 
 type PaginatedPets {
-    succes: Boolean!
-    errors: [String]
+    success: Boolean!
+    error: Error
     items: [Pet]!
     pagination: Pagination!
+    
 }
 
 type OwnershipResult {
     success: Boolean!
-    errors: [String]
+    error: Error
     ownership: Ownership
+    
 }
 
 type OwnershipsResult {
     success: Boolean!
-    errors: [String]
+    error: Error
     ownerships: [Ownership]!
+    
 }
 type NewOwnership {
     pet: Pet!
     ownership: Ownership!
+    
 }
 
 type PetAddedResult {
     success: Boolean!
-    errors: [String]
-    data: NewOwnership!
+    error: Error
+    
+    data: NewOwnership
 }
 
 type HealthCard {
@@ -298,6 +311,20 @@ input PetBodyCreate {
     coat: CoatCreate!
 }
 
+input PetBodyUpdate {
+    id: ID!
+    family: PetFamily
+    breed: String
+    coat: CoatUpdate
+}
+
+input CoatUpdate{
+    id: ID!
+    length: CoatLength
+    colors: [String]
+    pattern: CoatPattern
+}
+
 input CoatCreate{
     length: CoatLength!
     colors: [String]!
@@ -323,7 +350,16 @@ input OwnershipUpdate {
 
 input PetUpdate {
     name: String
-    breed: String
+    body: PetBodyUpdate
+    birthday: String
+    neutered: Boolean
+    gender: Gender
+    chip_code: String
+    weigth_kg: Float
+    temperament: String
+    diet: [String]
+    intollerance: [String]
+    disciplines: [String]
 }
 
 input PetCreate {

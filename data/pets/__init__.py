@@ -2,12 +2,13 @@ import uuid
 from datetime import datetime
 import pydash as py_
 from sqlalchemy import select, text
-
+from sqlalchemy.exc import ProgrammingError
 from .models import Pet, Gender
 from data import db
 from data.query_builder import build_query, build_count
 from libs.utils import camel_to_snake
-from libs.logger import logger
+from libs.logger import logger, stringify
+from api.errors import NotFoundError, BadRequest
 
 
 def build_where(filters) -> str:
@@ -43,25 +44,44 @@ def create_pet(data: dict):
     return pet.to_dict()
 
 
-def update_pet(data):
-
-    pet = Pet.query.get(id)
-    if pet:
-        pet = {**pet, **data}
-    db.session.add(pet)
-    db.session.commit()
-    return pet
+def update_pet(id, data):
+    logger.data(
+        f"id: {id}\n"\
+        f"dta: {stringify(data)}"
+    )
+    try: 
+        pet_model = db.session.query(Pet).filter(Pet.id== id)
+        if not pet_model:
+            raise NotFoundError(f"no pet found with id: {id}")
+        pet_old = pet_model.first().to_dict()
+        pet_model.update(data)
+        db.session.commit()
+        pet= {**pet_old, **pet_model.first().to_dict()}
+        logger.check(f'pet: {stringify(pet)}')
+        return  pet
+    except Exception as e:
+        logger.error(e)
+        raise e
 
 
 def get_pets(common_search):
+    logger.data(f"commons_search: {stringify(common_search)}")
     try:
         query = build_query(table="pets",search= common_search['search'],search_fields=common_search['search_fields'] ,ordering=common_search["ordering"],filters= common_search['filters'], pagination=common_search['pagination'] )
+        logger.check(f"query: {query}")
         manager = select(Pet).from_statement(text(query))
-        pets = db.session.execute(manager).scalars()
-        return [pet.to_dict() for pet in pets]
+        pets_model = db.session.execute(manager).scalars()
+        pets = [pet.to_dict() for pet in pets_model]
+        logger.check(f"pets found {len(pets)}")
+        return pets
+    except ProgrammingError as e:
+        logger.error(e)
+        exception = BadRequest("The fields provided may contains syntax errors")
+        exception.extension['extra'] = str(e)
+        raise exception
     except Exception as e: 
         logger.error(e)
-        raise Exception(e)
+        raise e
     
 def get_total_items(common_search):
     try:
@@ -70,7 +90,7 @@ def get_total_items(common_search):
         return result.first()[0]
     except Exception as e:
         logger.error(e)
-        raise Exception(e)
+        raise e
     
 
 def get_filtered_ownerships(filters,):
@@ -85,4 +105,13 @@ def get_filtered_ownerships(filters,):
 
 
 def get_pet(id):
-    return Pet.query.get(id).to_dict()
+    logger.data(f"id: {id}")
+    try:
+        pet_model = Pet.query.get(id)
+        if not pet_model:
+            raise NotFoundError(f"no pet found with id: {id}")
+        pet= pet_model.to_dict()
+        return pet
+    except Exception as e:
+        logger.error(e)
+        raise e

@@ -32,7 +32,7 @@ class Pet(db.Model):
             "id": self.id,
           
             "name": self.name,
-            "birthday": self.birthday,
+            "birthday": str(self.birthday),
             "neutered": self.neutered,
             "body_id": self.body_id,
             "gender": self.gender.name,        

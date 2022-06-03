@@ -1,10 +1,11 @@
 import uuid
 from datetime import datetime
+from sqlalchemy.exc import ProgrammingError
 from sqlalchemy import select, text
-
-from data.ownerships.models import Ownership
+from api.errors import InternalError, BadRequest, NotFoundError
 from data import db
-from libs.logger import logger
+from libs.logger import logger, stringify
+from data.ownerships.models import Ownership
 from data.query_builder import build_query, build_count, build_where
 
 
@@ -21,13 +22,25 @@ def create_ownership(data):
     db.session.commit()
     return ownership.to_dict()
     
-def update_ownership(data):
-    ownership = Ownership.query.get(id)
-    if ownership:
-        ownership= {**ownership, **data}
-    db.session.add(ownership)
-    db.session.commit()
-    return ownership 
+def update_ownership(id,data):
+    logger.data(
+        f"id: {id}\n"\
+        f"dta: {stringify(data)}"
+    )
+    try: 
+        ownership_model = db.session.query(Ownership).filter(Ownership.id== id)
+        if not ownership_model:
+            raise NotFoundError(f"no ownership found with id: {id}")
+        ownership_old = ownership_model.first().to_dict()
+        ownership_model.update(data)
+        db.session.commit()
+        ownership= {**ownership_old, **ownership_model.first().to_dict()}
+        logger.check(f'ownership: {stringify(ownership)}')
+        return  ownership
+    except Exception as e:
+        logger.error(e)
+        raise e
+
 
 def get_ownerships(common_search):
     try:
@@ -37,7 +50,7 @@ def get_ownerships(common_search):
         return [pet.to_dict() for pet in ownershps]
     except Exception as e: 
         logger.error(e)
-        raise Exception(e)
+        raise e
 
 def get_filtered_ownerships(filters,):
     results = select(Ownership).from_statement(text(
@@ -54,9 +67,12 @@ def get_total_items(common_search):
         query = build_count(table="ownerships",search= common_search['search'],search_fields=common_search['search_fields'] ,filters= common_search['filters'] )
         result = db.session.execute(query)
         return result.first()[0]
+    except ProgrammingError as e: 
+        logger.error(e)
+        raise BadRequest('malformed variables_fields')
     except Exception as e:
         logger.error(e)
-        raise Exception(e)
+        raise e
 
 def get_ownership(id):
     return Ownership.query.get(id).to_dict()    

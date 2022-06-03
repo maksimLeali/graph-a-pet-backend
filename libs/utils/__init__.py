@@ -1,8 +1,9 @@
 import re
 import pydash as py_
 import jwt
+from time import time
 from config import cfg
-from libs.logger import logger
+from libs.logger import logger, stringify
 
 def camel_to_snake(text: str) -> str:
     text = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', text)
@@ -29,6 +30,7 @@ def format_join(to_format):
     return join
 
 def format_common_search(common_search):
+    logger.info(f"common_search: {stringify(common_search)}")
     return {
         "pagination": {"page": common_search['page'],
                        "page_size": common_search['page_size']},
