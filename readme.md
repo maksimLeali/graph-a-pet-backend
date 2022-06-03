@@ -52,4 +52,4 @@ telegram:
     token: <YOUR_TOKEN> 
     adminId: <CHAT_ID>
 ```
-If you don't want or can't use telegram just set the `active` to `False`
+If you don't want or can't use telegram just set the `active` field to `False` and no bot will be activated
