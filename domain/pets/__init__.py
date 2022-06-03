@@ -6,6 +6,7 @@ from libs.logger import logger, stringify
 from libs.utils import format_common_search
 from math import ceil
 from api.errors import InternalError
+import pydash as py_
 
 @convert_kwargs_to_snake_case
 def get_ownerships(common_search):
@@ -52,7 +53,9 @@ def update_pet(id, data):
         f"data: {data}"
     )
     try:
-        pet= pets_data.update_pet(id, data)
+        if(data['body'] != None):
+            pet_bodies_domain.update_pet_body(data['body']['id'], py_.omit(data['body'], 'id'))
+        pet= pets_data.update_pet(id, py_.omit(data, 'body'))
         logger.check(f"pet {stringify(pet)}")
         return pet
     except Exception as e:

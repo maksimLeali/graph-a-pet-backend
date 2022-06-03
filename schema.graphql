@@ -24,7 +24,7 @@ type Mutation {
     logout: Boolean!
     addPet(pet: PetCreate!): PetResult!
     addPetToUser(pet: PetCreate!, userId: String!): PetAddedResult!
-    addPetToMe(pet: PetCreate!): PetAddedResult!
+    addPetToMe(pet: PetCreate!, custodyLevel:CustodyLevel ): PetAddedResult!
     refreshToken: NewTokenResult!
 }
 
@@ -311,6 +311,20 @@ input PetBodyCreate {
     coat: CoatCreate!
 }
 
+input PetBodyUpdate {
+    id: ID!
+    family: PetFamily
+    breed: String
+    coat: CoatUpdate
+}
+
+input CoatUpdate{
+    id: ID!
+    length: CoatLength
+    colors: [String]
+    pattern: CoatPattern
+}
+
 input CoatCreate{
     length: CoatLength!
     colors: [String]!
@@ -336,7 +350,16 @@ input OwnershipUpdate {
 
 input PetUpdate {
     name: String
-    breed: String
+    body: PetBodyUpdate
+    birthday: String
+    neutered: Boolean
+    gender: Gender
+    chip_code: String
+    weigth_kg: Float
+    temperament: String
+    diet: [String]
+    intollerance: [String]
+    disciplines: [String]
 }
 
 input PetCreate {

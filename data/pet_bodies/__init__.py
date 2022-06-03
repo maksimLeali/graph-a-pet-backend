@@ -18,13 +18,24 @@ def create_pet_body(data):
     db.session.commit()
     return pet_body.to_dict()
     
-def update_pet_body(data):
-    pet_body = PetBody.query.get(id)
-    if pet_body:
-        pet_body= {**pet_body, **data}
-    db.session.add(pet_body)
-    db.session.commit()
-    return pet_body
+def update_pet_body(id, data):
+    logger.data(
+        f"id: {id}\n"\
+        f"dta: {stringify(data)}"
+    )
+    try: 
+        pet_body_model = db.session.query(PetBody).filter(PetBody.id== id)
+        if not pet_body_model:
+            raise NotFoundError(f"no pet_body found with id: {id}")
+        pet_body_old = pet_body_model.first().to_dict()
+        pet_body_model.update(data)
+        db.session.commit()
+        pet_body= {**pet_body_old, **pet_body_model.first().to_dict()}
+        logger.check(f'pet_body: {stringify(pet_body)}')
+        return  pet_body
+    except Exception as e:
+        logger.error(e)
+        raise e
 
 def get_pet_bodies():
     return [pet_body.to_dict() for pet_body in PetBody.query.all()]

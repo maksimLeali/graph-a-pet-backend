@@ -23,13 +23,24 @@ def create_coat(data):
         logger.error(e)
         raise BadRequest(e)
     
-def update_coat(data):
-    coat = Coat.query.get(id)
-    if coat:
-        coat= {**coat, **data}
-    db.session.add(coat)
-    db.session.commit()
-    return coat
+def update_coat(id, data):
+    logger.data(
+        f"id: {id}\n"\
+        f"dta: {stringify(data)}"
+    )
+    try: 
+        coat_model = db.session.query(Coat).filter(Coat.id== id)
+        if not coat_model:
+            raise NotFoundError(f"no coat found with id: {id}")
+        coat_old = coat_model.first().to_dict()
+        coat_model.update(data)
+        db.session.commit()
+        coat= {**coat_old, **coat_model.first().to_dict()}
+        logger.check(f'coat: {stringify(coat)}')
+        return  coat
+    except Exception as e:
+        logger.error(e)
+        raise e
 
 def get_coats():
     return [coat.to_dict() for coat in Coat.query.all()]

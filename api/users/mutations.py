@@ -90,13 +90,13 @@ def login_resolver(obj, info, email, password):
 
 @convert_kwargs_to_snake_case
 @min_role(UserRole.ADMIN.name)
-def add_pet_to_user_resolver(obj, info, pet, user_id):
+def add_pet_to_user_resolver(obj, info, pet, user_id, custody_level):
     logger.api(
         f"user_id: {user_id}\n"\
         f"pet: {stringify(pet)}"
     )
     try: 
-        new_pet, new_ownership = add_pet_to_user(user_id, pet)
+        new_pet, new_ownership = add_pet_to_user(user_id, pet, custody_level)
         payload= {
             "success": True,
             "data": {
@@ -115,12 +115,12 @@ def add_pet_to_user_resolver(obj, info, pet, user_id):
 
 @convert_kwargs_to_snake_case
 @auth_middleware
-def add_pet_to_me_resolver(obj, info, pet):
+def add_pet_to_me_resolver(obj, info, pet, custody_level):
     logger.api(f"pet: {stringify(pet)}")
     try: 
         token =  info.context.headers['authorization']
         user = get_request_user(token)
-        new_pet, new_ownership = add_pet_to_user(user['id'], pet)
+        new_pet, new_ownership = add_pet_to_user(user['id'], pet, custody_level)
         payload= {
             "success": True,
             "data": {

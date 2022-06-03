@@ -96,7 +96,7 @@ def get_pagination(common_search):
         logger.error(e)
         raise e
 
-def add_pet_to_user(user_id, pet):
+def add_pet_to_user(user_id, pet, custody_level = CustodyLevel.SUB_OWNER.name):
     logger.domain(
         f"user_id: {user_id}\n"\
         f"pet: {stringify(pet)}"
@@ -109,7 +109,7 @@ def add_pet_to_user(user_id, pet):
         ownership = {
             "user_id": user['id'],
             "pet_id": new_pet['id'],
-            "custody_level": CustodyLevel.OWNER.name
+            "custody_level": custody_level
         }
         new_ownership = ownerships_domain.create_ownership(ownership)
         return (new_pet, new_ownership)
