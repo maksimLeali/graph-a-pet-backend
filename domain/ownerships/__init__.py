@@ -26,7 +26,17 @@ def create_ownership(data):
     return ownerships_data.create_ownership(data)
 
 def update_ownership(id, data):
-    return ownerships_data.update_ownership(id, data)
+    logger.domain(
+        f"id: {id}\n"\
+        f"data: {stringify(data)}"
+    )
+    try: 
+        ownership= ownerships_data.update_ownership(id, data)
+        logger.check(f'ownership: {ownership}')
+        return ownership
+    except Exception as e: 
+        logger.error(e)
+        raise e
 
 def get_ownerships(common_search):
     try: 
