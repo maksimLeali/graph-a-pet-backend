@@ -1,5 +1,10 @@
-# Pet finder (Back-end)
-Pet finder backend is *wip* project that I'm developping in my free time.
+# GraphAPet (Back-end)
+GraphAPet back-end is *wip* project that I'm developping in my free time.
+It should work as a platform to help people find a pet in their vicinity or to keep track of your pets medication / events / vet appointments. 
+
+This part is the core of the applciation, it manage every user and evry business logic. 
+I serve as a skeleton for the app.
+
 
 ## Installation 
 Clone this repo to your device.
@@ -120,4 +125,3 @@ I divided pagination ordering and filers so that every itmes could be searched t
         - `ranges`: min and max value for the column to match, if only one is set is lik sayng, everything tha id more ( or less ) the the selected value
         - `lists` : list of value the selected column can be setto be mached by the request _USER.role in ('ADMIN', 'USER')_ 
         - `join` : with this you can duplicate the `filters` structure to a child of the main entity, like from `OWNERSHIP` you can go down and filter `PET` or `USER` 
-        

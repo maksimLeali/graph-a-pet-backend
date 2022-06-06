@@ -60,7 +60,7 @@ class CustomFormatter(logging.Formatter):
         return re.sub("(§-§.*§-§)", format_path(re.search('(§-§.*§-§)'.replace('\\', '/'), formatted_record).group(0)), formatted_record ).replace("§-§","")
     
 level= cfg['logging']['level']
-logger = logging.getLogger('pet-finder')
+logger = logging.getLogger('graph_a_pet')
 logger.check = lambda msg, *args: logger._log(logging.CHECK, msg, args)
 logger.input = lambda msg, *args: logger._log(logging.INPUT, msg, args)
 logger.output = lambda msg, *args: logger._log(logging.OUTPUT, msg, args)
