@@ -106,12 +106,12 @@ This should just be used as a method to retrive data given some option like "the
 Since we are using a SQL like db i created a method to query the db in a way that should suffice for every future entity.
 I divided pagination ordering and filers so that every itmes could be searched the same way: 
 - pagination: 
-    ```page_size```: determs the `lIMIT` sql parameter, by default set to 20
-    ```page```: moltiply this value with page_size and you obtain the `SKIP` parameter, by default set to 0
+    - ```page_size```: determs the `lIMIT` sql parameter, by default set to 20
+    - ```page```: moltiply this value with page_size and you obtain the `SKIP` parameter, by default set to 0
 - ordering: 
-    ```order_by```: the name of the primary column to order items, by defoult is set to `created_at`
-    ```order_direction```: ASC or DESC to tedermin how items should be ordered,  by defoult `ASC`
+    - ```order_by```: the name of the primary column to order items, by defoult is set to `created_at`
+    - ```order_direction```: ASC or DESC to tedermin how items should be ordered,  by defoult `ASC`
 - filters: 
     this include for the main entity the ```search``` and ```search_columns``` property
-    ```search```: text to look in the columns selected by ```search_columns```, by default is an empty string
-    ```search_columns```: array of strings that will be used to look for the text insered in ```search``` field
+    - ```search```: text to look in the columns selected by ```search_columns```, by default is an empty string
+    - ```search_columns```: array of strings that will be used to look for the text insered in ```search``` field
