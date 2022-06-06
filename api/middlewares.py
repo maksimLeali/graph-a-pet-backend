@@ -20,14 +20,17 @@ def auth_middleware(f):
     def function_wrapper(obj: Any, info: GraphQLResolveInfo, **args):
         logger.middleware("check if user is authorized")
         try :
+            logger.warning(cfg['jwt']['secret'])
+            logger.warning(info.context.headers['authorization'])
             bearer = info.context.headers['authorization'].split('Bearer ')[1]
             decoded_bearer= jwt.decode(bearer,cfg['jwt']['secret'],algorithms=["HS256"] )
+            logger.info(decoded_bearer)
             get_user(decoded_bearer['user']['id'])
         except jwt.ExpiredSignatureError as e : 
             logger.error(f"Token expired for user {decoded_bearer['user']['id']} ")
             raise Exception("Token expired")
-        except :
-            logger.error('unauthorized')        
+        except Exception as e:
+            logger.error(e)        
             raise AuthenticationError('unauthorized')      
             
         return f(obj, info, **args)

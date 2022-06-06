@@ -78,13 +78,13 @@ def login_resolver(obj, info, email, password):
             "user": user
         }
         logger.check(f"user: {stringify(user)}")
-    except Exception as e:  # todo not found
+    except Exception as e:  
         logger.error(e)
         payload = {
             "success": False,
             "token": None,
             "user": None,
-            "errors": format_error(e,info.context.headers['authorization']) 
+            "error": format_error(e,info.context.headers['authorization']) 
         }
     return payload
 

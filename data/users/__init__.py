@@ -89,5 +89,10 @@ def get_user(id):
         raise e
     
 def get_user_from_email(email) -> User:
-     return User.query.filter(User.email==email).first().to_dict()
-    
+    logger.data(f'email: {email}')
+    try:
+        user_model=  User.query.filter(User.email==email).first()
+        logger.check(f"user: {user_model}")
+        return user_model.to_dict()
+    except Exception as e:
+        logger.error(e)
