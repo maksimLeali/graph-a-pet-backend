@@ -6,7 +6,7 @@ Clone this repo to your device.
 I suggest to create a virtual environment 
 
 once you have cloned the repo, by enteryng the project folder install the requirments by using the package manager [pip](https://pip.pypa.io/en/stable/)
-and add the ```-r``` parameter so it will recursively add every needed module.
+and add the `-r` parameter so it will recursively add every needed module.
 
 ```bash
 pip install -r requirments.txt
@@ -75,7 +75,7 @@ If i want some change in the logic that rule the server it should suffice change
 The first level shoul funciton as an entry level for all the incominc request, it decide what enters and what exit. 
 I'm trying to do the very minimal here, like just saying "if the user ask for A, the server will responde with A, or if something gose wrong, with this error". 
 
-So every function is wrapped in a ``` try except``` block so i'm always _-(or at least  most of the time)-_ in control over eventual errors.
+So every function is wrapped in a ` try except` block so i'm always _-(or at least  most of the time)-_ in control over eventual errors.
 
 There is a middleware that check if the users are enabled or not to do the action they have required and i'm using a decorator to have a more clean function.
  I would have loved to use decorator on every query and mutation like i did with the resolvers :
@@ -88,8 +88,8 @@ operation_a():
     except Exception as e:
         #return error
  ```
-but unfortunately I can't declare the QueryType or MutationType in a file and call-it to another to add fields and then add it to the ```make_executable_schema``` method.
-So i Created the ```operation.py``` to group them all in a single file, including every resolver.
+but unfortunately I can't declare the QueryType or MutationType in a file and call-it to another to add fields and then add it to the `make_executable_schema` method.
+So i Created the `operation.py` to group them all in a single file, including every resolver.
 
 
 ### DOMAIN layer
@@ -106,12 +106,18 @@ This should just be used as a method to retrive data given some option like "the
 Since we are using a SQL like db i created a method to query the db in a way that should suffice for every future entity.
 I divided pagination ordering and filers so that every itmes could be searched the same way: 
 - pagination: 
-    - ```page_size```: determs the `lIMIT` sql parameter, by default set to 20
-    - ```page```: moltiply this value with page_size and you obtain the `SKIP` parameter, by default set to 0
+    - `page_size`: determs the `lIMIT` sql parameter, by default set to 20
+    - `page`: moltiply this value with page_size and you obtain the `SKIP` parameter, by default set to 0
 - ordering: 
-    - ```order_by```: the name of the primary column to order items, by defoult is set to `created_at`
-    - ```order_direction```: ASC or DESC to tedermin how items should be ordered,  by defoult `ASC`
+    - `order_by`: the name of the primary column to order items, by defoult is set to `created_at`
+    - `order_direction`: ASC or DESC to tedermin how items should be ordered,  by defoult `ASC`
 - filters: 
-    this include for the main entity the ```search``` and ```search_columns``` property
-    - ```search```: text to look in the columns selected by ```search_columns```, by default is an empty string
-    - ```search_columns```: array of strings that will be used to look for the text insered in ```search``` field
+    this include for the main entity the `search` and `search_columns` property
+    - `search`: text to look in the columns selected by `search_columns`, by default is an empty string
+    - `search_columns`: array of strings that will be used to look for the text insered in `search` field
+    - `filters`: 
+        - `fixeds`: 1 to 1 match on the selected column and value _user.name = 'Enzo'_ 
+        - `ranges`: min and max value for the column to match, if only one is set is lik sayng, everything tha id more ( or less ) the the selected value
+        - `lists` : list of value the selected column can be setto be mached by the request _USER.role in ('ADMIN', 'USER')_ 
+        - `join` : with this you can duplicate the `filters` structure to a child of the main entity, like from `OWNERSHIP` you can go down and filter `PET` or `USER` 
+        
