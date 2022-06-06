@@ -2,8 +2,10 @@
 GraphAPet back-end is *wip* project that I'm developping in my free time.
 It should work as a platform to help people find a pet in their vicinity or to keep track of your pets medication / events / vet appointments. 
 
-This part is the core of the applciation, it manage every user and evry business logic. 
-I serve as a skeleton for the app.
+This part is the core of the applciation, it manages every user and every business logic. 
+It serve as a skeleton for the app.
+
+Every action is logged in a file with the extension `.log` and if setted the right way there shoud be 3of htem, one for every layer of the app.
 
 
 ## Installation 
