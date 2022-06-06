@@ -124,4 +124,4 @@ I divided pagination ordering and filers so that every itmes could be searched t
         - `fixeds`: 1 to 1 match on the selected column and value _user.name = 'Enzo'_ 
         - `ranges`: min and max value for the column to match, if only one is set is lik sayng, everything tha id more ( or less ) the the selected value
         - `lists` : list of value the selected column can be setto be mached by the request _USER.role in ('ADMIN', 'USER')_ 
-        - `join` : with this you can duplicate the `filters` structure to a child of the main entity, like from `OWNERSHIP` you can go down and filter `PET` or `USER` 
+        - `join` : with this you can duplicate the `filters` structure to a child of the main entity, like from `OWNERSHIP` you can go down and filter `PET` or `USER`, and so on to every "children"
