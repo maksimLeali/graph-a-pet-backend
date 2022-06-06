@@ -53,3 +53,10 @@ telegram:
     adminId: <CHAT_ID>
 ```
 If you don't want or can't use telegram just set the `active` field to `False` and no bot will be activated
+
+### firebase bucket
+to save the media that users will send, i usually create a bucket on firebase. 
+So create your project on the firebae console and get your authentication key ( i usually store it in the root folder )
+
+Then from the firebase console create a new bucket and save the name.
+
