@@ -94,6 +94,9 @@ type Error{
     extra: String
 }
 
+"""
+how a list is owganized by how many items has been found, in which page we are, the number of element per page and how many pages there are
+"""
 type Pagination{
     total_items: Int
     total_pages: Int

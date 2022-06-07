@@ -132,5 +132,5 @@ def login(email, password) -> str:
                     cfg['jwt']['secret'], algorithm="HS256"), user
         raise AuthenticationError('Credentials error')
     except Exception as e:
-        logger.error("Credential errors")
+        logger.error(e)
         raise e

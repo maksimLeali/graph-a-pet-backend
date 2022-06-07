@@ -23,7 +23,7 @@ def graphql_server():
         data,
         context_value=request,
         debug=app.debug,
-        logger="pet-finder"
+        logger="graph_a_pet"
     )
     status_code = 200 if success else 400
     return jsonify(result), status_code
@@ -31,4 +31,3 @@ def graphql_server():
 
 if __name__ == "__main__":
     app.run(debug=True)
-    
