@@ -3,6 +3,7 @@ pyvenv.cfg
 include/
 lib
 config.yml
+/app/
 venv 
 bin/
 serviceAccountKey.json

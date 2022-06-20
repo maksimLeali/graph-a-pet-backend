@@ -2,8 +2,8 @@ FROM python:3.8-slim-buster
 
 RUN pip install --upgrade pip setuptools
 
-# We copy just the requirements.txt first to leverage Docker cache
-COPY ./requirements.txt /app/requirements.txt
+# We copy everything in thge sub dir app
+COPY . /app/
 
 WORKDIR /app
 
