@@ -9,8 +9,4 @@ WORKDIR /app
 
 RUN pip install -r requirements.txt
 
-COPY . /app
-
-ENTRYPOINT [ "python3" ]
-
 CMD [ "-m gunicorn --workers 4 --bind 0.0.0.0:5000 app:app" ]
