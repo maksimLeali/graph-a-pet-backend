@@ -98,3 +98,4 @@ def get_user_from_email(email) -> User:
         return user_model.to_dict()
     except Exception as e:
         logger.error(e)
+        raise e

@@ -34,7 +34,7 @@ class CustomFormatter(logging.Formatter):
     cyan_bold = "\033[1;36m" 
     reset = "\x1b[0m"
     italic= "\x1b[3m"
-    format = "%(asctime)s %(levelname)s: §-§%(pathname)s§-§ | %(funcName)s()\n%(message)s\n"
+    format = "%(asctime)s %(levelname)s: §-§%(pathname)s§-§ | %(funcName)s()" + reset + "\n%(message)s\n"
     extended_format = format +italic +"[ %(pathname)s:%(lineno)d ]\n"
 
     FORMATS = {

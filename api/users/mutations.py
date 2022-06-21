@@ -84,7 +84,7 @@ def login_resolver(obj, info, email, password):
             "success": False,
             "token": None,
             "user": None,
-            "error": format_error(e,info.context.headers['authorization']) 
+            "error": format_error(e) 
         }
     return payload
 

@@ -26,7 +26,7 @@ error_pagination = {
     "total_pages": 0
 }
 
-def format_error (e, token="Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjp7ImlkIjoiZWViMDJmMjctYTZkYi00ZDM5LWI0MWEtYzc3OTU2MDc4ZmIzIiwiZmlyc3RfbmFtZSI6IkFub25pbW8iLCJsYXN0X25hbWUiOiJBbm9uaW1vIiwiZW1haWwiOiJhbm9uQGFub24uY29tIiwicm9sZSI6IlVTRVIiLCJjcmVhdGVkX2F0IjoiMjAyMi0wNS0wNSAwMDowMDowMCJ9LCJpYXQiOjk5NTMzODQ0MzksImV4cCI6MTY1Mzk4OTIzOX0.0BsuDTn18kJo_bwpGNSvxo9W3L1szyGmHmvr77Pv-2o"): 
+def format_error (e, token="Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjp7ImlkIjoiZWViMDJmMjctYTZkYi00ZDM5LWI0MWEtYzc3OTU2MDc4ZmIzIiwiZmlyc3RfbmFtZSI6IkNhcmxvIiwibGFzdF9uYW1lIjoiUGlwcG9sbyIsImVtYWlsIjoiYy5tYW5nb0BncmVjaWEuaXQiLCJyb2xlIjoiQURNSU4iLCJjcmVhdGVkX2F0IjoiMjAyMi0wNS0wNSAwMDowMDowMCJ9LCJpYXQiOjE2NTU4MjQyOTIsImV4cCI6MTY1NjQyOTA5Mn0.9a6ByCDimwFpGsENEKmP2FNvq3q6LShx-wM-rPf8uNs"): 
     if not type(e) in errors_types :
         logger.critical(
             "Exception not handled properly\n"\
