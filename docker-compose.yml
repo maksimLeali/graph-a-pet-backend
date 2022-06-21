@@ -19,3 +19,5 @@ services:
             - POSTGRES_USER=myuser
             - POSTGRES_PASSWORD=password
             - POSTGRES_DB=pet-finder
+volumes:
+  postgres_data:
