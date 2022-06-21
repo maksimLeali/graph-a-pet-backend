@@ -1,12 +1,12 @@
 version: '3.1'
 services:
     server:
-        build: ./app
+        build: ./
         command: python3 -m gunicorn --workers 4 --bind 0.0.0.0:5000 app:app
         ports:
             - 5000:5000
         volumes:
-            - ./app:/app
+            - .:/app
         environment:
-            - FLASK_APP=project/__init__.py
+            - FLASK_APP=app.py
             - FLASK_ENV=development
