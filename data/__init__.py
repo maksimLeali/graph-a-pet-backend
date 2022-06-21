@@ -3,7 +3,7 @@ import os
 from flask_sqlalchemy import SQLAlchemy
 from config import cfg 
 
-basedir = os.path.abspath(os.path.dirname(__file__))
+print(os.getenv("DATABASE_URL", "sqlite://"))
 
 app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL", "postgresql://")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
