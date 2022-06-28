@@ -4,7 +4,9 @@ from ariadne import graphql_sync, load_schema_from_path, make_executable_schema,
 from ariadne.constants import PLAYGROUND_HTML
 from flask import request, jsonify
 from api.operations import object_types
-
+from config import cfg
+from libs.logger import logger
+import os
 
 type_defs = load_schema_from_path("./")
 schema = make_executable_schema(
@@ -28,6 +30,10 @@ def graphql_server():
     status_code = 200 if success else 400
     return jsonify(result), status_code
 
-
+os.environ['WERKZEUG_RUN_MAIN'] = 'true'
 if __name__ == "__main__":
-    app.run(debug=True)
+    logger.start(
+        f"Server is running on http://{cfg['flask']['host']}:{cfg['flask']['port']}\n" \
+        f"See playground on http://{cfg['flask']['host']}:{cfg['flask']['port']}/graphql"
+        )
+    app.run(host=cfg['flask']['host'], port=cfg['flask']['port'])

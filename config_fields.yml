@@ -14,3 +14,6 @@ telegram:
   active: ~
   token: ~
   admin_id: ~
+flask:
+  host: ~
+  port: ~

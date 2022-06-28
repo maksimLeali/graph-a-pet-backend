@@ -14,6 +14,7 @@ class CustomFormatter(logging.Formatter):
     logging.API = logging.INFO + 3
     logging.DOMAIN = logging.INFO + 4 
     logging.DATA = logging.INFO + 5
+    logging.START = logging.INFO + 6
     logging.addLevelName(logging.CHECK, "CHECK")
     logging.addLevelName(logging.INPUT, "INPUT")
     logging.addLevelName(logging.OUTPUT, "OUTPUT")
@@ -21,6 +22,7 @@ class CustomFormatter(logging.Formatter):
     logging.addLevelName(logging.API, "API")
     logging.addLevelName(logging.DOMAIN, "DOMAIN")
     logging.addLevelName(logging.DATA, "DATA")
+    logging.addLevelName(logging.START, "START")
     grey = "\x1b[38;20m"
     green= "\033[92m"
     yellow = "\x1b[33;20m"
@@ -36,6 +38,7 @@ class CustomFormatter(logging.Formatter):
     italic= "\x1b[3m"
     format = "%(asctime)s %(levelname)s: §-§%(pathname)s§-§ | %(funcName)s()" + reset + "\n%(message)s\n"
     extended_format = format +italic +"[ %(pathname)s:%(lineno)d ]\n"
+    start_format =  "%(message)s"
 
     FORMATS = {
         logging.DEBUG: grey+ "⚪  " + format + reset, #10
@@ -47,6 +50,7 @@ class CustomFormatter(logging.Formatter):
         logging.API: green_bold + "📤  " + extended_format + reset, #23
         logging.DOMAIN: cyan_bold + "🛠️  " + extended_format + reset, #24
         logging.DATA: blue_bold + "📁  " + extended_format + reset, #25
+        logging.START:italic + green_bold + "🚀  "  + start_format + reset, #26
         logging.WARNING: yellow + "🟡  " + extended_format + reset, #30
         logging.ERROR: red + "❌  " + extended_format + reset, #40
         logging.CRITICAL: bold_red + "⛔  " + extended_format + reset, #50
@@ -55,9 +59,11 @@ class CustomFormatter(logging.Formatter):
     def format(self, record):
         log_fmt = self.FORMATS.get(record.levelno)
         formatter = logging.Formatter(log_fmt, datefmt="%Y-%m-%dT%H:%M:%S.00Z")
+        if (record.levelno == logging.START):
+            return formatter.format(record)
         formatted_record = re.sub(f"{str(pathlib.Path().resolve())}/".replace('\\','/'), '',  formatter.format(record) )
 
-        return re.sub("(§-§.*§-§)", format_path(re.search('(§-§.*§-§)'.replace('\\', '/'), formatted_record).group(0)), formatted_record ).replace("§-§","")
+        return re.sub("(§-§.*§-§)", format_path(re.search('(§-§.*§-§)'.replace('\\', '/'), formatted_record).group(0)), formatted_record ).replace("§-§","") 
     
 level= cfg['logging']['level']
 logger = logging.getLogger('waitress')
@@ -68,6 +74,7 @@ logger.middleware = lambda msg, *args: logger._log(logging.MIDDLEWARE, msg, args
 logger.api = lambda msg, *args: logger._log(logging.API, msg, args)
 logger.domain = lambda msg, *args: logger._log(logging.DOMAIN, msg, args)
 logger.data = lambda msg, *args: logger._log(logging.DATA, msg, args)
+logger.start = lambda msg, *args: logger._log(logging.START, msg, args)
 logger.setLevel(level)
 ch = logging.StreamHandler()
 
