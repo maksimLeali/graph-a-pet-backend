@@ -16,7 +16,7 @@ from api.pet_bodies.mutations import *
 from api.coats.resolvers import coat
 from api.coats.queries import *
 from api.coats.mutations import *
-
+from api.health_cards.queries import * 
 from domain import refresh_token
 from api.middlewares import auth_middleware
 
@@ -49,6 +49,7 @@ query.set_field("getPet", get_pet_resolver)
 query.set_field("me", me_resolver)
 query.set_field("getOwnership", get_ownership_resolver)
 query.set_field("listOwnerships", list_ownerships_resolver)
+query.set_field("listHealthCards", list_health_cards_resolver)
 
 mutation = MutationType()
 mutation.set_field('createUser', create_user_resolver)

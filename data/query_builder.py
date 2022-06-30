@@ -39,6 +39,11 @@ tables_common_properties = {
         "alias": "ow",
         "other_table_ref": "ownership_id"
         },
+    "health_cards": {
+        "search_columns": [],
+        "alias": "hlc",
+        "oterh_table_ref": "health_card_id"
+    }
 }
 
 def build_join(parent: str, join: dict):

@@ -1,6 +1,7 @@
 from libs.logger import logger
 from libs.telegram import send_message_to_admin
 from libs.utils import get_request_user
+from config import cfg
 class BadRequest(Exception):
     extension= {"code": "400", "extra": None}
 
@@ -35,6 +36,6 @@ def format_error (e, token="Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2Vy
         )
         user= get_request_user(token)
         logger.warning('sending error to admin via TELEGRAM')
-        send_message_to_admin(f"utente: {user['email']} {user['first_name']} {user['last_name']}\ngenerated the following untracked error:\n🚫 🚫 🚫 🚫 🚫 🚫 🚫 🚫 🚫 🚫 🚫 🚫\n{str(e)}\n🚫 🚫 🚫 🚫 🚫 🚫 🚫 🚫 🚫 🚫 🚫 🚫")
+        send_message_to_admin(f"Poject: {cfg['project']['name']}\nutente: {user['email']} {user['first_name']} {user['last_name']}\ngenerated the following untracked error:\n\n🚫 🚫 🚫 🚫 🚫 🚫 🚫 🚫 🚫 🚫 🚫 🚫\n\n{str(e)}\n\n🚫 🚫 🚫 🚫 🚫 🚫 🚫 🚫 🚫 🚫 🚫 🚫")
         e= InternalError('Internal server error').additinal_message(str(e))
     return { "message" : str(e), "code": e.extension['code'], "extra": e.extension['extra']  }

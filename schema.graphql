@@ -11,6 +11,7 @@ type Query {
     me: UserResult!
     getOwnership(id: ID!): OwnershipResult!
     listOwnerships(commonSearch: CommonSearch= {}):PaginatedOwnerships!
+    listHealthCards(commonSearch: CommonSearch= {}): PaginatedHealthCards !
 }
 
 type Mutation {
@@ -223,6 +224,14 @@ type PaginatedPets {
     
 }
 
+type PaginatedHealthCards {
+    success: Boolean!
+    error: Error
+    items: [HealthCard]!
+    pagination: Pagination!
+    
+}
+
 type OwnershipResult {
     success: Boolean!
     error: Error
@@ -251,18 +260,12 @@ type PetAddedResult {
 
 type HealthCard {
     id: ID!
-    logs: [String]!
-    events: [Treatment]!
+    pet: Pet!
+    treatments: [Treatment]!
 }
 
 type Treatment {
-    id: ID!
     name: String!
-    created_at: String!
-    type: TreatmentType!
-    date: String!
-    notes: String
-    booster_date: String
 }
 
 input FixedFilter {
