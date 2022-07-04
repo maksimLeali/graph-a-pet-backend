@@ -262,10 +262,17 @@ type HealthCard {
     id: ID!
     pet: Pet!
     treatments: [Treatment]!
+    notes: [String]!
 }
 
 type Treatment {
+    id: ID! 
     name: String!
+    created_at: String!
+    type: TreatmentType!
+    date: String!
+    notes: String
+    booster_date: String
 }
 
 input FixedFilter {
