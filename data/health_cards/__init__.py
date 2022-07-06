@@ -21,6 +21,7 @@ def create_health_card(data):
         )
         db.session.add(health_card)
         db.session.commit()
+        logger.check(f"health_card: {health_card}")
         return health_card.to_dict()
     except Exception as e:
         logger.error(e)
