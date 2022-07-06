@@ -80,6 +80,7 @@ def get_pet(id):
     except Exception as e: 
         logger.error(e)
         raise e
+    
 def get_pagination(common_search):
     try: 
         total_items = pets_data.get_total_items(common_search)

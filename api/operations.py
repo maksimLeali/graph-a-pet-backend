@@ -50,6 +50,7 @@ query.set_field("me", me_resolver)
 query.set_field("getOwnership", get_ownership_resolver)
 query.set_field("listOwnerships", list_ownerships_resolver)
 query.set_field("listHealthCards", list_health_cards_resolver)
+query.set_field("getHealthCard", get_health_card_resolver)
 
 mutation = MutationType()
 mutation.set_field('createUser', create_user_resolver)

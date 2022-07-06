@@ -12,6 +12,7 @@ type Query {
     getOwnership(id: ID!): OwnershipResult!
     listOwnerships(commonSearch: CommonSearch= {}):PaginatedOwnerships!
     listHealthCards(commonSearch: CommonSearch= {}): PaginatedHealthCards !
+    getHealthCard(id: ID!): HealthCardResult
 }
 
 type Mutation {
@@ -263,6 +264,12 @@ type HealthCard {
     pet: Pet!
     treatments: [Treatment]!
     notes: [String]!
+}
+
+type HealthCardResult {
+    health_card: HealthCard
+    success: Boolean
+    error: Error
 }
 
 type Treatment {

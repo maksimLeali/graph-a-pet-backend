@@ -3,6 +3,17 @@ import data.health_cards as health_cards_data
 from libs.logger import logger, stringify
 from math import ceil
 
+
+def get_health_card(id): 
+    logger.domain(f"id: {id}")
+    try:
+        health_card= health_cards_data.get_health_card(id)
+        logger.check(f"health_card: {stringify(health_card)}")
+        return health_card
+    except Exception as e: 
+        logger.error(e)
+        raise e
+
 def create_health_card(data):
     try:
         return health_cards_data.create_health_card(data)
