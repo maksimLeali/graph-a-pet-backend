@@ -92,7 +92,10 @@ def get_user_from_email(email) -> User:
     logger.data(f'email: {email}')
     try:
         user_model=  User.query.filter(User.email==email).first()
+        if not user_model:  
+            raise NotFoundError(f"No user found with email {email}") 
         logger.check(f"user: {user_model}")
         return user_model.to_dict()
     except Exception as e:
         logger.error(e)
+        raise e
