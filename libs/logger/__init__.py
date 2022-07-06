@@ -7,21 +7,21 @@ import re
 
 
 class CustomFormatter(logging.Formatter):    
-    logging.CHECK = logging.INFO +1
     logging.INPUT = logging.DEBUG + 1
     logging.OUTPUT = logging.DEBUG  + 2
-    logging.MIDDLEWARE = logging.INFO + 2
-    logging.API = logging.INFO + 3
-    logging.DOMAIN = logging.INFO + 4 
-    logging.DATA = logging.INFO + 5
+    logging.MIDDLEWARE = logging.INFO + 1
+    logging.API = logging.INFO + 2
+    logging.DOMAIN = logging.INFO + 3 
+    logging.DATA = logging.INFO + 4
+    logging.CHECK = logging.INFO + 5
     logging.START = logging.INFO + 6
-    logging.addLevelName(logging.CHECK, "CHECK")
     logging.addLevelName(logging.INPUT, "INPUT")
     logging.addLevelName(logging.OUTPUT, "OUTPUT")
     logging.addLevelName(logging.MIDDLEWARE, "MIDDLEWARE")
     logging.addLevelName(logging.API, "API")
     logging.addLevelName(logging.DOMAIN, "DOMAIN")
     logging.addLevelName(logging.DATA, "DATA")
+    logging.addLevelName(logging.CHECK, "CHECK")
     logging.addLevelName(logging.START, "START")
     grey = "\x1b[38;20m"
     green= "\033[92m"
@@ -45,11 +45,11 @@ class CustomFormatter(logging.Formatter):
         logging.INPUT: purple + "🔻\n " + format + reset, #11
         logging.OUTPUT: purple + format + "🔺  \n" + reset, #12
         logging.INFO: blue+ "ℹ️  " + format + reset, #20
-        logging.CHECK: green + "✅  " + extended_format + reset, #21
-        logging.MIDDLEWARE: yellow_bold + "🔑  " + extended_format + reset, #22
-        logging.API: green_bold + "📤  " + extended_format + reset, #23
-        logging.DOMAIN: cyan_bold + "🛠️  " + extended_format + reset, #24
-        logging.DATA: blue_bold + "📁  " + extended_format + reset, #25
+        logging.MIDDLEWARE: yellow_bold + "🔑  " + extended_format + reset, #21
+        logging.API: green_bold + "📤  " + extended_format + reset, #22
+        logging.DOMAIN: cyan_bold + "🛠️  " + extended_format + reset, #23
+        logging.DATA: blue_bold + "📁  " + extended_format + reset, #24
+        logging.CHECK: green + "✅  " + extended_format + reset, #25
         logging.START:italic + green_bold + "🚀  "  + start_format + reset, #26
         logging.WARNING: yellow + "🟡  " + extended_format + reset, #30
         logging.ERROR: red + "❌  " + extended_format + reset, #40
