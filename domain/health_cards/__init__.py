@@ -1,8 +1,13 @@
 
 import data.health_cards as health_cards_data
+import domain.pets as pets_domain
+from api.errors import NotFoundError
 from libs.logger import logger, stringify
 from math import ceil
 
+def get_pet(obj,info):
+    logger.check(f"pet_id: {obj['pet_id']}")
+    return pets_domain.get_pet(obj['pet_id'])
 
 def get_health_card(id): 
     logger.domain(f"id: {id}")
@@ -15,7 +20,11 @@ def get_health_card(id):
         raise e
 
 def create_health_card(data):
+    logger.domain(f"data: {stringify(data)}")
     try:
+        pet = pets_domain.get_pet(data['pet_id'])
+        if(not pet):
+            raise NotFoundError(f"no pet found with id: {data['pet_id']}")
         return health_cards_data.create_health_card(data)
     except Exception as e:
         logger.error(e)

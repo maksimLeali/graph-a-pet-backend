@@ -14,9 +14,9 @@ def create_health_card(data):
         today = datetime.today()
         health_card = HealthCard(
             id = f"{uuid.uuid4()}",
-            length=data["length"], 
-            pattern=data["pattern"], 
-            colors= data['colors'],
+            pet_id = data['pet_id'],
+            notes = [],
+            treatments = [],
             created_at=today.strftime("%b-%d-%Y")
         )
         db.session.add(health_card)
@@ -79,7 +79,7 @@ def get_health_card(id):
 
 def get_total_items(common_search):
     try:
-        query = build_count(table="ownerships",search= common_search['search'],search_fields=common_search['search_fields'] ,filters= common_search['filters'] )
+        query = build_count(table="health_cards",search= common_search['search'],search_fields=common_search['search_fields'] ,filters= common_search['filters'] )
         result = db.session.execute(query)
         return result.first()[0]
     except ProgrammingError as e: 

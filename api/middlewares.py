@@ -20,8 +20,6 @@ def auth_middleware(f):
     def function_wrapper(obj: Any, info: GraphQLResolveInfo, **args):
         logger.middleware("check if user is authorized")
         try :
-            logger.warning(cfg['jwt']['secret'])
-            logger.warning(info.context.headers['authorization'])
             bearer = info.context.headers['authorization'].split('Bearer ')[1]
             decoded_bearer= jwt.decode(bearer,cfg['jwt']['secret'],algorithms=["HS256"] )
             logger.info(decoded_bearer)

@@ -17,6 +17,8 @@ from api.coats.resolvers import coat
 from api.coats.queries import *
 from api.coats.mutations import *
 from api.health_cards.queries import * 
+from api.health_cards.mutations import * 
+from api.health_cards.resolvers import health_card
 from domain import refresh_token
 from api.middlewares import auth_middleware
 
@@ -63,5 +65,7 @@ mutation.set_field('addPetToUser', add_pet_to_user_resolver)
 mutation.set_field('addPetToMe', add_pet_to_me_resolver)
 mutation.set_field('updateOwnership', update_ownership_resolver)
 mutation.set_field("refreshToken", refresh_token_resolver)
+mutation.set_field("updateHealthCard", update_health_card_resolver)
+mutation.set_field("createHealthCard", create_health_card_resolver)
 
-object_types = [query, mutation, user, pet, ownership, pet_body, coat]
+object_types = [query, mutation, user, pet, ownership, pet_body, coat, health_card]
