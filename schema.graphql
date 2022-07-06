@@ -11,8 +11,6 @@ type Query {
     me: UserResult!
     getOwnership(id: ID!): OwnershipResult!
     listOwnerships(commonSearch: CommonSearch= {}):PaginatedOwnerships!
-    listHealthCards(commonSearch: CommonSearch= {}): PaginatedHealthCards!
-    getHealthCard(id: ID!): HealthCardResult
 }
 
 type Mutation {
@@ -28,8 +26,6 @@ type Mutation {
     addPetToUser(pet: PetCreate!, userId: String!): PetAddedResult!
     addPetToMe(pet: PetCreate!, custodyLevel:CustodyLevel ): PetAddedResult!
     refreshToken: NewTokenResult!
-    createHealthCard(data: HealthCardCreate!): HealthCardResult! 
-    updateHealthCard(id: ID!, data:HealthCardUpdate!): HealthCardResult!
 }
 
 scalar Upload
@@ -227,14 +223,6 @@ type PaginatedPets {
     
 }
 
-type PaginatedHealthCards {
-    success: Boolean!
-    error: Error
-    items: [HealthCard]!
-    pagination: Pagination!
-    
-}
-
 type OwnershipResult {
     success: Boolean!
     error: Error
@@ -263,19 +251,12 @@ type PetAddedResult {
 
 type HealthCard {
     id: ID!
-    pet: Pet!
-    treatments: [Treatment]!
-    notes: [String]!
-}
-
-type HealthCardResult {
-    health_card: HealthCard
-    success: Boolean
-    error: Error
+    logs: [String]!
+    events: [Treatment]!
 }
 
 type Treatment {
-    id: ID! 
+    id: ID!
     name: String!
     created_at: String!
     type: TreatmentType!
@@ -397,12 +378,4 @@ input PetCreate {
     intollerance: [String]
     disciplines: [String]
 
-}
-
-input HealthCardCreate {
-    pet_id: ID!
-}
-
-input HealthCardUpdate {
-    notes: [String]!
 }
