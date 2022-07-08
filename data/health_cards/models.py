@@ -7,7 +7,7 @@ class HealthCard(db.Model):
     __tablename__ =  'health_cards'
     id =  db.Column(db.String, primary_key=True)
     pet_id=  db.Column(db.String, db.ForeignKey('pets.id'))
-    treatments = db.Column(db.JSON)
+    treatments= db.relationship("Treatment", uselist=True, backref='health_cards')
     notes =  db.Column(db.JSON)
     created_at =  db.Column(db.DateTime, default= datetime.now().strftime('%Y-%m-%dT%H:%M:%S'))
     def to_dict(self) :

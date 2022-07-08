@@ -30,8 +30,8 @@ def graphql_server():
     status_code = 200 if success else 400
     return jsonify(result), status_code
 
-os.environ['WERKZEUG_RUN_MAIN'] = 'true'
 if __name__ == "__main__":
+    os.environ['WERKZEUG_RUN_MAIN'] = 'true'
     logger.start(
         f"Server is running on http://{cfg['flask']['host']}:{cfg['flask']['port']}\n" \
         f"See playground on http://{cfg['flask']['host']}:{cfg['flask']['port']}/graphql"
