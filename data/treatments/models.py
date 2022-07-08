@@ -12,7 +12,7 @@ class TreatmentType(Enum):
     
 class Treatment(db.Model):
     __tablename__ = 'treatments',
-    name = db.Column(db.STRING)
+    name = db.Column(db.String)
     date = db.Column(db.DateTime)
     type = db.Column(db.Enum(TreatmentType), default=TreatmentType.REMINDER.name)
     health_card_id= db.Column(db.String, db.ForeignKey('health_cards.id'))

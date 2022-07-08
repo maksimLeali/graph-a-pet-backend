@@ -5,6 +5,5 @@ lib
 config.yml
 /app/
 venv 
-bin/
 serviceAccountKey.json
 **/__log__*

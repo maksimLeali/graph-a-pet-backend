@@ -38,11 +38,6 @@ enum UserRole {
     USER,
     ADMIN
 }
-enum TreatmentType {
-    VACCINE,
-    ANTIPARASITE,
-    OPERATION
-}
 
 enum CustodyLevel {
     SUB_OWNER,
@@ -56,6 +51,14 @@ enum Gender {
     NOT_SAID
 }
 
+enum TreatmentType{
+    VACCINE ,
+    ANTIPARASITIC,
+    TABLET,
+    OPERATION,
+    REMINDER,
+}
+
 enum CoatName {
     FUR,
     SCALES,
@@ -63,6 +66,14 @@ enum CoatName {
     SKIN,
     SHED,
     COAT
+}
+
+enum FrequencyUnit {
+    MINUTELY,
+    DAILY,
+    WEEKLY,
+    MONTHLY,
+    YEARLY
 }
 
 enum PetFamily {
@@ -281,6 +292,8 @@ type Treatment {
     type: TreatmentType!
     date: String!
     notes: String
+    frequency_value: Int
+    frequency_unit: FrequencyUnit
     booster_date: String
 }
 
