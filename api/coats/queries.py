@@ -4,11 +4,11 @@ import domain.coats as coats_domain
 @convert_kwargs_to_snake_case
 def list_coats_resolver(obj, info):
     try:
-        coats = coats_domain.get_coats()
+        coat = coats_domain.get_coats()
         
         payload = {
             "success": True,
-            "coats": coats
+            "coats": coat
         }
     except Exception as error:
         payload = {
