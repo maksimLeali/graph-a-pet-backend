@@ -3,7 +3,6 @@ from data import db
 from sqlalchemy.dialects.postgresql import JSON
 from datetime import datetime
 
-
 class HealthCard(db.Model):
     __tablename__ = 'health_cards'
     id = db.Column(db.String, primary_key=True)
@@ -14,4 +13,5 @@ class HealthCard(db.Model):
         return {
             "id": self.id,
             "created_at": str(self.created_at)
+
         }
