@@ -8,7 +8,6 @@ from libs.logger import logger,stringify
 from api.errors import InternalError, NotFoundError, BadRequest
 from sqlalchemy import select, text
 
-
 from data.users.models import User, UserRole
 from data import db
 
