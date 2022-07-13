@@ -17,7 +17,6 @@ class NotFoundError(Exception):
 class InternalError(Exception):
     extension ={"code": "500", "extra": None}
 
-
 errors_types=[AuthenticationError, ForbiddenError, NotFoundError, InternalError, BadRequest]
 
 error_pagination = {
@@ -44,5 +43,5 @@ def format_error (e, token="Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2Vy
             } 
         logger.warning('sending error to admin via TELEGRAM')
         send_message_to_admin(f"Poject: {cfg['project']['name']}\nutente: {user['email']} {user['first_name']} {user['last_name']}\ngenerated the following untracked error:\n\n🚫 🚫 🚫 🚫 🚫 🚫 🚫 🚫 🚫 🚫 🚫 🚫\n\n{str(e)}\n\n🚫 🚫 🚫 🚫 🚫 🚫 🚫 🚫 🚫 🚫 🚫 🚫")
-        e= InternalError('Internal server error').additinal_message(str(e))
+        e= InternalError('Internal server error')
     return { "message" : str(e), "code": e.extension['code'], "extra": e.extension['extra']  }

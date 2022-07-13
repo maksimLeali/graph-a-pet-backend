@@ -27,7 +27,7 @@ class PetBody(db.Model):
     family= db.Column(db.Enum(PetFamily))
     breed= db.Column(db.String)
     pet= db.relationship('Pet', backref="pet_bodies", lazy=True, uselist=False )
-    created_at = db.Column(db.DateTime, default= datetime.now().strftime('%Y-%m-%dT%H:%M:%S'))
+    created_at = db.Column(db.DateTime, default= datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'))
     
     def to_dict(self):
         return {

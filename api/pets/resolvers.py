@@ -5,7 +5,9 @@ from libs.logger import logger, stringify
 from api.errors import error_pagination
 from libs.utils import format_common_search
 
+pet = ObjectType("Pet")
 
+@pet.field('ownerships')
 @convert_kwargs_to_snake_case
 def pet_ownerships_resolver(obj, info, common_search):
     common_search= format_common_search(common_search)
@@ -22,7 +24,7 @@ def pet_ownerships_resolver(obj, info, common_search):
             "success": True
         }
         logger.check(
-            f"ownerships: {stringify(ownerships)}\n"\
+            f"ownerships: {len(ownerships)}\n"\
             f"pagination: {stringify(pagination)}"
         )
     except Exception as  e: 
@@ -35,6 +37,5 @@ def pet_ownerships_resolver(obj, info, common_search):
         }
     return resolved
 
-pet = ObjectType("Pet")
-pet.set_field("ownerships", pet_ownerships_resolver)
+
 pet.set_field("body", pets_domain.get_body)

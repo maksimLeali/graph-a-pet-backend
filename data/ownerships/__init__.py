@@ -16,7 +16,7 @@ def create_ownership(data):
         user_id=data["user_id"], 
         pet_id=data["pet_id"], 
         custody_level= data['custody_level'],
-        created_at=today.strftime("%b-%d-%Y")
+        created_at=today.strftime("%Y-%m-%dT%H:%M:%SZ")
     )
     db.session.add(ownership)
     db.session.commit()
