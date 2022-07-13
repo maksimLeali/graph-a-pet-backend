@@ -11,7 +11,6 @@ class TreatmentType(Enum):
     REMINDER="REMINDER",
     
 class FrequencyUnit(Enum) :
-    MINUTELY= "MINUTELY",
     DAILY= "DAILY",
     WEEKLY= "WEEKLY",
     MONTHLY= "MONTHLY",
@@ -27,14 +26,16 @@ class Treatment(db.Model):
     logs = db.Column(db.JSON)
     frequency_value = db.Column(db.Integer)
     frequency_unit = db.Column(db.Enum(FrequencyUnit))
+    frequency_times = db.Column(db.Integer)
     created_at = db.Column(db.DateTime, default= datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'))
     def to_dict(self):
         return {
             "id": self.id,
             "date" : self.date.strftime('%Y-%m-%dT%H:%M:%SZ'),
             "frequency_value": self.frequency_value,
-            "frequency_unit": self.frequency_unit,
-            "booster_date": self.booster_date.strftime('%Y-%m-%dT%H:%M:%SZ') if self.booster_date else None,
+            "frequency_unit": self.frequency_unit.name,
+            "frequency_times": self.frequency_times,
+            "booster_id": self.booster_id,
             "type": self.type.name,
             "health_card_id": self.health_card_id,
             "logs" : self.logs,

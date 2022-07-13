@@ -73,7 +73,6 @@ enum CoatName {
 }
 
 enum FrequencyUnit {
-    MINUTELY,
     DAILY,
     WEEKLY,
     MONTHLY,
@@ -310,6 +309,7 @@ type Treatment {
     date: String!
     logs: [String]
     frequency_value: Int
+    frequency_times: Int
     frequency_unit: FrequencyUnit
     booster: Treatment
     health_card: HealthCard
@@ -435,6 +435,9 @@ input TreatmentCreate{
     logs: [String]
     date: String!
     booster_date: String
+    frequency_times: Int
+    frequency_value: Int
+    frequency_unit: FrequencyUnit
     type: TreatmentType!
 }
 input TreatmentUpdate{

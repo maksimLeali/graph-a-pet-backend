@@ -27,7 +27,7 @@ def create_treatment(data: dict):
         treatment = Treatment(
             id=f"{uuid.uuid4()}",
             date = datetime.strptime(data.get("date"), "%Y-%m-%dT%H:%M:%SZ"),
-            booster_date = datetime.strptime(data.get("booster_date"),"%Y-%m-%dT%H:%M:%SZ") if data.get("booster_date") else None,
+            booster_id = data.get('booster_id'),
             health_card_id = data.get("health_card_id"),
             type = data.get("type"),
             logs = data.get("logs"),
