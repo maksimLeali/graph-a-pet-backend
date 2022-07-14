@@ -286,7 +286,7 @@ type PetAddedResult {
 type HealthCard {
     id: ID!
     pet: Pet!
-    treatments: [Treatment]!
+    treatments(commonSearch: CommonSearch = {}): PaginatedTreatments!
     notes: [String]!
 }
 

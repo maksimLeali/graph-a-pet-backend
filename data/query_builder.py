@@ -40,9 +40,14 @@ tables_common_properties = {
         "other_table_ref": "ownership_id"
         },
     "health_cards": {
-        "search_columns": ["notes"],
+        "search_columns": ["logs"],
         "alias": "hlc",
         "oterh_table_ref": "health_card_id"
+    },
+    "treatments": {
+        "search_columns": ["logs"],
+        "alias": "tr",
+        "other_table_ref": "treatment_id"
     }
 }
 
