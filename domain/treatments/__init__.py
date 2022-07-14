@@ -10,27 +10,15 @@ import pendulum as pdl
 
 
 def setUnits(frequency_unit, value):
+    years,months,weeks,days = 0, 0, 0, 0
     if (frequency_unit == FrequencyUnit.YEARLY.name):
-        days = 0
-        months = 0
         years = value
-        weeks = 0
-
     elif (frequency_unit == FrequencyUnit.MONTHLY.name):
-        days = 0
         months = value
-        years = 0
-        weeks = 0
     elif (frequency_unit == FrequencyUnit.WEEKLY.name):
-        days = 0
-        months = 0
-        years = 0
         weeks = value
     elif (frequency_unit == FrequencyUnit.DAILY.name):
         days = value
-        months = 0
-        years = 0
-        weeks = 0
     return years, months, weeks, days
 
 
