@@ -31,7 +31,7 @@ def setUnits(frequency_unit, value):
         months = 0
         years = 0
         weeks = 0
-        return years, months, weeks, days
+    return years, months, weeks, days
 
 
 def get_health_card(health_card_id):
@@ -54,30 +54,37 @@ def get_paginated_treatments(common_search):
         raise e
 
 
-def create_treatment(data):
-    logger.domain(f"treatment: {stringify(data)}")
+def create_treatment(data, props_booster_id=None):
+    logger.domain(
+            f"treatment: {stringify(data)}\n"\
+            f"id: {props_booster_id}"
+        )
     try:
-        if(not data['booster_date'] == None):
-            logger.error('++++++++++++++')
+        if(data.get('booster_date') is not None):
             booster = create_treatment(py_.omit({
                 **data,
                 'date': data['booster_date']
             },
                 'booster_date'))
-            data['booster_id'] = booster['id']
             data = py_.omit(data, 'booster_date')
-        logger.warning(
-            [data['frequency_times'], data['frequency_value'], data['frequency_unit']])
-        logger.warning(
-            f"Nonw in aray : {None in [data['frequency_times'], data['frequency_value'], data['frequency_unit']] } ")
-        if(not None in [data['frequency_times'], data['frequency_value'], data['frequency_unit']]):
-            years, months, weeks, days = setUnits(data['frequency_unit'], data['frequency_value'])
+            props_booster_id = booster['id']
+
+
+        if(not None in [data.get('frequency_times'), data.get('frequency_value'), data.get('frequency_unit')]):
+            years, months, weeks, days = setUnits(
+                data['frequency_unit'], data['frequency_value'])
             for i in range(1, data['frequency_times']):
-                new_date= pdl.parse(data['date']).add(years= years * (data['frequency_times'] - i) , months = months *  (data['frequency_times'] - i), weeks=weeks * (data['frequency_times'] - i), days=days * (data['frequency_times'] - i))
-                logger.info(
-                    f"{data['frequency_value']} * {data['frequency_times'] - i} {data['frequency_unit']}\n"
-                    f"{data['date']} -> { new_date}"
-                )
+                new_date = pdl.parse(data['date']).add(years=years * (data['frequency_times'] - i), months=months * (
+                    data['frequency_times'] - i), weeks=weeks * (data['frequency_times'] - i), days=days * (data['frequency_times'] - i))
+                temp_booster = create_treatment(py_.omit({
+                    **data,
+                    "date": str(new_date).replace('+00:00', 'Z'),
+                    "booster_id": props_booster_id,
+                },
+                    ['frequency_value', 'frequency_unit', 'frequency_times']
+                ),props_booster_id)
+                props_booster_id = temp_booster['id']
+        data['booster_id']= props_booster_id
         treatment = treatments_data.create_treatment(data)
         logger.check(f"Treatment : {stringify(data)}")
         return treatment

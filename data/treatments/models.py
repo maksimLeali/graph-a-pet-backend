@@ -33,7 +33,7 @@ class Treatment(db.Model):
             "id": self.id,
             "date" : self.date.strftime('%Y-%m-%dT%H:%M:%SZ'),
             "frequency_value": self.frequency_value,
-            "frequency_unit": self.frequency_unit.name,
+            "frequency_unit": self.frequency_unit.name if self.frequency_unit else None,
             "frequency_times": self.frequency_times,
             "booster_id": self.booster_id,
             "type": self.type.name,
