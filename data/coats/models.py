@@ -1,6 +1,5 @@
 from enum import Enum
 from data import db
-from data.models import *
 from datetime import datetime
     
 class CoatLength(Enum) :
