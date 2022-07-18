@@ -11,10 +11,13 @@ type Query {
     me: UserResult!
     getOwnership(id: ID!): OwnershipResult!
     listOwnerships(commonSearch: CommonSearch= {}):PaginatedOwnerships!
+<<<<<<< HEAD
     listHealthCards(commonSearch: CommonSearch= {}): PaginatedHealthCards!
     getHealthCard(id: ID!): HealthCardResult
     getTreatment(id: ID!): TreatmentResult
     listTreatments(commonSearch: CommonSearch = {}): PaginatedTreatments
+=======
+>>>>>>> main
 }
 
 type Mutation {
@@ -30,10 +33,13 @@ type Mutation {
     addPetToUser(pet: PetCreate!, userId: String!): PetAddedResult!
     addPetToMe(pet: PetCreate!, custodyLevel:CustodyLevel ): PetAddedResult!
     refreshToken: NewTokenResult!
+<<<<<<< HEAD
     createHealthCard(data: HealthCardCreate!): HealthCardResult! 
     updateHealthCard(id: ID!, data:HealthCardUpdate!): HealthCardResult!
     createTreatment(data: TreatmentCreate!): TreatmentResult!
     updateTreatment(id: ID!, data: TreatmentUpdate!): TreatmentResult!
+=======
+>>>>>>> main
 }
 
 scalar Upload
@@ -249,14 +255,6 @@ type PaginatedPets {
     
 }
 
-type PaginatedHealthCards {
-    success: Boolean!
-    error: Error
-    items: [HealthCard]!
-    pagination: Pagination!
-    
-}
-
 type OwnershipResult {
     success: Boolean!
     error: Error
@@ -285,6 +283,7 @@ type PetAddedResult {
 
 type HealthCard {
     id: ID!
+<<<<<<< HEAD
     pet: Pet!
     treatments(commonSearch: CommonSearch = {}): PaginatedTreatments!
     notes: [String]!
@@ -294,6 +293,10 @@ type HealthCardResult {
     health_card: HealthCard
     success: Boolean
     error: Error
+=======
+    logs: [String]!
+    events: [Treatment]!
+>>>>>>> main
 }
 
 type TreatmentResult {
@@ -303,7 +306,12 @@ type TreatmentResult {
 }
 
 type Treatment {
+<<<<<<< HEAD
     id: ID! 
+=======
+    id: ID!
+    name: String!
+>>>>>>> main
     created_at: String!
     type: TreatmentType!
     name: String!
@@ -429,6 +437,7 @@ input PetCreate {
     intollerance: [String]
     disciplines: [String]
 
+<<<<<<< HEAD
 }
 
 input TreatmentCreate{
@@ -460,4 +469,6 @@ input HealthCardCreate {
 
 input HealthCardUpdate {
     notes: [String]!
+=======
+>>>>>>> main
 }
