@@ -1,5 +1,3 @@
-project:
-  name: ~
 db:
   host: ~
   user: ~
@@ -16,6 +14,3 @@ telegram:
   active: ~
   token: ~
   admin_id: ~
-flask:
-  host: ~
-  port: ~
