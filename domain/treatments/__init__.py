@@ -1,3 +1,4 @@
+from api.errors import NotFoundError
 from ariadne import convert_kwargs_to_snake_case
 import data.treatments as treatments_data
 from data.treatments.models import FrequencyUnit
@@ -10,7 +11,7 @@ import pendulum as pdl
 
 
 def setUnits(frequency_unit, value):
-    years,months,weeks,days = 0, 0, 0, 0
+    years, months, weeks, days = 0, 0, 0, 0
     if (frequency_unit == FrequencyUnit.YEARLY.name):
         years = value
     elif (frequency_unit == FrequencyUnit.MONTHLY.name):
@@ -44,9 +45,9 @@ def get_paginated_treatments(common_search):
 
 def create_treatment(data, props_booster_id=None):
     logger.domain(
-            f"treatment: {stringify(data)}\n"\
-            f"id: {props_booster_id}"
-        )
+        f"treatment: {stringify(data)}\n"
+        f"id: {props_booster_id}"
+    )
     try:
         if(data.get('booster_date') is not None):
             booster = create_treatment(py_.omit({
@@ -56,7 +57,6 @@ def create_treatment(data, props_booster_id=None):
                 'booster_date'))
             data = py_.omit(data, 'booster_date')
             props_booster_id = booster['id']
-
 
         if(not None in [data.get('frequency_times'), data.get('frequency_value'), data.get('frequency_unit')]):
             years, months, weeks, days = setUnits(
@@ -70,9 +70,9 @@ def create_treatment(data, props_booster_id=None):
                     "booster_id": props_booster_id,
                 },
                     ['frequency_value', 'frequency_unit', 'frequency_times']
-                ),props_booster_id)
+                ), props_booster_id)
                 props_booster_id = temp_booster['id']
-        data['booster_id']= props_booster_id
+        data['booster_id'] = props_booster_id
         treatment = treatments_data.create_treatment(data)
         logger.check(f"Treatment : {stringify(data)}")
         return treatment
@@ -87,12 +87,64 @@ def update_treatment(id, data):
         f"data: {data}"
     )
     try:
-        treatment = treatments_data.update_treatment(id, data)
+        treatment = get_treatment(id)
+        if(treatment.get('booster_id') != None) :
+            booster = get_treatment(treatment.get('booster_id'))
+        if (data.get('booster_date') != None):
+            try:
+                booster = get_treatment(treatment['booster_id'])
+                new_booster_date = data['booster_date']
+                treatments_data.update_treatment(booster['id'], {
+                    **py_.omit(data, ['frequency_unit',
+                                      'frequency_time',
+                                      'frequency_value',
+                                      'booster_date']), "date": new_booster_date
+                })
+            except NotFoundError as e:
+                booster = create_treatment(py_.omit(
+                    {**treatment, **data}, ['frequency_unit', 'frequency_time', 'frequency_value', 'booster_date']))
+            except Exception as e:
+                logger.error(e)
+                raise e
+            
+        if(not None in [data.get('frequency_times'), data.get('frequency_value'), data.get('frequency_unit')] and booster != None):
+            delete_boosters(booster)
+            years, months, weeks, days = setUnits(
+                data['frequency_unit'], data['frequency_value'])
+            update_booster_id = None
+            for i in range(1, data['frequency_times']):
+                new_date = pdl.parse(treatment['date']).add(years=years * (data['frequency_times'] - i), months=months * (
+                    data['frequency_times'] - i), weeks=weeks * (data['frequency_times'] - i), days=days * (data['frequency_times'] - i))
+                logger.info(new_date)
+                temp_booster = create_treatment(py_.omit({
+                    **treatment,
+                    **data,
+                    "date": str(new_date).replace('+00:00', 'Z'),
+                    "booster_id": update_booster_id,
+                },
+                    ['frequency_value', 'frequency_unit', 'frequency_times']
+                ), update_booster_id)
+                update_booster_id = temp_booster['id']
+                booster = temp_booster
+            pass
+        if (len(py_.omit(data, 'booster_date').keys()) > 0 or booster != None):
+            treatment = treatments_data.update_treatment(id, py_.omit(
+                {**data, "booster_id": booster['id'] if booster != None else None}, 'booster_date'))
         logger.check(f"treatment {stringify(treatment)}")
         return treatment
     except Exception as e:
         logger.error(e)
         raise e
+
+def delete_boosters(treatment):
+    booster_id = treatment.get('booster_id')
+    logger.warning(f'start: {booster_id} ')
+    if booster_id != None:
+        booster = get_treatment(booster_id)
+        delete_boosters(booster)
+    logger.check(f'end: {booster_id} ')
+    treatments_data.delete_treatment(treatment['id'])
+    
 
 
 def get_treatments(common_search):

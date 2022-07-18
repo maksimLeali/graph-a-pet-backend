@@ -4,7 +4,7 @@ include/
 lib
 config.yml
 /app/
-venv 
+venv
 /alembic/alembic.ini
 serviceAccountKey.json
 **/__log__*

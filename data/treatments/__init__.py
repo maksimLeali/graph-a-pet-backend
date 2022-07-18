@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 import pydash as py_
-from sqlalchemy import select, text
+from sqlalchemy import select, text, delete
 from sqlalchemy.exc import ProgrammingError
 from .models import Treatment, Gender
 from data import db
@@ -30,6 +30,7 @@ def create_treatment(data: dict):
             booster_id = data.get('booster_id'),
             health_card_id = data.get("health_card_id"),
             type = data.get("type"),
+            name = data.get("name"),
             logs = data.get("logs"),
             frequency_unit = data.get("frequency_unit"),
             frequency_value = data.get("frequency_value"),
@@ -61,7 +62,18 @@ def update_treatment(id, data):
     except Exception as e:
         logger.error(e)
         raise e
-
+    
+    
+def delete_treatment(id): 
+    logger.data(f"id: {id}")
+    try: 
+        logger.check(f'deleting: {id}')
+        Treatment.query.filter_by(id = id).delete()
+        db.session.commit()
+        logger.check(f'deleted {id}')
+    except Exception as e:
+        logger.error(e)
+        raise e
 
 def get_treatments(common_search):
     logger.data(f"commons_search: {stringify(common_search)}")

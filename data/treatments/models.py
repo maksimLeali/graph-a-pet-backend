@@ -24,7 +24,7 @@ class Treatment(db.Model):
     id = db.Column(db.String, primary_key=True)
     name = db.Column(db.String)
     date = db.Column(db.DateTime)
-    booster_id = db.Column(db.String, db.ForeignKey('treatments.id'))
+    booster_id = db.Column(db.String)
     type = db.Column(db.Enum(TreatmentType),
                      default=TreatmentType.REMINDER.name)
     health_card_id = db.Column(db.String, db.ForeignKey('health_cards.id'))

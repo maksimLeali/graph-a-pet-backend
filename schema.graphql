@@ -306,6 +306,7 @@ type Treatment {
     id: ID! 
     created_at: String!
     type: TreatmentType!
+    name: String!
     date: String!
     logs: [String]
     frequency_value: Int
@@ -432,19 +433,25 @@ input PetCreate {
 
 input TreatmentCreate{
     health_card_id: ID!
-    logs: [String]
+    name: String!
     date: String!
+    type: TreatmentType!
+    logs: [String]
     booster_date: String
     frequency_times: Int
     frequency_value: Int
     frequency_unit: FrequencyUnit
-    type: TreatmentType!
 }
 input TreatmentUpdate{
     logs: [String]
     date: String
+    name: String
+    delete_old: Boolean
     booster_date: String
     type: TreatmentType
+    frequency_times: Int
+    frequency_value: Int
+    frequency_unit: FrequencyUnit
 }
 
 input HealthCardCreate {
