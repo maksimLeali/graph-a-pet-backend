@@ -16,16 +16,12 @@ from api.pet_bodies.mutations import *
 from api.coats.resolvers import coat
 from api.coats.queries import *
 from api.coats.mutations import *
-<<<<<<< HEAD
 from api.health_cards.queries import * 
 from api.health_cards.mutations import * 
 from api.health_cards.resolvers import health_card
 from api.treatments.queries import * 
 from api.treatments.mutations import * 
 from api.treatments.resolvers import treatment
-=======
-
->>>>>>> main
 from domain import refresh_token
 from api.middlewares import auth_middleware
 
@@ -58,13 +54,10 @@ query.set_field("getPet", get_pet_resolver)
 query.set_field("me", me_resolver)
 query.set_field("getOwnership", get_ownership_resolver)
 query.set_field("listOwnerships", list_ownerships_resolver)
-<<<<<<< HEAD
 query.set_field("listHealthCards", list_health_cards_resolver)
 query.set_field("getHealthCard", get_health_card_resolver)
 query.set_field("getTreatment", get_treatment_resolver)
 query.set_field("listTreatments", list_treatments_resolver)
-=======
->>>>>>> main
 
 mutation = MutationType()
 mutation.set_field('createUser', create_user_resolver)
@@ -77,14 +70,9 @@ mutation.set_field('addPetToUser', add_pet_to_user_resolver)
 mutation.set_field('addPetToMe', add_pet_to_me_resolver)
 mutation.set_field('updateOwnership', update_ownership_resolver)
 mutation.set_field("refreshToken", refresh_token_resolver)
-<<<<<<< HEAD
 mutation.set_field("updateHealthCard", update_health_card_resolver)
 mutation.set_field("createHealthCard", create_health_card_resolver)
 mutation.set_field("createTreatment", create_treatment_resolver)
 mutation.set_field("updateTreatment", update_treatment_resolver)
 
 object_types = [query, mutation, user, pet, ownership, pet_body, coat, health_card, treatment]
-=======
-
-object_types = [query, mutation, user, pet, ownership, pet_body, coat]
->>>>>>> main
