@@ -13,6 +13,8 @@ type Query {
     listOwnerships(commonSearch: CommonSearch= {}):PaginatedOwnerships!
     listHealthCards(commonSearch: CommonSearch= {}): PaginatedHealthCards!
     getHealthCard(id: ID!): HealthCardResult
+    getTreatment(id: ID!): TreatmentResult
+    listTreatments(commonSearch: CommonSearch = {}): PaginatedTreatments
 }
 
 type Mutation {
@@ -30,6 +32,8 @@ type Mutation {
     refreshToken: NewTokenResult!
     createHealthCard(data: HealthCardCreate!): HealthCardResult! 
     updateHealthCard(id: ID!, data:HealthCardUpdate!): HealthCardResult!
+    createTreatment(data: TreatmentCreate!): TreatmentResult!
+    updateTreatment(id: ID!, data: TreatmentUpdate!): TreatmentResult!
 }
 
 scalar Upload
@@ -37,11 +41,6 @@ scalar Upload
 enum UserRole {
     USER,
     ADMIN
-}
-enum TreatmentType {
-    VACCINE,
-    ANTIPARASITE,
-    OPERATION
 }
 
 enum CustodyLevel {
@@ -56,6 +55,14 @@ enum Gender {
     NOT_SAID
 }
 
+enum TreatmentType{
+    VACCINE ,
+    ANTIPARASITIC,
+    TABLET,
+    OPERATION,
+    REMINDER,
+}
+
 enum CoatName {
     FUR,
     SCALES,
@@ -63,6 +70,13 @@ enum CoatName {
     SKIN,
     SHED,
     COAT
+}
+
+enum FrequencyUnit {
+    DAILY,
+    WEEKLY,
+    MONTHLY,
+    YEARLY
 }
 
 enum PetFamily {
@@ -190,10 +204,18 @@ type PaginatedUsers {
     items: [User]!
     pagination: Pagination!
 }
+
 type PaginatedOwnerships {
     success: Boolean
     error: Error
     items: [Ownership]!
+    pagination: Pagination!
+}
+
+type PaginatedTreatments {
+    success: Boolean
+    error: Error
+    items: [Treatment]!
     pagination: Pagination!
 }
 
@@ -264,7 +286,7 @@ type PetAddedResult {
 type HealthCard {
     id: ID!
     pet: Pet!
-    treatments: [Treatment]!
+    treatments(commonSearch: CommonSearch = {}): PaginatedTreatments!
     notes: [String]!
 }
 
@@ -274,14 +296,24 @@ type HealthCardResult {
     error: Error
 }
 
+type TreatmentResult {
+    treatment: Treatment
+    success: Boolean
+    error: Error
+}
+
 type Treatment {
     id: ID! 
-    name: String!
     created_at: String!
     type: TreatmentType!
+    name: String!
     date: String!
-    notes: String
-    booster_date: String
+    logs: [String]
+    frequency_value: Int
+    frequency_times: Int
+    frequency_unit: FrequencyUnit
+    booster: Treatment
+    health_card: HealthCard
 }
 
 input FixedFilter {
@@ -397,6 +429,29 @@ input PetCreate {
     intollerance: [String]
     disciplines: [String]
 
+}
+
+input TreatmentCreate{
+    health_card_id: ID!
+    name: String!
+    date: String!
+    type: TreatmentType!
+    logs: [String]
+    booster_date: String
+    frequency_times: Int
+    frequency_value: Int
+    frequency_unit: FrequencyUnit
+}
+input TreatmentUpdate{
+    logs: [String]
+    date: String
+    name: String
+    delete_old: Boolean
+    booster_date: String
+    type: TreatmentType
+    frequency_times: Int
+    frequency_value: Int
+    frequency_unit: FrequencyUnit
 }
 
 input HealthCardCreate {

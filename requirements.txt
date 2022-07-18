@@ -35,12 +35,15 @@ libsass==0.21.0
 MarkupSafe==2.1.1
 multidict==6.0.2
 passlib==1.7.4
+pendulum==2.1.2
 platformdirs==2.5.0
 psycopg2-binary==2.9.3
 pycodestyle==2.8.0
 pycparser==2.21
 pydash==5.1.0
 PyJWT==2.3.0
+python-dateutil==2.8.2
+pytzdata==2020.1
 PyYAML==5.4.1
 requests==2.27.1
 six==1.16.0

@@ -1,7 +1,6 @@
 
 from typing import Dict
 import pydash as py_
-from api.errors import InternalError
 from libs.utils import camel_to_snake
 from itertools import permutations
 from libs.logger import logger, stringify
@@ -40,9 +39,14 @@ tables_common_properties = {
         "other_table_ref": "ownership_id"
         },
     "health_cards": {
-        "search_columns": ["notes"],
+        "search_columns": ["logs"],
         "alias": "hlc",
         "oterh_table_ref": "health_card_id"
+    },
+    "treatments": {
+        "search_columns": ["logs"],
+        "alias": "tr",
+        "other_table_ref": "treatment_id"
     }
 }
 

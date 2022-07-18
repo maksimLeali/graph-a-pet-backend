@@ -1,6 +1,5 @@
 from enum import Enum
 from data import db
-from data.models import *
 from datetime import datetime
     
 class CoatLength(Enum) :
@@ -29,7 +28,7 @@ class Coat(db.Model):
     colors = db.Column(db.ARRAY(db.String))
     length = db.Column(db.Enum(CoatLength))
     pattern = db.Column(db.Enum(CoatPattern))
-    created_at = db.Column(db.DateTime, default= datetime.now().strftime('%Y-%m-%dT%H:%M:%S'))
+    created_at = db.Column(db.DateTime, default= datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'))
     pet_body= db.relationship('PetBody', backref="coats", lazy=True, uselist=False )
     
     def to_dict(self):

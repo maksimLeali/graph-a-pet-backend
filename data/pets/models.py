@@ -26,7 +26,7 @@ class Pet(db.Model):
     diet= db.Column(db.ARRAY(db.String), default=[])
     intollerance= db.Column(db.ARRAY(db.String), default= [])
     disciplines= db.Column(db.ARRAY(db.String), default= [])
-    created_at = db.Column(db.DateTime, default= datetime.now().strftime('%Y-%m-%dT%H:%M:%S'))
+    created_at = db.Column(db.DateTime, default= datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'))
     def to_dict(self):
         return {
             "id": self.id,

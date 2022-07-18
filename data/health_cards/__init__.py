@@ -17,7 +17,7 @@ def create_health_card(data):
             pet_id = data['pet_id'],
             notes = [],
             treatments = [],
-            created_at=today.strftime("%b-%d-%Y")
+            created_at=today.strftime("%Y-%m-%dT%H:%M:%SZ")
         )
         db.session.add(health_card)
         db.session.commit()

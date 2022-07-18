@@ -9,12 +9,11 @@ class HealthCard(db.Model):
     pet_id=  db.Column(db.String, db.ForeignKey('pets.id'))
     treatments= db.relationship("Treatment", uselist=True, backref='health_cards')
     notes =  db.Column(db.JSON)
-    created_at =  db.Column(db.DateTime, default= datetime.now().strftime('%Y-%m-%dT%H:%M:%S'))
+    created_at =  db.Column(db.DateTime, default= datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'))
     def to_dict(self) :
         return  {
             "id":  self.id,
             "created_at":  str(self.created_at),
             "pet_id":  self.pet_id,
-            "treatments":  self.treatments,
             "notes":  self.notes,
         }

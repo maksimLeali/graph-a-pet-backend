@@ -14,7 +14,7 @@ class Ownership(db.Model):
     user_id = db.Column(db.String, db.ForeignKey('users.id'))
     pet_id= db.Column(db.String, db.ForeignKey('pets.id'))
     custody_level= db.Column(db.Enum(CustodyLevel))
-    created_at = db.Column(db.DateTime, default= datetime.now().strftime('%Y-%m-%dT%H:%M:%S'))
+    created_at = db.Column(db.DateTime, default= datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'))
     def to_dict(self):
         return {
             "id": self.id,

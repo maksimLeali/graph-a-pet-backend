@@ -16,7 +16,7 @@ class User(db.Model):
     password = db.Column(db.String)
     role = db.Column(db.Enum(UserRole))
     ownerships = db.relationship("Ownership", uselist=True, backref='users')
-    created_at = db.Column(db.DateTime, default= datetime.now().strftime('%Y-%m-%dT%H:%M:%S'))
+    created_at = db.Column(db.DateTime, default= datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'))
     def to_dict(self):
         return {
             "id": self.id,
