@@ -5,8 +5,8 @@ from ariadne.constants import PLAYGROUND_HTML
 from flask import request, jsonify
 from api.operations import object_types
 from config import cfg
-import os 
 from libs.logger import logger
+import os
 
 type_defs = load_schema_from_path("./")
 schema = make_executable_schema(
