@@ -1,4 +1,3 @@
-from tkinter import E
 from libs.logger import logger
 from ariadne import QueryType, MutationType
 from api.users.resolvers import user
