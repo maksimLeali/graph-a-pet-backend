@@ -1,3 +1,5 @@
+project: 
+  name: ~
 db:
   host: ~
   user: ~
@@ -11,6 +13,9 @@ firbase:
 logging: 
   level: ~
 telegram: 
-  active: ~
+  active: False
   token: ~
   admin_id: ~
+flask:
+  host: ~
+  port: ~
