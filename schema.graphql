@@ -365,14 +365,12 @@ input PetBodyCreate {
 }
 
 input PetBodyUpdate {
-    id: ID!
     family: PetFamily
     breed: String
     coat: CoatUpdate
 }
 
 input CoatUpdate{
-    id: ID!
     length: CoatLength
     colors: [String]
     pattern: CoatPattern

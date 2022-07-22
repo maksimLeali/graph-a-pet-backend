@@ -53,8 +53,9 @@ def update_pet(id, data):
         f"data: {data}"
     )
     try:
+        pet = pets_data.get_pet(id);
         if(data['body'] != None):
-            pet_bodies_domain.update_pet_body(data['body']['id'], py_.omit(data['body'], 'id'))
+            pet_bodies_domain.update_pet_body(pet['body_id'], py_.omit(data['body'], 'id'))
         pet= pets_data.update_pet(id, py_.omit(data, 'body'))
         logger.check(f"pet {stringify(pet)}")
         return pet
