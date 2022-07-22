@@ -36,6 +36,7 @@ tables_common_properties = {
     "ownerships":{ 
         "search_columns": ['custody_level'],
         "alias": "ow",
+        "bridge_table": True,
         "other_table_ref": "ownership_id"
         },
     "health_cards": {
@@ -44,7 +45,7 @@ tables_common_properties = {
         "other_table_ref": "health_card_id"
     },
     "treatments": {
-        "search_columns": ["logs"],
+        "search_columns": ["logs", "name"],
         "alias": "tr",
         "other_table_ref": "treatment_id"
     }
@@ -63,7 +64,7 @@ def build_join(parent: str, join: dict):
         join_keys= py_.keys(join)
         for key in join_keys:
             join_alias=tables_common_properties[key]['alias']
-            join_string += f"JOIN {key} AS {join_alias} ON {parent_alias}.{tables_common_properties[key]['other_table_ref']} = {join_alias}.id "
+            join_string += f"JOIN {key} AS {join_alias} ON {parent_alias}.{tables_common_properties[key]['other_table_ref']} = {join_alias}.id " if not tables_common_properties[key].get('bridge_table') == True else f"JOIN {key} AS {join_alias} ON {join_alias}.{tables_common_properties[parent]['other_table_ref']} = {parent_alias}.id "
             filter_keys = py_.keys(join[key])
             for f_key in filter_keys :
                 if f_key == "lists" :

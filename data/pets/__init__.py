@@ -69,6 +69,7 @@ def get_pets(common_search):
     try:
         query = build_query(table="pets",search= common_search['search'],search_fields=common_search['search_fields'] ,ordering=common_search["ordering"],filters= common_search['filters'], pagination=common_search['pagination'] )
         logger.check(f"query: {query}")
+        logger.warning(f"query: {query}")
         manager = select(Pet).from_statement(text(query))
         pets_model = db.session.execute(manager).scalars()
         pets = [pet.to_dict() for pet in pets_model]
