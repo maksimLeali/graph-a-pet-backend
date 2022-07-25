@@ -56,6 +56,7 @@ def update_user(id, data):
         raise e
 
 def get_users(common_search):
+    logger.data(f"commons_search: {stringify(common_search)}")
     try:
         query = build_query(table="users",search= common_search['search'],search_fields=common_search['search_fields'] ,ordering=common_search["ordering"],filters= common_search['filters'], pagination=common_search['pagination'] )
         manager = select(User).from_statement(text(query))

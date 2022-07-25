@@ -336,8 +336,18 @@ input RangeFilter {
 }
 
 input Join {
-    key: String
-    value: Filters
+    key: String!
+    value: Filters! || DeepFilters!
+}
+
+input SearchValue {
+    value: String =""
+    fields: [String] = []
+}
+
+input Search {
+    key: String,
+    value: SearchValue 
 }
 
 input Filters {
@@ -345,6 +355,13 @@ input Filters {
     ranges: [RangeFilter] = []
     lists: [ListFilter] = []
     join: [Join] = []
+    search: [Search]
+}
+input DeepFilters {
+    and: Filters,
+    or: Filters,
+    not: Filters 
+   
 }
 
 
@@ -356,6 +373,14 @@ input CommonSearch {
     search: String = ""
     search_fields: [String] = []
     filters: Filters = { fixeds: [] , ranges: [], lists: [], join: []}
+}
+
+input DeepSearch {
+    page: Int = 0
+    page_size: Int = 20
+    order_by: String = "created_at"
+    order_direction: String = "desc"
+    filters: DeepFilters = { fixeds: [] , ranges: [], lists: [], join: []} || DeepFilters
 }
 
 input PetBodyCreate {
