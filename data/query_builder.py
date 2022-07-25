@@ -278,7 +278,7 @@ def build_deep_query(table: str, search, search_fields, pagination: Dict[str, in
         f"table: {table}, search: {search} in {stringify(search_fields)}\n"
         f"filters: {stringify(filters)}"
     )
-    build_deep_where(table, [], filters)
+    build_deep_where(table, [table], filters)
     # alias = tables_common_properties[table]['alias']
     # query = f"SELECT {alias}.* " \
     #     f"FROM {table} AS {alias} " \
@@ -304,6 +304,26 @@ def build_deep_where(table: str, already_joined: list, filters: Dict[str, dict] 
     print('§§§§§§§§§§§§§§§§§§§§§§§§§§§§')
     print('§§§§§§§§§§§§§§§§§§§§§§§§§§§§')
     
-def build_deep_join (){
-    
-}
+def build_deep_join (parent: str, join:  dict, already_joined):
+    try:
+        logger.info(
+            "DATA | query_builder.py | build_join"
+            f"\nparent: {parent} "
+            f"\njoin: {stringify(join)}"
+            f"\nalredy_joined: {already_joined}"
+        )
+        join_string = ""
+        # filters = []
+        parent_alias = tables_common_properties[parent]['alias']
+        join_keys = py_.keys(join)
+        for key in join_keys:
+            join_alias = tables_common_properties[key]['alias']
+            if(not key in already_joined):
+                already_joined.append(key)
+                join_string += f"JOIN {key} AS {join_alias} ON {parent_alias}.{tables_common_properties[key]['other_table_ref']} = {join_alias}.id " if not tables_common_properties[key].get(
+                'bridge_table') == True else f"JOIN {key} AS {join_alias} ON {join_alias}.{tables_common_properties[parent]['other_table_ref']} = {parent_alias}.id "
+            filter_keys = py_.keys(join[key])
+
+    except Exception as e:
+        logger.error(e)
+        raise e
