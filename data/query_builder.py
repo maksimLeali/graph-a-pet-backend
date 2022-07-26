@@ -104,14 +104,16 @@ def format_and_filters (alias: str, filters: dict):
     filters_to_format = []
     formatted_fixed_filters = format_fixed_filters(alias, filters.get("fixeds"), "AND")
     formatted_list_filters = format_list_filters(alias, filters.get("lists"), "AND")
-    formatted_and_filters = f" ({format_or_filters(alias, filters.get('or'))}) "
     formatted_range_filters = format_range_filters(alias, filters.get('ranges'))
+    formatted_or_filters = format_or_filters(alias, filters.get('or'))
     if len(formatted_fixed_filters) > 0:
         filters_to_format.append(formatted_fixed_filters)
     if len(formatted_list_filters) > 0:
         filters_to_format.append(formatted_list_filters)
-    if len(formatted_and_filters) > 0:
-        filters_to_format.append(formatted_and_filters)
+    if len(formatted_range_filters) > 0:
+        filters_to_format.append(formatted_range_filters)
+    if len(formatted_or_filters) > 0:
+        filters_to_format.append(f"({formatted_or_filters})")
     formatted_filters = ' AND  '.join(filters_to_format)
     return formatted_filters
     
@@ -120,15 +122,31 @@ def format_or_filters (alias: str, filters: dict):
     filters_to_format = []
     formatted_fixed_filters = format_fixed_filters(alias, filters.get("fixeds"), "OR")
     formatted_list_filters = format_list_filters(alias, filters.get("lists"), "OR")
+    formatted_range_filters = format_range_filters(alias, filters.get('ranges'))
     if len(formatted_fixed_filters) > 0:
         filters_to_format.append(formatted_fixed_filters)
     if len(formatted_list_filters) > 0:
         filters_to_format.append(formatted_list_filters)
+    if len(formatted_range_filters) > 0:
+        filters_to_format.append(formatted_range_filters)
     formatted_filters = ' OR  '.join(filters_to_format)
     return formatted_filters
     
 def format_not_filters (alias: str, filters: dict):
     print(filters)
+    filters_to_format = []
+    formatted_fixed_filters = format_fixed_filters(alias, filters.get("fixeds"), "OR")
+    formatted_list_filters = format_list_filters(alias, filters.get("lists"), "OR")
+    formatted_range_filters = format_range_filters(alias, filters.get('ranges'))
+    
+    if len(formatted_fixed_filters) > 0:
+        filters_to_format.append(formatted_fixed_filters)
+    if len(formatted_list_filters) > 0:
+        filters_to_format.append(formatted_list_filters)
+    if len(formatted_range_filters) > 0:
+        filters_to_format.append(formatted_range_filters)
+    formatted_filters = f'NOT  ({" OR " .join(filters_to_format)})'
+    return formatted_filters
 
 def format_range_filters(alias, filters: Dict[str, Dict[str, str]], operator: str= "AND") -> str:
     logger.input(
@@ -294,15 +312,25 @@ def build_deep_where(table: str, already_joined: list, filters: Dict[str, dict] 
     print(already_joined) 
     print(table)
     alias = tables_common_properties[table]['alias']
-    format_and = format_and_filters(alias, filters['and'])
-    format_or = format_or_filters(alias, filters['or'])
-    format_not = format_not_filters(alias, filters['not'])
-    
-    print('§§§§§§§§§§§§§§§§§§§§§§§§§§§§')
+    format_and = format_and_filters(alias, filters.get('and'))
+    format_or = format_or_filters(alias, filters.get('or'))
+    format_not = format_not_filters(alias, filters.get('not'))
+    filters_to_format = []
     print('§§§§§§§§§§§§§§§§§§§§§§§§§§§§')
     print(stringify(format_and))
     print('§§§§§§§§§§§§§§§§§§§§§§§§§§§§')
+    print(stringify(format_or))
     print('§§§§§§§§§§§§§§§§§§§§§§§§§§§§')
+    print(stringify(format_not))
+    print('§§§§§§§§§§§§§§§§§§§§§§§§§§§§')
+    if(len(format_and)> 0):
+        filters_to_format.append(format_and)
+    if(len(format_or)> 0):
+        filters_to_format.append(format_or)
+    if(len(format_not)> 0):
+        filters_to_format.append(format_not)
+    formatted_filters = f" ({ ') AND ('.join(filters_to_format)})"
+    logger.warning(formatted_filters)
     
 def build_deep_join (parent: str, join:  dict, already_joined):
     try:
@@ -323,7 +351,7 @@ def build_deep_join (parent: str, join:  dict, already_joined):
                 join_string += f"JOIN {key} AS {join_alias} ON {parent_alias}.{tables_common_properties[key]['other_table_ref']} = {join_alias}.id " if not tables_common_properties[key].get(
                 'bridge_table') == True else f"JOIN {key} AS {join_alias} ON {join_alias}.{tables_common_properties[parent]['other_table_ref']} = {parent_alias}.id "
             filter_keys = py_.keys(join[key])
-
+        
     except Exception as e:
         logger.error(e)
         raise e
