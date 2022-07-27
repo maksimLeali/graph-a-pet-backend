@@ -11,7 +11,7 @@ pet = ObjectType("Pet")
 @convert_kwargs_to_snake_case
 def pet_ownerships_resolver(obj, info, common_search):
     common_search= format_common_search(common_search)
-    common_search['filters']['fixeds']['user_id'] = obj['id']
+    common_search['filters']['fixed']['user_id'] = obj['id']
     logger.api(
         f"user_id: {obj['id']}\n"\
         f'common_search: {stringify(common_search)}'

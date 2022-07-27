@@ -39,7 +39,7 @@ def format_common_search(common_search):
             "order_direction": common_search['order_direction']
         },
         "filters": {
-            "fixeds": format_filters(common_search['filters']['fixeds']),
+            "fixed": format_filters(common_search['filters']['fixed']),
             "lists": format_filters(common_search['filters']['lists']),
             "ranges": format_filters(common_search['filters']['ranges']),
             "join": format_join(common_search['filters']['join'])

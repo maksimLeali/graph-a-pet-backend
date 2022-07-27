@@ -351,7 +351,7 @@ input Search {
 }
 
 input Filters {
-    fixeds: [FixedFilter] = []
+    fixed: [FixedFilter] = []
     ranges: [RangeFilter] = []
     lists: [ListFilter] = []
     join: [Join] = []
@@ -372,7 +372,7 @@ input CommonSearch {
     order_direction: String = "desc"
     search: String = ""
     search_fields: [String] = []
-    filters: Filters = { fixeds: [] , ranges: [], lists: [], join: []}
+    filters: Filters = { fixed: [] , ranges: [], lists: [], join: []}
 }
 
 input DeepSearch {
@@ -380,7 +380,7 @@ input DeepSearch {
     page_size: Int = 20
     order_by: String = "created_at"
     order_direction: String = "desc"
-    filters: DeepFilters = { fixeds: [] , ranges: [], lists: [], join: []} || DeepFilters
+    filters: DeepFilters = { fixed: [] , ranges: [], lists: [], join: []} || DeepFilters
 }
 
 input PetBodyCreate {
