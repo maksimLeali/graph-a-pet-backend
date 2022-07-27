@@ -115,6 +115,7 @@ def format_and_filters (table: str, filters: dict, already_joined: list, join_st
         formatted_fixed_filters = format_fixed_filters(alias, filters.get("fixed"), "AND")
         formatted_list_filters = format_list_filters(alias, filters.get("lists"), "AND")
         formatted_range_filters = format_range_filters(alias, filters.get('ranges'))
+        formatted_search_filters = format_search_filters(table, filters.get('search'))
         join_string, join_filters = build_deep_join(table, filters.get('join') , already_joined, join_string)
         join_string, formatted_or_filters = format_or_filters(table, filters.get('or'),already_joined, join_string)
         join_string, formatted_not_filters = format_not_filters(table, filters.get('not'),already_joined, join_string)
@@ -124,6 +125,8 @@ def format_and_filters (table: str, filters: dict, already_joined: list, join_st
             filters_to_format.append(formatted_list_filters)
         if len(formatted_range_filters) > 0:
             filters_to_format.append(formatted_range_filters)
+        if len(formatted_search_filters) > 0:
+            filters_to_format.append(formatted_search_filters)
         if len(formatted_or_filters) > 0:
             filters_to_format.append(f"({formatted_or_filters})")
         if len(formatted_not_filters) > 0:
@@ -150,6 +153,7 @@ def format_or_filters (table: str, filters: dict, already_joined: list, join_str
         formatted_fixed_filters = format_fixed_filters(alias, filters.get("fixed"), "OR")
         formatted_list_filters = format_list_filters(alias, filters.get("lists"), "OR")
         formatted_range_filters = format_range_filters(alias, filters.get('ranges'))
+        formatted_search_filters = format_search_filters(table, filters.get('search'))
         join_string, join_filters = build_deep_join(table, filters.get('join') , already_joined, join_string)
         join_string, formatted_and_filters = format_and_filters(table, filters.get('and'), already_joined, join_string)
         join_string, formatted_not_filters = format_not_filters(table, filters.get('not'), already_joined, join_string)
@@ -159,6 +163,8 @@ def format_or_filters (table: str, filters: dict, already_joined: list, join_str
             filters_to_format.append(formatted_list_filters)
         if len(formatted_range_filters) > 0:
             filters_to_format.append(formatted_range_filters)
+        if len(formatted_search_filters) > 0:
+            filters_to_format.append(formatted_search_filters)
         if len(formatted_and_filters) > 0:
             filters_to_format.append(f"({formatted_and_filters})")
         if len(formatted_not_filters) > 0:
@@ -185,6 +191,7 @@ def format_not_filters (table: str, filters: dict, already_joined: list, join_st
         formatted_fixed_filters = format_fixed_filters(alias, filters.get("fixed"), "OR")
         formatted_list_filters = format_list_filters(alias, filters.get("lists"), "OR")
         formatted_range_filters = format_range_filters(alias, filters.get('ranges'))
+        formatted_search_filters = format_search_filters(table, filters.get('search'))
         join_string, join_filters = build_deep_join(table, filters.get('join') , already_joined, join_string)
         join_string, formatted_and_filters = format_and_filters(table, filters.get('and'), already_joined, join_string)
         join_string, formatted_or_filters = format_or_filters(table, filters.get('or'), already_joined, join_string)
@@ -194,6 +201,8 @@ def format_not_filters (table: str, filters: dict, already_joined: list, join_st
             filters_to_format.append(formatted_list_filters)
         if len(formatted_range_filters) > 0:
             filters_to_format.append(formatted_range_filters)
+        if len(formatted_search_filters) > 0:
+            filters_to_format.append(formatted_search_filters)
         if len(formatted_and_filters) > 0:
             filters_to_format.append(f"({formatted_and_filters})")
         if len(formatted_or_filters) > 0:
@@ -230,16 +239,18 @@ def format_range_filters(alias, filters: Dict[str, Dict[str, str]], operator: st
     return formatted_filters
 
 
-def format_search_filter(alias, filters: Dict[str, list]) -> str: 
-    logger.input(
-        f"alias: {alias} \n"
+def format_search_filters(table, filters: Dict[str, list]) -> str: 
+    logger.info(
+        "###############\n"
+        f"alias: {table} \n"
         f"filters: {stringify(filters)}"
     )
     search_list= []
     formatted_search = ""
     try: 
+        alias = tables_common_properties[table]['alias']
         # search
-        search_fields= filters.get("fields") if len(filters.get("fields"))> 0 else tables_common_properties[alias]['search_columns']
+        search_fields= filters.get("fields") if len(filters.get("fields"))> 0 else tables_common_properties[table]['search_columns']
         if  filters.get("value") and len(filters.get("value")) >0 :
             to_permutate = filters.get("value").split(' ')
             for i in range(len(to_permutate)):
@@ -250,6 +261,7 @@ def format_search_filter(alias, filters: Dict[str, list]) -> str:
                 formatted_search += f"{'(' if i==1 and k==1 else ''} "  \
                 f"LOWER({alias}.{camel_to_snake(field)}) LIKE LOWER('%{value}%') "  \
                     f"{'OR' if i <  len(search_list) or k < len(search_fields)  else ')'} "
+        logger.critical(f'formatted_search: {formatted_search}')
     except Exception as e: 
         logger.warning(e)
         pass
