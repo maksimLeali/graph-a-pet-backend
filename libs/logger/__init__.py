@@ -53,7 +53,7 @@ class CustomFormatter(logging.Formatter):
         logging.START:italic + green_bold + "🚀  "  + start_format + reset, #26
         logging.WARNING: yellow + "🟡  " + extended_format + reset, #30
         logging.ERROR: red + "❌  " + extended_format + reset, #40
-        logging.CRITICAL: green + "✅  " + extended_format + reset, #50
+        logging.CRITICAL: bold_red + "⛔  " + extended_format + reset, #50
     }
     
     def format(self, record):
