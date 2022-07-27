@@ -101,7 +101,7 @@ def build_join(parent: str, join: dict):
     except Exception as e:
         logger.error(e)
         raise e
-
+    
 def format_and_filters (table: str, filters: dict, already_joined: list, join_string):
     logger.input(
         f"table: {table}\n"
@@ -229,6 +229,31 @@ def format_range_filters(alias, filters: Dict[str, Dict[str, str]], operator: st
         pass
     return formatted_filters
 
+
+def format_search_filter(alias, filters: Dict[str, list]) -> str: 
+    logger.input(
+        f"alias: {alias} \n"
+        f"filters: {stringify(filters)}"
+    )
+    search_list= []
+    formatted_search = ""
+    try: 
+        # search
+        search_fields= filters.get("fields") if len(filters.get("fields"))> 0 else tables_common_properties[alias]['search_columns']
+        if  filters.get("value") and len(filters.get("value")) >0 :
+            to_permutate = filters.get("value").split(' ')
+            for i in range(len(to_permutate)):
+                search_list.extend([" ".join(val)
+                                for val in permutations(to_permutate, i+1)])
+        for i, value in enumerate(search_list, start=1):
+            for k, field in enumerate(search_fields, start=1):
+                formatted_search += f"{'(' if i==1 and k==1 else ''} "  \
+                f"LOWER({alias}.{camel_to_snake(field)}) LIKE LOWER('%{value}%') "  \
+                    f"{'OR' if i <  len(search_list) or k < len(search_fields)  else ')'} "
+    except Exception as e: 
+        logger.warning(e)
+        pass
+    return formatted_search
 
 def format_fixed_filters(alias, filters: Dict[str, str], operator: str = "AND") -> str:
     logger.input(
@@ -377,7 +402,7 @@ def build_deep_query(table: str,  filters: dict = {"and": {}, "or": {}, "not": {
     # return query
 
 def build_deep_where(table: str, already_joined: list, join_string: list, filters: Dict[str, dict] = {"or": None, "and": None, "not": None }) -> str:
-    logger.info(
+    logger.input(
         f"table: {table}\n"
         f"already_joined: {already_joined}\n"
         f"join_string: {join_string}\n"
@@ -395,16 +420,7 @@ def build_deep_where(table: str, already_joined: list, join_string: list, filter
         filters_to_format.append(format_or)
     if(len(format_not)> 0):
         filters_to_format.append(format_not)
-    formatted_filters = f" ({ ') AND ('.join(filters_to_format)})"
-    logger.critical(
-        '**********************\n'
-        f"formatted_filters: {formatted_filters}"
-    )
-    logger.critical(
-        '**********************\n'
-        f"join_string: {join_string}"
-    )
-    
+    formatted_filters = f" ({ ') AND ('.join(filters_to_format)})"    
     return join_string, formatted_filters
     
 def build_deep_join (parent: str, join:  dict, already_joined: list, join_string: list):
