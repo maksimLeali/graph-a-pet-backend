@@ -67,10 +67,10 @@ def build_join (parent: str, join:  dict, already_joined: list, join_string: lis
             join_alias = tables_common_properties[key]['alias']
             if(not key in already_joined):
                 already_joined.append(key)
+                join_string.append(f"JOIN {key} AS {join_alias} ON {parent_alias}.{tables_common_properties[key]['other_table_ref']} = {join_alias}.id " if (tables_common_properties[key].get(
+                'bridge_table') != True) else f"JOIN {key} AS {join_alias} ON {join_alias}.{tables_common_properties[parent]['other_table_ref']} = {parent_alias}.id " )
             join_string, formatted_filters =build_where(key,already_joined,join_string, join[key])
-            logger.error(stringify(formatted_filters))
             filters.append(formatted_filters)
-        
         logger.output(
             f"join_string: {join_string}\n"
             f"join_filters: {stringify(filters)}"
@@ -79,7 +79,6 @@ def build_join (parent: str, join:  dict, already_joined: list, join_string: lis
     except Exception as e:
         logger.error(e)
         raise e
-
 def build_where(table: str, already_joined: list, join_string: list, filters: Dict[str, dict] = {"or": None, "and": None, "not": None }) -> str:
     logger.input(
         f"table: {table}\n"
@@ -107,7 +106,7 @@ def build_where(table: str, already_joined: list, join_string: list, filters: Di
     return join_string, formatted_filters
 
 def format_main_filters (table: str, filters: dict, already_joined: list, join_string :list, operator: str):
-    logger.input(
+    logger.info(
         f"table: {table}\n"
         f"filters: {stringify(filters)}\n"
         f"operator: {operator}\n"
@@ -148,7 +147,7 @@ def format_main_filters (table: str, filters: dict, already_joined: list, join_s
             formatted_filters = ' OR  '.join(filters_to_format)
         else: 
             formatted_filters = ' AND  '.join(filters_to_format)
-        logger.output(f"formatted_filters: {formatted_filters}")
+        logger.check(f"formatted_filters: {formatted_filters}")
     except Exception as e: 
         logger.warning(e)
         pass
@@ -266,17 +265,17 @@ def build_query(table: str,pagination: dict = {"page_size" : 20, "page": 0}, ord
     )
     join_string, formatted_filters = build_where(table, [table], [], filters)
     alias = tables_common_properties[table]['alias']
-    joins_to_print= '\n'.join(join_string)
-    query = f"SELECT {alias}.* " \
-        f"FROM {table} AS {alias} " \
-        f"{''.join(join_string)} " \
+    
+    query = f"SELECT {alias}.* "\
+        f"FROM {table} AS {alias} "\
+        f"{''.join(join_string)} "\
         f"WHERE {formatted_filters} " \
         f"ORDER BY {alias}.{ordering['order_by']} {ordering['order_direction'].upper()}, {alias}.id ASC " \
         f"LIMIT {pagination['page_size']} OFFSET {pagination['page_size'] * pagination['page']}"
     logger.check(
         f"SELECT {alias}.* \n" \
         f"FROM {table} AS {alias} \n" \
-        f"{joins_to_print} \n" \
+        f"{''.join(join_string)} \n" \
         f"WHERE {formatted_filters} \n" \
         f"ORDER BY {alias}.{ordering['order_by']} {ordering['order_direction'].upper()}, {alias}.id ASC \n" \
         f"LIMIT {pagination['page_size']} \nOFFSET {pagination['page_size'] * pagination['page']}"

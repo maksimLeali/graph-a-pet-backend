@@ -360,7 +360,11 @@ input Filters {
 input DeepFilters {
     and: Filters,
     or: Filters,
-    not: Filters 
+    not: Filters,
+    fixed: [FixedFilter] = []
+    ranges: [RangeFilter] = []
+    lists: [ListFilter] = []
+    join: [Join] = []
    
 }
 
@@ -380,7 +384,7 @@ input DeepSearch {
     page_size: Int = 20
     order_by: String = "created_at"
     order_direction: String = "desc"
-    filters: DeepFilters = { fixed: [] , ranges: [], lists: [], join: []} || DeepFilters
+    filters: DeepFilters = { fixed: [] , ranges: [], lists: [], join: [], and: [], or: [], not: []}
 }
 
 input PetBodyCreate {
