@@ -236,7 +236,7 @@ def format_list_filters(alias, filters: Dict[str, list], operator: str = "AND") 
     return formatted_filters
 
 
-def build_count(table: str, search, search_fields, filters: dict = {"fixed": [], "lists": [], "ranges": []}):
+def build_count(table: str, filters: dict = {"fixed": [], "lists": [], "ranges": []}):
     logger.input(
         f"table: {table},"
         f"filters: {stringify(filters)}"

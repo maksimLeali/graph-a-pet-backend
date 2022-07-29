@@ -44,7 +44,7 @@ def update_ownership(id,data):
 
 def get_ownerships(common_search):
     try:
-        query = build_query(table="ownerships",search= common_search['search'],search_fields=common_search['search_fields'] ,ordering=common_search["ordering"],filters= common_search['filters'], pagination=common_search['pagination'] )
+        query = build_query(table="ownerships",ordering=common_search["ordering"],filters= common_search['filters'], pagination=common_search['pagination'] )
         manager = select(Ownership).from_statement(text(query))
         ownershps = db.session.execute(manager).scalars()
         return [pet.to_dict() for pet in ownershps]
@@ -64,7 +64,7 @@ def get_filtered_ownerships(filters,):
 
 def get_total_items(common_search):
     try:
-        query = build_count(table="ownerships",search= common_search['search'],search_fields=common_search['search_fields'] ,filters= common_search['filters'] )
+        query = build_count(table="ownerships",filters= common_search['filters'] )
         result = db.session.execute(query)
         return result.first()[0]
     except ProgrammingError as e: 

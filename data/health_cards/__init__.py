@@ -49,7 +49,7 @@ def update_health_card(id, data):
 def get_health_cards(common_search):
     logger.data(f"commons_search: {stringify(common_search)}")
     try:
-        query = build_query(table="health_cards",search= common_search['search'],search_fields=common_search['search_fields'] ,ordering=common_search["ordering"],filters= common_search['filters'], pagination=common_search['pagination'] )
+        query = build_query(table="health_cards",ordering=common_search["ordering"],filters= common_search['filters'], pagination=common_search['pagination'] )
         logger.check(f"query: {query}")
         manager = select(HealthCard).from_statement(text(query))
         health_cards_model = db.session.execute(manager).scalars()
@@ -80,7 +80,7 @@ def get_health_card(id):
 
 def get_total_items(common_search):
     try:
-        query = build_count(table="health_cards",search= common_search['search'],search_fields=common_search['search_fields'] ,filters= common_search['filters'] )
+        query = build_count(table="health_cards",filters= common_search['filters'] )
         result = db.session.execute(query)
         return result.first()[0]
     except ProgrammingError as e: 

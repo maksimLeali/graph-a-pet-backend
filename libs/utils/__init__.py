@@ -26,38 +26,41 @@ def format_common_search(deep_search):
             "order_by": deep_search['order_by'],
             "order_direction": deep_search['order_direction']
         },
-        "filters": format_deep_filters(deep_search.get('filetrs')) 
+        "filters": format_deep_filters(deep_search.get('filters'))  if deep_search.get('filters') else {}
     }
     
 def format_deep_filters(filters: dict):
     logger.info(f"filters: {stringify(filters)}")
-    keys = py_.keys(filters)
-    logger.info(f"{keys}")
-    keys_to_promote = py_.filter_(keys, lambda x: x not in ['and', 'or', 'not'])
- 
-    filters['and']  = filters.get('and') if filters.get('and') != None else {}
-    for key in keys_to_promote : 
-        filters['and'][key] = filters[key]
-        del filters[key]
-    logger.warning(f"{stringify(filters)}")
-    for key in filters : 
-        for deep_key in filters[key]:
-            logger.warning(f"key: {key} -> deep_key: {deep_key}")
-            if deep_key in ['and', 'or', 'not' ] :
-                filters[key][deep_key] = format_deep_filters(filters[key][deep_key])[deep_key]
-            else:
-                if deep_key == 'search': 
-                    filters[key][deep_key] = filters[key][deep_key]
-                elif deep_key == 'join' : 
-                    join = {}
-                    for entity in filters[key][deep_key] :
-                        logger.info(entity)
-                        join_key = entity['key']
-                        join[join_key]= format_deep_filters(entity['value'])
-                    filters[key][deep_key] = join
+    try: 
+        keys = py_.keys(filters)
+        logger.info(f"{keys}")
+        keys_to_promote = py_.filter_(keys, lambda x: x not in ['and', 'or', 'not'])
+    
+        filters['and']  = filters.get('and') if filters.get('and') != None else {}
+        for key in keys_to_promote : 
+            filters['and'][key] = filters[key]
+            del filters[key]
+        logger.warning(f"{stringify(filters)}")
+        for key in filters : 
+            for deep_key in filters[key]:
+                logger.warning(f"key: {key} -> deep_key: {deep_key}")
+                if deep_key in ['and', 'or', 'not' ] :
+                    filters[key][deep_key] = format_deep_filters(filters[key][deep_key])[deep_key]
                 else:
-                    filters[key][deep_key] = format_filters(filters[key][deep_key])
-    logger.critical(stringify(filters))
+                    if deep_key == 'search': 
+                        filters[key][deep_key] = filters[key][deep_key]
+                    elif deep_key == 'join' : 
+                        join = {}
+                        for entity in filters[key][deep_key] :
+                            logger.info(entity)
+                            join_key = entity['key']
+                            join[join_key]= format_deep_filters(entity['value'])
+                        filters[key][deep_key] = join
+                    else:
+                        filters[key][deep_key] = format_filters(filters[key][deep_key])
+        logger.critical(stringify(filters))
+    except Exception as e: 
+        logger.warn(e)
     return filters
 
 def get_request_user(token : str):
