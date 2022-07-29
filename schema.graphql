@@ -337,17 +337,13 @@ input RangeFilter {
 
 input Join {
     key: String!
-    value: Filters! || DeepFilters!
+    value: DeepFilters!
 }
 
-input SearchValue {
+
+input SearchFilter {
     value: String =""
     fields: [String] = []
-}
-
-input Search {
-    key: String,
-    value: SearchValue 
 }
 
 input Filters {
@@ -355,31 +351,23 @@ input Filters {
     ranges: [RangeFilter] = []
     lists: [ListFilter] = []
     join: [Join] = []
-    search: [Search]
+    search: [SearchFilter]
 }
 input DeepFilters {
-    and: Filters,
-    or: Filters,
-    not: Filters,
+    and: DeepFilters,
+    or: DeepFilters,
+    not: DeepFilters,
     fixed: [FixedFilter] = []
     ranges: [RangeFilter] = []
+    search: SearchFilter = {value: "", fields: []}
     lists: [ListFilter] = []
     join: [Join] = []
    
 }
 
 
-input CommonSearch {
-    page: Int = 0
-    page_size: Int = 20
-    order_by: String = "created_at"
-    order_direction: String = "desc"
-    search: String = ""
-    search_fields: [String] = []
-    filters: Filters = { fixed: [] , ranges: [], lists: [], join: []}
-}
 
-input DeepSearch {
+input CommonSearch {
     page: Int = 0
     page_size: Int = 20
     order_by: String = "created_at"
