@@ -7,6 +7,10 @@ COPY db_scheme.jso ./alembic/
 COPY . /app/
 
 WORKDIR /app
+RUN cd ./alembic
+RUN alembic upgrade head
+RUN cd ..
+
 
 RUN pip install -r requirements.txt
 
