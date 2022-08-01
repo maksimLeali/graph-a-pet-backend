@@ -8,9 +8,7 @@ COPY . /app/
 
 WORKDIR /app
 RUN pip install -r requirements.txt
-RUN cd ./alembic
-RUN alembic upgrade head
-RUN cd ..
+
 
 
 
