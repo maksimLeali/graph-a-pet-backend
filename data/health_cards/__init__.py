@@ -81,8 +81,8 @@ def get_health_card(id):
 def get_total_items(common_search):
     try:
         query = build_count(table="health_cards",filters= common_search['filters'] )
-        result = db.session.execute(query)
-        return result.first()[0]
+        result = db.session.execute(query).first()
+        return result[0] if result!= None else 0
     except ProgrammingError as e: 
         logger.error(e)
         raise BadRequest('malformed variables_fields')
