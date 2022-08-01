@@ -14,7 +14,15 @@ health_card.set_field("pet", get_pet)
 def health_card_treatments_resolver(obj, info, common_search):
     logger.info(common_search)
     common_search= format_common_search(common_search)
-    common_search['filters']['fixeds']['health_card_id'] = obj['id']
+    common_search['filters']['and']= { 
+        **(common_search['filters'].get('and') if common_search.get('filters').get('and')!= None else {}), 
+        **{ 
+            'fixed' :  {
+                **(common_search['filters'].get('and').get('fixed') if common_search.get('filters').get('and')!= None and common_search['filters'].get('and').get('fixed') != None else {}),
+                **{'health_card_id' : obj['id'] }
+            } 
+        } 
+    }
     logger.api(
         f"health_card_id: {obj['id']}\n"\
         f'common_search: {stringify(common_search)}'

@@ -336,16 +336,35 @@ input RangeFilter {
 }
 
 input Join {
-    key: String
-    value: Filters
+    key: String!
+    value: DeepFilters!
+}
+
+
+input SearchFilter {
+    value: String =""
+    fields: [String] = []
 }
 
 input Filters {
-    fixeds: [FixedFilter] = []
+    fixed: [FixedFilter] = []
     ranges: [RangeFilter] = []
     lists: [ListFilter] = []
     join: [Join] = []
+    search: [SearchFilter]
 }
+input DeepFilters {
+    and: DeepFilters,
+    or: DeepFilters,
+    not: DeepFilters,
+    fixed: [FixedFilter] = []
+    ranges: [RangeFilter] = []
+    search: SearchFilter = {value: "", fields: []}
+    lists: [ListFilter] = []
+    join: [Join] = []
+   
+}
+
 
 
 input CommonSearch {
@@ -353,9 +372,7 @@ input CommonSearch {
     page_size: Int = 20
     order_by: String = "created_at"
     order_direction: String = "desc"
-    search: String = ""
-    search_fields: [String] = []
-    filters: Filters = { fixeds: [] , ranges: [], lists: [], join: []}
+    filters: DeepFilters = { fixed: [] , ranges: [], lists: [], join: [], and: [], or: [], not: []}
 }
 
 input PetBodyCreate {

@@ -3,6 +3,7 @@ import domain.ownerships as ownerships_domain
 from libs.logger import logger
 from libs.utils import format_common_search
 from api.middlewares import min_role, RoleLevel
+from api.errors import format_error, error_pagination
 
 
 @convert_kwargs_to_snake_case
@@ -19,7 +20,9 @@ def list_ownerships_resolver(obj, info, common_search):
     except Exception as error:
         payload = {
             "success": False,
-            "errors": [str(error)]
+            "items": [],
+            "pagination": error_pagination,
+            "error": format_error(error)
         }
     return payload
 

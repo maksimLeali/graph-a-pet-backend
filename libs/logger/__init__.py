@@ -44,7 +44,7 @@ class CustomFormatter(logging.Formatter):
         logging.DEBUG: grey+ "⚪  " + format + reset, #10
         logging.INPUT: purple + "🔻\n " + format + reset, #11
         logging.OUTPUT: purple + format + "🔺  \n" + reset, #12
-        logging.INFO: blue+ "ℹ️  " + format + reset, #20
+        logging.INFO: blue+ "ℹ️  " + extended_format + reset, #20
         logging.MIDDLEWARE: yellow_bold + "🔑  " + extended_format + reset, #21
         logging.API: green_bold + "📤  " + extended_format + reset, #22
         logging.DOMAIN: cyan_bold + "🛠️  " + extended_format + reset, #23

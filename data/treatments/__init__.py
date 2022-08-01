@@ -78,7 +78,7 @@ def delete_treatment(id):
 def get_treatments(common_search):
     logger.data(f"commons_search: {stringify(common_search)}")
     try:
-        query = build_query(table="treatments",search= common_search['search'],search_fields=common_search['search_fields'] ,ordering=common_search["ordering"],filters= common_search['filters'], pagination=common_search['pagination'] )
+        query = build_query(table="treatments",ordering=common_search["ordering"],filters= common_search['filters'], pagination=common_search['pagination'] )
         logger.check(f"query: {query}")
         manager = select(Treatment).from_statement(text(query))
         treatments_model = db.session.execute(manager).scalars()
@@ -96,7 +96,7 @@ def get_treatments(common_search):
     
 def get_total_items(common_search):
     try:
-        query = build_count(table="treatments",search= common_search['search'],search_fields=common_search['search_fields'] ,filters= common_search['filters'] )
+        query = build_count(table="treatments",filters= common_search['filters'] )
         result = db.session.execute(query)
         return result.first()[0]
     except Exception as e:

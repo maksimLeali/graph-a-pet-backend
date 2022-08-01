@@ -170,7 +170,7 @@ the same way:
     - `search_columns`: array of strings that will be used to look for the text
     insered in `search` field
     - `filters`:
-        - `fixeds`: 1 to 1 match on the selected column and value *user.name = 'Enzo'*
+        - `fixed`: 1 to 1 match on the selected column and value *user.name = 'Enzo'*
         - `ranges`: min and max value for the column to match, if only one is
         set is lik sayng, everything tha id more ( or less ) the the selected value
         - `lists` : list of value the selected column can be setto be mached by
