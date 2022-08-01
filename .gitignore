@@ -5,6 +5,7 @@ lib
 config.yml
 /app/
 venv
+/alembic/db_scheme.json
 /alembic/alembic.ini
 serviceAccountKey.json
 **/__log__*
