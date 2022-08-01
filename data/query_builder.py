@@ -1,56 +1,11 @@
 from typing import Dict
 import pydash as py_
+from api.errors import BadRequest
 from libs.utils import camel_to_snake
 from itertools import permutations
 from libs.logger import logger, stringify
-
-tables_common_properties = {
-    "users": {
-        "search_columns": [
-            'first_name',
-            'last_name',
-            'email',
-        ],
-        "alias": "us",
-        "other_table_ref": "user_id"
-    },
-    "pets": {
-        "search_columns": [
-            "name",
-        ],
-        "alias": "pt",
-        "other_table_ref": "pet_id"
-
-    },
-    "pet_bodies": {
-        "search_columns": ['breed'],
-        "alias": "ptb",
-        "other_table_ref": "body_id"
-    },
-    "coats": {
-        "search_columns": ['pattern'],
-        "alias": "ct",
-        "other_table_ref": "coat_id"
-    },
-    "ownerships": {
-        "search_columns": ['custody_level'],
-        "alias": "ow",
-        "bridge_table": True,
-        "other_table_ref": "ownership_id"
-    },
-    "health_cards": {
-        "search_columns": ["logs"],
-        "alias": "hlc",
-        "bridge_table": True,
-        "other_table_ref": "health_card_id"
-    },
-    "treatments": {
-        "search_columns": ["logs", "name"],
-        "alias": "tr",
-        "bridge_table": True,
-        "other_table_ref": "treatment_id"
-    }
-}
+from config import cfg
+tables_common_properties = cfg.get('db_scheme')
 
 def build_join (parent: str, join:  dict, already_joined: list, join_string: list):
     try:
@@ -61,14 +16,22 @@ def build_join (parent: str, join:  dict, already_joined: list, join_string: lis
         )
         
         filters = []
-        parent_alias = tables_common_properties[parent]['alias']
         join_keys = py_.keys(join)
         for key in join_keys:
-            join_alias = tables_common_properties[key]['alias']
             if(not key in already_joined):
+                parent_alias = tables_common_properties[parent]['alias']
+                join_alias = tables_common_properties[key]['alias']
                 already_joined.append(key)
-                join_string.append(f"JOIN {key} AS {join_alias} ON {parent_alias}.{tables_common_properties[key]['other_table_ref']} = {join_alias}.id " if (tables_common_properties[key].get(
-                'bridge_table') != True) else f"JOIN {key} AS {join_alias} ON {join_alias}.{tables_common_properties[parent]['other_table_ref']} = {parent_alias}.id " )
+                if(parent in tables_common_properties[key]['children']):
+                    joining_string = f"JOIN {key} AS {join_alias} ON {parent_alias}.{tables_common_properties[key]['other_table_ref']} = {join_alias}.id " 
+                elif (key in tables_common_properties[parent]['children']):
+                    joining_string = f"JOIN {key} AS {join_alias} ON {join_alias}.{tables_common_properties[parent]['other_table_ref']} = {parent_alias}.id " 
+                else :
+                    logger.error(f'no links between {parent} and {key}')
+                    error = BadRequest(f'no_links_between_tables')              
+                    error.extension['extra']= f" no links between {parent} and {key}"
+                    raise error
+                join_string.append(joining_string)
             join_string, formatted_filters =build_where(key,already_joined,join_string, join[key])
             filters.append(formatted_filters)
         logger.output(
@@ -148,6 +111,9 @@ def format_main_filters (table: str, filters: dict, already_joined: list, join_s
         else: 
             formatted_filters = ' AND  '.join(filters_to_format)
         logger.check(f"formatted_filters: {formatted_filters}")
+    except BadRequest as e:
+        logger.error(e)
+        raise e
     except Exception as e: 
         logger.warning(e)
         pass
@@ -237,27 +203,34 @@ def format_list_filters(alias, filters: Dict[str, list], operator: str = "AND") 
 
 
 def build_count(table: str, filters: dict = {"fixed": [], "lists": [], "ranges": []}):
+    
     logger.input(
         f"table: {table},"
         f"filters: {stringify(filters)}"
     )
-    join_string, formatted_filters = build_where(table, [table], [], filters)
-    alias = tables_common_properties[table]['alias']
-    joins_to_print= '\n'.join(join_string)
-    logger.critical(f'*****\n*********\n********\n*******\n{stringify(filters)}\n{len(filters)}\n******\n********\n*********\n*******')
+    try: 
+        join_string, formatted_filters = build_where(table, [table], [], filters)
+        alias = tables_common_properties[table]['alias']
+        joins_to_print= '\n'.join(join_string)
+        logger.critical(f'*****\n*********\n********\n*******\n{stringify(filters)}\n{len(filters)}\n******\n********\n*********\n*******')
 
-    query_count = f"SELECT COUNT({alias}.*) " \
-        f"FROM {table} AS {alias} " \
-        f"{''.join(join_string)} " \
-        f"{'WHERE' + formatted_filters if len(filters)> 0 else ''} " \
-            
-    logger.check(
-        f"SELECT {alias}.* \n" \
-        f"FROM {table} AS {alias} \n" \
-        f"{joins_to_print} \n" \
-        f"WHERE {formatted_filters} \n" \
-    )
-    return query_count
+        query_count = f"SELECT COUNT(DISTINCT({alias}.id)) " \
+            f"FROM {table} AS {alias} " \
+            f"{''.join(join_string)} " \
+            f"{'WHERE' + formatted_filters if len(filters)> 0 else ''} " \
+            f"GROUP BY ({alias}.id) " \
+                
+        logger.check(
+            f"SELECT COUNT(DISTINCT({alias}.id)) \n" \
+            f"FROM {table} AS {alias} \n" \
+            f"{joins_to_print} \n" \
+            f"WHERE {formatted_filters} \n" \
+            f"GROUP BY ({alias}.id) " \
+        )
+        return query_count
+    except Exception as e: 
+        logger.error(e)
+        raise e
 
 def build_query(table: str,pagination: dict = {"page_size" : 20, "page": 0}, ordering: dict = {"order_by": "created_at", "order_direction": "ASC"}, filters: dict = {"and": {}, "or": {}, "not": {}}):
     logger.input(
@@ -265,21 +238,27 @@ def build_query(table: str,pagination: dict = {"page_size" : 20, "page": 0}, ord
         f"table: {table},"
         f"filters: {stringify(filters)}"
     )
-    join_string, formatted_filters = build_where(table, [table], [], filters)
-    alias = tables_common_properties[table]['alias']
-    
-    query = f"SELECT {alias}.* "\
-        f"FROM {table} AS {alias} "\
-        f"{''.join(join_string)} "\
-        f"{'WHERE' + formatted_filters if len(filters)> 0 else ''} " \
-        f"ORDER BY {alias}.{ordering['order_by']} {ordering['order_direction'].upper()}, {alias}.id ASC " \
-        f"LIMIT {pagination['page_size']} OFFSET {pagination['page_size'] * pagination['page']}"
-    logger.check(
-        f"SELECT {alias}.* \n" \
-        f"FROM {table} AS {alias} \n" \
-        f"{''.join(join_string)} \n" \
-        f"WHERE {formatted_filters} \n" \
-        f"ORDER BY {alias}.{ordering['order_by']} {ordering['order_direction'].upper()}, {alias}.id ASC \n" \
-        f"LIMIT {pagination['page_size']} \nOFFSET {pagination['page_size'] * pagination['page']}"
-    )
-    return query
+    try: 
+        join_string, formatted_filters = build_where(table, [table], [], filters)
+        alias = tables_common_properties[table]['alias']
+        
+        query = f"SELECT {alias}.*  "\
+            f"FROM {table} AS {alias} "\
+            f"{''.join(join_string)} "\
+            f"{'WHERE' + formatted_filters if len(filters)> 0 else ''} " \
+            f"GROUP BY ({alias}.id) " \
+            f"ORDER BY {alias}.{ordering['order_by']} {ordering['order_direction'].upper()}, {alias}.id ASC " \
+            f"LIMIT {pagination['page_size']} OFFSET {pagination['page_size'] * pagination['page']}"
+        logger.check(
+            f"SELECT DISTINCT ({alias}.id), {alias}.*  \n" \
+            f"FROM {table} AS {alias} \n" \
+            f"{''.join(join_string)} \n" \
+            f"WHERE {formatted_filters} \n" \
+            f"GROUP BY ({alias}.id) \n" \
+            f"ORDER BY {alias}.{ordering['order_by']} {ordering['order_direction'].upper()}, {alias}.id ASC \n" \
+            f"LIMIT {pagination['page_size']} \nOFFSET {pagination['page_size'] * pagination['page']}"
+        )
+        return query
+    except Exception as e: 
+        logger.error(e)
+        raise e

@@ -10,7 +10,15 @@ user = ObjectType("User")
 @convert_kwargs_to_snake_case
 def user_ownerships_resolver(obj, info, common_search):
     common_search= format_common_search(common_search)
-    common_search['filters']['and']= { 'fixed' : {'user_id' : obj['id'] } } 
+    common_search['filters']['and']= { 
+        **(common_search['filters'].get('and') if common_search.get('filters').get('and')!= None else {}), 
+        **{ 
+            'fixed' :  {
+                **(common_search['filters'].get('and').get('fixed') if common_search.get('filters').get('and')!= None and common_search['filters'].get('and').get('fixed') != None else {}),
+                **{'user_id' : obj['id'] }
+            } 
+        } 
+    } 
     logger.api(
         f"user_id: {obj['id']}\n"\
         f'common_search: {stringify(common_search)}'
