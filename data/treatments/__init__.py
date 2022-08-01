@@ -97,8 +97,8 @@ def get_treatments(common_search):
 def get_total_items(common_search):
     try:
         query = build_count(table="treatments",filters= common_search['filters'] )
-        result = db.session.execute(query)
-        return result.first()[0]
+        result = db.session.execute(query).first()
+        return result[0] if result!= None else 0
     except Exception as e:
         logger.error(e)
         raise e
