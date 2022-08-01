@@ -8,7 +8,7 @@ COPY . /app/
 
 WORKDIR /app
 RUN cd ./alembic
-RUN python -m alembic upgrade head
+RUN alembic upgrade head
 RUN cd ..
 
 
