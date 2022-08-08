@@ -56,7 +56,8 @@ def me_resolver(obj, info):
     logger.api("me")
     try:
         token =  info.context.headers['authorization']
-        user = get_request_user(token)
+        current_user = get_request_user(token)
+        user = users_domain.get_user(current_user.get(id))
         payload = {
             "success": True,
             "user": user,
