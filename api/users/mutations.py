@@ -69,6 +69,31 @@ def update_user_resolver(obj, info, id, data):
     return payload
 
 @convert_kwargs_to_snake_case
+@min_role(UserRole.USER.name)
+def update_me_resolver(obj, info, data):
+    logger.api(
+        f"data: {stringify(data)}"
+    )
+    try:
+        token =  info.context.headers['authorization']
+        current_user = get_request_user(token)
+        
+        user = update_user(current_user.get('id'), data)
+        payload = {
+            "success": True,
+            "user": user
+        }
+        logger.check(f'user: {stringify(user)}')
+    except Exception as e:  
+        logger.error(e)
+        payload = {
+            "success": False,
+            "user": None,
+            "error": format_error(e) 
+        }
+    return payload
+
+@convert_kwargs_to_snake_case
 def login_resolver(obj, info, email, password):
     logger.api(f"email: {email}, password: {password}")
     try :
