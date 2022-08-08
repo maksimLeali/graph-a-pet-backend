@@ -1,8 +1,9 @@
 # mutations.py
+
 from ariadne import convert_kwargs_to_snake_case
 from domain.users import create_user, update_user, login, add_pet_to_user
 from api.middlewares import auth_middleware, min_role
-from api.errors import format_error
+from api.errors import format_error, NotFoundError
 from data.users.models import UserRole
 from libs.utils import get_request_user
 from libs.logger import logger, stringify
@@ -40,7 +41,7 @@ def signup_resolver(obj, info, data):
         payload = {
             "success": False,
             "user": None,
-            "error": format_error(e,info.context.headers['authorization']) 
+            "error": format_error(e) 
         }
     return payload
 
@@ -63,7 +64,32 @@ def update_user_resolver(obj, info, id, data):
         payload = {
             "success": False,
             "user": None,
-            "error": format_error(e,info.context.headers['authorization']) 
+            "error": format_error(e) 
+        }
+    return payload
+
+@convert_kwargs_to_snake_case
+@min_role(UserRole.USER.name)
+def update_me_resolver(obj, info, data):
+    logger.api(
+        f"data: {stringify(data)}"
+    )
+    try:
+        token =  info.context.headers['authorization']
+        current_user = get_request_user(token)
+        
+        user = update_user(current_user.get('id'), data)
+        payload = {
+            "success": True,
+            "user": user
+        }
+        logger.check(f'user: {stringify(user)}')
+    except Exception as e:  
+        logger.error(e)
+        payload = {
+            "success": False,
+            "user": None,
+            "error": format_error(e) 
         }
     return payload
 
@@ -78,13 +104,16 @@ def login_resolver(obj, info, email, password):
             "user": user
         }
         logger.check(f"user: {stringify(user)}")
+    except NotFoundError as not_found: 
+        logger.error(e)
+        
     except Exception as e:  
         logger.error(e)
         payload = {
             "success": False,
             "token": None,
             "user": None,
-            "error": format_error(e,info.context.headers['authorization']) 
+            "error": format_error(e) 
         }
     return payload
 
