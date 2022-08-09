@@ -218,14 +218,13 @@ def build_count(table: str, filters: dict = {"fixed": [], "lists": [], "ranges":
             f"FROM {table} AS {alias} " \
             f"{''.join(join_string)} " \
             f"{'WHERE' + formatted_filters if len(filters)> 0 else ''} " \
-            f"GROUP BY ({alias}.id) " \
+ 
                 
         logger.check(
             f"SELECT COUNT(DISTINCT({alias}.id)) \n" \
             f"FROM {table} AS {alias} \n" \
             f"{joins_to_print} \n" \
             f"WHERE {formatted_filters} \n" \
-            f"GROUP BY ({alias}.id) " \
         )
         return query_count
     except Exception as e: 
