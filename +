@@ -1,0 +1,13 @@
+fix: fragments delete and added 8 workers
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+#
+# Committer: Maksim Leali <maksimleali@Maksims-Mac-mini.local>
+#
+# On branch develop
+# Your branch is up to date with 'origin/develop'.
+#
+# Changes to be committed:
+#	modified:   docker-compose.yml
+#	modified:   schema.graphql
+#

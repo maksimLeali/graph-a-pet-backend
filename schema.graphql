@@ -477,15 +477,3 @@ input HealthCardUpdate {
     notes: [String]!
 }
 
-fragment ListUser on User {
-    id
-    email
-    last_name
-    first_name
-    ownerships{
-        items{
-            id
-            custody_level
-        }
-    }
-}
