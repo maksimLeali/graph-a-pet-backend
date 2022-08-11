@@ -212,7 +212,6 @@ def build_count(table: str, filters: dict = {"fixed": [], "lists": [], "ranges":
         join_string, formatted_filters = build_where(table, [table], [], filters)
         alias = tables_common_properties[table]['alias']
         joins_to_print= '\n'.join(join_string)
-        logger.critical(f'*****\n*********\n********\n*******\n{stringify(filters)}\n{len(filters)}\n******\n********\n*********\n*******')
 
         query_count = f"SELECT COUNT(DISTINCT({alias}.id)) " \
             f"FROM {table} AS {alias} " \
