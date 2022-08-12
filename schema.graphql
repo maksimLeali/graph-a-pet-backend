@@ -130,7 +130,7 @@ type User {
     email: String!
     role: UserRole!
     created_at: String!
-    ownerships(commonSearch: CommonSearch = {}): PaginatedOwnerships = []
+    ownerships(commonSearch: CommonSearch = {}): PaginatedOwnerships ?
 }
 
 type Coat {
