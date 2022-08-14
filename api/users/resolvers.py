@@ -3,7 +3,7 @@ import domain.users as users_domain
 from libs.logger import logger, stringify
 from libs.utils import format_common_search
 from api.errors import error_pagination, format_error
-
+from data.ownerships.models import CustodyLevel
 user = ObjectType("User")
 
 @user.field("ownerships")
@@ -40,3 +40,64 @@ def user_ownerships_resolver(obj, info, common_search):
             "error": format_error(e,info.context.headers['authorization']) 
         }
     return resolved
+
+@user.field('pets_on_loan')
+def pets_on_loan_resolver(obj, info ):
+    filters = { 
+        "pagination": {
+            "page_size": 10000,
+            "page": 0,
+        },  
+        "ordering":{
+            "order_by":"created_at",
+            "order_direction":"desc"
+        },
+
+        "filters" : { 
+            "and": {
+                "lists" : {
+                    "custody_level" : [
+                        CustodyLevel.SUB_OWNER.name, 
+                        CustodyLevel.PET_SITTER.name
+                    ]
+                },
+                "fixed": {
+                    "user_id" : obj["id"]
+                } 
+            }
+        }
+    }
+    try : 
+        logger.api(f"filters : {stringify(filters)}")
+        total_items = users_domain.count_ownerships(filters)
+        return total_items
+    except Exception as e: 
+        raise e
+
+@user.field('pets_owned')
+def pets_owned_resolver(obj, info ):
+    filters = { 
+        "pagination": {
+            "page_size": 10000,
+            "page": 0,
+        }, 
+        "ordering":{
+            "order_by":"created_at",
+            "order_direction":"desc"
+        },
+ 
+        "filters" : { 
+            "and": {
+                "fixed": {
+                    "custody_level": CustodyLevel.OWNER.name,
+                    "user_id" : obj["id"]
+                } 
+            }
+        }
+    }
+    try : 
+        logger.api(f"filters : {stringify(filters)}")
+        total_items = users_domain.count_ownerships(filters)
+        return total_items
+    except Exception as e: 
+        raise e

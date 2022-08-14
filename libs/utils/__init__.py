@@ -58,7 +58,7 @@ def format_deep_filters(filters: dict):
                         filters[key][deep_key] = join
                     else:
                         filters[key][deep_key] = format_filters(filters[key][deep_key])
-        logger.critical(stringify(filters))
+        logger.check(stringify(filters))
     except Exception as e: 
         logger.warn(e)
     return filters
