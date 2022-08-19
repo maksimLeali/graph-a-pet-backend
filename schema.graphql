@@ -372,7 +372,7 @@ input DeepFilters {
 
 
 input CommonSearch {
-    page: Int = 20
+    page: Int = 0
     page_size: Int = 20
     order_by: String = "created_at"
     order_direction: String = "desc"
