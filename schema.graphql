@@ -14,7 +14,7 @@ type Query {
     listHealthCards(commonSearch: CommonSearch= {}): PaginatedHealthCards!
     getHealthCard(id: ID!): HealthCardResult
     getTreatment(id: ID!): TreatmentResult
-    listTreatments(commonSearch: CommonSearch = {}): PaginatedTreatments
+    listTreatments(commonSearch: CommonSearch = {}): PaginatedTreatments!
 }
 
 type Mutation {
