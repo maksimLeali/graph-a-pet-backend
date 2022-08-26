@@ -23,6 +23,17 @@ def get_ownerships(common_search):
         logger.error(e)
         raise e
 
+@convert_kwargs_to_snake_case
+def count_ownerships(common_search):
+    logger.domain(f"common_search: {stringify(common_search)}")
+    try:
+        pagination = ownerships_domain.get_pagination(common_search)
+        logger.check(f"response: {stringify({'ownerships' :  pagination}) }")
+        return (pagination.get("total_items", 0))
+    except Exception as e : 
+        logger.error(e)
+        raise e
+
 def create_user(data):
     logger.domain(f'data: {stringify(data)}')
     try: 
