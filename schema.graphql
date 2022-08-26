@@ -166,7 +166,7 @@ type Pet {
     gender: Gender!
     health_card: HealthCard
     chip_code: String
-    weigth_kg: Float
+    weight_kg: Float
     temperament: String
     diet: [String]
     intollerance: [String]
@@ -424,7 +424,7 @@ input PetUpdate {
     neutered: Boolean
     gender: Gender
     chip_code: String
-    weigth_kg: Float
+    weight_kg: Float
     temperament: String
     diet: [String]
     intollerance: [String]
@@ -438,7 +438,7 @@ input PetCreate {
     neutered: Boolean!
     gender: Gender!
     chip_code: String
-    weigth_kg: Float
+    weight_kg: Float
     temperament: String
     diet: [String]
     intollerance: [String]
