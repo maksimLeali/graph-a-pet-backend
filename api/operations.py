@@ -18,6 +18,8 @@ from api.coats.mutations import *
 from api.health_cards.queries import * 
 from api.health_cards.mutations import * 
 from api.health_cards.resolvers import health_card
+from api.medias.queries import * 
+from api.medias.mutations import * 
 from api.treatments.queries import * 
 from api.treatments.mutations import * 
 from api.treatments.resolvers import treatment
@@ -57,6 +59,8 @@ query.set_field("listHealthCards", list_health_cards_resolver)
 query.set_field("getHealthCard", get_health_card_resolver)
 query.set_field("getTreatment", get_treatment_resolver)
 query.set_field("listTreatments", list_treatments_resolver)
+query.set_field("listMedias", list_medias_resolver)
+query.set_field("getMedia", get_media_resolver)
 
 mutation = MutationType()
 mutation.set_field('createUser', create_user_resolver)
@@ -74,5 +78,6 @@ mutation.set_field("updateHealthCard", update_health_card_resolver)
 mutation.set_field("createHealthCard", create_health_card_resolver)
 mutation.set_field("createTreatment", create_treatment_resolver)
 mutation.set_field("updateTreatment", update_treatment_resolver)
+mutation.set_field("updateMedia", update_media_resolver)
 
 object_types = [query, mutation, user, pet, ownership, pet_body, coat, health_card, treatment]

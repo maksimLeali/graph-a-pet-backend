@@ -68,3 +68,8 @@ def get_request_user(token : str):
     bearer = token.split('Bearer ')[1]
     decoded_bearer= jwt.decode(bearer,cfg['jwt']['secret'],algorithms=["HS256"] )
     return decoded_bearer['user']
+
+def allowed_files(file_name:str):
+    logger.info(file_name)
+    return '.' in file_name and \
+           file_name.rsplit('.', 1)[1].lower() in {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}

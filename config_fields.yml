@@ -8,8 +8,8 @@ db:
   table: ~
 jwt:
   secret: ~
-firbase:
-  buket_storage: ~
+firebase:
+  bucket: ~
 logging: 
   level: ~
 telegram: 

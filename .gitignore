@@ -4,6 +4,7 @@ include/
 lib
 config.yml
 /app/
+/temp
 venv
 /alembic/db_scheme.json
 /alembic/alembic.ini
