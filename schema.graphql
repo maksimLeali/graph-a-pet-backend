@@ -397,7 +397,7 @@ input MediaUpdate {
     type: String
 }
 
-input MediaUpdate {
+input MediaCreate {
     url: String!
     scope: String!
     ref_id: String!
