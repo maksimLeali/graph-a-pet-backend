@@ -17,6 +17,7 @@ class User(db.Model):
     role = db.Column(db.Enum(UserRole))
     ownerships = db.relationship("Ownership", uselist=True, backref='users')
     created_at = db.Column(db.DateTime, default= datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'))
+    updated_at = db.Column(db.DateTime)
     def to_dict(self):
         return {
             "id": self.id,
@@ -26,5 +27,6 @@ class User(db.Model):
             "password": self.password,
             "role": self.role.name,
             "created_at": str(self.created_at),
+            "updated_at": str(self.updated_at) if self.updated_at else None,
         }
         
