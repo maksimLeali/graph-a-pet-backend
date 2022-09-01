@@ -38,6 +38,7 @@ type Mutation {
     createTreatment(data: TreatmentCreate!): TreatmentResult!
     updateTreatment(id: ID!, data: TreatmentUpdate!): TreatmentResult!
     updateMedia(id:ID!, data: MediaUpdate!): MediaResult!
+    createMedia(id:ID!, data: MediaCreate!): MediaResult!
 }
 
 scalar Upload
@@ -394,6 +395,13 @@ input MediaUpdate {
     scope: String
     ref_id: String
     type: String
+}
+
+input MediaUpdate {
+    url: String!
+    scope: String!
+    ref_id: String!
+    type: String!
 }
 
 

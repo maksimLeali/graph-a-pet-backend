@@ -47,6 +47,7 @@ def upload_file():
         filename = secure_filename(file.filename)
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         public_url =upload_image(app.config['UPLOAD_FOLDER']+'/', filename)
+        os.remove(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         return jsonify({"public_url" : public_url}), 200
 
 if __name__ == "__main__":
