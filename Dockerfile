@@ -8,7 +8,7 @@ COPY . /app/
 
 WORKDIR /app
 RUN pip install -r requirements.txt
-RUN cd alembic && alembic upgrade head && cd ..
+CMD ["./startup.sh"]
 
 
 
