@@ -32,6 +32,7 @@ class Treatment(db.Model):
     frequency_value = db.Column(db.Integer)
     frequency_unit = db.Column(db.Enum(FrequencyUnit))
     frequency_times = db.Column(db.Integer)
+    updated_at = db.Column(db.DateTime)
     created_at = db.Column(
         db.DateTime, default=datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'))
 
@@ -46,6 +47,7 @@ class Treatment(db.Model):
             "booster_id": self.booster_id,
             "type": self.type.name,
             "health_card_id": self.health_card_id,
+            "updated_at": str(self.updated_at) if self.updated_at else None,
             "logs": self.logs,
             "created_at": self.created_at.strftime('%Y-%m-%dT%H:%M:%SZ')
         }
