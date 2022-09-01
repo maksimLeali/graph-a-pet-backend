@@ -12,6 +12,8 @@ services:
         environment:
             - FLASK_APP=app.py
             - FLASK_ENV=development
+        networks:
+            - gap-network
 
     postgres:
         image: postgres:13-alpine
@@ -23,5 +25,10 @@ services:
             - POSTGRES_USER=myuser
             - POSTGRES_PASSWORD=password
             - POSTGRES_DB=graph-a-pet
+        networks:
+            - gap-network
 volumes:
   postgres_data:
+
+networks:
+    gap-network:
