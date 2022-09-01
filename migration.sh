@@ -1,10 +1,10 @@
 #!/bin/sh
 echo 'waiting'
 
-while ! mysqladmin ping -h"database" --silent; do
+while ! mysqladmin ping -h"postgres" --silent; do
   sleep 1
 done
-
+cd alembic
 alembic upgrade head
-
+cd ..
 # Start the backend...
