@@ -1,7 +1,5 @@
 from enum import Enum
-from data import db
-from data.models import *
-from datetime import datetime
+from data import db, Base
 
 
 class PetFamily(Enum) :
@@ -18,7 +16,7 @@ class PetFamily(Enum) :
 
 
 
-class PetBody(db.Model):
+class PetBody(Base):
     __tablename__ = 'pet_bodies'
     id = db.Column(db.String, primary_key=True)
     coat_id= db.Column(db.String, db.ForeignKey('coats.id'))
@@ -27,7 +25,6 @@ class PetBody(db.Model):
     family= db.Column(db.Enum(PetFamily))
     breed= db.Column(db.String)
     pet= db.relationship('Pet', backref="pet_bodies", lazy=True, uselist=False )
-    created_at = db.Column(db.DateTime, default= datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'))
     
     def to_dict(self):
         return {

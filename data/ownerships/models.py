@@ -1,21 +1,17 @@
 from enum import Enum
-from data import db
-from data.models import *
-from datetime import datetime
+from data import db, Base
 class CustodyLevel(Enum):
     OWNER = "OWNER"
     SUB_OWNER = "SUB_OWNER"
     PET_SITTER = "PET_SITTER"
     
 
-class Ownership(db.Model):
+class Ownership(Base):
     __tablename__ = 'ownerships'
     id = db.Column(db.String, primary_key=True)
     user_id = db.Column(db.String, db.ForeignKey('users.id'))
     pet_id= db.Column(db.String, db.ForeignKey('pets.id'))
     custody_level= db.Column(db.Enum(CustodyLevel))
-    created_at = db.Column(db.DateTime, default= datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'))
-    updated_at = db.Column(db.DateTime)
     def to_dict(self):
         return {
             "id": self.id,

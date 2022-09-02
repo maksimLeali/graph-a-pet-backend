@@ -1,9 +1,9 @@
 from enum import Enum
-from data import db
+from data import db, Base
 from sqlalchemy.dialects.postgresql import JSON
 from datetime import datetime
 
-class HealthCard(db.Model):
+class HealthCard(Base):
     __tablename__ =  'health_cards'
     id =  db.Column(db.String, primary_key=True)
     pet_id=  db.Column(db.String, db.ForeignKey('pets.id'))

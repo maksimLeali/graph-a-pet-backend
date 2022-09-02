@@ -1,5 +1,5 @@
 from enum import Enum
-from data import db
+from data import db, Base
 from data.models import *
 from datetime import datetime
 
@@ -19,7 +19,7 @@ class FrequencyUnit(Enum):
     YEARLY = "YEARLY"
 
 
-class Treatment(db.Model):
+class Treatment(Base):
     __tablename__ = 'treatments'
     id = db.Column(db.String, primary_key=True)
     name = db.Column(db.String)
@@ -32,10 +32,7 @@ class Treatment(db.Model):
     frequency_value = db.Column(db.Integer)
     frequency_unit = db.Column(db.Enum(FrequencyUnit))
     frequency_times = db.Column(db.Integer)
-    updated_at = db.Column(db.DateTime)
-    created_at = db.Column(
-        db.DateTime, default=datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'))
-
+    
     def to_dict(self):
         return {
             "id": self.id,

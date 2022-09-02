@@ -1,5 +1,5 @@
 from enum import Enum
-from data import db
+from data import db, Base
 from datetime import datetime
     
 class CoatLength(Enum) :
@@ -22,7 +22,7 @@ class CoatPattern(Enum) :
     
 
 
-class Coat(db.Model):
+class Coat(Base):
     __tablename__ = 'coats'
     id = db.Column(db.String, primary_key=True)
     colors = db.Column(db.ARRAY(db.String))

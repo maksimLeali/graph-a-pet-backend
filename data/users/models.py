@@ -1,13 +1,11 @@
 from enum import Enum
-from data import db
-from data.models import *
-from datetime import datetime
+from data import db, Base
 
 class UserRole(Enum):
      USER = "USER"
      ADMIN = "ADMIN"
 
-class User(db.Model):
+class User(Base):
     __tablename__ = 'users'
     id = db.Column(db.String, primary_key=True)
     first_name = db.Column(db.String)
@@ -16,8 +14,7 @@ class User(db.Model):
     password = db.Column(db.String)
     role = db.Column(db.Enum(UserRole))
     ownerships = db.relationship("Ownership", uselist=True, backref='users')
-    created_at = db.Column(db.DateTime, default= datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'))
-    updated_at = db.Column(db.DateTime)
+
     def to_dict(self):
         return {
             "id": self.id,

@@ -1,8 +1,5 @@
-from email.policy import default
 from enum import Enum
-from data import db
-from data.models import *
-from datetime import datetime
+from data import db, Base
 
 class Gender(Enum):
     MALE="MALE",
@@ -10,7 +7,7 @@ class Gender(Enum):
     NOT_SAID="NOT_SAID"
 
 
-class Pet(db.Model):
+class Pet(Base):
     __tablename__ = 'pets'
     id = db.Column(db.String, primary_key=True)
     name = db.Column(db.String)
@@ -26,7 +23,7 @@ class Pet(db.Model):
     diet= db.Column(db.ARRAY(db.String), default=[])
     intollerance= db.Column(db.ARRAY(db.String), default= [])
     disciplines= db.Column(db.ARRAY(db.String), default= [])
-    created_at = db.Column(db.DateTime, default= datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'))
+
     def to_dict(self):
         return {
             "id": self.id,

@@ -1,3 +1,4 @@
+from datetime import datetime
 from api import app
 from flask_sqlalchemy import SQLAlchemy
 from config import cfg 
@@ -7,3 +8,8 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config['UPLOAD_FOLDER']='temp'
 db = SQLAlchemy(app)
 
+class Base(db.Model):
+    __abstract__= True
+    created_at = db.Column(db.DateTime, default= datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'))
+    updated_at = db.Column(db.DateTime)
+    deleted_at = db.Column(db.DateTime)
