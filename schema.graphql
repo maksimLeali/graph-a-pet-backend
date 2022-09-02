@@ -182,7 +182,7 @@ type Pet {
 
 type Media {
     id: ID!
-    url: String
+    url: String!
     type: String!
     scope: String!
     ref_id: String! 
