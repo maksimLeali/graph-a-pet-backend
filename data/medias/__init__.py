@@ -14,10 +14,12 @@ def create_media(data):
     try:
         today = datetime.today()
         media = Media(
-            id = f"{uuid.uuid4()}",
-            type = data.get('type'),
-            url = data.get('url'),
-            created_at=today.strftime("%Y-%m-%dT%H:%M:%SZ")
+            id=f"{uuid.uuid4()}",
+            type=data.get('type'),
+            url=data.get('url'),
+            scope = data.get('scope'),
+            created_at=today.strftime("%Y-%m-%dT%H:%M:%SZ"),
+            ref_id=data.get('ref_id')
         )
         db.session.add(media)
         db.session.commit()
@@ -25,22 +27,23 @@ def create_media(data):
     except Exception as e:
         logger.error(e)
         raise e
-    
-def update_media(id,data):
+
+
+def update_media(id, data):
     logger.data(
-        f"id: {id}\n"\
+        f"id: {id}\n"
         f"dta: {stringify(data)}"
     )
-    try: 
-        media_model = db.session.query(Media).filter(Media.id== id)
+    try:
+        media_model = db.session.query(Media).filter(Media.id == id)
         if not media_model:
             raise NotFoundError(f"no media found with id: {id}")
         media_old = media_model.first().to_dict()
         media_model.update(data)
         db.session.commit()
-        media= {**media_old, **media_model.first().to_dict()}
+        media = {**media_old, **media_model.first().to_dict()}
         logger.check(f'media: {stringify(media)}')
-        return  media
+        return media
     except Exception as e:
         logger.error(e)
         raise e
@@ -48,13 +51,15 @@ def update_media(id,data):
 
 def get_medias(common_search):
     try:
-        query = build_query(table="medias",ordering=common_search["ordering"],filters= common_search['filters'], pagination=common_search['pagination'] )
+        query = build_query(table="medias", ordering=common_search["ordering"],
+                            filters=common_search['filters'], pagination=common_search['pagination'])
         manager = select(Media).from_statement(text(query))
         medias = db.session.execute(manager).scalars()
         return [pet.to_dict() for pet in medias]
-    except Exception as e: 
+    except Exception as e:
         logger.error(e)
         raise e
+
 
 def get_filtered_medias(filters,):
     results = select(Media).from_statement(text(
@@ -68,15 +73,16 @@ def get_filtered_medias(filters,):
 
 def get_total_items(common_search):
     try:
-        query = build_count(table="medias",filters= common_search['filters'] )
+        query = build_count(table="medias", filters=common_search['filters'])
         result = db.session.execute(query).first()
-        return result[0] if result!= None else 0
-    except ProgrammingError as e: 
+        return result[0] if result != None else 0
+    except ProgrammingError as e:
         logger.error(e)
         raise BadRequest('malformed variables_fields')
     except Exception as e:
         logger.error(e)
         raise e
 
+
 def get_media(id):
-    return Media.query.get(id).to_dict()    
+    return Media.query.get(id).to_dict()

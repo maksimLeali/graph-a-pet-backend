@@ -17,8 +17,13 @@ def get_paginated_medias(common_search):
         raise e
 
 def create_media(data):
-    return medias_data.create_media(data)
-
+    logger.domain(f'data {stringify(data)}')
+    try: 
+        return medias_data.create_media(data)
+    except Exception as e:
+        logger.error(e)
+        raise e
+    
 def update_media(id, data):
     logger.domain(
         f"id: {id}\n"\

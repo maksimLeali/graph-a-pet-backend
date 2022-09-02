@@ -12,8 +12,8 @@ class Media(Base):
         return {
             "id" : self.id,
             "type": self.type,
-            "url": self.type,
+            "url": self.url,
             "scope": self.scope,
-            "refId": self.ref_id,
+            "ref_id": self.ref_id,
             "created_at": str(self.created_at)
         }

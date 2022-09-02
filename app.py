@@ -58,4 +58,4 @@ if __name__ == "__main__":
         f"Server is running on http://{cfg['flask']['host']}:{cfg['flask']['port']}\n" \
         f"See playground on http://{cfg['flask']['host']}:{cfg['flask']['port']}/graphql"
         )
-    app.run(host=cfg['flask']['host'], port=cfg['flask']['port'])
+    app.run(host=cfg['flask']['host'], port=cfg['flask']['port'], debug=False)

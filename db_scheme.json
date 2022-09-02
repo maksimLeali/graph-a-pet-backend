@@ -45,5 +45,10 @@
         "search_columns": ["logs", "name"],
         "alias": "tr",
         "other_table_ref": "treatment_id"
+    },
+    "medias": {
+        "search_columns": ["url"],
+        "alias": "md",
+        "other_table_ref": "media_id"
     }
 }

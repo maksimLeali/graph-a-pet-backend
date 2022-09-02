@@ -38,7 +38,7 @@ type Mutation {
     createTreatment(data: TreatmentCreate!): TreatmentResult!
     updateTreatment(id: ID!, data: TreatmentUpdate!): TreatmentResult!
     updateMedia(id:ID!, data: MediaUpdate!): MediaResult!
-    createMedia(id:ID!, data: MediaCreate!): MediaResult!
+    createMedia(data: MediaCreate!): MediaResult!
 }
 
 scalar Upload
@@ -137,7 +137,7 @@ type User {
     ownerships(commonSearch: CommonSearch = {}): PaginatedOwnerships
     pets_owned: Int!
     pets_on_loan: Int!
-
+    profile_picture: Media
 }
 
 type Coat {
@@ -182,7 +182,7 @@ type Pet {
 
 type Media {
     id: ID!
-    src: String
+    url: String
     type: String!
     scope: String!
     ref_id: String! 

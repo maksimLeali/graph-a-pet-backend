@@ -7,21 +7,40 @@ from api.errors import AuthenticationError, InternalError, NotFoundError
 from data.ownerships.models import CustodyLevel
 import domain.pets as pets_domain
 import domain.ownerships as ownerships_domain
+import domain.medias as media_domain
 from passlib.hash import pbkdf2_sha256
 import jwt
 import pydash as py_
 from config import cfg
 
+
+@convert_kwargs_to_snake_case
+def get_profile_pic(user_id: str):
+    logger.domain(f"id {user_id}")
+    try:
+        medias = media_domain.get_medias({"ordering": {"order_direction": "ASC", "order_by": "created_at"}, "pagination": {
+                                        "page_size": 10, "page": 0}, "filters": {"and": {"fixed": {"ref_id ": user_id, "scope": "profile_picture"}}}})
+        media= medias[0]
+        logger.check(media)
+        return media
+    except Exception as e:
+        logger.error(e)
+        raise e
+
+
 @convert_kwargs_to_snake_case
 def get_ownerships(common_search):
     logger.domain(f"common_search: {stringify(common_search)}")
     try:
-        ownerships, pagination = ownerships_domain.get_paginated_ownerships(common_search)
-        logger.check(f"response: {stringify({'ownerships' : ownerships , 'pagination': pagination}) }")
+        ownerships, pagination = ownerships_domain.get_paginated_ownerships(
+            common_search)
+        logger.check(
+            f"response: {stringify({'ownerships' : ownerships , 'pagination': pagination}) }")
         return (ownerships, pagination)
-    except Exception as e : 
+    except Exception as e:
         logger.error(e)
         raise e
+
 
 @convert_kwargs_to_snake_case
 def count_ownerships(common_search):
@@ -30,26 +49,28 @@ def count_ownerships(common_search):
         pagination = ownerships_domain.get_pagination(common_search)
         logger.check(f"response: {stringify({'ownerships' :  pagination}) }")
         return (pagination.get("total_items", 0))
-    except Exception as e : 
+    except Exception as e:
         logger.error(e)
         raise e
 
+
 def create_user(data):
     logger.domain(f'data: {stringify(data)}')
-    try: 
-        user= users_data.create_user(data)
+    try:
+        user = users_data.create_user(data)
         return user
     except Exception as e:
         logger.error(e)
         raise e
 
+
 def update_user(id, data):
     logger.domain(
-        f"id: {id}\n"\
+        f"id: {id}\n"
         f"data: {stringify(data)}"
     )
-    try: 
-        user= users_data.update_user(id, data)
+    try:
+        user = users_data.update_user(id, data)
         logger.check(f"user: {stringify(user)}")
         return user
     except Exception as e:
@@ -64,38 +85,41 @@ def get_paginated_users(common_search):
         users = get_users(common_search)
         logger.check(f"pagination: {stringify(pagination)}")
         return (users, pagination)
-    except Exception as e: 
+    except Exception as e:
         logger.error(e)
         raise e
 
+
 def get_users(common_search):
     logger.input(f"common_search: {stringify(common_search)}")
-    try: 
-        users= users_data.get_users(common_search)
+    try:
+        users = users_data.get_users(common_search)
         logger.output(f"users: {len(users)}")
         return users
     except Exception as e:
         logger.error(e)
         raise e
 
+
 def get_user(id):
     logger.domain(f"id: {id}")
     try:
-        user= users_data.get_user(id)
+        user = users_data.get_user(id)
         logger.check(f"user: {stringify(user)}")
         return user
     except Exception as e:
         logger.error(e)
         raise e
 
+
 def get_pagination(common_search):
     logger.input(f"common_search: {stringify(common_search)}")
-    try: 
+    try:
         total_items = users_data.get_total_items(common_search)
         page_size = common_search['pagination']['page_size']
-        total_pages = ceil(total_items /page_size)
+        total_pages = ceil(total_items / page_size)
         current_page = common_search['pagination']['page']
-        pagination= {
+        pagination = {
             "total_items": total_items,
             "total_pages": total_pages,
             "current_page": current_page,
@@ -107,9 +131,10 @@ def get_pagination(common_search):
         logger.error(e)
         raise e
 
-def add_pet_to_user(user_id, pet, custody_level = CustodyLevel.SUB_OWNER.name):
+
+def add_pet_to_user(user_id, pet, custody_level=CustodyLevel.SUB_OWNER.name):
     logger.domain(
-        f"user_id: {user_id}\n"\
+        f"user_id: {user_id}\n"
         f"pet: {stringify(pet)}"
     )
     try:
@@ -128,6 +153,7 @@ def add_pet_to_user(user_id, pet, custody_level = CustodyLevel.SUB_OWNER.name):
         logger.error(e)
         raise e
 
+
 def login(email, password) -> str:
     logger.domain(f"email: {email}, password: {password}")
     try:
@@ -136,11 +162,11 @@ def login(email, password) -> str:
         if(pbkdf2_sha256.verify(password, user['password'])):
             logger.check("user verified")
             return jwt.encode(
-                        {"user": py_.omit(user, "password"),
-                         "iat": int(time()),
-                         "exp": int(time()) + 7 * 24*60*60
-                        }, 
-                    cfg['jwt']['secret'], algorithm="HS256"), user
+                {"user": py_.omit(user, "password"),
+                 "iat": int(time()),
+                 "exp": int(time()) + 7 * 24*60*60
+                 },
+                cfg['jwt']['secret'], algorithm="HS256"), user
         raise AuthenticationError('Credentials error')
     except Exception as e:
         logger.error(e)

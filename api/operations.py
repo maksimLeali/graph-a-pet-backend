@@ -79,5 +79,6 @@ mutation.set_field("createHealthCard", create_health_card_resolver)
 mutation.set_field("createTreatment", create_treatment_resolver)
 mutation.set_field("updateTreatment", update_treatment_resolver)
 mutation.set_field("updateMedia", update_media_resolver)
+mutation.set_field("createMedia", create_media_resolver)
 
 object_types = [query, mutation, user, pet, ownership, pet_body, coat, health_card, treatment]

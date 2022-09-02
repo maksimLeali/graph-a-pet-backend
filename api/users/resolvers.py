@@ -101,3 +101,13 @@ def pets_owned_resolver(obj, info ):
         return total_items
     except Exception as e: 
         raise e
+    
+@user.field('profile_picture')
+def resolve_profile_picture(obj,info):
+    logger.api(f'{obj["id"]}')
+    try :
+        media = users_domain.get_profile_pic(obj['id'])
+        return media
+    except Exception as e:
+        logger.error(e)
+        
