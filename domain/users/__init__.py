@@ -1,4 +1,3 @@
-from tkinter import E
 from ariadne import convert_kwargs_to_snake_case
 import data.users as users_data
 from math import ceil
