@@ -1,7 +1,7 @@
 # mutations.py
 
 from ariadne import convert_kwargs_to_snake_case
-from domain.users import create_user, update_user, login, add_pet_to_user
+from domain.users import create_user, update_user, login, add_pet_to_user, delete_user
 from api.middlewares import auth_middleware, min_role
 from api.errors import format_error, NotFoundError
 from data.users.models import UserRole
@@ -161,8 +161,23 @@ def add_pet_to_me_resolver(obj, info, pet, custody_level):
         logger.error(e)
         payload = {
             "success": False,
-            "errors": [f"Incorrect date format provided. Date should be in "
-                       f"the format dd-mm-yyyy"]
+            "errors": format_error(e)
         }
     return payload
 
+@convert_kwargs_to_snake_case
+@min_role(UserRole.ADMIN.name)
+def delete_user_resolver(obj, info, id, soft = True):
+    logger.api(f"id{id} {'soft' if soft else 'hard'} remove")
+    try: 
+        delete_user(id, soft)
+        payload= {
+            "success": True,
+        }  
+    except Exception as e: 
+        logger.error(e)
+        payload = {
+            "success": False,
+            "errors": format_error(e)
+        }
+    return payload

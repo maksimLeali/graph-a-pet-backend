@@ -1,3 +1,4 @@
+from tkinter import E
 from ariadne import convert_kwargs_to_snake_case
 import data.users as users_data
 from math import ceil
@@ -77,6 +78,14 @@ def update_user(id, data):
         logger.error(e)
         raise e
 
+def delete_user(id, soft=True):
+    logger.domain(f"id {id} {'soft' if soft else 'hard'} remove ")
+    try: 
+        users_data.delete_user(id, soft)
+        
+    except Exception as e:
+        logger.error(e)
+        raise e
 
 def get_paginated_users(common_search):
     logger.domain(f"common_search: {stringify(common_search)}")

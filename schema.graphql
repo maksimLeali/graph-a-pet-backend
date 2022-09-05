@@ -23,6 +23,7 @@ type Mutation {
     createUser(data: UserCreate!): UserResult!
     signUp(data: UserCreate!): UserResult!
     updateUser(id: ID!, data: UserUpdate!): UserResult!
+    deleteUser(id: ID!, soft: Boolean = true): DefaultResult!
     updateMe( data: UserUpdate!): UserResult!
     createPet(data: PetCreate!): PetResult!
     updatePet(id: ID!, data: PetUpdate!): PetResult!
@@ -338,6 +339,11 @@ type Treatment {
     frequency_unit: FrequencyUnit
     booster: Treatment
     health_card: HealthCard
+}
+
+type DefaultResult {
+    success: Boolean
+    error: Error
 }
 
 input FixedFilter {
