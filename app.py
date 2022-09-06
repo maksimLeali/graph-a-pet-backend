@@ -56,6 +56,6 @@ if __name__ == "__main__":
     os.environ['WERKZEUG_RUN_MAIN'] = 'true'
     logger.start(
         f"Server is running on http://{cfg['flask']['host']}:{cfg['flask']['port']}\n" \
-        f"See playground on http://{cfg['flask']['host']}:{cfg['flask']['port']}/graphql"
+        f"See playground on http://{cfg['flask']['host']}:{cfg['flask']['port']}/graphql\n"
         )
     app.run(host=cfg['flask']['host'], port=cfg['flask']['port'], debug=False)
