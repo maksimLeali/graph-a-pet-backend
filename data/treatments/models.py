@@ -1,7 +1,7 @@
 from enum import Enum
 from data import db, Base
 from data.models import *
-from datetime import datetime
+from sqlalchemy.dialects.postgresql import JSONB
 
 
 class TreatmentType(Enum):
@@ -28,7 +28,7 @@ class Treatment(Base):
     type = db.Column(db.Enum(TreatmentType),
                      default=TreatmentType.REMINDER.name)
     health_card_id = db.Column(db.String, db.ForeignKey('health_cards.id'))
-    logs = db.Column(db.JSON)
+    logs = db.Column(JSONB)
     frequency_value = db.Column(db.Integer)
     frequency_unit = db.Column(db.Enum(FrequencyUnit))
     frequency_times = db.Column(db.Integer)

@@ -82,6 +82,7 @@ def get_treatments(common_search):
         logger.check(f"query: {query}")
         manager = select(Treatment).from_statement(text(query))
         treatments_model = db.session.execute(manager).scalars()
+        logger.warning(treatments_model)
         treatments = [treatment.to_dict() for treatment in treatments_model]
         logger.check(f"treatments found {len(treatments)}")
         return treatments
