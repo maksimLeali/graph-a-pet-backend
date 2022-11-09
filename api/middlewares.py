@@ -54,8 +54,6 @@ def min_role(role: UserRole):
                 if level[user['role']] < level[role] :
                     logger.error(f"{user['id']} with role {user['role']} doesn't have access to resource" )
                     raise ForbiddenError('insufficent role')
-                logger.check(f"{user['id']} with role {user['role']} can access resource")
-                logger.critical(f"{user['id']} with role {user['role']} can access resource")
                 return fn(obj, info, **args)
             except Exception as e:
                 error= format_error(e,info.context.headers['authorization'] )
