@@ -35,7 +35,7 @@ def graphql_server():
     )
     status_code = 200 if success else 400
     return jsonify(result), status_code
-
+    
 @app.route('/upload', methods=['POST'])
 def upload_file():
     if 'file' not in request.files:

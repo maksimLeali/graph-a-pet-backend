@@ -1,8 +1,8 @@
 from ariadne import convert_kwargs_to_snake_case
-from graphql import GraphQLResolveInfo
+from graphql import GraphQLError, GraphQLResolveInfo
 import domain.users as users_domain
 from data.users.models import UserRole
-from api.errors import format_error, error_pagination
+from api.errors import ForbiddenError, format_error, error_pagination
 from api.middlewares import auth_middleware, min_role
 from libs.logger import logger, stringify
 from libs.utils import format_common_search, get_request_user
@@ -22,12 +22,9 @@ def list_users_resolver(obj, info: GraphQLResolveInfo, common_search):
         }
     except Exception as e:
         logger.error(e)
-        payload = {
-            "success": False,
-            "error": format_error(e,info.context.headers['authorization']) ,
-            "items": [],
-            "pagination": error_pagination
-        }
+        error= format_error(e,info.context.headers['authorization'])
+        
+        raise GraphQLError(error.get('message') , extensions=error )
     return payload
 
 @convert_kwargs_to_snake_case
