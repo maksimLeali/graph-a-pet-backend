@@ -104,9 +104,6 @@ def login_resolver(obj, info, email, password):
             "user": user
         }
         logger.check(f"user: {stringify(user)}")
-    except NotFoundError as not_found: 
-        logger.error(e)
-        
     except Exception as e:  
         logger.error(e)
         payload = {
