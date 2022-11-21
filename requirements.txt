@@ -5,11 +5,13 @@ aiosignal==1.2.0
 alembic==1.8.1
 aniso8601==9.0.1
 anyio==3.5.0
+APScheduler==3.9.1.post1
 ariadne==0.15.0
 asgiref==3.5.1
 async-timeout==4.0.2
 attrs==21.4.0
 autopep8==1.6.0
+backports.zoneinfo==0.2.1
 bcrypt==3.2.0
 CacheControl==0.12.11
 cachetools==5.2.0
@@ -65,9 +67,12 @@ pyasn1-modules==0.2.8
 pycodestyle==2.8.0
 pycparser==2.21
 pydash==5.1.0
+pyee==9.0.4
 PyJWT==2.3.0
 pyparsing==3.0.9
 python-dateutil==2.8.2
+pytz==2022.6
+pytz-deprecation-shim==0.1.0.post0
 pytzdata==2020.1
 PyYAML==5.4.1
 requests==2.27.1
@@ -80,6 +85,8 @@ telepot==12.7
 toml==0.10.2
 tomli==2.0.1
 typing_extensions==4.2.0
+tzdata==2022.6
+tzlocal==4.2
 uritemplate==4.1.1
 urllib3==1.26.9
 uvicorn==0.17.6

@@ -12,6 +12,8 @@ firebase:
   bucket: ~
 logging: 
   level: ~
+cron:
+  active: ~
 telegram: 
   active: False
   token: ~
