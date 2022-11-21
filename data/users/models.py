@@ -14,6 +14,8 @@ class User(Base):
     password = db.Column(db.String)
     role = db.Column(db.Enum(UserRole))
     ownerships = db.relationship("Ownership", uselist=True, backref='users')
+    last_login = db.Column(db.DateTime)
+    last_activity  = db.Column(db.DateTime)
 
     def to_dict(self):
         return {
