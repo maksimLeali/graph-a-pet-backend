@@ -4,7 +4,7 @@ from typing import Any
 
 from graphql import GraphQLError, GraphQLResolveInfo
 from api.errors import AuthenticationError, ForbiddenError, format_error
-from domain.users import get_user
+from domain.users import get_user, update_user_activity
 from time import time
 from libs.logger import logger
 from data.users.models import UserRole
@@ -31,6 +31,7 @@ def auth_middleware(f):
             logger.error(e)        
             raise AuthenticationError('unauthorized')      
             
+        update_user_activity(decoded_bearer.get('user').get('id'))
         return f(obj, info, **args)
     return function_wrapper
 
@@ -54,6 +55,7 @@ def min_role(role: UserRole):
                 if level[user['role']] < level[role] :
                     logger.error(f"{user['id']} with role {user['role']} doesn't have access to resource" )
                     raise ForbiddenError('insufficent role')
+                update_user_activity(user.get('id'))
                 return fn(obj, info, **args)
             except Exception as e:
                 error= format_error(e,info.context.headers['authorization'] )

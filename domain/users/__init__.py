@@ -10,6 +10,7 @@ import domain.ownerships as ownerships_domain
 import domain.medias as media_domain
 from passlib.hash import pbkdf2_sha256
 import jwt
+from datetime import datetime
 import pydash as py_
 from config import cfg
 
@@ -71,6 +72,16 @@ def update_user(id, data):
     )
     try:
         user = users_data.update_user(id, data)
+        logger.check(f"user: {stringify(user)}")
+        return user
+    except Exception as e:
+        logger.error(e)
+        raise e
+    
+def update_user_activity(id):
+    logger.domain(f"id: {id}")
+    try:
+        user = users_data.update_user(id, {"last_activity" :datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ') })
         logger.check(f"user: {stringify(user)}")
         return user
     except Exception as e:
@@ -168,7 +179,8 @@ def login(email, password) -> str:
         user = users_data.get_user_from_email(email)
         logger.domain(f"verofiyg user: {user['email']}")
         if(pbkdf2_sha256.verify(password, user['password'])):
-            logger.check("user verified")
+            logger.check(f"user verified : {stringify(user)}")
+            users_data.update_user(user.get('id'), {"last_login": datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')  })
             return jwt.encode(
                 {"user": py_.omit(user, "password"),
                  "iat": int(time()),
