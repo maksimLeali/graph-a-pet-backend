@@ -13,6 +13,7 @@ def hourly():
     ee.emit('cron:hourly')
 
 def minutely():
+    logger.error('here')
     ee.emit('cron:minutely')
     
 def test():
