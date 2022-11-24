@@ -50,5 +50,10 @@
         "search_columns": ["url"],
         "alias": "md",
         "other_table_ref": "media_id"
+    },
+    "statistics": {
+        "search_columns": [],
+        "alias": "sts",
+        "other_table_ref": "statistic_id"
     }
 }

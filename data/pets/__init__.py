@@ -83,7 +83,17 @@ def get_pets(common_search):
     except Exception as e: 
         logger.error(e)
         raise e
-    
+
+def get_all_pets ():
+    logger.data("fetching all pets")
+    try:
+        pets  = Pet.query.all()
+        logger.check(f"pets: {len(pets)}")
+        return pets
+    except Exception as e:
+        logger.error(e)
+        raise e
+
 def get_total_items(common_search):
     try:
         query = build_count(table="pets",filters= common_search['filters'] )

@@ -13,7 +13,7 @@ from libs.firebase.storage import upload_image
 from werkzeug.utils import secure_filename
 from libs.utils import allowed_files
 from libs.cron import start_scheduler
-
+import schedules
 type_defs = load_schema_from_path("./")
 schema = make_executable_schema(
     type_defs, object_types,  snake_case_fallback_resolvers
@@ -22,7 +22,7 @@ schema = make_executable_schema(
 if (cfg['cron']['active']):
     start_scheduler()
 else :
-    logger.warning('cron disabled')
+    logger.setup('cron disabled')
 
 
 @app.route("/graphql", methods=["GET"])

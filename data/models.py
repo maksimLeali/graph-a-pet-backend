@@ -6,3 +6,4 @@ from .ownerships.models import *
 from .health_cards.models import *
 from .treatments.models import *
 from .medias.models import *
+from .statistics.models import *

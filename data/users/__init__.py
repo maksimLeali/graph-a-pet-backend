@@ -2,7 +2,7 @@ from typing import Dict
 from passlib.hash import pbkdf2_sha256
 import uuid
 from sqlalchemy.exc import InvalidRequestError
-from datetime import datetime
+from datetime import datetime, timedelta
 from data.query_builder import build_query, build_count
 from libs.logger import logger, stringify
 from api.errors import InternalError, NotFoundError, BadRequest
@@ -66,6 +66,36 @@ def get_users(common_search):
         manager = select(User).from_statement(text(query))
         users = db.session.execute(manager).scalars()
         return [user.to_dict() for user in users]
+    except Exception as e:
+        logger.error(e)
+        raise e
+
+def get_all_users ():
+    logger.data("fetching all users")
+    try:
+        users  = User.query.all()
+        logger.check(f"users: {len(users)}")
+        return users
+    except Exception as e:
+        logger.error(e)
+        raise e
+    
+def get_all_active_users():
+    logger.data('fetching all active users ')
+    try: 
+        users = User.query.filter(User.last_activity > datetime.now() -timedelta(days=1)).all()
+        logger.check(f"active users: {len(users)}")
+        return users
+    except Exception as e:
+        logger.error(e)
+        raise e
+
+def get_all_logged_users_within_x_days(days):
+    logger.data('fetching all active users ')
+    try: 
+        users = User.query.filter(User.last_activity > datetime.now() -timedelta(days=days)).all()
+        logger.info(f"users logged from at least {days} days: {len(users)}")
+        return users
     except Exception as e:
         logger.error(e)
         raise e

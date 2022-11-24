@@ -14,7 +14,8 @@ class CustomFormatter(logging.Formatter):
     logging.DOMAIN = logging.INFO + 3 
     logging.DATA = logging.INFO + 4
     logging.CHECK = logging.INFO + 5
-    logging.START = logging.INFO + 6
+    logging.SETUP = logging.INFO + 6
+    logging.START = logging.INFO + 7
     logging.addLevelName(logging.INPUT, "INPUT")
     logging.addLevelName(logging.OUTPUT, "OUTPUT")
     logging.addLevelName(logging.MIDDLEWARE, "MIDDLEWARE")
@@ -23,6 +24,7 @@ class CustomFormatter(logging.Formatter):
     logging.addLevelName(logging.DATA, "DATA")
     logging.addLevelName(logging.CHECK, "CHECK")
     logging.addLevelName(logging.START, "START")
+    logging.addLevelName(logging.SETUP, "SETUP")
     grey = "\x1b[38;20m"
     green= "\033[92m"
     yellow = "\x1b[33;20m"
@@ -51,6 +53,7 @@ class CustomFormatter(logging.Formatter):
         logging.DATA: blue_bold + "📁  " + extended_format + reset, #24
         logging.CHECK: green + "✅  " + extended_format + reset, #25
         logging.START:italic + green_bold + "🚀  "  + start_format + reset, #26
+        logging.SETUP:italic + cyan_bold + "⚙️  "  + start_format + reset, #26
         logging.WARNING: yellow + "🟡  " + extended_format + reset, #30
         logging.ERROR: red + "❌  " + extended_format + reset, #40
         logging.CRITICAL: bold_red + "⛔  " + extended_format + reset, #50
@@ -59,7 +62,7 @@ class CustomFormatter(logging.Formatter):
     def format(self, record):
         log_fmt = self.FORMATS.get(record.levelno)
         formatter = logging.Formatter(log_fmt, datefmt="%Y-%m-%dT%H:%M:%SZ.00Z")
-        if (record.levelno == logging.START):
+        if (record.levelno in [logging.START, logging.SETUP]):
             return formatter.format(record)
         formatted_record = re.sub(f"{str(pathlib.Path().resolve())}/".replace('\\','/'), '',  formatter.format(record) )
 
@@ -75,6 +78,7 @@ logger.api = lambda msg, *args: logger._log(logging.API, msg, args)
 logger.domain = lambda msg, *args: logger._log(logging.DOMAIN, msg, args)
 logger.data = lambda msg, *args: logger._log(logging.DATA, msg, args)
 logger.start = lambda msg, *args: logger._log(logging.START, msg, args)
+logger.setup = lambda msg, *args: logger._log(logging.SETUP, msg, args)
 logger.setLevel(level)
 ch = logging.StreamHandler()
 

@@ -17,6 +17,7 @@ type Query {
     listTreatments(commonSearch: CommonSearch = {}): PaginatedTreatments!
     getMedia(id: ID!): MediaResult!
     listMedias(commonSearch: CommonSearch= {}): PaginatedMedias!
+    getDashBoard: StatisticResult!
 }
 
 type Mutation {
@@ -128,6 +129,14 @@ type Pagination{
     page_size: Int
 }
 
+type Statistic {
+    id: ID!
+    date: String!
+    all_user: Int!
+    all_pets: Int!
+    all_active_users: Int!
+}
+
 type User {
     id: ID!
     first_name: String!
@@ -201,6 +210,12 @@ type UserResult {
     success: Boolean!
     error: Error
     user: User
+}
+
+type StatisticResult {
+    success: Boolean!
+    error: Error
+    statistic: Statistic
 }
 
 type UsersResult {
