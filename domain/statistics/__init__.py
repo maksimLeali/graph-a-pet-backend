@@ -10,7 +10,7 @@ import domain.ownerships as ownerships_domain
 import domain.medias as media_domain
 from passlib.hash import pbkdf2_sha256
 import jwt
-from datetime import datetime
+from datetime import datetime, timedelta
 import pydash as py_
 from config import cfg
 
@@ -38,7 +38,42 @@ def update_statistic(id, data):
     except Exception as e:
         logger.error(e)
         raise e
-    
+
+def get_today_statistics():
+    logger.domain('get today statistics')
+    try: 
+        today_statistics = statistics_data.get_statistics({"filters": {} ,"pagination" : {"page": 0, "page_size" : 1 }, "ordering" : { "order_by": "date", "order_direction" :"desc"} })[0]
+        this_month_statistics = statistics_data.get_statistics({"filters": { "and": { "ranges" : { "date" : {"min" : str(datetime.today() - timedelta(days=30))}}} } ,"pagination" : {"page": 0, "page_size" : 30 }, "ordering" : { "order_by": "date", "order_direction" :"desc"} })
+        labels = py_.map_(this_month_statistics, 'date')
+        # 3 : 100 = 2 : x 
+        response = {
+            "active_users": today_statistics.get("active_per_day"),
+            "all_pets": today_statistics.get("all_pets"),
+            "all_users": today_statistics.get("all_users"),
+            "active_users_percent": "{0:.2f}".format(( today_statistics.get("active_per_day") / today_statistics.get("all_users")  )* 100 ) ,
+            "active_users_stats": {
+                "data": py_.map_(this_month_statistics, 'active_per_day'),
+                "labels": labels,
+            },
+            "all_pet_stats": {
+                "data": py_.map_(this_month_statistics, 'all_pets'),
+                "labels": labels,
+            },
+            "all_users_stats": {
+                "data": py_.map_(this_month_statistics, 'all_users'),
+                "labels": labels,
+            },
+            "active_users_percent_stats": {
+                "data": py_.map_(this_month_statistics, lambda stat : "{0:.2f}".format((stat.get("active_per_day") / stat.get("all_users"))*100 )),
+                "labels": labels,
+            }
+        }
+        logger.check(stringify(response))
+        return response
+    except Exception as e : 
+        logger.error(e)
+        raise e
+
 def get_paginated_statistics(common_search):
     logger.domain(f"common_search: {stringify(common_search)}")
     try:

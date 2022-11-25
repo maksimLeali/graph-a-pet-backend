@@ -17,7 +17,8 @@ type Query {
     listTreatments(commonSearch: CommonSearch = {}): PaginatedTreatments!
     getMedia(id: ID!): MediaResult!
     listMedias(commonSearch: CommonSearch= {}): PaginatedMedias!
-    getDashBoard: StatisticResult!
+    getDashboard: DashboardResult!
+    
 }
 
 type Mutation {
@@ -218,10 +219,36 @@ type StatisticResult {
     statistic: Statistic
 }
 
+type DashboardResult {
+    success: Boolean!
+    error: Error
+    dashboard: Dashboard
+}
+
 type UsersResult {
     success: Boolean!
     error: Error
     users: [User]!
+}
+
+type  Dashboard {
+    active_users: Int!
+    active_users_percent: Float!
+    all_users: Int!
+    all_pets: Int!
+    active_users_percent_stats: StatFloatField!
+    active_users_stats: StatField!
+    all_pet_stats: StatField!
+    all_users_stats: StatField!
+}
+
+type StatField {
+    data: [Int!]!
+    labels: [String!]!
+}
+type StatFloatField {
+    data: [Float!]!
+    labels: [String!]!
 }
 
 type PaginatedUsers {

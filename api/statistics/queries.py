@@ -5,7 +5,7 @@ from data.users.models import UserRole
 from api.errors import ForbiddenError, format_error, error_pagination
 from api.middlewares import auth_middleware, min_role
 from libs.logger import logger, stringify
-from libs.utils import format_common_search, get_request_statistic
+from libs.utils import format_common_search
 
 @convert_kwargs_to_snake_case
 @min_role(UserRole.ADMIN.name)
@@ -38,7 +38,7 @@ def get_statistic_resolver(obj, info, id):
             "statistic": statistic
         }
         logger.check(f"statistic: {stringify(statistic)}")
-    except Exception as e:  # todo not found
+    except Exception as e:  
         logger.error(e)
         payload = {
             "success": False,
@@ -47,24 +47,24 @@ def get_statistic_resolver(obj, info, id):
         }
     return payload
 
+
 @convert_kwargs_to_snake_case
-@auth_middleware
-def me_resolver(obj, info):
-    logger.api("me")
-    try:
-        token =  info.context.headers['authorization']
-        current_statistic = get_request_statistic(token)
-        statistic = statistics_domain.get_statistic(current_statistic.get("id"))
+@min_role(UserRole.ADMIN.name)
+def dashboard_resolver(obj, info):
+    logger.api('dashboard')
+    try: 
+        dashboard = statistics_domain.get_today_statistics()
         payload = {
             "success": True,
-            "statistic": statistic,
+            "dashboard": dashboard
         }
-        logger.check(f"me: {statistic}")
-    except Exception as e:  
+        logger.check(f"statistic: {stringify(dashboard)}")
+        
+    except Exception as e:
         logger.error(e)
         payload = {
             "success": False,
-            "error": format_error(e, token),
+            "error": format_error(e,info.context.headers['authorization']),
             "statistic": None
         }
     return payload

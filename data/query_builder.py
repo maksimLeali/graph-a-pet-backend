@@ -243,10 +243,11 @@ def build_query(table: str,pagination: dict = {"page_size" : 20, "page": 0}, ord
         query = f"SELECT {alias}.*  "\
             f"FROM {table} AS {alias} "\
             f"{''.join(join_string)} "\
-            f"WHERE  {alias}.deleted_at IS NULL { 'AND ' + formatted_filters if len(filters)> 0 else ''} "  \
+            f"WHERE  {alias}.deleted_at IS NULL { 'AND ' + formatted_filters if len(filters)> 0  else ''} "  \
             f"GROUP BY ({alias}.id) " \
             f"ORDER BY {alias}.{ordering['order_by']} {ordering['order_direction'].upper()}, {alias}.id ASC " \
             f"LIMIT {pagination['page_size']} OFFSET {pagination['page_size'] * pagination['page']}"
+        
         logger.check(
             f"SELECT DISTINCT ({alias}.id), {alias}.*  \n" \
             f"FROM {table} AS {alias} \n" \

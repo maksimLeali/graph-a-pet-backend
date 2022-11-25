@@ -61,8 +61,8 @@ def get_total_items(common_search):
 def get_statistics(common_search):
     logger.data(f"commons_search: {stringify(common_search)}")
     try:
-        query = build_query(table="statistics", ordering=common_search["ordering"],
-                            filters=common_search['filters'], pagination=common_search['pagination'])
+        query = build_query(table="statistics", ordering=common_search.get("ordering"),
+                            filters=common_search.get('filters'), pagination=common_search.get('pagination'))
         manager = select(Statistic).from_statement(text(query))
         statistics = db.session.execute(manager).scalars()
         return [statistic.to_dict() for statistic in statistics]

@@ -23,6 +23,7 @@ from api.medias.mutations import *
 from api.treatments.queries import * 
 from api.treatments.mutations import * 
 from api.treatments.resolvers import treatment
+from api.statistics.queries import * 
 from domain import refresh_token
 from api.middlewares import auth_middleware
 
@@ -61,6 +62,7 @@ query.set_field("getTreatment", get_treatment_resolver)
 query.set_field("listTreatments", list_treatments_resolver)
 query.set_field("listMedias", list_medias_resolver)
 query.set_field("getMedia", get_media_resolver)
+query.set_field("getDashboard", dashboard_resolver)
 
 mutation = MutationType()
 mutation.set_field('createUser', create_user_resolver)
