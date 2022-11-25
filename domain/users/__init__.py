@@ -180,7 +180,8 @@ def login(email, password) -> str:
         logger.domain(f"verofiyg user: {user['email']}")
         if(pbkdf2_sha256.verify(password, user['password'])):
             logger.check(f"user verified : {stringify(user)}")
-            users_data.update_user(user.get('id'), {"last_login": datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')  })
+            today = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
+            users_data.update_user(user.get('id'), {"last_login": today,"last_activity":today   })
             return jwt.encode(
                 {"user": py_.omit(user, "password"),
                  "iat": int(time()),
