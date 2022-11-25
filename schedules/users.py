@@ -4,7 +4,7 @@ from data.users import get_all_active_users, get_all_users
 from libs.logger import logger, stringify
 from data.statistics import create_statistic
 
-@ee.on('cron:minutely')
+@ee.on('cron:daily')
 def save_daily_users_activity():
     try: 
         data =  {
