@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from data.query_builder import build_query, build_count
 from libs.logger import logger, stringify
 from api.errors import InternalError, NotFoundError, BadRequest
-from sqlalchemy import select, text
+from sqlalchemy import and_, not_, select, text
 
 from data.users.models import User, UserRole
 from data import db
@@ -83,7 +83,12 @@ def get_all_users ():
 def get_all_active_users():
     logger.data('fetching all active users ')
     try: 
-        users = User.query.filter(User.last_activity > datetime.now() -timedelta(days=1)).all()
+        users = db.session.query(User).filter(
+            and_( 
+                 (User.last_activity > datetime.now() -timedelta(days=1) ),  
+                 User.deleted_at == None 
+                ) 
+            ).all()
         logger.check(f"active users: {len(users)}")
         return users
     except Exception as e:
@@ -93,7 +98,12 @@ def get_all_active_users():
 def get_all_logged_users_within_x_days(days):
     logger.data('fetching all active users ')
     try: 
-        users = User.query.filter(User.last_activity > datetime.now() -timedelta(days=days)).all()
+        users = User.query.filter(
+            and_(
+                    (User.last_activity > datetime.now() -timedelta(days=days)),
+                    User.deleted_at == None 
+                )
+            ).all()
         logger.info(f"users logged from at least {days} days: {len(users)}")
         return users
     except Exception as e:

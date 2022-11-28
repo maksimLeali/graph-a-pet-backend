@@ -87,7 +87,7 @@ def get_pets(common_search):
 def get_all_pets ():
     logger.data("fetching all pets")
     try:
-        pets  = Pet.query.all()
+        pets  = Pet.query.filter(Pet.deleted_at == None ).all()
         logger.check(f"pets: {len(pets)}")
         return pets
     except Exception as e:

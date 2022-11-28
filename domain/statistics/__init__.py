@@ -1,18 +1,10 @@
-from ariadne import convert_kwargs_to_snake_case
+from data.pets import get_all_pets
 import data.statistics as statistics_data
 from math import ceil
-from time import time
+from data.users import get_all_active_users, get_all_users
 from libs.logger import logger, stringify
-from api.errors import AuthenticationError, InternalError, NotFoundError
-from data.ownerships.models import CustodyLevel
-import domain.pets as pets_domain
-import domain.ownerships as ownerships_domain
-import domain.medias as media_domain
-from passlib.hash import pbkdf2_sha256
-import jwt
 from datetime import datetime, timedelta
 import pydash as py_
-from config import cfg
 
 
 
@@ -43,30 +35,19 @@ def get_today_statistics():
     logger.domain('get today statistics')
     try: 
         today_statistics = statistics_data.get_statistics({"filters": {} ,"pagination" : {"page": 0, "page_size" : 1 }, "ordering" : { "order_by": "date", "order_direction" :"desc"} })[0]
-        this_month_statistics = statistics_data.get_statistics({"filters": { "and": { "ranges" : { "date" : {"min" : str(datetime.today() - timedelta(days=30))}}} } ,"pagination" : {"page": 0, "page_size" : 30 }, "ordering" : { "order_by": "date", "order_direction" :"desc"} })
+        this_month_statistics = statistics_data.get_statistics({"filters": { "and": { "ranges" : { "date" : {"min" : str(datetime.today().replace(day=1))}}} } ,"pagination" : {"page": 0, "page_size" : 31 }, "ordering" : { "order_by": "date", "order_direction" :"asc"} })
         labels = py_.map_(this_month_statistics, 'date')
         # 3 : 100 = 2 : x 
         response = {
-            "active_users": today_statistics.get("active_per_day"),
+            "active_users": today_statistics.get("active_users"),
             "all_pets": today_statistics.get("all_pets"),
             "all_users": today_statistics.get("all_users"),
-            "active_users_percent": "{0:.2f}".format(( today_statistics.get("active_per_day") / today_statistics.get("all_users")  )* 100 ) ,
-            "active_users_stats": {
-                "data": py_.map_(this_month_statistics, 'active_per_day'),
-                "labels": labels,
-            },
-            "all_pet_stats": {
-                "data": py_.map_(this_month_statistics, 'all_pets'),
-                "labels": labels,
-            },
-            "all_users_stats": {
-                "data": py_.map_(this_month_statistics, 'all_users'),
-                "labels": labels,
-            },
-            "active_users_percent_stats": {
-                "data": py_.map_(this_month_statistics, lambda stat : "{0:.2f}".format((stat.get("active_per_day") / stat.get("all_users"))*100 )),
-                "labels": labels,
-            }
+            "active_users_percent": "{0:.2f}".format(( today_statistics.get("active_users") / today_statistics.get("all_users")  )* 100 ) ,
+            "labels": labels,
+            "active_users_stats": py_.map_(this_month_statistics, 'active_users'),
+            "all_pet_stats": py_.map_(this_month_statistics, 'all_pets'),
+            "all_users_stats":  py_.map_(this_month_statistics, 'all_users'),
+            "active_users_percent_stats": py_.map_(this_month_statistics, lambda stat : "{0:.2f}".format((stat.get("active_users") / stat.get("all_users"))*100 )),
         }
         logger.check(stringify(response))
         return response
@@ -82,6 +63,23 @@ def get_paginated_statistics(common_search):
         logger.check(f"pagination: {stringify(pagination)}")
         return (statistics, pagination)
     except Exception as e:
+        logger.error(e)
+        raise e
+
+def get_real_time_statistic():
+    logger.domain('get real time stats')
+    try:
+        active_users = len(get_all_active_users())
+        all_users = len(get_all_users())
+        all_pets = len(get_all_pets())
+        data =  {
+            "active_users" :  active_users,
+            "all_users" :   all_users,
+            "all_pets" :   all_pets,
+            "active_users_percent" : "{0:.2f}".format((active_users / all_users  )* 100 ) ,
+        }
+        return data
+    except Exception as e: 
         logger.error(e)
         raise e
 
@@ -128,43 +126,3 @@ def get_pagination(common_search):
         raise e
 
 
-def add_pet_to_statistic(statistic_id, pet, custody_level=CustodyLevel.SUB_OWNER.name):
-    logger.domain(
-        f"statistic_id: {statistic_id}\n"
-        f"pet: {stringify(pet)}"
-    )
-    try:
-        statistic = statistics_data.get_statistic(statistic_id)
-        if(not statistic):
-            raise NotFoundError(f"no statistic found with id: {statistic_id}")
-        new_pet = pets_domain.create_pet(pet)
-        ownership = {
-            "statistic_id": statistic['id'],
-            "pet_id": new_pet['id'],
-            "custody_level": custody_level
-        }
-        new_ownership = ownerships_domain.create_ownership(ownership)
-        return (new_pet, new_ownership)
-    except Exception as e:
-        logger.error(e)
-        raise e
-
-
-def login(email, password) -> str:
-    logger.domain(f"email: {email}, password: {password}")
-    try:
-        statistic = statistics_data.get_statistic_from_email(email)
-        logger.domain(f"verofiyg statistic: {statistic['email']}")
-        if(pbkdf2_sha256.verify(password, statistic['password'])):
-            logger.check(f"statistic verified : {stringify(statistic)}")
-            statistics_data.update_statistic(statistic.get('id'), {"last_login": datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')  })
-            return jwt.encode(
-                {"statistic": py_.omit(statistic, "password"),
-                 "iat": int(time()),
-                 "exp": int(time()) + 7 * 24*60*60
-                 },
-                cfg['jwt']['secret'], algorithm="HS256"), statistic
-        raise AuthenticationError('Credentials error')
-    except Exception as e:
-        logger.error(e)
-        raise e

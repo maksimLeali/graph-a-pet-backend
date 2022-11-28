@@ -1,2 +1,2 @@
-from schedules import users
+from schedules import statistics
 

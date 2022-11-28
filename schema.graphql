@@ -18,6 +18,7 @@ type Query {
     getMedia(id: ID!): MediaResult!
     listMedias(commonSearch: CommonSearch= {}): PaginatedMedias!
     getDashboard: DashboardResult!
+    getRealTimeStatistic: RealTimeStatisticResult!
     
 }
 
@@ -225,6 +226,19 @@ type DashboardResult {
     dashboard: Dashboard
 }
 
+type RealTimeStatisticResult {
+    success: Boolean!
+    error: Error
+    statistics: DailyStats
+}
+
+type DailyStats {
+    all_users: Int!
+    active_users: Int!
+    all_pets: Int!
+    active_users_percent: Float!
+}
+
 type UsersResult {
     success: Boolean!
     error: Error
@@ -236,19 +250,11 @@ type  Dashboard {
     active_users_percent: Float!
     all_users: Int!
     all_pets: Int!
-    active_users_percent_stats: StatFloatField!
-    active_users_stats: StatField!
-    all_pet_stats: StatField!
-    all_users_stats: StatField!
-}
-
-type StatField {
-    data: [Int!]!
     labels: [String!]!
-}
-type StatFloatField {
-    data: [Float!]!
-    labels: [String!]!
+    active_users_percent_stats: [Float!]!
+    active_users_stats: [Int!]!
+    all_pet_stats: [Int!]!
+    all_users_stats: [Int!]!
 }
 
 type PaginatedUsers {

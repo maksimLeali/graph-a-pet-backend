@@ -47,6 +47,26 @@ def get_statistic_resolver(obj, info, id):
         }
     return payload
 
+@convert_kwargs_to_snake_case
+@min_role(UserRole.ADMIN.name)
+def get_real_time_statistic_resolver(obj, info):
+    logger.api(f"real time statistics ")
+    try:
+        statistic = statistics_domain.get_real_time_statistic()
+        payload = {
+            "success": True,
+            "statistics": statistic
+        }
+        logger.check(f"statistic: {stringify(statistic)}")
+    except Exception as e:  
+        logger.error(e)
+        payload = {
+            "success": False,
+            "error": format_error(e,info.context.headers['authorization']),
+            "statistics": None
+        }
+    return payload
+
 
 @convert_kwargs_to_snake_case
 @min_role(UserRole.ADMIN.name)

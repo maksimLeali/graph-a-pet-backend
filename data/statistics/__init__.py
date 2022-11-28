@@ -16,7 +16,7 @@ def create_statistic(data):
             date= datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'),
             all_users= data.get('all_users'),
             all_pets= data.get('all_pets'),
-            active_per_day= data.get('active_per_day'),
+            active_users= data.get('active_users'),
         )
         db.session.add(statistic_model)
         db.session.commit()
