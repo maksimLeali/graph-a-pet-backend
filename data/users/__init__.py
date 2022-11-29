@@ -73,7 +73,7 @@ def get_users(common_search):
 def get_all_users ():
     logger.data("fetching all users")
     try:
-        users  = User.query.all()
+        users  = User.query.filter(User.deleted_at == None).all()
         logger.check(f"users: {len(users)}")
         return users
     except Exception as e:
