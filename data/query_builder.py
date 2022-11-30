@@ -161,6 +161,7 @@ def format_search_filters(table, filters: Dict[str, list]) -> str:
                 formatted_search += f"{'(' if i==1 and k==1 else ''} "  \
                 f"LOWER({alias}.{camel_to_snake(field)}) LIKE LOWER('%{value}%') "  \
                     f"{'OR' if i <  len(search_list) or k < len(search_fields)  else ')'} "
+        formatted_search += f" OR {alias}.id =  LOWER('{value}')"
         logger.output(f'formatted_search: {formatted_search}')
     except Exception as e: 
         logger.warning(e)
