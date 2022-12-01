@@ -252,6 +252,7 @@ type  Dashboard {
     all_users: Int!
     all_pets: Int!
     labels: [String!]!
+    active_users_mean: Int!
     active_users_percent_stats: [Float!]!
     active_users_stats: [Int!]!
     all_pet_stats: [Int!]!

@@ -3,7 +3,8 @@ import data.statistics as statistics_data
 from math import ceil
 from data.users import get_all_active_users, get_all_users
 from libs.logger import logger, stringify
-from datetime import datetime, timedelta
+from datetime import datetime
+import pendulum
 import pydash as py_
 
 
@@ -35,13 +36,14 @@ def get_today_statistics():
     logger.domain('get today statistics')
     try: 
         today_statistics = statistics_data.get_statistics({"filters": {} ,"pagination" : {"page": 0, "page_size" : 1 }, "ordering" : { "order_by": "date", "order_direction" :"desc"} })[0]
-        this_month_statistics = statistics_data.get_statistics({"filters": { "and": { "ranges" : { "date" : {"min" : str(datetime.today().replace(day=1))}}} } ,"pagination" : {"page": 0, "page_size" : 31 }, "ordering" : { "order_by": "date", "order_direction" :"asc"} })
+        this_month_statistics = statistics_data.get_statistics({"filters": { "and": { "ranges" : { "date" : {"min" : pendulum.now().start_of('month').to_datetime_string() if pendulum.now().day != 1 else pendulum.now().subtract(months=1).to_datetime_string() }}} } ,"pagination" : {"page": 0, "page_size" : 31 }, "ordering" : { "order_by": "date", "order_direction" :"asc"} })
         labels = py_.map_(this_month_statistics, 'date')
         # 3 : 100 = 2 : x 
         response = {
             "active_users": today_statistics.get("active_users"),
             "all_pets": today_statistics.get("all_pets"),
             "all_users": today_statistics.get("all_users"),
+            "active_users_mean": int(py_.mean(py_.map_(this_month_statistics, 'active_users'))),
             "active_users_percent": "{0:.2f}".format(( today_statistics.get("active_users") / today_statistics.get("all_users")  )* 100 ) ,
             "labels": labels,
             "active_users_stats": py_.map_(this_month_statistics, 'active_users'),
