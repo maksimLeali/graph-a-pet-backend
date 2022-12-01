@@ -149,6 +149,7 @@ type User {
     ownerships(commonSearch: CommonSearch = {}): PaginatedOwnerships
     pets_owned: Int!
     pets_on_loan: Int!
+    last_activity: String
     profile_picture: Media
 }
 
@@ -244,7 +245,7 @@ type UsersResult {
     error: Error
     users: [User]!
 }
-
+ 
 type  Dashboard {
     active_users: Int!
     active_users_percent: Float!
@@ -495,6 +496,7 @@ input UserUpdate {
     first_name: String
     last_name: String
     email: String
+    last_activity: String
 }
 
 input UserCreate {

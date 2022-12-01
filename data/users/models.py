@@ -27,5 +27,6 @@ class User(Base):
             "role": self.role.name,
             "created_at": str(self.created_at),
             "updated_at": str(self.updated_at) if self.updated_at else None,
+            "last_activity": str(self.last_activity) if self.last_activity else None
         }
         
