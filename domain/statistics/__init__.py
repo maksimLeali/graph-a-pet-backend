@@ -1,3 +1,4 @@
+from enum import Enum
 from data.pets import get_all_pets
 import data.statistics as statistics_data
 from math import ceil
@@ -7,7 +8,11 @@ from datetime import datetime
 import pendulum
 import pydash as py_
 
-
+class CoatLength(Enum) :
+    DAILY = "DAILY",
+    WEEKLY = "WEEKLY",
+    MONTHLY = "MONTHLY"
+    
 
 def create_statistic(data):
     logger.domain(f'data: {stringify(data)}')
@@ -67,6 +72,9 @@ def get_paginated_statistics(common_search):
     except Exception as e:
         logger.error(e)
         raise e
+    
+def get_statistics(date_from, date_to, group_type):
+    logger.domain(f"from {date_from} to {date_to}")
 
 def get_real_time_statistic():
     logger.domain('get real time stats')

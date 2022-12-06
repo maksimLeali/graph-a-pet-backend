@@ -1076,7 +1076,7 @@ conn = http.client.HTTPSConnection("graph-a-pet.makso.me")
 payload = "{\"query\":\"mutation ($id: ID!, $data: UserUpdate!){\\n\\tupdateUser(id: $id, data: $data){\\n\\t\\tuser {\\n\\t\\t\\tid\\n\\t\\t\\tfirst_name\\n\\t\\t\\tlast_name\\n\\t\\t\\temail,\\n\\t\\t\\tlast_activity\\n\\t\\t\\tcreated_at\\n\\t\\t}\\n\\t\\tsuccess\\n\\t\\terror{\\n\\t\\t\\t code\\n\\t\\t\\tmessage\\n\\t\\t}\\n\\t}\\n}\",\"variables\":{\"id\":\"$$id$$\",\"data\":{\"last_activity\":\"$$date$$\"}}}"
 
 headers = {
-    'Authorization': "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjp7ImlkIjoiZWViMDJmMjctYTZkYi00ZDM5LWI0MWEtYzc3OTU2MDc4ZmIzIiwiZmlyc3RfbmFtZSI6IkNhcmxvIiwibGFzdF9uYW1lIjoiTE9MTE8iLCJlbWFpbCI6ImMubWFnbm9AZ3JlY2lhLml0Iiwicm9sZSI6IkFETUlOIiwiY3JlYXRlZF9hdCI6IjIwMjItMDUtMDUgMDA6MDA6MDAiLCJ1cGRhdGVkX2F0IjpudWxsfSwiaWF0IjoxNjY5NjI3MTExLCJleHAiOjE2NzAyMzE5MTF9.V0JOGBfOPR-Vz9ueivDM6FHGvA76S0wKIq1S1Qqc7Us",
+    'Authorization': "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjp7ImlkIjoiZWViMDJmMjctYTZkYi00ZDM5LWI0MWEtYzc3OTU2MDc4ZmIzIiwiZmlyc3RfbmFtZSI6IkNhcmxvIiwibGFzdF9uYW1lIjoiUGlwcG9sbyIsImVtYWlsIjoiYy5tYWdub0BncmVjaWEuaXQiLCJyb2xlIjoiQURNSU4iLCJjcmVhdGVkX2F0IjoiMjAyMi0wNS0wNSAwMDowMDowMCIsInVwZGF0ZWRfYXQiOm51bGwsImxhc3RfYWN0aXZpdHkiOiIyMDIyLTEyLTA1IDA5OjUzOjU3In0sImlhdCI6MTY3MDIzNDAzOCwiZXhwIjoxNjcwODM4ODM4fQ.HfK5cXYuSXAX6BfUeHnRaovY1_pzvehS8pTux5mApcs",
     'Content-Type': "application/json"
     }
 
