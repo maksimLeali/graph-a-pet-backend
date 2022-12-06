@@ -9,9 +9,9 @@ import pendulum
 import pydash as py_
 
 class CoatLength(Enum) :
-    DAILY = "DAILY",
-    WEEKLY = "WEEKLY",
-    MONTHLY = "MONTHLY"
+    DAILY = "day",
+    WEEKLY = "week",
+    MONTHLY = "month"
     
 
 def create_statistic(data):
@@ -43,7 +43,6 @@ def get_today_statistics():
         today_statistics = statistics_data.get_statistics({"filters": {} ,"pagination" : {"page": 0, "page_size" : 1 }, "ordering" : { "order_by": "date", "order_direction" :"desc"} })[0]
         this_month_statistics = statistics_data.get_statistics({"filters": { "and": { "ranges" : { "date" : {"min" : pendulum.now().start_of('month').to_datetime_string() if pendulum.now().day != 1 else pendulum.now().subtract(months=1).to_datetime_string() }}} } ,"pagination" : {"page": 0, "page_size" : 31 }, "ordering" : { "order_by": "date", "order_direction" :"asc"} })
         labels = py_.map_(this_month_statistics, 'date')
-        # 3 : 100 = 2 : x 
         response = {
             "active_users": today_statistics.get("active_users"),
             "all_pets": today_statistics.get("all_pets"),
@@ -73,8 +72,38 @@ def get_paginated_statistics(common_search):
         logger.error(e)
         raise e
     
-def get_statistics(date_from, date_to, group_type):
+def get_statistics_by_group(date_from, date_to, group_type):
     logger.domain(f"from {date_from} to {date_to}")
+    try: 
+        this_range_statistics = statistics_data.get_statistics({"filters": { "and": { "ranges" : { "date" : {"min" : date_from, "max" : date_to }}} } ,"pagination" : {"page": 0, "page_size" : 100 }, "ordering" : { "order_by": "date", "order_direction" :"asc"} })
+        logger.info(this_range_statistics)
+        statistics = {
+            "labels" : [],
+            "active_users_mean" : [],
+            "active_users_min" : [],
+            "active_users_max" : [],
+            "all_users": [],
+            "all_pets": [],
+        }
+        date_groups = {}
+        for record in this_range_statistics :
+            group = pendulum.parse(record.get("date")).start_of(group_type).format("YYYY-MM-DD")
+            if date_groups.get(group) == None :
+                date_groups[group]= []
+            date_groups[group].append(record)
+        for key in date_groups.keys():
+            statistics["labels"].append(key)
+            statistics["active_users_mean"].append( "{0:.2f}".format(py_.mean_by(date_groups[key], "active_users")))
+            statistics["all_pets"].append( "{0:.2f}".format(py_.mean_by(date_groups[key], "all_pets")))
+            statistics["all_users"].append( "{0:.2f}".format(py_.mean_by(date_groups[key], "all_users")))
+            statistics["active_users_max"].append( "{0:.2f}".format(py_.max_by(date_groups[key], "active_users")["active_users"]))
+            statistics["active_users_min"].append( "{0:.2f}".format(py_.min_by(date_groups[key], "active_users")["active_users"]))
+        
+        logger.check(stringify(statistics))
+        return statistics
+    except Exception as e :
+        logger.error(e)
+        raise e
 
 def get_real_time_statistic():
     logger.domain('get real time stats')

@@ -19,6 +19,7 @@ type Query {
     listMedias(commonSearch: CommonSearch= {}): PaginatedMedias!
     getDashboard: DashboardResult!
     getRealTimeStatistic: RealTimeStatisticResult!
+    getGroupedStatistics(date_from: String!, date_to: String, group: String ): StatisticsResult!
     
 }
 
@@ -225,6 +226,22 @@ type DashboardResult {
     success: Boolean!
     error: Error
     dashboard: Dashboard
+}
+
+
+type Statistics {
+    labels: [String]!
+    active_users_mean: [Float!]
+    active_users_min: [Float!]
+    active_users_max: [Float!]
+    all_users: [Float!]
+    all_pets: [Float!]
+}
+
+type StatisticsResult {
+    success: Boolean!
+    error: Error
+    statistics: Statistics
 }
 
 type RealTimeStatisticResult {

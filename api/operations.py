@@ -64,6 +64,7 @@ query.set_field("listMedias", list_medias_resolver)
 query.set_field("getMedia", get_media_resolver)
 query.set_field("getDashboard", dashboard_resolver)
 query.set_field("getRealTimeStatistic", get_real_time_statistic_resolver)
+query.set_field("getGroupedStatistics", get_statistics_by_group)
 
 mutation = MutationType()
 mutation.set_field('createUser', create_user_resolver)

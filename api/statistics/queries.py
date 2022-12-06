@@ -27,6 +27,26 @@ def list_statistics_resolver(obj, info: GraphQLResolveInfo, common_search):
         raise GraphQLError(error.get('message') , extensions=error )
     return payload
 
+
+@convert_kwargs_to_snake_case
+@min_role(UserRole.ADMIN.name)
+def get_statistics_by_group(obj, info, date_from, date_to, group):
+    logger.api(f"from {date_from} to {date_to} grouped {group}")
+    try:
+        statistics = statistics_domain.get_statistics_by_group(date_from, date_to, group)
+        payload= {
+            "success": True,
+            "statistics": statistics,
+        }
+    except Exception as e:
+        logger.error(e)
+        payload = {
+            "success": False,
+            "error": format_error(e,info.context.headers['authorization']),
+            "statistics": None
+        }
+    return payload
+
 @convert_kwargs_to_snake_case
 @min_role(UserRole.ADMIN.name)
 def get_statistic_resolver(obj, info, id):
