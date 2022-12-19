@@ -230,7 +230,7 @@ type DashboardResult {
 
 
 type Statistics {
-    labels: [String]!
+    labels: [String!]
     active_users_mean: [Float!]
     active_users_min: [Float!]
     active_users_max: [Float!]
