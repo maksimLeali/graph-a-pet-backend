@@ -1076,16 +1076,16 @@ conn = http.client.HTTPSConnection("graph-a-pet.makso.me")
 payload = "{\"query\":\"mutation ($id: ID!, $data: UserUpdate!){\\n\\tupdateUser(id: $id, data: $data){\\n\\t\\tuser {\\n\\t\\t\\tid\\n\\t\\t\\tfirst_name\\n\\t\\t\\tlast_name\\n\\t\\t\\temail,\\n\\t\\t\\tlast_activity\\n\\t\\t\\tcreated_at\\n\\t\\t}\\n\\t\\tsuccess\\n\\t\\terror{\\n\\t\\t\\t code\\n\\t\\t\\tmessage\\n\\t\\t}\\n\\t}\\n}\",\"variables\":{\"id\":\"$$id$$\",\"data\":{\"last_activity\":\"$$date$$\"}}}"
 
 headers = {
-    'Authorization': "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjp7ImlkIjoiZWViMDJmMjctYTZkYi00ZDM5LWI0MWEtYzc3OTU2MDc4ZmIzIiwiZmlyc3RfbmFtZSI6IkNhcmxvIiwibGFzdF9uYW1lIjoiUGlwcG9sbyIsImVtYWlsIjoiYy5tYWdub0BncmVjaWEuaXQiLCJyb2xlIjoiQURNSU4iLCJjcmVhdGVkX2F0IjoiMjAyMi0wNS0wNSAwMDowMDowMCIsInVwZGF0ZWRfYXQiOm51bGwsImxhc3RfYWN0aXZpdHkiOiIyMDIyLTEyLTE0IDA5OjMzOjU2In0sImlhdCI6MTY3MTAxNTY0MywiZXhwIjoxNjcxNjIwNDQzfQ.DHc2RLb2pPpawNqmBoye_NRJc0fJjIKI45pHo7u9MWg",
+    'Authorization': "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjp7ImlkIjoiZWViMDJmMjctYTZkYi00ZDM5LWI0MWEtYzc3OTU2MDc4ZmIzIiwiZmlyc3RfbmFtZSI6IkNhcmxvIiwibGFzdF9uYW1lIjoiUGlwcG9sbyIsImVtYWlsIjoiYy5tYWdub0BncmVjaWEuaXQiLCJyb2xlIjoiQURNSU4iLCJjcmVhdGVkX2F0IjoiMjAyMi0wNS0wNSAwMDowMDowMCIsInVwZGF0ZWRfYXQiOm51bGwsImxhc3RfYWN0aXZpdHkiOiIyMDIzLTAxLTE5IDEwOjAzOjU5In0sImlhdCI6MTY3NDEyNDgyNCwiZXhwIjoxNjc0NzI5NjI0fQ.iZ7axZ9KjitgVscDIm99IbKMOMO82TC13IYnSbDmp0c",
     'Content-Type': "application/json"
     }
 
 
 for id in ids :
-    random_date = pendulum.now().subtract(days=25).add(days=random.randint(5,28)).to_datetime_string()
+    random_date = pendulum.now().subtract(days=8).add(days=random.randint(5,28)).to_datetime_string()
     new_payload = payload.replace("$$id$$", id).replace("$$date$$", random_date)
 
     conn.request("POST", "/graphql", new_payload, headers)
-
     res = conn.getresponse()
     data = res.read()
+    print('ok')
