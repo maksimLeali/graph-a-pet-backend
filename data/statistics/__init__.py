@@ -91,7 +91,7 @@ def get_dashboard():
                 "GROUP BY "\
             "c_date "\
                 "ORDER BY "\
-            "c_date DESC "\
+            "c_date ASC "\
             "LIMIT 30"
         logger.info(query)
         to_return = []
