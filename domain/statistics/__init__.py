@@ -41,7 +41,7 @@ def get_today_statistics():
     logger.domain('get today statistics')
     try: 
         today_statistics = statistics_data.get_statistics({"filters": {} ,"pagination" : {"page": 0, "page_size" : 1 }, "ordering" : { "order_by": "date", "order_direction" :"desc"} })[0]
-        this_month_statistics = statistics_data.get_statistics({"filters": { "and": { "ranges" : { "date" : {"min" : pendulum.now().start_of('month').to_datetime_string() if pendulum.now().day != 1 else pendulum.now().subtract(months=1).to_datetime_string() }}} } ,"pagination" : {"page": 0, "page_size" : 31 }, "ordering" : { "order_by": "date", "order_direction" :"asc"} })
+        this_month_statistics = statistics_data.get_dashboard()
         labels = py_.map_(this_month_statistics, 'date')
         response = {
             "active_users": today_statistics.get("active_users"),

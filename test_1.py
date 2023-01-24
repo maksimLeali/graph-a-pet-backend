@@ -1082,7 +1082,7 @@ headers = {
 
 
 for id in ids :
-    random_date = pendulum.now().subtract(days=8).add(days=random.randint(5,28)).to_datetime_string()
+    random_date = pendulum.now().subtract(days=13).add(days=random.randint(5,28)).to_datetime_string()
     new_payload = payload.replace("$$id$$", id).replace("$$date$$", random_date)
 
     conn.request("POST", "/graphql", new_payload, headers)

@@ -70,3 +70,25 @@ def get_statistics(common_search):
     except Exception as e:
         logger.error(e)
         raise e
+    
+def get_dashboard():
+    logger.data("getting dashboard")
+    try:
+        query = "SELECT"\
+                    "date_trunc('day', stats.date) AS day,"\
+                    "AVG(stats.active_users) AS active_users,"\
+                    "AVG(stats.all_users) AS all_users,"\
+                    "AVG(stats.all_pets) AS all_pets"\
+                "FROM"\
+                    "statistics stats"\
+                "GROUP BY"\
+                    "day"\
+                "ORDER BY"\
+                    "day DESC"\
+                 "LIMIT 30"
+        manager = select(Statistic).from_statement(text(query))
+        statistics = db.session.execute(manager).scalar()
+        return [statistics.to_dict() for statistic in statistics]
+    except Exception as e:
+        logger.error(e)
+        raise e
