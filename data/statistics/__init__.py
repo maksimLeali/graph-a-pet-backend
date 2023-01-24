@@ -81,7 +81,7 @@ def get_dashboard():
     logger.data("getting dashboard")
     try:
         query = "SELECT "\
-            "date_trunc('day', stats.date) AS date, "\
+            "date_trunc('day', stats.date) AS c_date, "\
             "ROUND(AVG(stats.active_users)::NUMERIC, 2) AS active_users, "\
             "ROUND(AVG(stats.all_users)::NUMERIC, 2) AS all_users, "\
             "ROUND(AVG(stats.all_pets)::NUMERIC, 2) AS all_pets, "\
@@ -89,9 +89,9 @@ def get_dashboard():
                 "FROM "\
             "statistics stats "\
                 "GROUP BY "\
-            "date "\
+            "c_date "\
                 "ORDER BY "\
-            "date DESC "\
+            "c_date DESC "\
             "LIMIT 30"
         logger.info(query)
         to_return = []
@@ -103,7 +103,7 @@ def get_dashboard():
                 "active_users": int(row.active_users),
                 "all_users": int(row.all_users),
                 "all_pets": int(row.all_pets),
-                "date": str(row.date)
+                "date": str(row.c_date)
                 })
         return to_return
     except Exception as e:
