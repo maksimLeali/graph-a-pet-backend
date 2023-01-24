@@ -84,6 +84,7 @@ def get_dashboard():
             "AVG(stats.active_users) AS active_users, "\
             "AVG(stats.all_users) AS all_users, "\
             "AVG(stats.all_pets) AS all_pets "\
+            "'monthly_stats' as id "\
                 "FROM "\
             "statistics stats "\
                 "GROUP BY "\
