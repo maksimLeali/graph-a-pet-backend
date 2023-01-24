@@ -4,19 +4,20 @@ from data.query_builder import build_count, build_query
 from libs.logger import logger, stringify
 from datetime import datetime
 from .models import Statistic
-from data import db 
+from data import db
 from sqlalchemy.exc import InvalidRequestError
 import uuid
+
 
 def create_statistic(data):
     logger.data(f"data: {stringify(data)}")
     try:
         statistic_model = Statistic(
             id=f"{uuid.uuid4()}",
-            date= datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'),
-            all_users= data.get('all_users'),
-            all_pets= data.get('all_pets'),
-            active_users= data.get('active_users'),
+            date=datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'),
+            all_users=data.get('all_users'),
+            all_pets=data.get('all_pets'),
+            active_users=data.get('active_users'),
         )
         db.session.add(statistic_model)
         db.session.commit()
@@ -26,14 +27,16 @@ def create_statistic(data):
     except Exception as e:
         logger.error(e)
         raise e
-    
+
+
 def update_statistic(id, data):
     logger.data(
         f"id: {id}\n"
         f"data: {stringify(data)}"
     )
     try:
-        statistic_model = db.session.query(Statistic).filter(Statistic.id == id)
+        statistic_model = db.session.query(
+            Statistic).filter(Statistic.id == id)
         if not statistic_model:
             raise NotFoundError(f"no statistic found with id: {id}")
         statistic_old = statistic_model.first().to_dict()
@@ -48,6 +51,7 @@ def update_statistic(id, data):
     except Exception as e:
         logger.error(e)
         raise e
+
 
 def get_total_items(common_search):
     try:
@@ -70,22 +74,23 @@ def get_statistics(common_search):
     except Exception as e:
         logger.error(e)
         raise e
-    
+
+
 def get_dashboard():
     logger.data("getting dashboard")
     try:
         query = "SELECT "\
-                    "date_trunc('day', stats.date) AS day, "\
-                    "AVG(stats.active_users) AS active_users, "\
-                    "AVG(stats.all_users) AS all_users, "\
-                    "AVG(stats.all_pets) AS all_pets "\
+            "date_trunc('day', stats.date) AS day, "\
+            "AVG(stats.active_users) AS active_users, "\
+            "AVG(stats.all_users) AS all_users, "\
+            "AVG(stats.all_pets) AS all_pets "\
                 "FROM "\
-                    "statistics stats "\
+            "statistics stats "\
                 "GROUP BY "\
-                    "day "\
+            "day "\
                 "ORDER BY "\
-                    "day DESC "\
-                 "LIMIT 30"
+            "day DESC "\
+            "LIMIT 30"
         manager = select(Statistic).from_statement(text(query))
         statistics = db.session.execute(manager).scalar()
         return [statistics.to_dict() for statistic in statistics]
