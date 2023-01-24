@@ -6,6 +6,7 @@ from datetime import datetime
 from .models import Statistic
 from data import db
 from sqlalchemy.exc import InvalidRequestError
+
 import uuid
 
 
@@ -80,21 +81,31 @@ def get_dashboard():
     logger.data("getting dashboard")
     try:
         query = "SELECT "\
-            "date_trunc('day', stats.date) AS day, "\
-            "AVG(stats.active_users) AS active_users, "\
-            "AVG(stats.all_users) AS all_users, "\
-            "AVG(stats.all_pets) AS all_pets "\
-            "'monthly_stats' as id "\
+            "date_trunc('day', stats.date) AS date, "\
+            "ROUND(AVG(stats.active_users)::NUMERIC, 2) AS active_users, "\
+            "ROUND(AVG(stats.all_users)::NUMERIC, 2) AS all_users, "\
+            "ROUND(AVG(stats.all_pets)::NUMERIC, 2) AS all_pets, "\
+            "gen_random_uuid() as id "\
                 "FROM "\
             "statistics stats "\
                 "GROUP BY "\
-            "day "\
+            "date "\
                 "ORDER BY "\
-            "day DESC "\
+            "date DESC "\
             "LIMIT 30"
-        manager = select(Statistic).from_statement(text(query))
-        statistics = db.session.execute(manager).scalar()
-        return [statistics.to_dict() for statistic in statistics]
+        logger.info(query)
+        to_return = []
+        # manager = select(Statistic).from_statement(text(query))
+        statistics = db.engine.execute(query)
+        for row in statistics:
+            to_return.append({
+                "id": row.id,
+                "active_users": int(row.active_users),
+                "all_users": int(row.all_users),
+                "all_pets": int(row.all_pets),
+                "date": str(row.date)
+                })
+        return to_return
     except Exception as e:
         logger.error(e)
         raise e
