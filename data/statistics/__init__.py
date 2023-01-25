@@ -81,18 +81,23 @@ def get_dashboard():
     logger.data("getting dashboard")
     try:
         query = "SELECT "\
-            "date_trunc('day', stats.date) AS c_date, "\
-            "ROUND(AVG(stats.active_users)::NUMERIC, 2) AS active_users, "\
-            "ROUND(AVG(stats.all_users)::NUMERIC, 2) AS all_users, "\
-            "ROUND(AVG(stats.all_pets)::NUMERIC, 2) AS all_pets, "\
-            "gen_random_uuid() as id "\
+                    "date_trunc('day', stats.date) AS c_date, "\
+                    "ROUND(AVG(stats.active_users)::NUMERIC, 2) AS active_users, "\
+                    "ROUND(AVG(stats.all_users)::NUMERIC, 2) AS all_users, "\
+                    "ROUND(AVG(stats.all_pets)::NUMERIC, 2) AS all_pets, "\
+                    "gen_random_uuid() as id "\
                 "FROM "\
-            "statistics stats "\
+                    "statistics stats "\
+                "WHERE "\
+                    "CASE "\
+                        "WHEN date_part('day', now()) < 7 then stats.date > current_date - interval '7' DAY "\
+                        "else stats.date >  date_trunc('month', now()) "\
+                    "END "\
                 "GROUP BY "\
-            "c_date "\
+                    "c_date "\
                 "ORDER BY "\
-            "c_date ASC "\
-            "LIMIT 30"
+                    "c_date ASC "\
+                "LIMIT 30"
         logger.info(query)
         to_return = []
         # manager = select(Statistic).from_statement(text(query))
