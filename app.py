@@ -44,11 +44,12 @@ def graphql_server():
     return jsonify(result), status_code
     
 
+app.register_blueprint(media)
+
 if __name__ == "__main__":
     log = logging.getLogger('werkzeug')
     log.disabled = True
     os.environ['WERKZEUG_RUN_MAIN'] = 'true'
-    app.register_blueprint(media)
     logger.start(
         f"Server is running on http://{cfg['flask']['host']}:{cfg['flask']['port']}\n" \
         f"See playground on http://{cfg['flask']['host']}:{cfg['flask']['port']}/graphql\n"
