@@ -1,6 +1,6 @@
 from datetime import datetime
-from api import app
 from flask_sqlalchemy import SQLAlchemy
+from api import app
 from config import cfg 
 
 app.config["SQLALCHEMY_DATABASE_URI"] = f"postgresql://{cfg['db']['user']}:{cfg['db']['password']}@{cfg['db']['host']}:{cfg['db']['port']}/{cfg['db']['table']}"

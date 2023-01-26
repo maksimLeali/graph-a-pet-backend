@@ -1,8 +1,6 @@
 import data.medias as medias_data
-import domain.users as users_domain
-import domain.pets as pets_domain
-from api.errors import InternalError
 from libs.logger import logger, stringify
+
 from math import ceil
 
 def get_paginated_medias(common_search):
