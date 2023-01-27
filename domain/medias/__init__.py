@@ -1,7 +1,30 @@
+from io import BytesIO
 import data.medias as medias_data
 from libs.logger import logger, stringify
 
 from math import ceil
+from api.errors import BadRequest
+from libs.firebase.storage import upload_image
+import os
+# from config import cfg
+from PIL import Image, ImageDraw
+import urllib.request
+
+from werkzeug.utils import secure_filename
+from libs.utils import allowed_files
+
+def upload_media(file):
+    try: 
+        logger.domain('try to upload media')
+        if file and allowed_files(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join('temp', filename))
+            return upload_image('temp'+'/', filename)
+        error = BadRequest(f"file not allowed")
+        raise error
+    except Exception as e: 
+        logger.error(e)
+        raise e
 
 def get_paginated_medias(common_search):
     logger.domain(f"common_search: {stringify(common_search)}")
@@ -60,6 +83,35 @@ def get_pagination(common_search):
             "current_page": current_page,
             "page_size": page_size
         }
+    except Exception as e:
+        logger.error(e)
+        raise e
+
+def get_resized_media(id, size = { "width" : 400, "height" : 400}):
+    logger.domain(f"id: {id}, size: {stringify(size)}")
+    try:
+        media = medias_data.get_media(id)
+        logger.check(media)
+        with urllib.request.urlopen(media["url"]) as url:
+            img = Image.open(url)
+        logger.info(img)
+            
+        img.thumbnail((size["width"], size["height"]),Image.ANTIALIAS)
+        resized =(max(img.width, size['width']), max(img.height, size['height']))
+        transparent_box = Image.new("RGBA", resized, (255, 255, 255, 0))
+        draw = ImageDraw.Draw(transparent_box)
+        draw.rectangle([(0, 0), resized], fill=(255, 255, 255, 255))
+        logger.info(resized)
+        x = (transparent_box.width - img.width )/ 2 if transparent_box.width > img.width else 0
+        y = (transparent_box.height - img.height) / 2 if transparent_box.height > img.height else 0
+        
+        logger.info((x,y))
+        transparent_box.paste(img, (int(x), int(y)))
+        img_io = BytesIO()
+        transparent_box.save(img_io, "PNG", quality=100)
+        img_io.seek(0)
+            
+        return img_io, media["type"]
     except Exception as e:
         logger.error(e)
         raise e

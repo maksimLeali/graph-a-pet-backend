@@ -55,7 +55,7 @@ def get_medias(common_search):
                             filters=common_search['filters'], pagination=common_search['pagination'])
         manager = select(Media).from_statement(text(query))
         medias = db.session.execute(manager).scalars()
-        return [pet.to_dict() for pet in medias]
+        return [media.to_dict() for media in medias]
     except Exception as e:
         logger.error(e)
         raise e
@@ -85,4 +85,10 @@ def get_total_items(common_search):
 
 
 def get_media(id):
-    return Media.query.get(id).to_dict()
+    try:
+        media = Media.query.get(id)
+        logger.check(media)
+        return media.to_dict()
+    except Exception as e:
+        logger.error(e)
+        raise e 
