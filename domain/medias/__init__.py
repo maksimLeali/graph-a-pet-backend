@@ -100,7 +100,7 @@ def get_resized_media(id, size = { "width" : 400, "height" : 400}):
         resized =(max(img.width, size['width']), max(img.height, size['height']))
         transparent_box = Image.new("RGBA", resized, (255, 255, 255, 0))
         draw = ImageDraw.Draw(transparent_box)
-        draw.rectangle([(0, 0), resized], fill=(255, 255, 255, 255))
+        draw.rectangle([(0, 0), resized], fill=(255, 255, 255, 0))
         logger.info(resized)
         x = (transparent_box.width - img.width )/ 2 if transparent_box.width > img.width else 0
         y = (transparent_box.height - img.height) / 2 if transparent_box.height > img.height else 0
