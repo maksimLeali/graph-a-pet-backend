@@ -128,18 +128,13 @@ def get_cropped_media(id, size = { "width" : 400, "height" : 400}):
         
         max_width = min(img.width,size["width"]) 
         max_height = min(img.height, size["height"])
-        max_dimension = max(max_width, max_height)
-        if orig_width > orig_height:
-            new_width = max_dimension
-            new_height = int(max_dimension / orig_ratio)
-        elif orig_width < orig_height:
-            new_width = int(max_dimension * orig_ratio)
-            new_height = max_dimension
-        else :
-            new_width = max_dimension
-            new_height = int(max_dimension / orig_ratio)
-            new_width = int(max_dimension * orig_ratio)
-            new_height = max_dimension
+        min_dimension = max(max_width, max_height)
+        if orig_width <= orig_height:
+            new_width = min_dimension
+            new_height = int(min_dimension / orig_ratio)
+        else:
+            new_width = int(min_dimension * orig_ratio)
+            new_height = min_dimension
         
         img_resized = img.resize((new_width, new_height))
         logger.info(f"width: {img_resized.width}, height: {img_resized.height}")
