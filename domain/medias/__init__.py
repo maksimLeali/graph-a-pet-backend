@@ -120,12 +120,27 @@ def get_cropped_media(id, size = { "width" : 400, "height" : 400}):
         media = medias_data.get_media(id)
         with urllib.request.urlopen(media["url"]) as url:
             img = Image.open(url)
-        max_width = max(img.width,size["width"]) 
-        max_height = max(img.height, size["height"])
-        img_resized = img.resize((max_width, max_height))
         
-        left= (max_width - size['width'] ) // 2
-        upper = (max_height- size['height'] ) // 2
+        logger.info(f"width: {img.width}, height: {img.height}")  
+        orig_width, orig_height = img.size
+        orig_ratio = orig_width / orig_height
+        
+        
+        max_width = min(img.width,size["width"]) 
+        max_height = min(img.height, size["height"])
+        max_dimension = max(max_width, max_height)
+        if orig_width >= orig_height:
+            new_width = max_dimension
+            new_height = int(max_dimension / orig_ratio)
+        else:
+            new_width = int(max_dimension * orig_ratio)
+            new_height = max_dimension
+        
+        img_resized = img.resize((new_width, new_height))
+        logger.info(f"width: {img_resized.width}, height: {img_resized.height}")
+        
+        left= (new_width - size['width'] ) // 2
+        upper = (new_height- size['height'] ) // 2
         right = left + size['width']
         lower = upper + size['height']
         
