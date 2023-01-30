@@ -9,14 +9,14 @@ def get_media_no_size(id):
     logger.api(f"id: {id}")
     return {"data" : { "id": id}}
 
-@media.route('/<id>/fit/<size>', methods=["GET"])
+@media.route('/<id>/<size>/fit', methods=["GET"])
 def get_resized_fit_media(id,size):
     try:
         logger.api(f"id: {id}, size: {stringify(size)}")
-        # media, media_type = mediaDomain.get_resized_media(id, {"width": int(size.split("x")[0]) , "height": int(size.split("x")[1]) })
-        # logger.check(f"type: {media_type}")
-        # logger.check(f"{type(media)}")
-        return {"media": "fit"}
+        media, media_type = mediaDomain.get_resized_to_fit_media(id, {"width": int(size.split("x")[0]) , "height": int(size.split("x")[1]) })
+        logger.check(f"type: {media_type}")
+        logger.check(f"{type(media)}")
+        return send_file(media, media_type)
     except Exception as e: 
         logger.error(e)
         return abort(400, 'unable to process')
@@ -25,7 +25,7 @@ def get_resized_fit_media(id,size):
 def get_resized_media(id,size):
     try:
         logger.api(f"id: {id}, size: {stringify(size)}")
-        media, media_type = mediaDomain.get_resized_media(id, {"width": int(size.split("x")[0]) , "height": int(size.split("x")[1]) })
+        media, media_type = mediaDomain.get_cropped_media(id, {"width": int(size.split("x")[0]) , "height": int(size.split("x")[1]) })
         logger.check(f"type: {media_type}")
         logger.check(f"{type(media)}")
         return send_file(media, media_type)

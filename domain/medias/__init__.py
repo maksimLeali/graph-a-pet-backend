@@ -87,21 +87,19 @@ def get_pagination(common_search):
         logger.error(e)
         raise e
 
-def get_resized_media(id, size = { "width" : 400, "height" : 400}):
+def get_resized_to_fit_media(id, size = { "width" : 400, "height" : 400}):
     logger.domain(f"id: {id}, size: {stringify(size)}")
     try:
         media = medias_data.get_media(id)
         logger.check(media)
         with urllib.request.urlopen(media["url"]) as url:
             img = Image.open(url)
-        logger.info(img)
             
         img.thumbnail((size["width"], size["height"]),Image.ANTIALIAS)
         resized =(max(img.width, size['width']), max(img.height, size['height']))
         transparent_box = Image.new("RGBA", resized, (255, 255, 255, 0))
         draw = ImageDraw.Draw(transparent_box)
         draw.rectangle([(0, 0), resized], fill=(255, 255, 255, 0))
-        logger.info(resized)
         x = (transparent_box.width - img.width )/ 2 if transparent_box.width > img.width else 0
         y = (transparent_box.height - img.height) / 2 if transparent_box.height > img.height else 0
         
@@ -109,6 +107,32 @@ def get_resized_media(id, size = { "width" : 400, "height" : 400}):
         transparent_box.paste(img, (int(x), int(y)))
         img_io = BytesIO()
         transparent_box.save(img_io, "PNG", quality=100)
+        img_io.seek(0)
+            
+        return img_io, media["type"]
+    except Exception as e:
+        logger.error(e)
+        raise e
+
+def get_cropped_media(id, size = { "width" : 400, "height" : 400}):
+    logger.domain(f"crop ->  id: {id}, size: {stringify(size)}")
+    try:
+        media = medias_data.get_media(id)
+        with urllib.request.urlopen(media["url"]) as url:
+            img = Image.open(url)
+        max_width = max(img.width,size["width"]) 
+        max_height = max(img.height, size["height"])
+        img_resized = img.resize((max_width, max_height))
+        
+        left= (max_width - size['width'] ) // 2
+        upper = (max_height- size['height'] ) // 2
+        right = left + size['width']
+        lower = upper + size['height']
+        
+        im_cropped = img_resized.crop((left, upper,right, lower))    
+        
+        img_io = BytesIO()
+        im_cropped.save(img_io, "PNG", quality=100)
         img_io.seek(0)
             
         return img_io, media["type"]
