@@ -143,11 +143,11 @@ def get_resized_to_fit_media(id, size = { "width" : 400, "height" : 400}):
         
         
         if size["width"] <= size["height"]:
-            new_width = new_dimension
-            new_height = int(new_dimension / orig_ratio)
-        else:
             new_width = int(new_dimension * orig_ratio)
             new_height = new_dimension
+        else:
+            new_width = new_dimension
+            new_height = int(new_dimension / orig_ratio)
             
         resized =(new_width, new_height)
        
@@ -189,13 +189,13 @@ def get_cropped_media(id, size = { "width" : 400, "height" : 400}):
         new_dimension = max(max_width, max_height)
         if orig_width <= orig_height:
             logger.info("w < h")
-            new_width = int(new_dimension * orig_ratio)
-            new_height = new_dimension
-            
-        else:
-            logger.info("h < w")
             new_width = new_dimension
             new_height = int(new_dimension / orig_ratio)
+            
+        else:
+            new_width = int(new_dimension * orig_ratio)
+            new_height = new_dimension
+            logger.info("h < w")
         
         img_resized = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
         logger.info(f"width: {img_resized.width}, height: {img_resized.height}")
