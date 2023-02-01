@@ -134,33 +134,47 @@ def get_resized_to_fit_media(id, size = { "width" : 400, "height" : 400}):
         orig_ratio = orig_width / orig_height
         resized_ratio = size['width'] / size ['height']
         
-        
+        logger.info(f"original ration: {orig_ratio} \n"
+                    f"resized ration:  {resized_ratio}")
         max_width = size["width"] 
         max_height =  size["height"]
         
         logger.info(f"max_with : {max_width} max_heigth: {max_height}")
-        
         new_dimension = min(max_width, max_height)
+        new_width = new_dimension
+        new_height = int(new_dimension * orig_ratio)
+        height_diff = abs(size['height'] - img.height)
+        width_diff = abs(size['width'] - img.width)
+        if height_diff <= width_diff : 
+            logger.info('******')
+            new_height = min(size['height'], orig_height)
+            new_width = int(new_height * orig_ratio)
+
+        else :
+            logger.error('§§§§§§§§§')
+            new_width = size['width']
+            new_height = int(size['width'] / orig_ratio)
+            
         
-        
-        if size["width"] <= size["height"]:
-            if img.width < img.height :
-                logger.info('mw < mh && iw < ih')
-                new_width = new_dimension
-                new_height = int(new_dimension / orig_ratio)
-            else:
-                logger.info('mw < mh && ih < iW')
-                new_width = new_dimension
-                new_height = int(new_dimension / orig_ratio)
-        else:
-            if img.width < img.height :
-                logger.info('mh < mw && iw < ih')
-                new_width = int(new_dimension * orig_ratio)
-                new_height = new_dimension
-            else:
-                logger.info('mh < mw && ih < iW')
-                new_width =  int(new_dimension * orig_ratio)
-                new_height = new_dimension
+        # new_dimension = min(max_width, max_height)
+        # if size["width"] <= size["height"]:
+        #     if img.width <= img.height :
+        #         logger.info('mw < mh && iw < ih')
+        #         new_width = new_dimension
+        #         new_height = int(new_dimension * orig_ratio)
+        #     else:
+        #         logger.info('mw < mh && ih < iW')
+        #         new_width = new_dimension
+        #         new_height = int(new_dimension / orig_ratio)
+        # else:
+        #     if img.width < img.height :
+        #         logger.info('mh < mw && iw < ih')
+        #         new_width = int(new_dimension * orig_ratio)
+        #         new_height = new_dimension
+        #     else:
+        #         logger.info('mh < mw && ih < iW')
+        #         new_width =  int(new_dimension * orig_ratio)
+        #         new_height = new_dimension
                 
         resized =(new_width, new_height)
        
