@@ -132,63 +132,20 @@ def get_resized_to_fit_media(id, size = { "width" : 400, "height" : 400}):
             
         orig_width, orig_height = img.size
         orig_ratio = orig_width / orig_height
-        resized_ratio = size['width'] / size ['height']
-        
-        logger.info(f"original ration: {orig_ratio} \n"
-                    f"resized ration:  {resized_ratio}")
-        max_width = size["width"] 
-        max_height =  size["height"]
-        
-        logger.info(f"max_with : {max_width} max_heigth: {max_height}")
-        new_dimension = min(max_width, max_height)
-        new_width = new_dimension
-        new_height = int(new_dimension * orig_ratio)
-        height_diff = abs(size['height'] - img.height)
-        width_diff = abs(size['width'] - img.width)
-        if height_diff <= width_diff : 
-            logger.info('******')
-            new_height = min(size['height'], orig_height)
-            new_width = int(new_height * orig_ratio)
-
-        else :
-            logger.error('§§§§§§§§§')
+        if  (size['height']* orig_ratio ) > size['width'] :
             new_width = size['width']
-            new_height = int(size['width'] / orig_ratio)
-            
-        
-        # new_dimension = min(max_width, max_height)
-        # if size["width"] <= size["height"]:
-        #     if img.width <= img.height :
-        #         logger.info('mw < mh && iw < ih')
-        #         new_width = new_dimension
-        #         new_height = int(new_dimension * orig_ratio)
-        #     else:
-        #         logger.info('mw < mh && ih < iW')
-        #         new_width = new_dimension
-        #         new_height = int(new_dimension / orig_ratio)
-        # else:
-        #     if img.width < img.height :
-        #         logger.info('mh < mw && iw < ih')
-        #         new_width = int(new_dimension * orig_ratio)
-        #         new_height = new_dimension
-        #     else:
-        #         logger.info('mh < mw && ih < iW')
-        #         new_width =  int(new_dimension * orig_ratio)
-        #         new_height = new_dimension
-                
+            new_height =  int(size['width'] / orig_ratio)
+        else :
+            new_width = int(size['height'] * orig_ratio)
+            new_height = size['height'] 
+
         resized =(new_width, new_height)
-       
-        logger.info(f"box size | {(size['width'], size['height'])} \n"\
-            f"original | {(orig_width, orig_height)}\n"\
-            f"resized  | {resized}")
         img = img.resize(resized,Image.ANTIALIAS)
         transparent_box = Image.new("RGBA", (size["width"], size["height"]), (255, 255, 255, 0))
         draw = ImageDraw.Draw(transparent_box)
         draw.rectangle([(0, 0), (size["width"], size["height"])], fill=(255, 525, 255, 0))
         x = (transparent_box.width - img.width )/ 2 if transparent_box.width > img.width else 0
         y = (transparent_box.height - img.height) / 2 if transparent_box.height > img.height else 0
-        
-        
         transparent_box.paste(img, (int(x), int(y)))
         img_io = BytesIO()
         transparent_box.save(img_io, "PNG", quality=100)
@@ -209,19 +166,13 @@ def get_cropped_media(id, size = { "width" : 400, "height" : 400}):
         logger.info(f"width: {img.width}, height: {img.height}")  
         orig_width, orig_height = img.size
         orig_ratio = orig_width / orig_height
-        
-        max_width = size["width"] 
-        max_height =  size["height"] 
-        
-        new_dimension = max(max_width, max_height)
-        if abs(img.width - max_width) < abs(img.height - max_height) :
-            logger.info('mw < mh && iw < ih')
-            new_width =  int(new_dimension * orig_ratio)
-            new_height =new_dimension
-        else:
-            logger.info('mh < mw && iw < ih')
-            new_width = new_dimension 
-            new_height = int(new_dimension / orig_ratio)
+   
+        if  (size['height']* orig_ratio ) < size['width'] :
+            new_width = size['width']
+            new_height =  int(size['width'] / orig_ratio)
+        else :
+            new_width = int(size['height'] * orig_ratio)
+            new_height = size['height'] 
         
         img_resized = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
         logger.info(f"width: {img_resized.width}, height: {img_resized.height}")
