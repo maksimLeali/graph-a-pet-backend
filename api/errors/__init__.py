@@ -3,19 +3,19 @@ from libs.telegram import send_message_to_admin
 from libs.utils import get_request_user
 from config import cfg
 class BadRequest(Exception):
-    extension= {"code": "400", "extra": None}
+    extension= {"code": 400, "extra": None}
 
 class AuthenticationError(Exception):
-    extensions = {"code": "401", "extra": None}
+    extensions = {"code": 401, "extra": None}
 
 class ForbiddenError(Exception):
-    extension = {"code" : "403" , "extra": None}
+    extension = {"code" : 403 , "extra": None}
 
 class NotFoundError(Exception):
-    extension = {"code" : "404", "extra": None}
+    extension = {"code" : 404, "extra": None}
     
 class InternalError(Exception):
-    extension ={"code": "500", "extra": None}
+    extension ={"code": 500, "extra": None}
 
 errors_types=[AuthenticationError, ForbiddenError, NotFoundError, InternalError, BadRequest]
 

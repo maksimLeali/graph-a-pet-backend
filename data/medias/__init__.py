@@ -88,6 +88,8 @@ def get_media(id):
     try:
         media = Media.query.get(id)
         logger.check(media)
+        if media == None :
+            raise NotFoundError('media_not_found')
         return media.to_dict()
     except Exception as e:
         logger.error(e)

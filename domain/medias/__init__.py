@@ -192,3 +192,17 @@ def get_cropped_media(id, size = { "width" : 400, "height" : 400}):
     except Exception as e:
         logger.error(e)
         raise e
+    
+def get_media_file(id): 
+    logger.domain(f'id: {id}')
+    try: 
+        media = medias_data.get_media(id)
+        with urllib.request.urlopen(media["url"]) as url:
+            img = Image.open(url)
+        img_io = BytesIO()
+        img.save(img_io, "PNG", quality=100)
+        img_io.seek(0)
+        return img_io, media["type"]
+    except Exception as e:
+        logger.error(e)
+        raise e
