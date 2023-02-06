@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 from sqlalchemy.exc import ProgrammingError
-from sqlalchemy import select, text
+from sqlalchemy import select, text, Table, MetaData
 
 from repository import db
 from utils.logger import logger, stringify
@@ -62,6 +62,19 @@ def get_total_items(common_search):
     except ProgrammingError as e: 
         logger.error(e)
         raise BadRequest('malformed variables_fields')
+    except Exception as e:
+        logger.error(e)
+        raise e
+    
+def restore_memoriae(id):
+    try:
+        memoriae = get_damnatio_memoriae(id)
+        metadata = MetaData()
+        table = Table(memoriae.get('original_tale'), metadata, autoload=True, autoload_with)
+        logger.check(f"found {stringify(memoriae)}")
+        db.session.execute(table.insert().values(**memoriae.get('original_data')))
+        db.session.commit()
+        return memoriae
     except Exception as e:
         logger.error(e)
         raise e

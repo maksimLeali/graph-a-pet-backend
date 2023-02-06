@@ -48,6 +48,7 @@ type Mutation {
     updateTreatment(id: ID!, data: TreatmentUpdate!): TreatmentResult!
     updateMedia(id:ID!, data: MediaUpdate!): MediaResult!
     createMedia(data: MediaCreate!): MediaResult!
+    restoreMemoriae(id:ID!): DamnatioMemoriaeResult
 }
 
 scalar Upload

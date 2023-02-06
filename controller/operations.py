@@ -25,6 +25,7 @@ from controller.treatments.mutations import *
 from controller.treatments.resolvers import treatment
 from controller.statistics.queries import * 
 from controller.damnationes_memoriae.queries import * 
+from controller.damnationes_memoriae.mutation import * 
 from domain import refresh_token
 from controller.middlewares import auth_middleware
 
@@ -87,5 +88,6 @@ mutation.set_field("createTreatment", create_treatment_resolver)
 mutation.set_field("updateTreatment", update_treatment_resolver)
 mutation.set_field("updateMedia", update_media_resolver)
 mutation.set_field("createMedia", create_media_resolver)
+mutation.set_field("restoreMemoriae", restore_memoriae_resolver)
 
 object_types = [query, mutation, user, pet, ownership, pet_body, coat, health_card, treatment]
