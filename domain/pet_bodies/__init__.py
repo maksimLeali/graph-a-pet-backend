@@ -1,7 +1,7 @@
-import data.pet_bodies as pet_bodies_data
+import repository.pet_bodies as pet_bodies_data
 import domain.pets as pets_domain
 import domain.coats as coats_domain
-from libs.logger import logger, stringify
+from utils.logger import logger, stringify
 import pydash as py_
 
 def get_pet(obj,info):

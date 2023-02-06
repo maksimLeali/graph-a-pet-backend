@@ -27,7 +27,7 @@ type Mutation {
     createUser(data: UserCreate!): UserResult!
     signUp(data: UserCreate!): UserResult!
     updateUser(id: ID!, data: UserUpdate!): UserResult!
-    deleteUser(id: ID!, soft: Boolean = true): DefaultResult!
+    deleteUser(id: ID!): DefaultResult!
     updateMe( data: UserUpdate!): UserResult!
     createPet(data: PetCreate!): PetResult!
     updatePet(id: ID!, data: PetUpdate!): PetResult!

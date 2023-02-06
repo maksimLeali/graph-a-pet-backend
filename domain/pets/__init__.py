@@ -1,11 +1,11 @@
 from ariadne import convert_kwargs_to_snake_case
-import data.pets as pets_data
+import repository.pets as pets_data
 import domain.ownerships as ownerships_domain
 import domain.pet_bodies as pet_bodies_domain
-from libs.logger import logger, stringify
-from libs.utils import format_common_search
+from utils.logger import logger, stringify
+from utils import format_common_search
 from math import ceil
-from api.errors import InternalError
+from controller.errors import InternalError
 import pydash as py_
 
 @convert_kwargs_to_snake_case

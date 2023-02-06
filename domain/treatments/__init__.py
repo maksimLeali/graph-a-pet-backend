@@ -1,10 +1,10 @@
-from api.errors import NotFoundError
+from controller.errors import NotFoundError
 from ariadne import convert_kwargs_to_snake_case
-import data.treatments as treatments_data
-from data.treatments.models import FrequencyUnit
+import repository.treatments as treatments_data
+from repository.treatments.models import FrequencyUnit
 import domain.health_cards as health_cards_domain
-from libs.logger import logger, stringify
-from libs.utils import format_common_search
+from utils.logger import logger, stringify
+from utils import format_common_search
 from math import ceil
 import pydash as py_
 import pendulum as pdl

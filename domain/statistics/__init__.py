@@ -1,9 +1,9 @@
 from enum import Enum
-from data.pets import get_all_pets
-import data.statistics as statistics_data
+from repository.pets import get_all_pets
+import repository.statistics as statistics_data
 from math import ceil
-from data.users import get_all_active_users, get_all_users
-from libs.logger import logger, stringify
+from repository.users import get_all_active_users, get_all_users
+from utils.logger import logger, stringify
 from datetime import datetime
 import pendulum
 import pydash as py_

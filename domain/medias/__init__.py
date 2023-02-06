@@ -1,17 +1,17 @@
 from io import BytesIO
-import data.medias as medias_data
-from libs.logger import logger, stringify
+import repository.medias as medias_data
+from utils.logger import logger, stringify
 
 from math import ceil
-from api.errors import BadRequest
-from libs.firebase.storage import upload_image
+from controller.errors import BadRequest
+from utils.firebase.storage import upload_image
 import os
 # from config import cfg
 from PIL import Image, ImageDraw
 import urllib.request
 
 from werkzeug.utils import secure_filename
-from libs.utils import allowed_files
+from utils import allowed_files
 
 def upload_media(file):
     try: 

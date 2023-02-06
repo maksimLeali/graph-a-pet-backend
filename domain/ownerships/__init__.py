@@ -1,8 +1,8 @@
-import data.ownerships as ownerships_data
+import repository.ownerships as ownerships_data
 import domain.users as users_domain
 import domain.pets as pets_domain
-from api.errors import InternalError
-from libs.logger import logger, stringify
+from controller.errors import InternalError
+from utils.logger import logger, stringify
 from math import ceil
 
 def get_pet(obj,info):

@@ -1,9 +1,9 @@
 
-import data.health_cards as health_cards_data
+import repository.health_cards as health_cards_data
 import domain.pets as pets_domain
 import domain.treatments as treatments_domain
-from api.errors import NotFoundError
-from libs.logger import logger, stringify
+from controller.errors import NotFoundError
+from utils.logger import logger, stringify
 from math import ceil
 
 def get_pet(obj,info):

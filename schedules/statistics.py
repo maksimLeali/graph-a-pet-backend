@@ -1,8 +1,8 @@
 
 from domain.statistics import get_real_time_statistic
-from libs.cron import ee
-from libs.logger import logger, stringify
-from data.statistics import create_statistic
+from utils.cron import ee
+from utils.logger import logger, stringify
+from repository.statistics import create_statistic
 
 @ee.on('cron:hourly')
 def save_daily_users_activity():
