@@ -4,7 +4,7 @@ from math import ceil
 from time import time
 from utils.logger import logger, stringify
 from controller.errors import AuthenticationError, InternalError, NotFoundError
-import repository.damnatio_memoriae as damnatio
+import repository.damnationes_memoriae as damnatio
 from repository.ownerships.models import CustodyLevel
 import domain.pets as pets_domain
 import domain.ownerships as ownerships_domain

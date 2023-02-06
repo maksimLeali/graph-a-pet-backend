@@ -3,7 +3,7 @@ from repository import db
 from datetime import datetime
 
 
-class DamnatioMemoriae(db.Model):
+class DamnationesMemoriae(db.Model):
     id = db.Column(db.String, primary_key=True)
     original_table =  db.Column(db.String)
     created_at =  db.Column(db.DateTime, default= datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'))
@@ -12,6 +12,6 @@ class DamnatioMemoriae(db.Model):
         return  {
             "id":  self.id,
             "created_at":  str(self.created_at),
-            "origina_table": self.original_table,
+            "original_table": self.original_table,
             "original_data":  self.original_data,
         }

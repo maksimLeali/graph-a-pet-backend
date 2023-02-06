@@ -1,3 +1,5 @@
+scalar JSON
+
 schema {
     query: Query
     mutation: Mutation
@@ -20,6 +22,8 @@ type Query {
     getDashboard: DashboardResult!
     getRealTimeStatistic: RealTimeStatisticResult!
     getGroupedStatistics(date_from: String!, date_to: String, group: String ): StatisticsResult!
+    getDamnatioMemoriae(id: ID!): DamnatioMemoriaeResult
+    listDamnationesMemoriae(commonSearch: CommonSearch= {}): PaginatedDamnationesMemoriae
     
 }
 
@@ -154,6 +158,13 @@ type User {
     profile_picture: Media
 }
 
+type DamnatioMemoriae {
+    id: ID!
+    created_at: String!
+    original_table: String!
+    original_data: JSON
+}
+
 type Coat {
     id: ID!
     name: String!
@@ -214,6 +225,12 @@ type UserResult {
     success: Boolean!
     error: Error
     user: User
+}
+
+type DamnatioMemoriaeResult {
+    success: Boolean!
+    error: Error
+    DamnatioMemoriae: DamnatioMemoriae
 }
 
 type StatisticResult {
@@ -280,6 +297,13 @@ type PaginatedUsers {
     success: Boolean
     error: Error
     items: [User]!
+    pagination: Pagination!
+}
+
+type PaginatedDamnationesMemoriae{
+    success: Boolean!
+    error: Error
+    items: [DamnatioMemoriae]!
     pagination: Pagination!
 }
 

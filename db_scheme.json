@@ -44,16 +44,25 @@
     "treatments": {
         "search_columns": ["logs", "name"],
         "alias": "tr",
-        "other_table_ref": "treatment_id"
+        "other_table_ref": "treatment_id",
+        "children": []
     },
     "medias": {
         "search_columns": ["url"],
         "alias": "md",
-        "other_table_ref": "media_id"
+        "other_table_ref": "media_id",
+        "children": []
     },
     "statistics": {
         "search_columns": [],
         "alias": "sts",
-        "other_table_ref": "statistic_id"
+        "other_table_ref": "statistic_id",
+        "children": []
+    },
+    "damnationes_memoriae": {
+        "search_columns": [],
+        "alias": "dtm",
+        "other_table_ref": "damnatio_memoriae_id",
+        "children": []
     }
 }

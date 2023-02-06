@@ -7,4 +7,4 @@ from .health_cards.models import *
 from .treatments.models import *
 from .medias.models import *
 from .statistics.models import *
-from .damnatio_memoriae.models import *
+from .damnationes_memoriae.models import *
