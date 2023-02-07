@@ -48,7 +48,7 @@ type Mutation {
     updateTreatment(id: ID!, data: TreatmentUpdate!): TreatmentResult!
     updateMedia(id:ID!, data: MediaUpdate!): MediaResult!
     createMedia(data: MediaCreate!): MediaResult!
-    restoreMemoriae(id:ID!): DamnatioMemoriaeResult
+    restoreMemoriae(id:ID!): RestoredResult
 }
 
 scalar Upload
@@ -232,6 +232,12 @@ type DamnatioMemoriaeResult {
     success: Boolean!
     error: Error
     DamnatioMemoriae: DamnatioMemoriae
+}
+
+type RestoredResult {
+    success: Boolean!
+    error: Error
+    restored: JSON
 }
 
 type StatisticResult {

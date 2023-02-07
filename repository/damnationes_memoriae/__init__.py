@@ -7,7 +7,7 @@ from repository import db
 from utils.logger import logger, stringify
 from repository.damnationes_memoriae.models import DamnationesMemoriae
 from controller.errors import BadRequest
-from repository.query_builder import build_count,  build_query
+from repository.query_builder import build_count,  build_query, build_restore
 
 
 def create_damnatio_memoriae(data):
@@ -69,12 +69,11 @@ def get_total_items(common_search):
 def restore_memoriae(id):
     try:
         memoriae = get_damnatio_memoriae(id)
-        metadata = MetaData()
-        table = Table(memoriae.get('original_tale'), metadata, autoload=True, autoload_with)
         logger.check(f"found {stringify(memoriae)}")
-        db.session.execute(table.insert().values(**memoriae.get('original_data')))
+        query = build_restore(memoriae['original_table'], memoriae['original_data'])
+        db.session.execute(query)
         db.session.commit()
-        return memoriae
+        return memoriae['original_data']
     except Exception as e:
         logger.error(e)
         raise e
