@@ -1,7 +1,9 @@
 from ariadne import convert_kwargs_to_snake_case
-from domain.pets import create_pet, update_pet
+from domain.pets import create_pet, update_pet, delete_pet
 from utils.logger import logger, stringify
 from controller.errors import format_error
+from repository.users.models import UserRole
+from controller.middlewares import min_role
 
 
 @convert_kwargs_to_snake_case
@@ -39,5 +41,24 @@ def update_pet_resolver(obj, info, id, data):
         payload = {
             "success": False,
             "errors": format_error(e)
+        }
+    return payload
+
+@convert_kwargs_to_snake_case
+@min_role(UserRole.ADMIN.name)
+def delete_pet_resolver(obj, info, id):
+    logger.controller(f"id{id}  remove")
+    logger.check('here in api level')
+    try: 
+        memoriae_id = delete_pet(id)
+        payload= {
+            "success": True,
+            "id": memoriae_id
+        }  
+    except Exception as e: 
+        logger.error(e)
+        payload = {
+            "success": False,
+            "error": format_error(e)
         }
     return payload

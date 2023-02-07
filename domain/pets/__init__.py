@@ -2,6 +2,7 @@ from ariadne import convert_kwargs_to_snake_case
 import repository.pets as pets_data
 import domain.ownerships as ownerships_domain
 import domain.pet_bodies as pet_bodies_domain
+import repository.damnationes_memoriae as damnatio
 from utils.logger import logger, stringify
 from utils import format_common_search
 from math import ceil
@@ -96,3 +97,14 @@ def get_pagination(common_search):
     except Exception as e:
         logger.error(e)
         raise Exception(e)
+
+def delete_pet(id, ):
+    logger.domain(f"id {id} remove ")
+    try: 
+        pet = pets_data.get_pet(id)
+        memoriae_id = damnatio.create_damnatio_memoriae({"original_data": pet, 'original_table': 'pets'})
+        pets_data.delete_pet(id)
+        return memoriae_id
+    except Exception as e:
+        logger.error(e)
+        raise e

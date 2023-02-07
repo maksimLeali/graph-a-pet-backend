@@ -126,3 +126,16 @@ def get_pet(id):
     except Exception as e:
         logger.error(e)
         raise e
+
+def delete_pet(id, ):
+    logger.repository(f"id: {id}  remove")
+    try: 
+        pet_model = db.session.query(Pet).filter(Pet.id == id)
+        if not pet_model:
+            raise NotFoundError(f"no pet found with id: {id}")
+        pet_model.delete()
+        db.session.commit()
+        logger.check(f"deleted {id}")
+    except Exception as e: 
+        logger.error(e)
+        raise e
