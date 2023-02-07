@@ -237,6 +237,7 @@ type DamnatioMemoriaeResult {
 type RestoredResult {
     success: Boolean!
     error: Error
+    table: String
     restored: JSON
 }
 

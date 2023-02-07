@@ -88,9 +88,9 @@ def get_pagination(common_search):
 def restore_memoriae(id):
     logger.domain(f"restoring {id}")
     try:   
-        restored= damnationes_memoriae_data.restore_memoriae(id)
+        restored, table= damnationes_memoriae_data.restore_memoriae(id)
         logger.check(f"restored {stringify(restored)}")
-        return restored
+        return restored, table
     except Exception as e: 
         logger.error(e)
         raise e

@@ -73,7 +73,7 @@ def restore_memoriae(id):
         query = build_restore(memoriae['original_table'], memoriae['original_data'])
         db.session.execute(query)
         db.session.commit()
-        return memoriae['original_data']
+        return memoriae['original_data'], memoriae['original_table']
     except Exception as e:
         logger.error(e)
         raise e

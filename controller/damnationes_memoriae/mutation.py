@@ -6,9 +6,10 @@ from utils.logger import logger
 def restore_memoriae_resolver(obj, info, id,):
     logger.controller(f"restoring {id}")
     try:
-        restored = restore_memoriae(id)
+        restored, table = restore_memoriae(id)
         payload = {
             "success": True,
+            "table": table ,
             "restored": restored
         }
     except AttributeError:  # todo not found
