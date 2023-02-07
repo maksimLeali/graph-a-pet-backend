@@ -1,5 +1,7 @@
 import uuid
 from datetime import datetime
+import psycopg2
+import sqlalchemy
 from sqlalchemy.exc import ProgrammingError
 from sqlalchemy import select, text, Table, MetaData
 
@@ -74,6 +76,13 @@ def restore_memoriae(id):
         db.session.execute(query)
         db.session.commit()
         return memoriae['original_data'], memoriae['original_table']
+    except sqlalchemy.exc.IntegrityError as e:
+        if 'psycopg2.errors.UniqueViolation' in str(e):
+            message = f'could not resotre {memoriae["original_data"]["id"]} to {memoriae["original_table"]} becouse it already exist'
+        else : 
+            message= str(e.orig)
+        logger.error(message)
+        raise BadRequest(message)
     except Exception as e:
         logger.error(e)
         raise e

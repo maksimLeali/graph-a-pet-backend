@@ -262,13 +262,27 @@ def build_query(table: str,pagination: dict = {"page_size" : 20, "page": 0}, ord
     except Exception as e: 
         logger.error(e)
         raise e
-    
+
+def format_values_to_restore(data):
+    formatted_values = []
+    for value in data.values():
+        if isinstance(value, str) and value != 'NULL':
+            formatted_value = f"'{value}'"
+        else:
+            formatted_value = str(value)
+        formatted_values.append(formatted_value)
+    return formatted_values
+
+
 def build_restore(table, data):
     if not table in tables_common_properties:
         raise BadRequest(f'no table {table} was found')
+    
     parsed_data = { k: "NULL" if v is None else v for k,v in data.items() }
-
-    query = f"INSERT INTO \n\t{table} ({','.join( py_.keys(parsed_data))})\n"\
-         "VALUES \n\t(" + ','.join(py_.map_(parsed_data.values(), lambda v: f'\'{v}\'' if isinstance(v, str) and not v == 'NULL' else str(v))) + ")"
+    keys = py_.keys(parsed_data)
+    values = format_values_to_restore(parsed_data)
+    
+    query = f"INSERT INTO \n\t{table} ({','.join(keys)})\n"\
+         "VALUES \n\t(" + ','.join(values) + ")"
     logger.check(query)
     return query

@@ -1,6 +1,7 @@
 from ariadne import convert_kwargs_to_snake_case
 from domain.damnationes_memoriae import restore_memoriae
 from utils.logger import logger
+from controller.errors import format_error
 
 @convert_kwargs_to_snake_case
 def restore_memoriae_resolver(obj, info, id,):
@@ -12,9 +13,11 @@ def restore_memoriae_resolver(obj, info, id,):
             "table": table ,
             "restored": restored
         }
-    except AttributeError:  # todo not found
+    except Exception as e:  # todo not found
+        logger.error(e)
+        
         payload = {
             "success": False,
-            "errors": ["item matching id {id} not found"]
+            "error": format_error(e)
         }
     return payload
