@@ -6,7 +6,7 @@ import repository.damnationes_memoriae as damnatio
 from utils.logger import logger, stringify
 from utils import format_common_search
 from math import ceil
-from controller.errors import InternalError
+
 import pydash as py_
 
 @convert_kwargs_to_snake_case
