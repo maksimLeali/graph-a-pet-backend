@@ -8,7 +8,7 @@ from sqlalchemy import select, text, Table, MetaData
 from repository import db
 from utils.logger import logger, stringify
 from repository.damnationes_memoriae.models import DamnationesMemoriae
-from controller.errors import BadRequest
+from controller.errors import BadRequest, NotFoundError
 from repository.query_builder import build_count,  build_query, build_restore
 
 
@@ -24,7 +24,7 @@ def create_damnatio_memoriae(data):
         )
         db.session.add(damnatio_memoriae)
         db.session.commit()
-        return damnatio_memoriae.to_dict()
+        return damnatio_memoriae.to_dict()['id']
     except Exception as e:
         logger.error(e)
         raise e
@@ -32,7 +32,12 @@ def create_damnatio_memoriae(data):
 def get_damnatio_memoriae(id):
     logger.repository(f"fetching {id}")
     try :
-        return DamnationesMemoriae.query.get(id).to_dict()    
+        memoriae_model= DamnationesMemoriae.query.get(id) 
+        if not memoriae_model:
+                raise NotFoundError(f"no memory found with id: {id}")
+        memoriae= memoriae_model.to_dict()
+        logger.check(memoriae)
+        return memoriae
     except Exception as e: 
         logger.error(e)
         raise e
@@ -75,6 +80,7 @@ def restore_memoriae(id):
         query = build_restore(memoriae['original_table'], memoriae['original_data'])
         db.session.execute(query)
         db.session.commit()
+        delete_memoriae(id)
         return memoriae['original_data'], memoriae['original_table']
     except sqlalchemy.exc.IntegrityError as e:
         if 'psycopg2.errors.UniqueViolation' in str(e):
@@ -84,5 +90,18 @@ def restore_memoriae(id):
         logger.error(message)
         raise BadRequest(message)
     except Exception as e:
+        logger.error(e)
+        raise e
+    
+def delete_memoriae(id):
+    logger.repository(f"id: {id}  remove")
+    try: 
+        memoriae_model = db.session.query(DamnationesMemoriae).filter(DamnationesMemoriae.id == id)
+        if not memoriae_model:
+            raise NotFoundError(f"no memory found with id: {id}")
+        memoriae_model.delete()
+        db.session.commit()
+        logger.check(f"deleted {id}")
+    except Exception as e: 
         logger.error(e)
         raise e

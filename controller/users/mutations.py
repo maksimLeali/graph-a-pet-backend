@@ -168,14 +168,15 @@ def delete_user_resolver(obj, info, id):
     logger.controller(f"id{id}  remove")
     logger.check('here in api level')
     try: 
-        delete_user(id)
+        memoriae_id =delete_user(id)
         payload= {
             "success": True,
+            "id": memoriae_id
         }  
     except Exception as e: 
         logger.error(e)
         payload = {
             "success": False,
-            "errors": format_error(e)
+            "error": format_error(e)
         }
     return payload

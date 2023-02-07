@@ -93,9 +93,9 @@ def delete_user(id, ):
     logger.domain(f"id {id} remove ")
     try: 
         user = users_data.get_user(id)
-        damnatio.create_damnatio_memoriae({"original_data": user, 'original_table': 'users'})
-        # users_data.delete_user(id)
-        
+        memoriae_id = damnatio.create_damnatio_memoriae({"original_data": user, 'original_table': 'users'})
+        users_data.delete_user(id)
+        return memoriae_id
     except Exception as e:
         logger.error(e)
         raise e

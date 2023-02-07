@@ -31,7 +31,7 @@ type Mutation {
     createUser(data: UserCreate!): UserResult!
     signUp(data: UserCreate!): UserResult!
     updateUser(id: ID!, data: UserUpdate!): UserResult!
-    deleteUser(id: ID!): DefaultResult!
+    deleteUser(id: ID!): DeleteResult!
     updateMe( data: UserUpdate!): UserResult!
     createPet(data: PetCreate!): PetResult!
     updatePet(id: ID!, data: PetUpdate!): PetResult!
@@ -442,6 +442,12 @@ type Treatment {
 
 type DefaultResult {
     success: Boolean
+    error: Error
+}
+
+type DeleteResult {
+    success: Boolean
+    id: ID
     error: Error
 }
 
