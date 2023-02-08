@@ -76,3 +76,18 @@ def get_total_items(common_search):
 
 def get_ownership(id):
     return Ownership.query.get(id).to_dict()    
+
+
+def delete_ownership(id, ):
+    logger.repository(f"id: {id}  remove")
+    try: 
+        ownership_model = db.session.query(Ownership).filter(Ownership.id == id)
+        if not ownership_model:
+            raise NotFoundError(f"no ownership found with id: {id}")
+        ownership_model.delete()
+        db.session.commit()
+        logger.check(f"deleted {id}")
+    except Exception as e: 
+        logger.error(e)
+        raise e
+    

@@ -36,6 +36,7 @@ type Mutation {
     createPet(data: PetCreate!): PetResult!
     updatePet(id: ID!, data: PetUpdate!): PetResult!
     deletePet(id: ID!): DeleteResult!
+    deleteOwnership(id: ID!): DeleteResult!
     updateOwnership(id: ID!, data: OwnershipUpdate!): OwnershipResult!
     login(email: String!, password: String!):NewTokenResult!
     logout: Boolean!

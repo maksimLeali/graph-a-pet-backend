@@ -4,11 +4,12 @@ import pydash as py_
 from sqlalchemy import select, text
 from sqlalchemy.exc import ProgrammingError
 from .models import Pet, Gender
-from repository import db
+from repository import db, inspector
 from repository.query_builder import build_query, build_count
 from utils import camel_to_snake
 from utils.logger import logger, stringify
 from controller.errors import NotFoundError, BadRequest
+
 
 
 def build_where(filters) -> str:
@@ -139,3 +140,7 @@ def delete_pet(id, ):
     except Exception as e: 
         logger.error(e)
         raise e
+    
+
+        
+

@@ -1,5 +1,9 @@
 from ariadne import convert_kwargs_to_snake_case
-from domain.ownerships import create_ownership, update_ownership
+from controller.errors import format_error
+from controller.middlewares import min_role
+from domain.ownerships import create_ownership, update_ownership, delete_ownership
+from repository.users.models import UserRole
+from utils.logger import logger
 
 @convert_kwargs_to_snake_case
 def update_ownership_resolver(obj, info, id, data):
@@ -13,5 +17,23 @@ def update_ownership_resolver(obj, info, id, data):
         payload = {
             "success": False,
             "errors": ["item matching id {id} not found"]
+        }
+    return payload
+
+@convert_kwargs_to_snake_case
+@min_role(UserRole.ADMIN.name)
+def delete_ownership_resolver(obj, info, id):
+    logger.controller(f"id{id}  remove")
+    try: 
+        memoriae_id = delete_ownership(id)
+        payload= {
+            "success": True,
+            "id": memoriae_id
+        }  
+    except Exception as e: 
+        logger.error(e)
+        payload = {
+            "success": False,
+            "error": format_error(e)
         }
     return payload

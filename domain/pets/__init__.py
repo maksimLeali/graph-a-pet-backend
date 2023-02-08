@@ -3,6 +3,7 @@ import repository.pets as pets_data
 import domain.ownerships as ownerships_domain
 import domain.pet_bodies as pet_bodies_domain
 import repository.damnationes_memoriae as damnatio
+import domain.damnationes_memoriae as damnatio_domain
 from utils.logger import logger, stringify
 from utils import format_common_search
 from math import ceil
@@ -102,9 +103,7 @@ def delete_pet(id, ):
     logger.domain(f"id {id} remove ")
     try: 
         pet = pets_data.get_pet(id)
-        memoriae_id = damnatio.create_damnatio_memoriae({"original_data": pet, 'original_table': 'pets'})
-        pets_data.delete_pet(id)
-        return memoriae_id
+        return damnatio_domain.delete_row(id, 'pets', pet)
     except Exception as e:
         logger.error(e)
         raise e

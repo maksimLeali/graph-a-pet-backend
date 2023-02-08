@@ -1,68 +1,106 @@
 {
-    "users": {
-        "search_columns": [
-            "first_name",
-            "last_name",
-            "email"
-        ],
-        "alias": "us",
-        "other_table_ref": "user_id",
-        "children": ["ownerships"]
-    },
-    "pets": {
-        "search_columns": [
-            "name"
-        ],
-        "alias": "pt",
-        "other_table_ref": "pet_id",
-        "children": ["ownerships", "health_cards"]
-    },
-    "pet_bodies": {
-        "search_columns": ["breed"],
-        "alias": "ptb",
-        "other_table_ref": "body_id",
-        "children": ["pets"]
-    },
-    "coats": {
-        "search_columns": ["pattern"],
-        "alias": "ct",
-        "other_table_ref": "coat_id",
-        "children": ["pet_bodies"]
-    },
-    "ownerships": {
-        "search_columns": ["custody_level"],
-        "alias": "ow",
-        "other_table_ref": "ownership_id",
-        "children": []
-    },
-    "health_cards": {
-        "search_columns": ["logs"],
-        "alias": "hlc",
-        "other_table_ref": "health_card_id",
-        "children": ["treatments"]
-    },
-    "treatments": {
-        "search_columns": ["logs", "name"],
-        "alias": "tr",
-        "other_table_ref": "treatment_id",
-        "children": []
-    },
-    "medias": {
-        "search_columns": ["url"],
-        "alias": "md",
-        "other_table_ref": "media_id",
-        "children": []
-    },
-    "statistics": {
-        "search_columns": [],
-        "alias": "sts",
-        "other_table_ref": "statistic_id",
-        "children": []
-    },
-    "damnationes_memoriae": {
-        "search_columns": [],
-        "alias": "dtm",
-        "other_table_ref": "damnatio_memoriae_id",
-        "children": []
-    }
+	"users": {
+		"search_columns": [
+			"first_name",
+			"last_name",
+			"email"
+		],
+		"alias": "us",
+		"other_table_ref": "user_id",
+		"children": [
+			"ownerships"
+		]
+	},
+	"pets": {
+		"search_columns": [
+			"name"
+		],
+		"alias": "pt",
+		"other_table_ref": "pet_id",
+		"children": [
+			"ownerships",
+			"health_cards"
+		]
+	},
+	"pet_bodies": {
+		"search_columns": [
+			"breed"
+		],
+		"alias": "ptb",
+		"other_table_ref": "body_id",
+		"children": [
+			"pets"
+		]
+	},
+	"coats": {
+		"search_columns": [
+			"pattern"
+		],
+		"alias": "ct",
+		"other_table_ref": "coat_id",
+		"children": [
+			"pet_bodies"
+		]
+	},
+	"ownerships": {
+		"search_columns": [
+			"custody_level"
+		],
+		"alias": "ow",
+		"other_table_ref": "ownership_id",
+		"children": [
+
+		]
+	},
+	"health_cards": {
+		"search_columns": [
+			"logs"
+		],
+		"alias": "hlc",
+		"other_table_ref": "health_card_id",
+		"children": [
+			"treatments"
+		]
+	},
+	"treatments": {
+		"search_columns": [
+			"logs",
+			"name"
+		],
+		"alias": "tr",
+		"other_table_ref": "treatment_id",
+		"children": [
+
+		]
+	},
+	"medias": {
+		"search_columns": [
+			"url"
+		],
+		"alias": "md",
+		"other_table_ref": "media_id",
+		"children": [
+
+		]
+	},
+	"statistics": {
+		"search_columns": [
+
+		],
+		"alias": "sts",
+		"other_table_ref": "statistic_id",
+		"children": [
+
+		]
+	},
+	"damnationes_memoriae": {
+		"search_columns": [
+
+		],
+		"alias": "dtm",
+		"other_table_ref": "damnatio_memoriae_id",
+		"children": [
+
+		]
+	}
 }

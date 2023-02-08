@@ -20,9 +20,6 @@ def upload_image(dir, file_name):
         # Opt : if you want to make public access from the URL
         blob.make_public()
         logger.check(blob.public_url)
-        logger.check(blob)
-        logger.check(blob.metadata)
-        logger.check(blob.content_type)
         return blob.public_url, blob.content_type, blob.content_encoding, blob.size
     except Exception as e:
         logger.error(e)

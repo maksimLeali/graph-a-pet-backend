@@ -2,24 +2,27 @@ import uuid
 from datetime import datetime
 import psycopg2
 import sqlalchemy
+from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import ProgrammingError
 from sqlalchemy import select, text, Table, MetaData
 
-from repository import db
+from repository import db, inspector
 from utils.logger import logger, stringify
 from repository.damnationes_memoriae.models import DamnationesMemoriae
 from controller.errors import BadRequest, NotFoundError
-from repository.query_builder import build_count,  build_query, build_restore
-
+from repository.query_builder import build_count,  build_query, build_restore, tables_common_properties
+import pydash as py_
 
 def create_damnatio_memoriae(data):
-    logger.repository(f'putting {stringify(data)} into the damnatio memoriae')
+    logger.repository(f'putting {data} into the damnatio memoriae')
     try : 
         today = datetime.today()
         damnatio_memoriae = DamnationesMemoriae(
             id = f"{uuid.uuid4()}",
             original_data=data["original_data"], 
             original_table=data["original_table"], 
+            restore_after=data["restore_after"], 
+            restore_before=data["restore_before"], 
             created_at=today.strftime("%Y-%m-%dT%H:%M:%SZ")
         )
         db.session.add(damnatio_memoriae)
@@ -105,3 +108,52 @@ def delete_memoriae(id):
     except Exception as e: 
         logger.error(e)
         raise e
+
+def get_tables_referencing_table(table_name):
+    logger.info(f'getting al tables in which {table_name} is referenced')
+    try: 
+        table_names = py_.keys(tables_common_properties)
+        tables= []
+        for name in table_names :
+            candidates = inspector.get_foreign_keys(name)
+            for candidate in candidates :
+                if candidate['referred_table'] == table_name :
+                    logger.check(candidate)
+                    tables.append({"table": name, **candidate})
+        
+        logger.check(f"found {len(tables)} tables")
+        return tables
+    except Exception as e:
+        logger.error(e)
+        raise e
+
+def get_all_related(table):
+    try:
+        
+        # Find the tables that have a foreign key referencing the selected row
+        is_fk_in = get_tables_referencing_table(table)        
+        has_fk_in = inspector.get_foreign_keys(table)
+        
+        logger.check(f'destroy before itself {is_fk_in}')
+        logger.check(f'destroy after itself {has_fk_in}')
+        return is_fk_in,  has_fk_in, 
+    except Exception as e: 
+        logger.error(e)
+        raise e
+    
+
+
+# engine = create_engine('sqlite:///example.db')
+# metadata = MetaData(engine)
+
+# ownerships = Table('ownerships', metadata, autoload=True)
+
+# Session = sessionmaker(bind=engine)
+# session = Session()
+
+# rows = session.query(ownerships).filter(ownerships.c.user_id == '3').all()
+
+# for row in rows:
+#     print(row.id, row.user_id)
+
+# session.close()

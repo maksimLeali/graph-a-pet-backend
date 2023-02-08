@@ -4,7 +4,10 @@ import repository.damnationes_memoriae as damnationes_memoriae_data
 from math import ceil
 from repository.users import get_all_active_users, get_all_users
 from utils.logger import logger, stringify
-from datetime import datetime
+from datetime import datetime, date
+from sqlalchemy import Table, MetaData
+from repository import db
+from repository.query_builder import tables_common_properties
 import pendulum
 import pydash as py_
 
@@ -94,3 +97,47 @@ def restore_memoriae(id):
     except Exception as e: 
         logger.error(e)
         raise e
+    
+def row_to_dict(row):
+    row_dict = {column: getattr(row, column) for column in row.keys()}
+    for key, value in row_dict.items():
+        if isinstance(value, datetime) or isinstance(value, date ):
+            row_dict[key] = value.isoformat()
+    return row_dict
+    
+def delete_row(id, table, data, skip_ids= []):
+    logger.domain(f'removing {id} from {table}')
+    try:
+        destroy_before, destroy_after = damnationes_memoriae_data.get_all_related(table)
+        skip = [id, *skip_ids]
+        restore_after = []
+        restore_before = []
+        logger.warning(f"{id}, {skip_ids}")
+        for item in destroy_before : 
+            metadata = MetaData(db.get_engine())
+            linked = Table(item['table'], metadata, autoload=True)
+            rows = db.session.query(linked).filter(getattr(linked.c,tables_common_properties[table]['other_table_ref']) == id).all()
+            for row in rows:
+                if not row['id'] in skip_ids :
+                    temp_id, toskip = delete_row(row['id'], item['table'],row_to_dict(row), skip)
+                    restore_after.append(temp_id)
+                    skip= [*skip, *toskip]
+            
+        for item in destroy_after : 
+            metadata = MetaData(db.get_engine())
+            linked = Table(item['referred_table'], metadata, autoload=True)
+            current = Table(table, metadata, autoload=True)
+            rows = db.session.query(linked).filter(getattr(linked.c,"id") == getattr(current.c,item['constrained_columns'][0])).all()
+            for row in rows:
+                logger.critical(f"table: {item['referred_table']} row: {row}, id: {row['id']} , skip: {skip_ids}")
+                if not row['id'] in skip_ids :
+                    temp_id, toskip = delete_row(row['id'], item['referred_table'],row_to_dict(row), skip)
+                    restore_after.append(temp_id)
+                    skip= [*skip, *toskip]
+                    
+        memoriae_id = damnationes_memoriae_data.create_damnatio_memoriae({"original_data": data, 'original_table': table, "restore_before": restore_before, "restore_after" : restore_after})
+        return memoriae_id, skip
+    except Exception as e: 
+        logger.error(e)
+        raise e
+
