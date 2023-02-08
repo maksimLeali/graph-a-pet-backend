@@ -118,7 +118,8 @@ def delete_row(id, table, data, skip_ids= []):
             linked = Table(item['table'], metadata, autoload=True)
             rows = db.session.query(linked).filter(getattr(linked.c,tables_common_properties[table]['other_table_ref']) == id).all()
             for row in rows:
-                if not row['id'] in skip_ids :
+                logger.critical(row['id'] in skip)
+                if row['id'] not in skip :
                     temp_id, toskip = delete_row(row['id'], item['table'],row_to_dict(row), skip)
                     restore_after.append(temp_id)
                     skip= [*skip, *toskip]
@@ -130,7 +131,8 @@ def delete_row(id, table, data, skip_ids= []):
             rows = db.session.query(linked).filter(getattr(linked.c,"id") == getattr(current.c,item['constrained_columns'][0])).all()
             for row in rows:
                 logger.critical(f"table: {item['referred_table']} row: {row}, id: {row['id']} , skip: {skip_ids}")
-                if not row['id'] in skip_ids :
+                logger.critical(row['id'] in skip)
+                if row['id'] not in skip :
                     temp_id, toskip = delete_row(row['id'], item['referred_table'],row_to_dict(row), skip)
                     restore_after.append(temp_id)
                     skip= [*skip, *toskip]
