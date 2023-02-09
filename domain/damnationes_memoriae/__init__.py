@@ -107,36 +107,45 @@ def row_to_dict(row):
     
 def delete_row(id, table, data, skip_ids= []):
     logger.domain(f'removing {id} from {table}')
+    logger.critical(f'removing {id} from {table}')
     try:
-        destroy_before, destroy_after = damnationes_memoriae_data.get_all_related(table)
         skip = [id, *skip_ids]
         restore_after = []
         restore_before = []
-        logger.warning(f"{id}, {skip_ids}")
+        destroy_before, destroy_after = damnationes_memoriae_data.get_all_related(table)
+        if table=='ownerships' :
+            print('***********')
+            print('***********')
+            logger.critical(destroy_before)
+            logger.critical(destroy_after)
+            print('***********')
+            print('***********')
         for item in destroy_before : 
-            metadata = MetaData(db.get_engine())
-            linked = Table(item['table'], metadata, autoload=True)
-            rows = db.session.query(linked).filter(getattr(linked.c,tables_common_properties[table]['other_table_ref']) == id).all()
-            for row in rows:
-                logger.critical(row['id'] in skip)
-                if row['id'] not in skip :
-                    temp_id, toskip = delete_row(row['id'], item['table'],row_to_dict(row), skip)
-                    restore_after.append(temp_id)
-                    skip= [*skip, *toskip]
+            logger.warning('before')
             
+            if (tables_common_properties.get(table).get('inherit_delete').get(item['table']).get('cond') == 'all' or data[py_.keys(tables_common_properties.get(table).get('inherit_delete').get(item['table']).get('cond'))[0]] ==tables_common_properties.get(table).get('inherit_delete').get(item['table']).get('cond')[py_.keys(tables_common_properties.get(table).get('inherit_delete').get(item['table']).get('cond'))[0]] ): 
+                metadata = MetaData(db.get_engine())
+                linked = Table(item['table'], metadata, autoload=True)
+                rows = db.session.query(linked).filter(getattr(linked.c,tables_common_properties[table]['other_table_ref']) == id).all()
+                for row in rows:
+                    if row['id'] not in skip :
+                        temp_id, toskip = delete_row(row['id'], item['table'],row_to_dict(row), skip)
+                        restore_after.append(temp_id)
+                        skip= [*skip, *toskip]
         for item in destroy_after : 
             metadata = MetaData(db.get_engine())
             linked = Table(item['referred_table'], metadata, autoload=True)
-            current = Table(table, metadata, autoload=True)
-            rows = db.session.query(linked).filter(getattr(linked.c,"id") == getattr(current.c,item['constrained_columns'][0])).all()
-            for row in rows:
-                logger.critical(f"table: {item['referred_table']} row: {row}, id: {row['id']} , skip: {skip_ids}")
-                logger.critical(row['id'] in skip)
-                if row['id'] not in skip :
-                    temp_id, toskip = delete_row(row['id'], item['referred_table'],row_to_dict(row), skip)
-                    restore_after.append(temp_id)
-                    skip= [*skip, *toskip]
-                    
+            rows = db.session.query(linked).filter(getattr(linked.c,"id") == data[item['constrained_columns'][0]]).all()
+            if(table == 'ownerships') :
+                print(data[py_.keys(tables_common_properties.get(table).get('inherit_delete').get(item['referred_table']).get('cond'))[0]] )
+                print(tables_common_properties.get(table).get('inherit_delete').get(item['referred_table']).get('cond')[py_.keys(tables_common_properties.get(table).get('inherit_delete').get(item['referred_table']).get('cond'))[0]] )
+            if (tables_common_properties.get(table).get('inherit_delete').get(item['referred_table']).get('cond') == 'all' or data[py_.keys(tables_common_properties.get(table).get('inherit_delete').get(item['referred_table']).get('cond'))[0]] ==tables_common_properties.get(table).get('inherit_delete').get(item['referred_table']).get('cond')[py_.keys(tables_common_properties.get(table).get('inherit_delete').get(item['referred_table']).get('cond'))[0]] ): 
+                for row in rows:
+                    if row['id'] not in skip :
+                        temp_id, toskip = delete_row(row['id'], item['referred_table'],row_to_dict(row), skip)
+                        restore_before.append(temp_id)
+                        skip= [*skip, *toskip]
+            
         memoriae_id = damnationes_memoriae_data.create_damnatio_memoriae({"original_data": data, 'original_table': table, "restore_before": restore_before, "restore_after" : restore_after})
         return memoriae_id, skip
     except Exception as e: 

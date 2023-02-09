@@ -5,6 +5,7 @@ from time import time
 from utils.logger import logger, stringify
 from controller.errors import AuthenticationError, InternalError, NotFoundError
 import repository.damnationes_memoriae as damnatio
+import domain.damnationes_memoriae as damnatio_domain
 from repository.ownerships.models import CustodyLevel
 import domain.pets as pets_domain
 import domain.ownerships as ownerships_domain
@@ -93,9 +94,8 @@ def delete_user(id, ):
     logger.domain(f"id {id} remove ")
     try: 
         user = users_data.get_user(id)
-        memoriae_id = damnatio.create_damnatio_memoriae({"original_data": user, 'original_table': 'users'})
-        users_data.delete_user(id)
-        return memoriae_id
+        damnatio_id, skip  =damnatio_domain.delete_row(id, 'users', user)
+        return damnatio_id
     except Exception as e:
         logger.error(e)
         raise e

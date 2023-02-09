@@ -5,7 +5,7 @@ from utils import camel_to_snake
 from itertools import permutations
 from utils.logger import logger, stringify
 from config import cfg
-tables_common_properties = cfg.get('db_scheme')
+tables_common_properties = cfg.get('db_scheme').get('tables')
 
 def build_join (parent: str, join:  dict, already_joined: list, join_string: list):
     try:

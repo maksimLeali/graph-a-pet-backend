@@ -103,7 +103,8 @@ def delete_pet(id, ):
     logger.domain(f"id {id} remove ")
     try: 
         pet = pets_data.get_pet(id)
-        return damnatio_domain.delete_row(id, 'pets', pet)
+        damnatio_id, skip  =damnatio_domain.delete_row(id, 'pets', pet)
+        return damnatio_id
     except Exception as e:
         logger.error(e)
         raise e

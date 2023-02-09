@@ -136,7 +136,9 @@ def get_all_related(table):
         
         logger.check(f'destroy before itself {is_fk_in}')
         logger.check(f'destroy after itself {has_fk_in}')
-        return is_fk_in,  has_fk_in, 
+        inherit_delete = py_.keys(tables_common_properties.get(table).get('inherit_delete'))
+        logger.check(inherit_delete)
+        return py_.filter_(is_fk_in, lambda x: x['table'] in inherit_delete ),  py_.filter_(has_fk_in, lambda x: x['referred_table'] in inherit_delete ), 
     except Exception as e: 
         logger.error(e)
         raise e
