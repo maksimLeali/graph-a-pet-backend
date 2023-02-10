@@ -28,7 +28,7 @@ class Treatment(Base):
     type = db.Column(db.Enum(TreatmentType),
                      default=TreatmentType.REMINDER.name)
     health_card_id = db.Column(db.String, db.ForeignKey('health_cards.id'))
-    logs = db.Column(JSONB)
+    logs = db.Column(db.ARRAY(db.String))
     frequency_value = db.Column(db.Integer)
     frequency_unit = db.Column(db.Enum(FrequencyUnit))
     frequency_times = db.Column(db.Integer)

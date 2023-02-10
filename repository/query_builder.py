@@ -266,11 +266,18 @@ def build_query(table: str,pagination: dict = {"page_size" : 20, "page": 0}, ord
 def format_values_to_restore(data):
     formatted_values = []
     for value in data.values():
-        if isinstance(value, str) and value != 'NULL':
+        logger.info(f"value: {value} type {type(value)} {isinstance(value, list)}")
+        
+        if isinstance(value,list) : 
+            formatted_value= f'ARRAY{value}' if len(value) > 0 else 'ARRAY[]::varchar[]'
+        elif isinstance(value, dict) : 
+            formatted_value= f'{stringify(value)}::json'
+        elif isinstance(value, str) and value != 'NULL':
             formatted_value = f"'{value}'"
         else:
             formatted_value = str(value)
         formatted_values.append(formatted_value)
+    logger.error(formatted_values)
     return formatted_values
 
 

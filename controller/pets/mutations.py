@@ -1,5 +1,6 @@
 from ariadne import convert_kwargs_to_snake_case
 from domain.pets import create_pet, update_pet, delete_pet
+from utils import get_request_user
 from utils.logger import logger, stringify
 from controller.errors import format_error
 from repository.users.models import UserRole
@@ -50,7 +51,9 @@ def delete_pet_resolver(obj, info, id):
     logger.controller(f"id{id}  remove")
     logger.check('here in api level')
     try: 
-        memoriae_id = delete_pet(id)
+        token =  info.context.headers['authorization']
+        current_user = get_request_user(token)
+        memoriae_id = delete_pet(id, current_user['id'])
         payload= {
             "success": True,
             "id": memoriae_id

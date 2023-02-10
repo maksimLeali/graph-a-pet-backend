@@ -90,11 +90,11 @@ def update_user_activity(id):
         logger.error(e)
         raise e
 
-def delete_user(id, ):
+def delete_user(id, user_id ):
     logger.domain(f"id {id} remove ")
     try: 
         user = users_data.get_user(id)
-        damnatio_id, skip  =damnatio_domain.delete_row(id, 'users', user)
+        damnatio_id  =damnatio_domain.delete_row(id, 'users', user , user_id)
         return damnatio_id
     except Exception as e:
         logger.error(e)

@@ -53,7 +53,7 @@
                 "ownerships": {
                     "cond": "all"
                 },
-                "healt_cards": {
+                "health_cards": {
                     "cond": "all"
                 }
             }
@@ -113,7 +113,7 @@
             ],
             "inherit_delete": {
                 "treatments": {
-                    "cand": "all"
+                    "cond": "all"
                 }
             }
         },

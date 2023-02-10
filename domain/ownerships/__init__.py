@@ -2,7 +2,7 @@ import repository.ownerships as ownerships_data
 import domain.users as users_domain
 import domain.pets as pets_domain
 from controller.errors import InternalError
-import repository.damnationes_memoriae as damnatio
+import domain.damnationes_memoriae as damnatio_domain
 from utils.logger import logger, stringify
 from math import ceil
 
@@ -68,13 +68,12 @@ def get_pagination(common_search):
         logger.error(e)
         raise e
 
-def delete_ownership(id, ):
+def delete_ownership(id, user_id ):
     logger.domain(f"id {id} remove ")
     try: 
-        pet = ownerships_data.get_ownership(id)
+        ownership = ownerships_data.get_ownership(id)
         # pets_data.get_all_related(id)
-        memoriae_id = damnatio.create_damnatio_memoriae({"original_data": pet, 'original_table': 'ownerships'})
-        ownerships_data.delete_ownership(id)
+        memoriae_id = damnatio_domain.delete_row(id, 'ownerships', ownership ,user_id)
         return memoriae_id
     except Exception as e:
         logger.error(e)

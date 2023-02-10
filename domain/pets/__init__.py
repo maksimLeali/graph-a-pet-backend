@@ -10,6 +10,7 @@ from math import ceil
 
 import pydash as py_
 
+
 @convert_kwargs_to_snake_case
 def get_ownerships(common_search):
     logger.domain(f"common_search: {stringify(common_search)}")
@@ -99,11 +100,11 @@ def get_pagination(common_search):
         logger.error(e)
         raise Exception(e)
 
-def delete_pet(id, ):
+def delete_pet(id, user_id):
     logger.domain(f"id {id} remove ")
     try: 
         pet = pets_data.get_pet(id)
-        damnatio_id, skip  =damnatio_domain.delete_row(id, 'pets', pet)
+        damnatio_id  =damnatio_domain.delete_row(id, 'pets', pet, user_id)
         return damnatio_id
     except Exception as e:
         logger.error(e)

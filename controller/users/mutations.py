@@ -168,7 +168,9 @@ def delete_user_resolver(obj, info, id):
     logger.controller(f"id{id}  remove")
     logger.check('here in api level')
     try: 
-        memoriae_id =delete_user(id)
+        token =  info.context.headers['authorization']
+        current_user = get_request_user(token)
+        memoriae_id =delete_user(id, current_user['id'])
         payload= {
             "success": True,
             "id": memoriae_id

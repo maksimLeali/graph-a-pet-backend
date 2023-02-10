@@ -3,6 +3,7 @@ from controller.errors import format_error
 from controller.middlewares import min_role
 from domain.ownerships import create_ownership, update_ownership, delete_ownership
 from repository.users.models import UserRole
+from utils import get_request_user
 from utils.logger import logger
 
 @convert_kwargs_to_snake_case
@@ -25,7 +26,9 @@ def update_ownership_resolver(obj, info, id, data):
 def delete_ownership_resolver(obj, info, id):
     logger.controller(f"id{id}  remove")
     try: 
-        memoriae_id = delete_ownership(id)
+        token =  info.context.headers['authorization']
+        current_user = get_request_user(token)
+        memoriae_id = delete_ownership(id, current_user['id'])
         payload= {
             "success": True,
             "id": memoriae_id
