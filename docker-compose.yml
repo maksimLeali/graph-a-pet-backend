@@ -16,7 +16,7 @@ services:
             - gap-network
 
     postgres:
-        image: postgres:13-alpine
+        image: postgres:latest
         volumes:
             - postgres_data:/var/lib/postgresql/data/
         ports:
