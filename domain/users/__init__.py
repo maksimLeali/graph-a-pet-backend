@@ -30,7 +30,6 @@ def get_profile_pic(user_id: str):
         logger.error(e)
         raise e
 
-
 @convert_kwargs_to_snake_case
 def get_ownerships(common_search):
     logger.domain(f"common_search: {stringify(common_search)}")
