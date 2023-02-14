@@ -138,7 +138,6 @@ def update_treatment(id, data):
 
 def delete_boosters(treatment):
     booster_id = treatment.get('booster_id')
-    logger.warning(f'start: {booster_id} ')
     if booster_id != None:
         booster = get_treatment(booster_id)
         delete_boosters(booster)

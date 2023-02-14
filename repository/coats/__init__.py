@@ -30,9 +30,6 @@ def update_coat(id, data):
     )
     try: 
         coat_model = db.session.query(Coat).filter(Coat.id== id)
-        logger.warning(f"coat_model: {coat_model}")
-        logger.warning(f"first: {coat_model.first()}")
-
         if not coat_model:
             raise NotFoundError(f"no coat found with id: {id}")
         coat_old = coat_model.first().to_dict()

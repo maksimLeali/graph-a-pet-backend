@@ -197,8 +197,6 @@ def delete_row(id, table, data, user_id, skip_ids=[]):
                     f"skip: {skip_ids}")
         metadata = MetaData(db.get_engine())
         for item in destroy_before:
-            logger.warning("before")
-
             if should_delete(table, item['table'], data) :
                 linked = Table(item["table"], metadata, autoload=True)
                 rows = ( 
@@ -212,7 +210,7 @@ def delete_row(id, table, data, user_id, skip_ids=[]):
                             row["id"], item["table"], row_to_dict(row),user_id, skip
                         )
                         restore_after.append(temp_id)
-                        skip = [*skip, *toskip]
+                        skip = py_.uniq([*skip, *toskip])
         
 
         memoriae_id = create_damnatio_memoriae(
@@ -224,13 +222,12 @@ def delete_row(id, table, data, user_id, skip_ids=[]):
                 "deleted_by": user_id
             }
         )
-        logger.check(f"memoriae created : {memoriae_id}")
         orig_table =Table(table, metadata, autoload=True)
         stmt = orig_table.delete().where(orig_table.c.id == id)
         db.session.execute(stmt)
         db.session.commit()
+        logger.check(f"memoriae created : {memoriae_id}")
         for item in destroy_after:
-            logger.warning('after')
             if should_delete(table, item['referred_table'], data) :
                 linked = Table(item["referred_table"], metadata, autoload=True)
                 rows = (
@@ -238,7 +235,6 @@ def delete_row(id, table, data, user_id, skip_ids=[]):
                     .filter(getattr(linked.c, "id") == data[item["constrained_columns"][0]])
                     .all()
                 )
-                
                 for row in rows:
                     if row["id"] not in skip:
                         temp_id, toskip = delete_row(
@@ -246,9 +242,8 @@ def delete_row(id, table, data, user_id, skip_ids=[]):
                                 row), user_id, skip
                         )
                         restore_before.append(temp_id)
-                        skip = [*skip, *toskip]
+                        skip =  py_.uniq([*skip, *toskip])
         update_memoriae(memoriae_id, {"restore_before" : restore_before})
-        logger.check('deleted record')
         return memoriae_id, skip
     except Exception as e:
         logger.error(e)
@@ -259,8 +254,6 @@ def should_delete(base_table, related_table, data):
         "inherit_delete", {}).get(related_table, {})
     if inherit_delete.get("cond") == "all":
         return True
-    logger.info(base_table)
-    logger.info(inherit_delete.get("cond"))
     return data.get(list(inherit_delete.get("cond").keys())[0]) == list(inherit_delete.get("cond").values())[0]
 
 

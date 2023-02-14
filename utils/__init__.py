@@ -40,10 +40,8 @@ def format_deep_filters(filters: dict):
         for key in keys_to_promote : 
             filters['and'][key] = filters[key]
             del filters[key]
-        logger.warning(f"{stringify(filters)}")
         for key in filters : 
             for deep_key in filters[key]:
-                logger.warning(f"key: {key} -> deep_key: {deep_key}")
                 if deep_key in ['and', 'or', 'not' ] :
                     filters[key][deep_key] = format_deep_filters(filters[key][deep_key])[deep_key]
                 else:
