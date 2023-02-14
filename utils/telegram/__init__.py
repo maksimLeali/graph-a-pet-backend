@@ -14,5 +14,3 @@ def send_message_to_admin(msg):
         bot.sendMessage(chat_id=ADMIN_ID, text=msg)
         return
     logger.warning('Notifications via telegram disabled')
-    
-    
