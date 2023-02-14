@@ -15,7 +15,7 @@ jobs:
           username: ${{secrets.SSH_USERNAME}}
 
           script: |
-            cd app/graph-a-pet
+            cd projects/graph-a-pet-backend
             git pull
             cd alembic 
             alembic upgrade head
