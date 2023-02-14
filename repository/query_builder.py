@@ -267,7 +267,6 @@ def format_values_to_restore(data):
     formatted_values = []
     for value in data.values():
         logger.info(f"value: {value} type {type(value)} {isinstance(value, list)}")
-        
         if isinstance(value,list) : 
             formatted_value= f'ARRAY{value}' if len(value) > 0 else 'ARRAY[]::varchar[]'
         elif isinstance(value, dict) : 
