@@ -2,7 +2,6 @@ from repository import db
 
 from datetime import datetime
 
-
 class DamnationesMemoriae(db.Model):
     id = db.Column(db.String, primary_key=True)
     original_table =  db.Column(db.String)
