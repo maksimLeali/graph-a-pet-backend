@@ -279,7 +279,6 @@ def format_values_to_restore(data):
     logger.error(formatted_values)
     return formatted_values
 
-
 def build_restore(table, data):
     if not table in tables_common_properties:
         raise BadRequest(f'no table {table} was found')
