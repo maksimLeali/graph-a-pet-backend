@@ -75,8 +75,16 @@ def get_total_items(common_search):
         raise e
 
 def get_ownership(id):
-    return Ownership.query.get(id).to_dict()    
-
+    logger.repository(f"id: {id}")
+    try:
+        ownership_model = Ownership.query.get(id)
+        if not ownership_model:
+            raise NotFoundError(f"no pet found with id: {id}")
+        ownership= ownership_model.to_dict()
+        return ownership
+    except Exception as e:
+        logger.error(e)
+        raise e
 
 def delete_ownership(id, ):
     logger.repository(f"id: {id}  remove")

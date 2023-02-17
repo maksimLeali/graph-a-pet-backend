@@ -96,7 +96,7 @@
                 "pets": {
                     "cond": {
                         
-                    "custody_level": "OWNER"
+                        "eq": { "custody_level" : "OWNER"}
                         
                     }
                 }

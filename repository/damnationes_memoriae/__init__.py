@@ -254,7 +254,13 @@ def should_delete(base_table, related_table, data):
         "inherit_delete", {}).get(related_table, {})
     if inherit_delete.get("cond") == "all":
         return True
-    return data.get(list(inherit_delete.get("cond").keys())[0]) == list(inherit_delete.get("cond").values())[0]
+    condition_eq = inherit_delete.get("cond").get('eq')
+    logger.critical(condition_eq)
+    for key in list(condition_eq.keys()):
+        logger.critical(f"{key} {data[key]} {condition_eq[key]}")
+        if data[key] != condition_eq[key] :
+            return False
+    return True 
 
 
 def update_memoriae(id, data):

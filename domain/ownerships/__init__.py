@@ -72,7 +72,7 @@ def delete_ownership(id, user_id ):
     logger.domain(f"id {id} remove ")
     try: 
         ownership = ownerships_data.get_ownership(id)
-        # pets_data.get_all_related(id)
+        logger.check(stringify(ownership))
         memoriae_id = damnatio_domain.delete_row(id, 'ownerships', ownership ,user_id)
         return memoriae_id
     except Exception as e:
