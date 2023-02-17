@@ -8,7 +8,7 @@ from repository import db
 from repository.query_builder import build_query, build_count
 from utils import camel_to_snake
 from utils.logger import logger, stringify
-from controller.errors import NotFoundError, BadRequest
+from api.errors import NotFoundError, BadRequest
 
 
 def build_where(filters) -> str:

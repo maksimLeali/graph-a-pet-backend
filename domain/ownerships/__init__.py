@@ -1,7 +1,7 @@
 import repository.ownerships as ownerships_data
 import domain.users as users_domain
 import domain.pets as pets_domain
-from controller.errors import InternalError
+from api.errors import InternalError
 import domain.damnationes_memoriae as damnatio_domain
 from utils.logger import logger, stringify
 from math import ceil

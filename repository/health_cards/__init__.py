@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from repository.health_cards.models import HealthCard
 from repository import db
-from controller.errors import InternalError, NotFoundError, BadRequest
+from api.errors import InternalError, NotFoundError, BadRequest
 from utils.logger import logger, stringify
 from sqlalchemy.exc import ProgrammingError
 from repository.query_builder import build_query, build_count

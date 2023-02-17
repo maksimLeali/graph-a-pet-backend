@@ -2,8 +2,8 @@
 
 from ariadne import convert_kwargs_to_snake_case
 from domain.users import create_user, update_user, login, add_pet_to_user, delete_user
-from controller.middlewares import auth_middleware, min_role
-from controller.errors import format_error, NotFoundError
+from api.middlewares import auth_middleware, min_role
+from api.errors import format_error, NotFoundError
 from repository.users.models import UserRole
 from utils import get_request_user
 from utils.logger import logger, stringify
@@ -11,7 +11,7 @@ from utils.logger import logger, stringify
 @convert_kwargs_to_snake_case
 @min_role(UserRole.ADMIN.name)
 def create_user_resolver(obj, info, data):
-    logger.controller(f"data {stringify(data)}")
+    logger.api(f"data {stringify(data)}")
     try:
         user = create_user(data)
         payload = {
@@ -28,7 +28,7 @@ def create_user_resolver(obj, info, data):
 
 @convert_kwargs_to_snake_case
 def signup_resolver(obj, info, data):
-    logger.controller(f"data: {stringify(data)}")
+    logger.api(f"data: {stringify(data)}")
     try:
         user = create_user(data)
         payload = {
@@ -48,7 +48,7 @@ def signup_resolver(obj, info, data):
 @convert_kwargs_to_snake_case
 @min_role(UserRole.ADMIN.name)
 def update_user_resolver(obj, info, id, data):
-    logger.controller(
+    logger.api(
         f"id: {id}\n"\
         f"data: {stringify(data)}"
     )
@@ -71,7 +71,7 @@ def update_user_resolver(obj, info, id, data):
 @convert_kwargs_to_snake_case
 @min_role(UserRole.USER.name)
 def update_me_resolver(obj, info, data):
-    logger.controller(
+    logger.api(
         f"data: {stringify(data)}"
     )
     try:
@@ -95,7 +95,7 @@ def update_me_resolver(obj, info, data):
 
 @convert_kwargs_to_snake_case
 def login_resolver(obj, info, email, password):
-    logger.controller(f"email: {email}, password: {password}")
+    logger.api(f"email: {email}, password: {password}")
     try :
         token, user = login(email, password)
         payload = {
@@ -117,7 +117,7 @@ def login_resolver(obj, info, email, password):
 @convert_kwargs_to_snake_case
 @min_role(UserRole.ADMIN.name)
 def add_pet_to_user_resolver(obj, info, pet, user_id, custody_level):
-    logger.controller(
+    logger.api(
         f"user_id: {user_id}\n"\
         f"pet: {stringify(pet)}"
     )
@@ -142,7 +142,7 @@ def add_pet_to_user_resolver(obj, info, pet, user_id, custody_level):
 @convert_kwargs_to_snake_case
 @auth_middleware
 def add_pet_to_me_resolver(obj, info, pet, custody_level):
-    logger.controller(f"pet: {stringify(pet)}")
+    logger.api(f"pet: {stringify(pet)}")
     try: 
         token =  info.context.headers['authorization']
         user = get_request_user(token)
@@ -165,7 +165,7 @@ def add_pet_to_me_resolver(obj, info, pet, custody_level):
 @convert_kwargs_to_snake_case
 @min_role(UserRole.ADMIN.name)
 def delete_user_resolver(obj, info, id):
-    logger.controller(f"id{id}  remove")
+    logger.api(f"id{id}  remove")
     logger.check('here in api level')
     try: 
         token =  info.context.headers['authorization']

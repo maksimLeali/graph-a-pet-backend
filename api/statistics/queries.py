@@ -2,15 +2,15 @@ from ariadne import convert_kwargs_to_snake_case
 from graphql import GraphQLError, GraphQLResolveInfo
 import domain.statistics as statistics_domain
 from repository.users.models import UserRole
-from controller.errors import ForbiddenError, format_error, error_pagination
-from controller.middlewares import auth_middleware, min_role
+from api.errors import ForbiddenError, format_error, error_pagination
+from api.middlewares import auth_middleware, min_role
 from utils.logger import logger, stringify
 from utils import format_common_search
 
 @convert_kwargs_to_snake_case
 @min_role(UserRole.ADMIN.name)
 def list_statistics_resolver(obj, info: GraphQLResolveInfo, common_search):
-    logger.controller(f"common_search: {stringify(common_search)}")
+    logger.api(f"common_search: {stringify(common_search)}")
     common_search= format_common_search(common_search)
     try:
         statistics, pagination = statistics_domain.get_paginated_statistics(common_search)
@@ -31,7 +31,7 @@ def list_statistics_resolver(obj, info: GraphQLResolveInfo, common_search):
 @convert_kwargs_to_snake_case
 @min_role(UserRole.ADMIN.name)
 def get_statistics_by_group(obj, info, date_from, date_to, group):
-    logger.controller(f"from {date_from} to {date_to} grouped {group}")
+    logger.api(f"from {date_from} to {date_to} grouped {group}")
     try:
         statistics = statistics_domain.get_statistics_by_group(date_from, date_to, group)
         payload= {
@@ -50,7 +50,7 @@ def get_statistics_by_group(obj, info, date_from, date_to, group):
 @convert_kwargs_to_snake_case
 @min_role(UserRole.ADMIN.name)
 def get_statistic_resolver(obj, info, id):
-    logger.controller(f"id: {id}")
+    logger.api(f"id: {id}")
     try:
         statistic = statistics_domain.get_statistic(id)
         payload = {
@@ -70,7 +70,7 @@ def get_statistic_resolver(obj, info, id):
 @convert_kwargs_to_snake_case
 @min_role(UserRole.ADMIN.name)
 def get_real_time_statistic_resolver(obj, info):
-    logger.controller(f"real time statistics ")
+    logger.api(f"real time statistics ")
     try:
         statistic = statistics_domain.get_real_time_statistic()
         payload = {
@@ -91,7 +91,7 @@ def get_real_time_statistic_resolver(obj, info):
 @convert_kwargs_to_snake_case
 @min_role(UserRole.ADMIN.name)
 def dashboard_resolver(obj, info):
-    logger.controller('dashboard')
+    logger.api('dashboard')
     try: 
         dashboard = statistics_domain.get_today_statistics()
         payload = {

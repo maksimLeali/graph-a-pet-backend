@@ -1,6 +1,6 @@
 from typing import Dict
 import pydash as py_
-from controller.errors import BadRequest
+from api.errors import BadRequest
 from utils import camel_to_snake
 from itertools import permutations
 from utils.logger import logger, stringify

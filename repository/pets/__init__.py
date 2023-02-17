@@ -8,7 +8,7 @@ from repository import db, inspector
 from repository.query_builder import build_query, build_count
 from utils import camel_to_snake
 from utils.logger import logger, stringify
-from controller.errors import NotFoundError, BadRequest
+from api.errors import NotFoundError, BadRequest
 
 
 

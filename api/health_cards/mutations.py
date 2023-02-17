@@ -1,14 +1,14 @@
 from ariadne import convert_kwargs_to_snake_case
 from utils.logger import logger, stringify
-from controller.errors import format_error
+from api.errors import format_error
 
 from domain.health_cards import update_health_card, create_health_card
-from controller.middlewares import min_role, RoleLevel
+from api.middlewares import min_role, RoleLevel
 
 @convert_kwargs_to_snake_case
 @min_role(RoleLevel.USER.name)
 def update_health_card_resolver(obj, info, id, data):
-    logger.controller(
+    logger.api(
         f"id: {id}"\
         f"data: {stringify(data)}"
     )

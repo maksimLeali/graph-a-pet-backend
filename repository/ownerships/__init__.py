@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from sqlalchemy.exc import ProgrammingError
 from sqlalchemy import select, text
-from controller.errors import InternalError, BadRequest, NotFoundError
+from api.errors import InternalError, BadRequest, NotFoundError
 from repository import db
 from utils.logger import logger, stringify
 from repository.ownerships.models import Ownership

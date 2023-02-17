@@ -10,7 +10,7 @@ from repository import db, inspector
 from repository.users.models import UserRole
 from utils.logger import logger, stringify
 from repository.damnationes_memoriae.models import DamnationesMemoriae
-from controller.errors import BadRequest, NotFoundError
+from api.errors import BadRequest, NotFoundError
 from repository.query_builder import build_count,  build_query, build_restore, tables_common_properties
 import pydash as py_
 

@@ -1,6 +1,6 @@
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
-from controller import app
+from api import app
 from config import cfg 
 from sqlalchemy.engine import reflection
 

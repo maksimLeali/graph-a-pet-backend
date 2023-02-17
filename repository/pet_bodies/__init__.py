@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from repository.pet_bodies.models import PetBody
 from repository import db
-from controller.errors import InternalError, NotFoundError
+from api.errors import InternalError, NotFoundError
 from utils.logger import logger, stringify
 
 def create_pet_body(data):

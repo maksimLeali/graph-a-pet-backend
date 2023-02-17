@@ -3,7 +3,7 @@ import repository.medias as medias_data
 from utils.logger import logger, stringify
 
 from math import ceil
-from controller.errors import BadRequest
+from api.errors import BadRequest
 from utils.firebase.storage import upload_image
 import os
 # from config import cfg

@@ -1,23 +1,24 @@
 from ariadne import convert_kwargs_to_snake_case
+import domain.treatments as treatments_domain
 from utils.logger import logger, stringify
-from controller.errors import format_error, error_pagination
 from utils import format_common_search
-import domain.health_cards as health_cards_domain
-from controller.middlewares import min_role, RoleLevel
+from api.errors import InternalError, error_pagination, format_error
+from api.middlewares import min_role, RoleLevel
+
 
 @convert_kwargs_to_snake_case
 @min_role(RoleLevel.ADMIN.name)
-def list_health_cards_resolver(obj, info, common_search):
-    logger.controller(f"common_search: {stringify(common_search)}")
+def list_treatments_resolver(obj, info, common_search):
+    logger.api(f"common_search: {stringify(common_search)}")
     try:
         common_search = format_common_search(common_search)
-        health_cards, pagination = health_cards_domain.get_paginated_health_cards(common_search)
+        treatments, pagination = treatments_domain.get_paginated_treatments(common_search)
         payload = {
             "success": True,
-            "items": health_cards,
+            "items": treatments,
             "pagination": pagination,
         }
-        logger.check(f"health_cards found: {len(health_cards)}")
+        logger.check(f"treatments found: {len(treatments)}")
     except Exception as e:
         logger.error(e)
         payload = {
@@ -28,22 +29,22 @@ def list_health_cards_resolver(obj, info, common_search):
         }
     return payload
 
+
 @convert_kwargs_to_snake_case
 @min_role(RoleLevel.ADMIN.name)
-def get_health_card_resolver(obj, info, id):
-    logger.controller(f"id: {id}")
+def get_treatment_resolver(obj, info, id):
+    logger.api(f"id: {id}")
     try:
-        health_card = health_cards_domain.get_health_card(id)
+        treatment = treatments_domain.get_treatment(id)
         payload = {
             "success": True,
-            "health_card": health_card
+            "treatment": treatment
         }
-        logger.check(f"health_card: {stringify(health_card)}")
-    except Exception as e:  # todo not found
+    except Exception as e:
         logger.error(e)
         payload = {
             "success": False,
-            "health_card":None, 
+            "treatment":None, 
             "error": format_error(e,info.context.headers['authorization']) 
         }
     return payload

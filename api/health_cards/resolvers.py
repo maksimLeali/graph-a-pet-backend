@@ -2,7 +2,7 @@ from ariadne import ObjectType, convert_kwargs_to_snake_case
 from domain.health_cards import  get_pet
 from utils.logger import logger, stringify
 from utils import format_common_search
-from controller.errors import error_pagination, format_error
+from api.errors import error_pagination, format_error
 import domain.health_cards as health_cards_domain
 
 
@@ -23,7 +23,7 @@ def health_card_treatments_resolver(obj, info, common_search):
             } 
         } 
     }
-    logger.controller(
+    logger.api(
         f"health_card_id: {obj['id']}\n"\
         f'common_search: {stringify(common_search)}'
     )

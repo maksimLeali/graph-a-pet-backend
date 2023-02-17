@@ -5,7 +5,7 @@ from sqlalchemy.exc import InvalidRequestError
 from datetime import datetime, timedelta
 from repository.query_builder import build_query, build_count
 from utils.logger import logger, stringify
-from controller.errors import InternalError, NotFoundError, BadRequest
+from api.errors import InternalError, NotFoundError, BadRequest
 from sqlalchemy import and_, not_, select, text
 
 from repository.users.models import User, UserRole

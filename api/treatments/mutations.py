@@ -1,12 +1,12 @@
 from ariadne import convert_kwargs_to_snake_case
 from domain.treatments import create_treatment, update_treatment
 from utils.logger import logger, stringify
-from controller.errors import format_error
+from api.errors import format_error
 
 
 @convert_kwargs_to_snake_case
 def create_treatment_resolver(obj, info, data):
-    logger.controller(f"data: {stringify(data)}")
+    logger.api(f"data: {stringify(data)}")
     try:
         treatment = create_treatment(data)
         payload = {
@@ -24,7 +24,7 @@ def create_treatment_resolver(obj, info, data):
 
 @convert_kwargs_to_snake_case
 def update_treatment_resolver(obj, info, id, data):
-    logger.controller(
+    logger.api(
         f"id: {id}\n"\
         f"data: {stringify(data)}"
     )

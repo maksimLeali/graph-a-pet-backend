@@ -10,7 +10,7 @@ class CustomFormatter(logging.Formatter):
     logging.INPUT = logging.DEBUG + 1
     logging.OUTPUT = logging.DEBUG  + 2
     logging.MIDDLEWARE = logging.INFO + 1
-    logging.CONTROLLER = logging.INFO + 2
+    logging.API = logging.INFO + 2
     logging.DOMAIN = logging.INFO + 3 
     logging.REPOSITORY = logging.INFO + 4
     logging.CHECK = logging.INFO + 5
@@ -19,7 +19,7 @@ class CustomFormatter(logging.Formatter):
     logging.addLevelName(logging.INPUT, "INPUT")
     logging.addLevelName(logging.OUTPUT, "OUTPUT")
     logging.addLevelName(logging.MIDDLEWARE, "MIDDLEWARE")
-    logging.addLevelName(logging.CONTROLLER, "CONTROLLER")
+    logging.addLevelName(logging.API, "API")
     logging.addLevelName(logging.DOMAIN, "DOMAIN")
     logging.addLevelName(logging.REPOSITORY, "REPOSITORY")
     logging.addLevelName(logging.CHECK, "CHECK")
@@ -48,7 +48,7 @@ class CustomFormatter(logging.Formatter):
         logging.OUTPUT: purple + format + "🔺  \n" + reset, #12
         logging.INFO: blue+ "ℹ️  " + extended_format + reset, #20
         logging.MIDDLEWARE: yellow_bold + "🔑  " + extended_format + reset, #21
-        logging.CONTROLLER: green_bold + "📤  " + extended_format + reset, #22
+        logging.API: green_bold + "📤  " + extended_format + reset, #22
         logging.DOMAIN: cyan_bold + "🛠️  " + extended_format + reset, #23
         logging.REPOSITORY: blue_bold + "📁  " + extended_format + reset, #24
         logging.CHECK: green + "✅  " + extended_format + reset, #25
@@ -74,7 +74,7 @@ logger.check = lambda msg, *args: logger._log(logging.CHECK, msg, args)
 logger.input = lambda msg, *args: logger._log(logging.INPUT, msg, args)
 logger.output = lambda msg, *args: logger._log(logging.OUTPUT, msg, args)
 logger.middleware = lambda msg, *args: logger._log(logging.MIDDLEWARE, msg, args)
-logger.controller = lambda msg, *args: logger._log(logging.CONTROLLER, msg, args)
+logger.api = lambda msg, *args: logger._log(logging.CONTROLLER, msg, args)
 logger.domain = lambda msg, *args: logger._log(logging.DOMAIN, msg, args)
 logger.repository = lambda msg, *args: logger._log(logging.REPOSITORY, msg, args)
 logger.start = lambda msg, *args: logger._log(logging.START, msg, args)

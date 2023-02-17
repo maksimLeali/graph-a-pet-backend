@@ -2,7 +2,7 @@
 import repository.health_cards as health_cards_data
 import domain.pets as pets_domain
 import domain.treatments as treatments_domain
-from controller.errors import NotFoundError
+from api.errors import NotFoundError
 from utils.logger import logger, stringify
 from math import ceil
 

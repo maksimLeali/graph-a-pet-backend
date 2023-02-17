@@ -1,6 +1,6 @@
 from ariadne import convert_kwargs_to_snake_case
-from controller.errors import format_error
-from controller.middlewares import min_role
+from api.errors import format_error
+from api.middlewares import min_role
 from domain.ownerships import create_ownership, update_ownership, delete_ownership
 from repository.users.models import UserRole
 from utils import get_request_user
@@ -24,7 +24,7 @@ def update_ownership_resolver(obj, info, id, data):
 @convert_kwargs_to_snake_case
 @min_role(UserRole.ADMIN.name)
 def delete_ownership_resolver(obj, info, id):
-    logger.controller(f"id{id}  remove")
+    logger.api(f"id{id}  remove")
     try: 
         token =  info.context.headers['authorization']
         current_user = get_request_user(token)

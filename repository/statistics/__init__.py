@@ -1,5 +1,5 @@
 from sqlalchemy import select, text
-from controller.errors import BadRequest, NotFoundError
+from api.errors import BadRequest, NotFoundError
 from repository.query_builder import build_count, build_query
 from utils.logger import logger, stringify
 from datetime import datetime

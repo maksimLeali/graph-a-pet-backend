@@ -2,15 +2,15 @@ from ariadne import convert_kwargs_to_snake_case
 from graphql import GraphQLError, GraphQLResolveInfo
 import domain.damnationes_memoriae as damnationes_memoriae_domain
 from repository.users.models import UserRole
-from controller.errors import ForbiddenError, format_error, error_pagination
-from controller.middlewares import auth_middleware, min_role
+from api.errors import ForbiddenError, format_error, error_pagination
+from api.middlewares import auth_middleware, min_role
 from utils.logger import logger, stringify
 from utils import format_common_search
 
 @convert_kwargs_to_snake_case
 @min_role(UserRole.ADMIN.name)
 def list_damnationes_memoriae_resolver(obj, info: GraphQLResolveInfo, common_search):
-    logger.controller(f"common_search: {stringify(common_search)}")
+    logger.api(f"common_search: {stringify(common_search)}")
     common_search= format_common_search(common_search)
     try:
         damnationes_memoriae, pagination = damnationes_memoriae_domain.get_paginated_damnationes_memoriae(common_search)
@@ -30,7 +30,7 @@ def list_damnationes_memoriae_resolver(obj, info: GraphQLResolveInfo, common_sea
 @convert_kwargs_to_snake_case
 @min_role(UserRole.ADMIN.name)
 def get_damnatio_memoriae_resolver(obj, info, id):
-    logger.controller(f"id: {id}")
+    logger.api(f"id: {id}")
     try:
         damnatio_memoriae = damnationes_memoriae_domain.get_damnatio_memoriae(id)
         payload = {

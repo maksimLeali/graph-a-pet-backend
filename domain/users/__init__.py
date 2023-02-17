@@ -3,7 +3,7 @@ import repository.users as users_data
 from math import ceil
 from time import time
 from utils.logger import logger, stringify
-from controller.errors import AuthenticationError, InternalError, NotFoundError
+from api.errors import AuthenticationError, InternalError, NotFoundError
 import repository.damnationes_memoriae as damnatio
 import domain.damnationes_memoriae as damnatio_domain
 from repository.ownerships.models import CustodyLevel

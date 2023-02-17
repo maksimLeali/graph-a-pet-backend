@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from repository.coats.models import Coat
 from repository import db
-from controller.errors import InternalError, NotFoundError, BadRequest
+from api.errors import InternalError, NotFoundError, BadRequest
 from utils.logger import logger, stringify
 
 def create_coat(data):

@@ -3,7 +3,7 @@ from functools import wraps
 from typing import Any
 
 from graphql import GraphQLError, GraphQLResolveInfo
-from controller.errors import AuthenticationError, ForbiddenError, format_error
+from api.errors import AuthenticationError, ForbiddenError, format_error
 from domain.users import get_user, update_user_activity
 from time import time
 from utils.logger import logger

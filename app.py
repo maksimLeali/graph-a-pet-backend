@@ -1,5 +1,5 @@
 from pendulum import SECONDS_PER_MINUTE
-from controller import app
+from api import app
 from utils.logger import logger
 import os
 import logging
@@ -7,13 +7,13 @@ from ariadne import graphql_sync, load_schema_from_path, make_executable_schema,
     snake_case_fallback_resolvers
 from ariadne.constants import PLAYGROUND_HTML
 from flask import Blueprint, request, jsonify, abort
-from controller.operations import object_types
+from api.operations import object_types
 from config import cfg
 from utils.firebase.storage import upload_image
 from utils.cron import start_scheduler
 import schedules
-from controller.medias.routes import *
-from controller.blueprints import media
+from api.medias.routes import *
+from api.blueprints import media
 
 type_defs = load_schema_from_path("./")
 schema = make_executable_schema(

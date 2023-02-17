@@ -2,14 +2,14 @@ from ariadne import convert_kwargs_to_snake_case
 import domain.pets as pets_domain
 from utils.logger import logger, stringify
 from utils import format_common_search
-from controller.errors import InternalError, error_pagination, format_error
-from controller.middlewares import min_role, RoleLevel
+from api.errors import InternalError, error_pagination, format_error
+from api.middlewares import min_role, RoleLevel
 
 
 @convert_kwargs_to_snake_case
 @min_role(RoleLevel.ADMIN.name)
 def list_pets_resolver(obj, info, common_search):
-    logger.controller(f"common_search: {stringify(common_search)}")
+    logger.api(f"common_search: {stringify(common_search)}")
     try:
         common_search = format_common_search(common_search)
         pets, pagination = pets_domain.get_paginated_pets(common_search)
@@ -33,7 +33,7 @@ def list_pets_resolver(obj, info, common_search):
 @convert_kwargs_to_snake_case
 @min_role(RoleLevel.ADMIN.name)
 def get_pet_resolver(obj, info, id):
-    logger.controller(f"id: {id}")
+    logger.api(f"id: {id}")
     try:
         pet = pets_domain.get_pet(id)
         payload = {

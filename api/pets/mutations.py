@@ -2,14 +2,14 @@ from ariadne import convert_kwargs_to_snake_case
 from domain.pets import create_pet, update_pet, delete_pet
 from utils import get_request_user
 from utils.logger import logger, stringify
-from controller.errors import format_error
+from api.errors import format_error
 from repository.users.models import UserRole
-from controller.middlewares import min_role
+from api.middlewares import min_role
 
 
 @convert_kwargs_to_snake_case
 def create_pet_resolver(obj, info, data):
-    logger.controller(f"data: {stringify(data)}")
+    logger.api(f"data: {stringify(data)}")
     try:
         pet = create_pet(data)
         payload = {
@@ -27,7 +27,7 @@ def create_pet_resolver(obj, info, data):
 
 @convert_kwargs_to_snake_case
 def update_pet_resolver(obj, info, id, data):
-    logger.controller(
+    logger.api(
         f"id: {id}\n"\
         f"data: {stringify(data)}"
     )
@@ -48,7 +48,7 @@ def update_pet_resolver(obj, info, id, data):
 @convert_kwargs_to_snake_case
 @min_role(UserRole.ADMIN.name)
 def delete_pet_resolver(obj, info, id):
-    logger.controller(f"id{id}  remove")
+    logger.api(f"id{id}  remove")
     logger.check('here in api level')
     try: 
         token =  info.context.headers['authorization']

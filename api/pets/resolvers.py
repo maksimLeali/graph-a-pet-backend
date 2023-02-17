@@ -3,7 +3,7 @@ from ariadne import ObjectType, convert_kwargs_to_snake_case
 import domain.pets as pets_domain
 import domain.health_cards as health_cards_domain
 from utils.logger import logger, stringify
-from controller.errors import error_pagination
+from api.errors import error_pagination
 from utils import format_common_search
 
 pet = ObjectType("Pet")
@@ -22,7 +22,7 @@ def pet_ownerships_resolver(obj, info, common_search):
         } 
     }
     
-    logger.controller(
+    logger.api(
         f"pet_id: {obj['id']}\n"\
         f'common_search: {stringify(common_search)}'
     )

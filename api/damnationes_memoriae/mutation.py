@@ -2,11 +2,11 @@ from ariadne import convert_kwargs_to_snake_case
 from domain.damnationes_memoriae import restore_memoriae
 from utils import get_request_user
 from utils.logger import logger
-from controller.errors import format_error
+from api.errors import format_error
 
 @convert_kwargs_to_snake_case
 def restore_memoriae_resolver(obj, info, id,):
-    logger.controller(f"restoring {id}")
+    logger.api(f"restoring {id}")
     try:
         token =  info.context.headers['authorization']
         current_user = get_request_user(token)
