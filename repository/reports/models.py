@@ -2,15 +2,15 @@ from enum import Enum
 from repository import Base, db
 from sqlalchemy.sql.sqltypes import DECIMAL as Decimal
 
-class ReportType(Enum):
+class ReportTypes(Enum):
     MISSING="MISSING",
     FOUND="FOUND"
 
 class Report(Base):
-    __table_name__= 'reports'
+    __tablename__= 'reports'
     latitude = db.Column(Decimal(8,6))
     longitude = db.Column(Decimal(9,6))
-    type =db.Column(db.Enum(ReportType))
+    type =db.Column(db.Enum(ReportTypes))
     notes = db.Column(db.ARRAY(db.String), default= [])
     pet_id = db.Column(db.String, db.ForeignKey('pets.id'))
     user_id = db.Column(db.String, db.ForeignKey('users.id'))
