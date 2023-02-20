@@ -24,7 +24,6 @@ class CoatPattern(Enum) :
 
 class Coat(Base):
     __tablename__ = 'coats'
-    id = db.Column(db.String, primary_key=True)
     colors = db.Column(db.ARRAY(db.String))
     length = db.Column(db.Enum(CoatLength))
     pattern = db.Column(db.Enum(CoatPattern))

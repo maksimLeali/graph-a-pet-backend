@@ -8,7 +8,6 @@ class CustodyLevel(Enum):
 
 class Ownership(Base):
     __tablename__ = 'ownerships'
-    id = db.Column(db.String, primary_key=True)
     user_id = db.Column(db.String, db.ForeignKey('users.id'))
     pet_id= db.Column(db.String, db.ForeignKey('pets.id'))
     custody_level= db.Column(db.Enum(CustodyLevel))

@@ -7,7 +7,6 @@ class UserRole(Enum):
 
 class User(Base):
     __tablename__ = 'users'
-    id = db.Column(db.String, primary_key=True)
     first_name = db.Column(db.String)
     last_name = db.Column(db.String)
     email = db.Column(db.String)

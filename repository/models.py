@@ -8,3 +8,4 @@ from .treatments.models import *
 from .medias.models import *
 from .statistics.models import *
 from .damnationes_memoriae.models import *
+from .reports.models import *

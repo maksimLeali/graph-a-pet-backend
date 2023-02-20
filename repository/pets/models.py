@@ -9,7 +9,6 @@ class Gender(Enum):
 
 class Pet(Base):
     __tablename__ = 'pets'
-    id = db.Column(db.String, primary_key=True)
     name = db.Column(db.String)
   
     ownerships = db.relationship("Ownership", uselist=True, backref='pets')

@@ -5,7 +5,6 @@ from datetime import datetime
 
 class HealthCard(Base):
     __tablename__ =  'health_cards'
-    id =  db.Column(db.String, primary_key=True)
     pet_id=  db.Column(db.String, db.ForeignKey('pets.id'))
     treatments= db.relationship("Treatment", uselist=True, backref='health_cards')
     notes =  db.Column(db.ARRAY(db.String))

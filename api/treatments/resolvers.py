@@ -1,9 +1,7 @@
-from ariadne import ObjectType, convert_kwargs_to_snake_case
+from ariadne import ObjectType
 
 import domain.treatments as treatments_domain
 from utils.logger import logger, stringify
-from api.errors import error_pagination
-from utils import format_common_search
 
 treatment = ObjectType('Treatment')
 

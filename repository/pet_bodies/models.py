@@ -18,7 +18,6 @@ class PetFamily(Enum) :
 
 class PetBody(Base):
     __tablename__ = 'pet_bodies'
-    id = db.Column(db.String, primary_key=True)
     coat_id= db.Column(db.String, db.ForeignKey('coats.id'))
  #   image: Media!
  #   tags: [Tag]!

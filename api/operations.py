@@ -23,6 +23,9 @@ from api.medias.mutations import *
 from api.treatments.queries import * 
 from api.treatments.mutations import * 
 from api.treatments.resolvers import treatment
+from api.reports.queries import * 
+from api.reports.mutations import * 
+from api.reports.resolvers import report
 from api.statistics.queries import * 
 from api.damnationes_memoriae.queries import * 
 from api.damnationes_memoriae.mutation import * 
@@ -88,8 +91,10 @@ mutation.set_field("updateHealthCard", update_health_card_resolver)
 mutation.set_field("createHealthCard", create_health_card_resolver)
 mutation.set_field("createTreatment", create_treatment_resolver)
 mutation.set_field("updateTreatment", update_treatment_resolver)
+mutation.set_field("createReport", create_report_resolver)
+mutation.set_field("updateReport", update_report_resolver)
 mutation.set_field("updateMedia", update_media_resolver)
 mutation.set_field("createMedia", create_media_resolver)
 mutation.set_field("restoreMemoriae", restore_memoriae_resolver)
 
-object_types = [query, mutation, user, pet, ownership, pet_body, coat, health_card, treatment]
+object_types = [query, mutation, user, pet, ownership, pet_body, coat, health_card, treatment, report]

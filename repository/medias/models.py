@@ -2,7 +2,6 @@ from repository import db, Base
 
 class Media(Base):
     __tablename__ = 'medias'
-    id = db.Column(db.String, primary_key=True)
     type = db.Column(db.String)
     scope = db.Column(db.String)
     ref_id = db.Column(db.String)

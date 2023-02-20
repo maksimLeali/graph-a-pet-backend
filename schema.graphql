@@ -17,6 +17,8 @@ type Query {
     getHealthCard(id: ID!): HealthCardResult
     getTreatment(id: ID!): TreatmentResult
     listTreatments(commonSearch: CommonSearch = {}): PaginatedTreatments!
+    getReport(id: ID!): ReportResult
+    listReports(commonSearch: CommonSearch = {}): PaginatedReports!
     getMedia(id: ID!): MediaResult!
     listMedias(commonSearch: CommonSearch= {}): PaginatedMedias!
     getDashboard: DashboardResult!
@@ -48,6 +50,8 @@ type Mutation {
     updateHealthCard(id: ID!, data:HealthCardUpdate!): HealthCardResult!
     createTreatment(data: TreatmentCreate!): TreatmentResult!
     updateTreatment(id: ID!, data: TreatmentUpdate!): TreatmentResult!
+    createReport(data: ReportCreate!): ReportResult!
+    updateReport(id: ID!, data: ReportUpdate!): ReportResult!
     updateMedia(id:ID!, data: MediaUpdate!): MediaResult!
     createMedia(data: MediaCreate!): MediaResult!
     restoreMemoriae(id:ID!): RestoredResult
@@ -70,6 +74,11 @@ enum Gender {
     MALE,
     FEMALE,
     NOT_SAID
+}
+
+enum ReportType {
+    MISSING,
+    FOUND
 }
 
 enum TreatmentType{
@@ -229,6 +238,11 @@ type UserResult {
     error: Error
     user: User
 }
+type ReportResult {
+    success: Boolean!
+    error: Error
+    report: Report
+}
 
 type DamnatioMemoriaeResult {
     success: Boolean!
@@ -321,6 +335,13 @@ type PaginatedOwnerships {
     success: Boolean
     error: Error
     items: [Ownership]!
+    pagination: Pagination!
+}
+
+type PaginatedReports {
+    success: Boolean
+    error: Error
+    items: [Report]!
     pagination: Pagination!
 }
 
@@ -442,6 +463,35 @@ type Treatment {
     health_card: HealthCard
 }
 
+type Report {
+    id: ID!
+    created_at: String!
+    updated_at: String!
+    type: ReportType!
+    place: String!
+    coordinates: Coordinates!
+    latitude: Float!
+    longitude: Float!
+    reporter: Reporter!
+    responders: [Reporter]!
+    notes: [String]
+    user: User
+    pet: Pet
+    
+}
+
+type Reporter {
+    email: String!
+    first_name: String!
+    last_name: String!
+}
+
+type Coordinates {
+    latitude: Float,
+    longitude: Float
+}
+
+
 type DefaultResult {
     success: Boolean
     error: Error
@@ -517,6 +567,30 @@ input MediaCreate {
     type: String!
 }
 
+input ReportCreate {
+    type: ReportType!
+    place: String!
+    latitude: Float!
+    longitude: Float!
+    reporter: ReporterCreate!
+    notes: [String]
+    user_id: String
+    pet_id: String
+}
+
+input ReportUpdate {
+    place: String
+    latitude: Float
+    longitude: Float
+    notes: [String]
+    responders: [ReporterCreate]
+}
+
+input ReporterCreate {
+    email: String!
+    first_name: String!
+    last_name: String!
+}
 
 input CommonSearch {
     page: Int = 0

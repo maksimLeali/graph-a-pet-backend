@@ -21,7 +21,7 @@ class FrequencyUnit(Enum):
 
 class Treatment(Base):
     __tablename__ = 'treatments'
-    id = db.Column(db.String, primary_key=True)
+    
     name = db.Column(db.String)
     date = db.Column(db.DateTime)
     booster_id = db.Column(db.String)

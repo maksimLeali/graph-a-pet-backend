@@ -1,5 +1,12 @@
 {
     "tables": {
+        "base_template": {
+            "columns" : {
+                "id" : "id!",
+                "created_at": "date",
+                "update_at": "date" 
+            }
+        },
         "users": {
             "search_columns": [
                 "first_name",
@@ -9,11 +16,15 @@
             "alias": "us",
             "other_table_ref": "user_id",
             "children": [
-                "ownerships"
+                "ownerships",
+                "reports"
             ],
             "inherit_delete": {
                 "ownerships": {
                     "cond": "all"
+                },
+                "reports": {
+                    "cond":"all"
                 }
             }
         },
@@ -32,6 +43,7 @@
                 "chip_code": "string",
                 "gender": "enum(Gender)",
                 "weight_kg": "float",
+                "body_id": "string",
                 "temperament": "string",
                 "diet": "string[]",
                 "intollerance": "string[]",
@@ -44,7 +56,8 @@
             "other_table_ref": "pet_id",
             "children": [
                 "ownerships",
-                "health_cards"
+                "health_cards",
+                "reports"
             ],
             "inherit_delete": {
                 "pet_bodies": {
@@ -55,8 +68,39 @@
                 },
                 "health_cards": {
                     "cond": "all"
+                },
+                "reports": {
+                    "cond":"all"
                 }
             }
+        },
+        "reports": {
+            "enums": {
+                "ReportsType": [
+                    "MISSING",
+                    "FOUND"
+                ]
+                
+            },
+            "columns" : {
+                "latutude": "number",
+                "longitude": "number",
+                "type": "enum(ReportsType)",
+                "place" : "string",
+                "pet_id": "string",
+                "user_id": "string",
+                "reporter": "json",
+                "responders": "json[]",
+                "notes" : "string[]"
+            },
+            "other_table_ref": "report_id",
+            "children": [],
+            "alias": "rp",
+            "search-column": [
+                "place",
+                "notes"
+            ],
+            "inherit_delet" : {}
         },
         "pet_bodies": {
             "search_columns": [
