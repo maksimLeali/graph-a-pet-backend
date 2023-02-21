@@ -16,7 +16,6 @@ def create_report(data):
         report = Report(
             id=f"{uuid.uuid4()}",
             pet_id=data.get('pet_id'),
-            user_id=data.get('user_id'),
             notes=[],
             latitude=data.get("latitude"),
             longitude=data.get("longitude"),

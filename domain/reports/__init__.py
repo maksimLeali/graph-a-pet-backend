@@ -10,10 +10,6 @@ def get_pet(obj,info):
     logger.check(f"pet_id: {obj['pet_id']}")
     return pets_domain.get_pet(obj['pet_id'])
 
-def get_user(obj,info):
-    logger.check(f"user_id: {obj['user_id']}")
-    return users_domain.get_user(obj['user_id'])
-
 def get_coordinates(obj, info): 
     logger.check(f"id: {obj['id']}")
     return { "latitude" : obj["latitude"], "longitude": obj["longitude"]}
@@ -28,9 +24,15 @@ def get_report(id):
         logger.error(e)
         raise e
 
-def create_report(data):
+def create_report(data, user_id):
     logger.domain(f"data: {stringify(data)}")
     try:
+        if user_id :
+            try:
+                users_domain.get_user(user_id)
+                data.get('reporter')['user_id'] = user_id
+            except: 
+                logger.warning(f'no valid user with id {user_id}')
         return reports_data.create_report(data)
     except Exception as e:
         logger.error(e)
@@ -78,3 +80,26 @@ def get_pagination(common_search):
     except Exception as e:
         logger.error(e)
         raise Exception(e)
+    
+def add_reporter(id, reporter, user_id): 
+    logger.domain(
+        f"if: {id}\n"\
+        f"reporter: {reporter}\n"\
+        f"user_id: {user_id}\n"\
+        )
+    try: 
+        report = reports_data.get_report(id)
+        if user_id :
+            try:
+                users_domain.get_user(user_id)
+                reporter['user_id'] = user_id
+            except: 
+                logger.warning(f'no valid user with id {user_id}')
+        responders = report['responders']
+        responders.append(reporter)
+        updated_report = update_report(id, {"responders" : responders})
+        logger.check(f'updated: {updated_report}')
+        return updated_report
+    except Exception as e:
+        logger.error(e) 
+        raise e

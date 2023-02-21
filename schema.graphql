@@ -54,7 +54,8 @@ type Mutation {
     updateReport(id: ID!, data: ReportUpdate!): ReportResult!
     updateMedia(id:ID!, data: MediaUpdate!): MediaResult!
     createMedia(data: MediaCreate!): MediaResult!
-    restoreMemoriae(id:ID!): RestoredResult
+    restoreMemoriae(id:ID!): RestoredResult!
+    respondToReport(id: ID!, reporter: ReporterCreate!): ReportResult!
 }
 
 scalar Upload
@@ -475,7 +476,6 @@ type Report {
     reporter: Reporter!
     responders: [Reporter]!
     notes: [String]
-    user: User
     pet: Pet
     
 }
@@ -484,6 +484,7 @@ type Reporter {
     email: String!
     first_name: String!
     last_name: String!
+    user_id: String
 }
 
 type Coordinates {
@@ -574,7 +575,6 @@ input ReportCreate {
     longitude: Float!
     reporter: ReporterCreate!
     notes: [String]
-    user_id: String
     pet_id: String
 }
 
@@ -590,6 +590,7 @@ input ReporterCreate {
     email: String!
     first_name: String!
     last_name: String!
+    user_id: String
 }
 
 input CommonSearch {
