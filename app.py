@@ -1,15 +1,30 @@
+from pendulum import SECONDS_PER_MINUTE
 from api import app
+from utils.logger import logger
+import os
+import logging
 from ariadne import graphql_sync, load_schema_from_path, make_executable_schema, \
     snake_case_fallback_resolvers
 from ariadne.constants import PLAYGROUND_HTML
-from flask import request, jsonify
+from flask import Blueprint, request, jsonify, abort
 from api.operations import object_types
-
+from config import cfg
+from utils.firebase.storage import upload_image
+from utils.cron import start_scheduler
+import schedules
+from api.medias.routes import *
+from api.blueprints import media
 
 type_defs = load_schema_from_path("./")
 schema = make_executable_schema(
     type_defs, object_types,  snake_case_fallback_resolvers
 )
+
+if (cfg['cron']['active']):
+    start_scheduler()
+else :
+    logger.setup('cron disabled')
+
 
 @app.route("/graphql", methods=["GET"])
 def graphql_playground():
@@ -27,11 +42,16 @@ def graphql_server():
     )
     status_code = 200 if success else 400
     return jsonify(result), status_code
+    
+
+app.register_blueprint(media)
 
 if __name__ == "__main__":
+    log = logging.getLogger('werkzeug')
+    log.disabled = True
     os.environ['WERKZEUG_RUN_MAIN'] = 'true'
     logger.start(
         f"Server is running on http://{cfg['flask']['host']}:{cfg['flask']['port']}\n" \
-        f"See playground on http://{cfg['flask']['host']}:{cfg['flask']['port']}/graphql"
+        f"See playground on http://{cfg['flask']['host']}:{cfg['flask']['port']}/graphql\n"
         )
-    app.run(host=cfg['flask']['host'], port=cfg['flask']['port'])
+    app.run(host=cfg['flask']['host'], port=cfg['flask']['port'], debug=False)

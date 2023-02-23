@@ -1,19 +1,23 @@
 from ariadne import convert_kwargs_to_snake_case
 import domain.coats as coats_domain
+from utils.logger import logger
+from api.errors import format_error
 
 @convert_kwargs_to_snake_case
 def list_coats_resolver(obj, info):
+    logger.info('listing coats')
     try:
         coat = coats_domain.get_coats()
-        
+        logger.check(f"found {len(coat)}")
         payload = {
             "success": True,
             "coats": coat
         }
-    except Exception as error:
+    except Exception as e:
+        logger.error(e)
         payload = {
             "success": False,
-            "errors": [str(error)]
+            "error": format_error(e, info.context.headers['authorization']) 
         }
     return payload
 
@@ -25,9 +29,10 @@ def get_coat_resolver(obj, info, id):
             "success": True,
             "coat": coat.to_dict()
         }
-    except AttributeError:  # todo not found
+    except Exception as e:  
+        logger.error(e)
         payload = {
             "success": False,
-            "errors": ["coat item matching {id} not found"]
+            "error":format_error(e, info.context.headers['authorization']) 
         }
     return payload

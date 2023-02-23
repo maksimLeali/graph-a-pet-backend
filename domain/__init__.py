@@ -1,8 +1,8 @@
 import jwt
 from time import time
 
-from libs.utils import get_request_user
-from libs.logger import logger
+from utils import get_request_user
+from utils.logger import logger
 from config import cfg
 import pydash as py_
 

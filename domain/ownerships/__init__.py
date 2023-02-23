@@ -1,8 +1,9 @@
-import data.ownerships as ownerships_data
+import repository.ownerships as ownerships_data
 import domain.users as users_domain
 import domain.pets as pets_domain
 from api.errors import InternalError
-from libs.logger import logger, stringify
+import domain.damnationes_memoriae as damnatio_domain
+from utils.logger import logger, stringify
 from math import ceil
 
 def get_pet(obj,info):
@@ -63,6 +64,17 @@ def get_pagination(common_search):
             "current_page": current_page,
             "page_size": page_size
         }
+    except Exception as e:
+        logger.error(e)
+        raise e
+
+def delete_ownership(id, user_id ):
+    logger.domain(f"id {id} remove ")
+    try: 
+        ownership = ownerships_data.get_ownership(id)
+        logger.check(stringify(ownership))
+        memoriae_id = damnatio_domain.delete_row(id, 'ownerships', ownership ,user_id)
+        return memoriae_id
     except Exception as e:
         logger.error(e)
         raise e

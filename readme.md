@@ -11,11 +11,12 @@ It serve as a skeleton for the app.
 ## Installation
 
 Clone this repo to your device.
-I suggest to create a virtual environment
 
 once you have cloned the repo, by enteryng the project folder install the
 requirments by using the package manager [pip](https://pip.pypa.io/en/stable/)
 and add the `-r` parameter so it will recursively add every needed module.
+
+I suggest you to create a virtual environment
 
 ```bash
 pip install -r requirments.txt
@@ -29,7 +30,7 @@ python3 -m pip intall -r requirments.txt
 
 ## Environment variable
 
-Since i can't public everyprivate key but i want to let you know what variable
+Since i can't public every private key but i want to let you know what variable
 are used in the project i made a `config_fileds.yml` file that will contain
 every variable name and path, but not the values
 
@@ -73,7 +74,6 @@ telegram:
 ```
 
 If you don't want or can't use telegram just set the `active` field to `False`
-and no bot will be activated
 
 ### firebase bucket
 
@@ -90,15 +90,15 @@ For instance i divided the server into 3 main layer :
 
 1. API
 2. DOMAIN
-3. DATA
+3. REPOSITORY
 
 and each one shoul be as indipendand as possible from the others, so if i change
-the DB, and migrate from PostgreSQL to mongoDB, the domain layer and dataLayer
+the DB, and migrate from PostgreSQL to mongoDB, the DOMAIN and API layer
 should function as nothing happend.
-If i want to migrate from postgresql to REST API the data layer and domani layer
+If i want to migrate from GRAPHQL to REST API the REPOSITORY and DOMAIN layer
 should work like nothing happend
 If i want some change in the logic that rule the server it should suffice change
-the domain layer, leaving API and DATA untouched.
+the domain layer, leaving API and REPOSITORY untouched.
 
 ### API layer
 
@@ -116,7 +116,7 @@ I would have loved to use decorator on every query and mutation like i did with
 the resolvers :
 
  ```python
-@query('operetionA')
+@query('operetion')
 @auth_middleware
 operation_a():
     try:
@@ -126,15 +126,15 @@ operation_a():
  ```
 
 but unfortunately I can't declare the QueryType or MutationType in a file and
-call-it to another to add fields and then add it to
+call it to another to add fields and then add it to
 the `make_executable_schema` method.
 So i Created the `operation.py` to group them all in a single file, including
 every resolver.
 
 ### DOMAIN layer
 
-Here goes theapplication business logic.
-Here should go what the application need to do in order to complete the request.
+Here goes the application business logic.
+There should be placed what the application need to do in order to complete the request.
 Like if a user is signing UP, here is where you should trigger the event of
 sending an e-mail to him with che verification code.
 Or if a user is adding a pet to him-self then here is where you first call the
@@ -143,7 +143,7 @@ Or if a user is adding a pet to him-self then here is where you first call the
 It would be best if this level does not chage how the users call a method or how
 the data Layer fetch the data.
 
-### DATA layer
+### REPOSITORY layer
 
 This is where the data are saved and fetched.
 This should just be used as a method to retrive data given some option like
@@ -170,7 +170,7 @@ the same way:
     - `search_columns`: array of strings that will be used to look for the text
     insered in `search` field
     - `filters`:
-        - `fixeds`: 1 to 1 match on the selected column and value *user.name = 'Enzo'*
+        - `fixed`: 1 to 1 match on the selected column and value *user.name = 'Enzo'*
         - `ranges`: min and max value for the column to match, if only one is
         set is lik sayng, everything tha id more ( or less ) the the selected value
         - `lists` : list of value the selected column can be setto be mached by
@@ -178,3 +178,35 @@ the same way:
         - `join` : with this you can duplicate the `filters` structure to a child
         of the main entity, like from `OWNERSHIP` you can go down and filter `PET`
         or `USER`, and so on to every "children"
+
+Using filters you may want to make condition like "AND", "OR" and "NOT",
+like listing every user tha don't own a pet named "pluto" or things like that.
+
+By defoult every filter is wrappend in the "AND" condition, to change wrap the condition
+in the property you want like
+
+```json
+{
+    "filters": {
+        "or": [
+            {
+                "fixed": [...]
+            },
+            {
+                "lists": [...]
+            }
+            {
+                "not": [
+                    {
+                        "fixed": []
+                    }
+                ]
+            }
+        ],
+
+    }
+}
+```
+
+in this exsmple the query will return every record that satisfy one of the filters
+added in the "or" field.

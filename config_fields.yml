@@ -1,3 +1,5 @@
+project: 
+  name: ~
 db:
   host: ~
   user: ~
@@ -6,11 +8,17 @@ db:
   table: ~
 jwt:
   secret: ~
-firbase:
-  buket_storage: ~
+firebase:
+  bucket: ~
 logging: 
   level: ~
-telegram: 
+cron:
   active: ~
+  test_enabled: ~
+telegram: 
+  active: False
   token: ~
   admin_id: ~
+flask:
+  host: ~
+  port: ~

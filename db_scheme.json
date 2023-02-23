@@ -1,0 +1,218 @@
+{
+    "tables": {
+        "base_template": {
+            "columns" : {
+                "id" : "id!",
+                "created_at": "date",
+                "update_at": "date" 
+            }
+        },
+        "users": {
+            "search_columns": [
+                "first_name",
+                "last_name",
+                "email"
+            ],
+            "alias": "us",
+            "other_table_ref": "user_id",
+            "children": [
+                "ownerships",
+                "reports"
+            ],
+            "inherit_delete": {
+                "ownerships": {
+                    "cond": "all"
+                },
+                "reports": {
+                    "cond":"all"
+                }
+            }
+        },
+        "pets": {
+            "enums": {
+                "Gender": [
+                    "MALE",
+                    "FEMALE",
+                    "NOT_SAID"
+                ]
+            },
+            "columns": {
+                "name": "string",
+                "birthday": "date",
+                "neutered": "bool",
+                "chip_code": "string",
+                "gender": "enum(Gender)",
+                "weight_kg": "float",
+                "body_id": "string",
+                "temperament": "string",
+                "diet": "string[]",
+                "intollerance": "string[]",
+                "disciplines": "string[]"
+            },
+            "search_columns": [
+                "name"
+            ],
+            "alias": "pt",
+            "other_table_ref": "pet_id",
+            "children": [
+                "ownerships",
+                "health_cards",
+                "reports"
+            ],
+            "inherit_delete": {
+                "pet_bodies": {
+                    "cond": "all"
+                },
+                "ownerships": {
+                    "cond": "all"
+                },
+                "health_cards": {
+                    "cond": "all"
+                },
+                "reports": {
+                    "cond":"all"
+                }
+            }
+        },
+        "reports": {
+            "enums": {
+                "ReportsType": [
+                    "MISSING",
+                    "FOUND"
+                ]
+                
+            },
+            "columns" : {
+                "latutude": "number",
+                "longitude": "number",
+                "type": "enum(ReportsType)",
+                "place" : "string",
+                "pet_id": "string",
+                "user_id": "string",
+                "reporter": "json",
+                "responders": "json[]",
+                "notes" : "string[]"
+            },
+            "other_table_ref": "report_id",
+            "children": [],
+            "alias": "rp",
+            "search-column": [
+                "place",
+                "notes"
+            ],
+            "inherit_delet" : {}
+        },
+        "pet_bodies": {
+            "search_columns": [
+                "breed"
+            ],
+            "alias": "ptb",
+            "other_table_ref": "body_id",
+            "children": [
+                "pets"
+            ],
+            "inherit_delete": {
+                "coats": {
+                    "cond": "all"
+                }
+            }
+        },
+        "coats": {
+            "search_columns": [
+                "pattern"
+            ],
+            "alias": "ct",
+            "other_table_ref": "coat_id",
+            "children": [
+                "pet_bodies"
+            ]
+        },
+        "ownerships": {
+            "search_columns": [
+                "custody_level"
+            ],
+            "alias": "ow",
+            "other_table_ref": "ownership_id",
+            "children": [
+
+            ],
+            "inherit_delete": {
+                "pets": {
+                    "cond": {
+                        
+                        "eq": { "custody_level" : "OWNER"}
+                        
+                    }
+                }
+            }
+        },
+        "health_cards": {
+            "search_columns": [
+                "logs"
+            ],
+            "alias": "hlc",
+            "other_table_ref": "health_card_id",
+            "children": [
+                "treatments"
+            ],
+            "inherit_delete": {
+                "treatments": {
+                    "cond": "all"
+                }
+            }
+        },
+        "treatments": {
+            "search_columns": [
+                "logs",
+                "name"
+            ],
+            "alias": "tr",
+            "other_table_ref": "treatment_id",
+            "children": [
+
+            ],
+            "inherit_delete": {
+
+            }
+        },
+        "medias": {
+            "search_columns": [
+                "url"
+            ],
+            "alias": "md",
+            "other_table_ref": "media_id",
+            "children": [
+
+            ],
+            "inherit_delete": {
+
+            }
+        },
+        "statistics": {
+            "search_columns": [
+
+            ],
+            "alias": "sts",
+            "other_table_ref": "statistic_id",
+            "children": [
+
+            ],
+            "inherit_delete": {
+
+            }
+        },
+        "damnationes_memoriae": {
+            "search_columns": [
+
+            ],
+            "alias": "dtm",
+            "other_table_ref": "damnatio_memoriae_id",
+            "children": [
+
+            ],
+            "inherit_delete": {
+
+            }
+        }
+    }
+}

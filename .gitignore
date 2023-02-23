@@ -3,7 +3,10 @@ pyvenv.cfg
 include/
 lib
 config.yml
-venv 
-bin/
+/app/
+/temp
+venv
+/alembic/db_scheme.json
+/alembic/alembic.ini
 serviceAccountKey.json
 **/__log__*

@@ -1,7 +1,7 @@
 from ariadne import convert_kwargs_to_snake_case
 import domain.pets as pets_domain
-from libs.logger import logger, stringify
-from libs.utils import format_common_search
+from utils.logger import logger, stringify
+from utils import format_common_search
 from api.errors import InternalError, error_pagination, format_error
 from api.middlewares import min_role, RoleLevel
 

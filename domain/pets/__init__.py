@@ -1,12 +1,15 @@
 from ariadne import convert_kwargs_to_snake_case
-import data.pets as pets_data
+import repository.pets as pets_data
 import domain.ownerships as ownerships_domain
 import domain.pet_bodies as pet_bodies_domain
-from libs.logger import logger, stringify
-from libs.utils import format_common_search
+import repository.damnationes_memoriae as damnatio
+import domain.damnationes_memoriae as damnatio_domain
+from utils.logger import logger, stringify
+from utils import format_common_search
 from math import ceil
-from api.errors import InternalError
+
 import pydash as py_
+
 
 @convert_kwargs_to_snake_case
 def get_ownerships(common_search):
@@ -53,8 +56,9 @@ def update_pet(id, data):
         f"data: {data}"
     )
     try:
+        pet = pets_data.get_pet(id);
         if(data['body'] != None):
-            pet_bodies_domain.update_pet_body(data['body']['id'], py_.omit(data['body'], 'id'))
+            pet_bodies_domain.update_pet_body(pet['body_id'], py_.omit(data['body'], 'id'))
         pet= pets_data.update_pet(id, py_.omit(data, 'body'))
         logger.check(f"pet {stringify(pet)}")
         return pet
@@ -95,3 +99,13 @@ def get_pagination(common_search):
     except Exception as e:
         logger.error(e)
         raise Exception(e)
+
+def delete_pet(id, user_id):
+    logger.domain(f"id {id} remove ")
+    try: 
+        pet = pets_data.get_pet(id)
+        damnatio_id  =damnatio_domain.delete_row(id, 'pets', pet, user_id)
+        return damnatio_id
+    except Exception as e:
+        logger.error(e)
+        raise e

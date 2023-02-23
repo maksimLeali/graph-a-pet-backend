@@ -1,21 +1,21 @@
-from libs.logger import logger
-from libs.telegram import send_message_to_admin
-from libs.utils import get_request_user
+from utils.logger import logger
+from utils.telegram import send_message_to_admin
+from utils import get_request_user
+from config import cfg
 class BadRequest(Exception):
-    extension= {"code": "400", "extra": None}
+    extension= {"code": 400, "extra": None}
 
 class AuthenticationError(Exception):
-    extensions = {"code": "401", "extra": None}
+    extensions = {"code": 401, "extra": None}
 
 class ForbiddenError(Exception):
-    extension = {"code" : "403" , "extra": None}
+    extension = {"code" : 403 , "extra": None}
 
 class NotFoundError(Exception):
-    extension = {"code" : "404", "extra": None}
+    extension = {"code" : 404, "extra": None}
     
 class InternalError(Exception):
-    extension ={"code": "500", "extra": None}
-
+    extension ={"code": 500, "extra": None}
 
 errors_types=[AuthenticationError, ForbiddenError, NotFoundError, InternalError, BadRequest]
 
@@ -33,8 +33,15 @@ def format_error (e, token="Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2Vy
             f"{type(e)}\n"\
             f"{e}"
         )
-        user= get_request_user(token)
+        try :
+            user= get_request_user(token)
+        except : 
+            user = {
+                "email":"anon@anon.anon",
+                "first_name": "Anon",
+                "last_name": "Anon"
+            } 
         logger.warning('sending error to admin via TELEGRAM')
-        send_message_to_admin(f"utente: {user['email']} {user['first_name']} {user['last_name']}\ngenerated the following untracked error:\n🚫 🚫 🚫 🚫 🚫 🚫 🚫 🚫 🚫 🚫 🚫 🚫\n{str(e)}\n🚫 🚫 🚫 🚫 🚫 🚫 🚫 🚫 🚫 🚫 🚫 🚫")
-        e= InternalError('Internal server error').additinal_message(str(e))
+        send_message_to_admin(f"Poject: {cfg['project']['name']}\nutente: {user['email']} {user['first_name']} {user['last_name']}\ngenerated the following untracked error:\n\n🚫 🚫 🚫 🚫 🚫 🚫 🚫 🚫 🚫 🚫 🚫 🚫\n\n{str(e)}\n\n🚫 🚫 🚫 🚫 🚫 🚫 🚫 🚫 🚫 🚫 🚫 🚫")
+        e= InternalError('Internal server error')
     return { "message" : str(e), "code": e.extension['code'], "extra": e.extension['extra']  }

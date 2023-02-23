@@ -1,0 +1,24 @@
+name: DEPLOY-DEV
+on:
+  push:
+    branches: [ "develop" ]
+  workflow_dispatch:
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build And Deploy on development
+        uses: appleboy/ssh-action@v0.1.2
+        with:
+          host: ${{secrets.SSH_HOST}}
+          key: ${{secrets.SSH_KEY}}
+          username: ${{secrets.SSH_USERNAME}}
+
+          script: |
+            cd projects/graph-a-pet-backend
+            git pull
+            cd alembic 
+            alembic upgrade head
+            cd ..
+            docker-compose up -d --build --remove-orphans
+            echo 'Deployment finished succesfully'

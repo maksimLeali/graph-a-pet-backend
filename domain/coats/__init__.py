@@ -1,7 +1,7 @@
 
-import data.coats as coats_data
+import repository.coats as coats_data
 import domain.pet_bodies as pet_bodies_domain
-from libs.logger import logger, stringify
+from utils.logger import logger, stringify
 
 def get_body(obj,info):
     return pet_bodies_domain.get_pet_body(obj['pet_body_id'])
