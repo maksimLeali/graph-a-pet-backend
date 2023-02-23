@@ -18,6 +18,7 @@ def update_health_card_resolver(obj, info, id, data):
             "success": True,
             "health_card": health_card
         }
+        logger.check(stringify(health_card))
     except Exception as e:
         logger.error(e)
         payload = {
@@ -30,6 +31,7 @@ def update_health_card_resolver(obj, info, id, data):
 @convert_kwargs_to_snake_case
 @min_role(RoleLevel.USER.name)
 def create_health_card_resolver(obj, info, data): 
+    logger.api(f"data: {stringify(data)}")
     try: 
         health_card = create_health_card(data)
         payload = {

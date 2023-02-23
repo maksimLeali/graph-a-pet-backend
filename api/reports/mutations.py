@@ -23,7 +23,7 @@ def create_report_resolver(obj, info, data):
         logger.error(e)
         payload = {
             "success": False,
-            "errors": format_error(e)
+            "errors": format_error(e, info.context.headers['authorization'])
         }
     return payload
 
@@ -44,7 +44,7 @@ def update_report_resolver(obj, info, id, data):
         logger.error(e)
         payload = {
             "success": False,
-            "errors": format_error(e)
+            "errors": format_error(e, info.context.headers['authorization'])
         }
     return payload
 
@@ -68,6 +68,6 @@ def respond_to_report_resolver(obj, info, id, reporter):
         logger.error(e)
         payload = {
             "success": False,
-            "errors": format_error(e)
+            "errors": format_error(e, info.context.headers['authorization'])
         }
     return payload

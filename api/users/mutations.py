@@ -41,7 +41,7 @@ def signup_resolver(obj, info, data):
         payload = {
             "success": False,
             "user": None,
-            "error": format_error(e) 
+            "error": format_error(e, info.context.headers['authorization']) 
         }
     return payload
 
@@ -64,7 +64,7 @@ def update_user_resolver(obj, info, id, data):
         payload = {
             "success": False,
             "user": None,
-            "error": format_error(e) 
+            "error": format_error(e, info.context.headers['authorization']) 
         }
     return payload
 
@@ -89,7 +89,7 @@ def update_me_resolver(obj, info, data):
         payload = {
             "success": False,
             "user": None,
-            "error": format_error(e) 
+            "error": format_error(e, info.context.headers['authorization']) 
         }
     return payload
 
@@ -110,7 +110,7 @@ def login_resolver(obj, info, email, password):
             "success": False,
             "token": None,
             "user": None,
-            "error": format_error(e) 
+            "error": format_error(e, info.context.headers['authorization']) 
         }
     return payload
 
@@ -158,7 +158,7 @@ def add_pet_to_me_resolver(obj, info, pet, custody_level):
         logger.error(e)
         payload = {
             "success": False,
-            "errors": format_error(e)
+            "errors": format_error(e, info.context.headers['authorization'])
         }
     return payload
 
@@ -179,6 +179,6 @@ def delete_user_resolver(obj, info, id):
         logger.error(e)
         payload = {
             "success": False,
-            "error": format_error(e)
+            "error": format_error(e, info.context.headers['authorization'])
         }
     return payload

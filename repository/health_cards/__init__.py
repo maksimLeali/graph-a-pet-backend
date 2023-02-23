@@ -79,6 +79,7 @@ def get_health_card(id):
         raise e
 
 def get_total_items(common_search):
+    logger.repository(f"common_seaech: {stringify(common_search)}")
     try:
         query = build_count(table="health_cards",filters= common_search['filters'] )
         result = db.session.execute(query).first()

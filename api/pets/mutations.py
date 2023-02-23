@@ -21,7 +21,7 @@ def create_pet_resolver(obj, info, data):
         logger.error(e)
         payload = {
             "success": False,
-            "errors": format_error(e)
+            "errors": format_error(e, info.context.headers['authorization'])
         }
     return payload
 
@@ -41,7 +41,7 @@ def update_pet_resolver(obj, info, id, data):
     except Exception as e:  # todo not found
         payload = {
             "success": False,
-            "errors": format_error(e)
+            "errors": format_error(e, info.context.headers['authorization'])
         }
     return payload
 
@@ -62,6 +62,6 @@ def delete_pet_resolver(obj, info, id):
         logger.error(e)
         payload = {
             "success": False,
-            "error": format_error(e)
+            "error": format_error(e, info.context.headers['authorization'])
         }
     return payload

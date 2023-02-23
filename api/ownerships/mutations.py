@@ -37,6 +37,6 @@ def delete_ownership_resolver(obj, info, id):
         logger.error(e)
         payload = {
             "success": False,
-            "error": format_error(e)
+            "error": format_error(e, info.context.headers['authorization'])
         }
     return payload

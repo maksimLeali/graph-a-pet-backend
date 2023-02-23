@@ -21,6 +21,6 @@ def restore_memoriae_resolver(obj, info, id,):
         
         payload = {
             "success": False,
-            "error": format_error(e)
+            "error": format_error(e, info.context.headers['authorization'])
         }
     return payload
