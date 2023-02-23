@@ -47,11 +47,11 @@ to get it you can look up for the [@RawDataBot](https://web.telegram.org/z/#2112
 in telegram and starting the conversation.
 It should respond you with  a structure like that:
 
-```bash
+```json
 {
     "update_id": ~,
     "message": {
-        "from": {...}
+        "from": {...},
         "chat": {
             "id": <CHAT_ID>,
             "first_name": ~,
