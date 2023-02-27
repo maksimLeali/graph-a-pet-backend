@@ -296,6 +296,8 @@ type DailyStats {
     all_users: Int!
     active_users: Int!
     all_pets: Int!
+    all_reports: Int!
+    daily_reports: Int!
     active_users_percent: Float!
 }
 

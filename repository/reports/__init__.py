@@ -6,7 +6,8 @@ from api.errors import InternalError, NotFoundError, BadRequest
 from utils.logger import logger, stringify
 from sqlalchemy.exc import ProgrammingError
 from repository.query_builder import build_query, build_count
-from sqlalchemy import select, text
+from sqlalchemy import and_, not_, select, text
+from datetime import datetime, timedelta
 
 
 def create_report(data):
@@ -98,6 +99,30 @@ def get_total_items(common_search):
     except ProgrammingError as e:
         logger.error(e)
         raise BadRequest('malformed variables_fields')
+    except Exception as e:
+        logger.error(e)
+        raise e
+
+def get_all_reports ():
+    logger.repository("fetching all users")
+    try:
+        users  = Report.query.all()
+        logger.check(f"users: {len(users)}")
+        return users
+    except Exception as e:
+        logger.error(e)
+        raise e
+    
+def get_daily_reports():
+    logger.repository('fetching all active users ')
+    try: 
+        users = db.session.query(Report).filter(
+            and_( 
+                 (Report.created_at> datetime.now() -timedelta(days=1) )
+                ) 
+            ).all()
+        logger.check(f"active users: {len(users)}")
+        return users
     except Exception as e:
         logger.error(e)
         raise e

@@ -3,8 +3,8 @@ from repository.pets import get_all_pets
 import repository.statistics as statistics_data
 from math import ceil
 from repository.users import get_all_active_users, get_all_users
+from repository.reports import get_all_reports, get_daily_reports
 from utils.logger import logger, stringify
-from datetime import datetime
 import pendulum
 import pydash as py_
 
@@ -111,10 +111,14 @@ def get_real_time_statistic():
         active_users = len(get_all_active_users())
         all_users = len(get_all_users())
         all_pets = len(get_all_pets())
+        all_reports = len(get_all_reports())
+        daily_reports= len(get_daily_reports())
         data =  {
             "active_users" :  active_users,
             "all_users" :   all_users,
             "all_pets" :   all_pets,
+            "all_reports" :   all_reports,
+            "daily_reports": daily_reports,
             "active_users_percent" : "{0:.2f}".format((active_users / all_users  )* 100 ) ,
         }
         return data
