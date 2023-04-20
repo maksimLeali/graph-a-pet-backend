@@ -10,3 +10,4 @@ venv
 /alembic/alembic.ini
 serviceAccountKey.json
 **/__log__*
+test*.py

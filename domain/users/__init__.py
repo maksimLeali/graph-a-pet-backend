@@ -9,6 +9,7 @@ import domain.damnationes_memoriae as damnatio_domain
 from repository.ownerships.models import CustodyLevel
 import domain.pets as pets_domain
 import domain.ownerships as ownerships_domain
+import domain.reports as reports_domain
 import domain.medias as media_domain
 from passlib.hash import pbkdf2_sha256
 import jwt
@@ -39,6 +40,19 @@ def get_ownerships(common_search):
         logger.check(
             f"response: {stringify({'ownerships' : ownerships , 'pagination': pagination}) }")
         return (ownerships, pagination)
+    except Exception as e:
+        logger.error(e)
+        raise e
+    
+@convert_kwargs_to_snake_case
+def get_reports(common_search):
+    logger.domain(f"common_search: {stringify(common_search)}")
+    try:
+        reports, pagination = reports_domain.get_paginated_reports(
+            common_search)
+        logger.check(
+            f"response: {stringify({'reportss' : reports , 'pagination': pagination}) }")
+        return (reports, pagination)
     except Exception as e:
         logger.error(e)
         raise e

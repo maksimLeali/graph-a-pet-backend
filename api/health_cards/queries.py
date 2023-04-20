@@ -7,7 +7,7 @@ from api.middlewares import min_role, RoleLevel
 
 @convert_kwargs_to_snake_case
 @min_role(RoleLevel.ADMIN.name)
-def list_health_cards_resolver(obj, info, common_search):
+def  list_health_cards_resolver(obj, info, common_search):
     logger.api(f"common_search: {stringify(common_search)}")
     try:
         common_search = format_common_search(common_search)

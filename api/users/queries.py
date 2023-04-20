@@ -68,3 +68,29 @@ def me_resolver(obj, info):
             "user": None
         }
     return payload
+
+@convert_kwargs_to_snake_case
+@auth_middleware
+def user_dashboard_resolver(obj, info):
+    logger.api("getting_dashboard")
+    try: 
+        token =  info.context.headers['authorization']
+        current_user = get_request_user(token)
+        # user_dashboard = get_user_dashboard(current_user.get('id'))
+        payload = {
+            'success' : True,
+            'dashboard' : {
+                'user_id': current_user['id']
+            }
+        }
+    except Exception as e: 
+        logger.error(e)
+        payload = {
+            "success": False,
+            "error": format_error(e, token),
+            "user": None
+        }
+    return payload
+    
+        
+    

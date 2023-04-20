@@ -26,6 +26,7 @@ type Query {
     getGroupedStatistics(date_from: String!, date_to: String, group: String ): StatisticsResult!
     getDamnatioMemoriae(id: ID!): DamnatioMemoriaeResult
     listDamnationesMemoriae(commonSearch: CommonSearch= {}): PaginatedDamnationesMemoriae
+    getUserDashboard: UserDashboardResult!
     
 }
 
@@ -169,6 +170,7 @@ type User {
     pets_on_loan: Int!
     last_activity: String
     profile_picture: Media
+    reports(commonSearch: CommonSearch = {}): PaginatedReports
 }
 
 type DamnatioMemoriae {
@@ -438,6 +440,18 @@ type HealthCard {
     pet: Pet!
     treatments(commonSearch: CommonSearch = {}): PaginatedTreatments!
     notes: [String]!
+}
+
+type UserDashboardResult {
+    dashboard: UserDashboard
+    error: Error
+    success: Boolean
+
+}
+type UserDashboard {
+    user_id: String
+    ownerships(commonSearch: CommonSearch ={}): PaginatedOwnerships
+    reports(commonSearch: CommonSearch = {}): PaginatedReports
 }
 
 type HealthCardResult {

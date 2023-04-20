@@ -1,6 +1,6 @@
 from utils.logger import logger
 from ariadne import QueryType, MutationType
-from api.users.resolvers import user
+from api.users.resolvers import user, dashboard
 from api.users.queries import *
 from api.users.mutations import *
 from api.pets.resolvers import pet
@@ -73,6 +73,7 @@ query.set_field("getDashboard", dashboard_resolver)
 query.set_field("getRealTimeStatistic", get_real_time_statistic_resolver)
 query.set_field("getGroupedStatistics", get_statistics_by_group)
 query.set_field("listDamnationesMemoriae", list_damnationes_memoriae_resolver)
+query.set_field("getUserDashboard", user_dashboard_resolver)
 
 mutation = MutationType()
 mutation.set_field('createUser', create_user_resolver)
@@ -100,4 +101,4 @@ mutation.set_field("updateMedia", update_media_resolver)
 mutation.set_field("createMedia", create_media_resolver)
 mutation.set_field("restoreMemoriae", restore_memoriae_resolver)
 
-object_types = [query, mutation, user, pet, ownership, pet_body, coat, health_card, treatment, report]
+object_types = [query, mutation, user, dashboard, pet, ownership, pet_body, coat, health_card, treatment, report]

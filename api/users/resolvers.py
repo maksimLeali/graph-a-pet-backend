@@ -1,10 +1,13 @@
 from ariadne import ObjectType, convert_kwargs_to_snake_case
 import domain.users as users_domain
 from utils.logger import logger, stringify
-from utils import format_common_search
+from utils import format_common_search, get_request_user
 from api.errors import error_pagination, format_error
 from repository.ownerships.models import CustodyLevel
+import pendulum
 user = ObjectType("User")
+dashboard = ObjectType("UserDashboard")
+
 
 @user.field("ownerships")
 @convert_kwargs_to_snake_case
@@ -21,6 +24,41 @@ def user_ownerships_resolver(obj, info, common_search):
     } 
     logger.api(
         f"user_id: {obj['id']}\n"\
+        f'common_search: {stringify(common_search)}'
+    )
+    try: 
+        ownerships, pagination= users_domain.get_ownerships(common_search)
+        resolved = {
+            "items": ownerships,
+            "pagination": pagination,
+            "success": True
+        }
+        logger.check(f"pagination: {stringify(pagination)}")
+    except Exception as  e: 
+        logger.error(e)
+        resolved= {
+            "items": [],
+            "pagination": error_pagination,
+            "success": False,
+            "error": format_error(e,info.context.headers['authorization']) 
+        }
+    return resolved
+
+@dashboard.field("ownerships")
+@convert_kwargs_to_snake_case
+def user_ownerships_resolver(obj, info, common_search):
+    common_search= format_common_search(common_search)
+    common_search['filters']['and']= { 
+        **(common_search['filters'].get('and') if common_search.get('filters').get('and')!= None else {}), 
+        **{ 
+            'fixed' :  {
+                **(common_search['filters'].get('and').get('fixed') if common_search.get('filters').get('and')!= None and common_search['filters'].get('and').get('fixed') != None else {}),
+                **{'user_id' : obj['user_id'] }
+            } 
+        } 
+    } 
+    logger.api(
+        f"user_id: {obj['user_id']}\n"\
         f'common_search: {stringify(common_search)}'
     )
     try: 
@@ -111,3 +149,68 @@ def resolve_profile_picture(obj,info):
     except Exception as e:
         logger.error(e)
         
+        
+
+@user.field("reports")
+@convert_kwargs_to_snake_case
+def user_ownerships_resolver(obj, info, common_search):
+    common_search= format_common_search(common_search)
+    common_search['filters']['and']= { 
+        **(common_search['filters'].get('and') if common_search.get('filters').get('and')!= None else {}), 
+        **{ 
+            'fixed' :  {
+                **(common_search['filters'].get('and').get('fixed') if common_search.get('filters').get('and')!= None and common_search['filters'].get('and').get('fixed') != None else {}),
+                **{"reporter ->> 'email'" : obj['email'] }
+            } 
+        } 
+    }
+
+    try: 
+        reports, pagination= users_domain.get_reports(common_search)
+        resolved = {
+            "items": reports,
+            "pagination": pagination,
+            "success": True
+        }
+        logger.check(f"pagination: {stringify(pagination)}")
+    except Exception as  e: 
+        logger.error(e)
+        resolved= {
+            "items": [],
+            "pagination": error_pagination,
+            "success": False,
+            "error": format_error(e,info.context.headers['authorization']) 
+        }
+    return resolved
+
+@dashboard.field("reports")
+@convert_kwargs_to_snake_case
+def user_ownerships_resolver(obj, info, common_search):
+    common_search= format_common_search(common_search)
+    common_search['filters']['and']= { 
+        **(common_search['filters'].get('and') if common_search.get('filters').get('and')!= None else {}), 
+        **{ 
+            'ranges' :  {
+                **(common_search['filters'].get('and').get('ranges') if common_search.get('filters').get('and')!= None and common_search['filters'].get('and').get('ranges') != None else {}),
+                **{'created_at': { 'min':  pendulum.now().subtract(weeks=1).format('YYYY-MM-DD') , 'max' : pendulum.now().add(days=1).format('YYYY-MM-DD')}}
+            } 
+        } 
+    }
+
+    try: 
+        reports, pagination= users_domain.get_reports(common_search)
+        resolved = {
+            "items": reports,
+            "pagination": pagination,
+            "success": True
+        }
+        logger.check(f"pagination: {stringify(pagination)}")
+    except Exception as  e: 
+        logger.error(e)
+        resolved= {
+            "items": [],
+            "pagination": error_pagination,
+            "success": False,
+            "error": format_error(e,info.context.headers['authorization']) 
+        }
+    return resolved
