@@ -56,7 +56,7 @@ def upload_file():
     if not file or file.filename == '':
         return abort(400, 'no file selected')
     try:
-        public_url, type, encoding, size = mediaDomain.upload_media(file)
-        return jsonify({"public_url" : public_url, "type": type, "size": size, "encodig": encoding}), 200
+        public_url, type, encoding, size, main_colors = mediaDomain.upload_media(file)
+        return jsonify({"public_url" : public_url, "type": type, "size": size, "encodig": encoding, "main_colors":main_colors}), 200
     except Exception as e:
         logger.error(e)

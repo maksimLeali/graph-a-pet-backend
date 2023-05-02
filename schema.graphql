@@ -225,6 +225,8 @@ type Media {
     url: String!
     type: String!
     scope: String!
+    main_color: MainColor
+    main_colors: [MainColor!]
     ref_id: String! 
 }
 
@@ -235,6 +237,10 @@ type Ownership {
     custody_level: CustodyLevel!
 }
 
+type MainColor {
+    color: String!
+    contrast: String!
+}
 
 type UserResult {
     success: Boolean!
@@ -570,10 +576,17 @@ input DeepFilters {
    
 }
 
+input MainColorCreate {
+    color: String!
+    contrast: String
+}
+
 input MediaUpdate {
     url: String
     scope: String
     ref_id: String
+    main_colors: [MainColorCreate] = []
+    main_color: MainColorCreate
     type: String
 }
 
@@ -581,6 +594,8 @@ input MediaCreate {
     url: String!
     scope: String!
     ref_id: String!
+    main_colors: [MainColorCreate] = []
+    main_color: MainColorCreate
     type: String!
 }
 

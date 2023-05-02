@@ -19,6 +19,7 @@ cffi==1.15.0
 charset-normalizer==2.0.12
 click==8.1.2
 colorama==0.4.4
+colorthief==0.2.1
 distlib==0.3.4
 filelock==3.6.0
 firebase==3.0.1

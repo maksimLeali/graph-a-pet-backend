@@ -18,6 +18,8 @@ def create_media(data):
             type=data.get('type'),
             url=data.get('url'),
             scope = data.get('scope'),
+            main_colors= data.get('main_colors'),
+            main_color= data.get('main_color'),
             created_at=today.strftime("%Y-%m-%dT%H:%M:%SZ"),
             ref_id=data.get('ref_id')
         )

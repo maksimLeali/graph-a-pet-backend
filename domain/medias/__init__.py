@@ -13,13 +13,30 @@ import urllib.request
 from werkzeug.utils import secure_filename
 from utils import allowed_files
 
+from colorthief import ColorThief
+
+
+def get_luminance(hex_color):
+    color = hex_color[1:]
+    hex_red = int(color[0:2], base=16)
+    hex_green = int(color[2:4], base=16)
+    hex_blue = int(color[4:6], base=16)
+    return hex_red * 0.2126 + hex_green * 0.7152 + hex_blue * 0.0722
+
 def upload_media(file):
     try: 
         logger.domain('try to upload media')
         if file and allowed_files(file.filename):
             filename = secure_filename(file.filename)
             file.save(os.path.join('temp', filename))
-            return upload_image('temp'+'/', filename)
+            ct = ColorThief('temp/'+filename)
+            palette = ct.get_palette(color_count=5)
+            main_colors = [("#"+f"{color[0]:02x}"+f"{color[1]:02x}"+f"{color[2]:02x}").upper() for color in palette]
+            colors = [ {"color" : color, "contrast" : "#FFFFFF" if get_luminance(color) < 140 else "#000000" } for color in main_colors]
+            logger.domain( "-".join([color.replace("#","") for color in main_colors]))
+            logger.domain(colors)
+            public_url, type, encoding, size, = upload_image('temp/', filename)
+            return public_url, type, encoding, size, colors
         error = BadRequest(f"file not allowed")
         raise error
     except Exception as e: 
