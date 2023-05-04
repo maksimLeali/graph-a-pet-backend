@@ -218,6 +218,7 @@ type Pet {
     diet: [String]
     intollerance: [String]
     disciplines: [String]
+    main_picture: Media
 }
 
 type Media {

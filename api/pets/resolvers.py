@@ -8,6 +8,17 @@ from utils import format_common_search
 
 pet = ObjectType("Pet")
 
+
+@pet.field('main_picture')
+def resolve_profile_picture(obj,info):
+    logger.api(f'{obj["id"]}')
+    try :
+        media = pets_domain.get_main_pic(obj['id'])
+        return media
+    except Exception as e:
+        logger.error(e)
+        
+
 @pet.field('ownerships')
 @convert_kwargs_to_snake_case
 def pet_ownerships_resolver(obj, info, common_search):

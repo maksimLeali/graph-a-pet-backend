@@ -2,6 +2,7 @@ from ariadne import convert_kwargs_to_snake_case
 import repository.pets as pets_data
 import domain.ownerships as ownerships_domain
 import domain.pet_bodies as pet_bodies_domain
+import domain.medias as media_domain
 import repository.damnationes_memoriae as damnatio
 import domain.damnationes_memoriae as damnatio_domain
 from utils.logger import logger, stringify
@@ -10,6 +11,18 @@ from math import ceil
 
 import pydash as py_
 
+@convert_kwargs_to_snake_case
+def get_main_pic(pet_id: str):
+    logger.domain(f"id {pet_id}")
+    try:
+        medias = media_domain.get_medias({"ordering": {"order_direction": "ASC", "order_by": "created_at"}, "pagination": {
+                                        "page_size": 10, "page": 0}, "filters": {"and": {"fixed": {"ref_id ": pet_id, "scope": "pet_main_picture"}}}})
+        media= medias[0]
+        logger.check(media)
+        return media
+    except Exception as e:
+        logger.error(e)
+        raise e
 
 @convert_kwargs_to_snake_case
 def get_ownerships(common_search):
