@@ -42,6 +42,7 @@ type Mutation {
     deleteOwnership(id: ID!): DeleteResult!
     updateOwnership(id: ID!, data: OwnershipUpdate!): OwnershipResult!
     login(email: String!, password: String!):NewTokenResult!
+    linkPetToUser(userId: ID!, petID: String,  custodyLevel:CustodyLevel): OwnershipResult!
     logout: Boolean!
     addPet(pet: PetCreate!): PetResult!
     addPetToUser(pet: PetCreate!, userId: String!): PetAddedResult!

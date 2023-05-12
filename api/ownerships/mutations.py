@@ -40,3 +40,8 @@ def delete_ownership_resolver(obj, info, id):
             "error": format_error(e, info.context.headers['authorization'])
         }
     return payload
+
+
+@convert_kwargs_to_snake_case
+def delete_ownership_resolver(obj, info, userId, petId, custodyLevel):
+    logger.api('linking pet {petId} to user')
