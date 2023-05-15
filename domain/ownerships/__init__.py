@@ -1,7 +1,7 @@
 import repository.ownerships as ownerships_data
 import domain.users as users_domain
 import domain.pets as pets_domain
-from api.errors import InternalError
+from api.errors import BadRequest, NotFoundError, ForbiddenError
 import domain.damnationes_memoriae as damnatio_domain
 from utils.logger import logger, stringify
 from math import ceil
@@ -51,6 +51,43 @@ def get_ownership(id):
 
 def get_filtered_ownerships(filters):
     return ownerships_data.get_filtered_ownerships(filters)
+
+def link_pet_to_me(data):
+    try : 
+        user = users_domain.get_user(data.get('user_id'))
+        if user == None : 
+            raise NotFoundError(f'no user found with id {data.get("user_id")}') 
+        pet = pets_domain.get_pet(data.get("pet_id"))
+        if pet == None : 
+            raise NotFoundError(f'no pet found with id {data.get("pet_id")}') 
+        
+        if(data.get("custody_level") == None):
+            raise BadRequest(f'missing custody_level')
+        
+        if(data.get("custody_level") == "OWNER" and user.get('role') != 'ADMIN'):
+            raise ForbiddenError(f"only admins can create ownerships of 'OWNER' level")
+        return create_ownership(data)
+            
+    except Exception as e:
+        logger.error(e)
+        raise e
+    
+def link_pet_to_user(data):
+    try : 
+        user = users_domain.get_user(data.get('user_id'))
+        if user == None : 
+            raise NotFoundError(f'no user found with id {data.get("user_id")}') 
+        pet = pets_domain.get_pet(data.get("pet_id"))
+        if pet == None : 
+            raise NotFoundError(f'no pet found with id {data.get("pet_id")}') 
+        
+        if(data.get("custody_level") == None):
+            raise BadRequest(f'missing custody_level')
+        return create_ownership(data)
+    except Exception as e:
+        logger.error(e)
+        raise e
+        
 
 def get_pagination(common_search):
     try: 
