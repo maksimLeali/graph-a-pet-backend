@@ -9,12 +9,6 @@ class PetFamily(Enum) :
     BIRDS= "BIRDS"
     FISH= "FISH"
 
-    
-
-
-
-
-
 
 class PetBody(Base):
     __tablename__ = 'pet_bodies'

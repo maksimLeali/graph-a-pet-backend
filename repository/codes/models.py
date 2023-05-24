@@ -5,6 +5,7 @@ class Code(Base):
     code = db.Column(db.String)
     ref_id = db.Column(db.String)
     ref_table= db.Column(db.String)
+    created_by= db.Column(db.String, db.ForeignKey('users.id'))
 
     def to_dict(self):
         return {

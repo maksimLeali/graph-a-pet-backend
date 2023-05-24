@@ -23,6 +23,7 @@ def auth_middleware(f):
             bearer = info.context.headers['authorization'].split('Bearer ')[1]
             decoded_bearer= jwt.decode(bearer,cfg['jwt']['secret'],algorithms=["HS256"] )
             logger.info(decoded_bearer)
+            
             get_user(decoded_bearer['user']['id'])
         except jwt.ExpiredSignatureError as e : 
             logger.error(f"Token expired for user {decoded_bearer['user']['id']} ")

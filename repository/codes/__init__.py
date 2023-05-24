@@ -29,9 +29,11 @@ def create_code(data):
 
 
 def get_codes(common_search):
+    logger.repository(f'getting codes: {stringify(common_search)}')
     try:
         query = build_query(table="codes", ordering=common_search["ordering"],
                             filters=common_search['filters'], pagination=common_search['pagination'])
+        logger.info(query)
         manager = select(Code).from_statement(text(query))
         codes = db.session.execute(manager).scalars()
         return [code.to_dict() for code in codes]

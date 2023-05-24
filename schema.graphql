@@ -60,6 +60,7 @@ type Mutation {
     updateMedia(id:ID!, data: MediaUpdate!): MediaResult!
     createMedia(data: MediaCreate!): MediaResult!
     createCode(data: CodeCreate!): CodeResult!
+    checkCode(code: String!): CodeValidationResult!
     restoreMemoriae(id:ID!): RestoredResult!
     respondToReport(id: ID!, reporter: ReporterCreate!): ReportResult!
 }
@@ -421,6 +422,13 @@ type MediaResult {
 type CodeResult {
     success: Boolean!
     error: Error
+    code: Code
+}
+
+type CodeValidationResult {
+    success: Boolean!
+    error: Error
+    is_valid: Boolean
     code: Code
 }
 
