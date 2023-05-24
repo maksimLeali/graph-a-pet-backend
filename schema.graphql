@@ -20,7 +20,9 @@ type Query {
     getReport(id: ID!): ReportResult
     listReports(commonSearch: CommonSearch = {}): PaginatedReports!
     getMedia(id: ID!): MediaResult!
+    getCode(id: ID!): CodeResult!
     listMedias(commonSearch: CommonSearch= {}): PaginatedMedias!
+    listCodes(commonSearch: CommonSearch= {}): PaginatedCodes!
     getDashboard: DashboardResult!
     getRealTimeStatistic: RealTimeStatisticResult!
     getGroupedStatistics(date_from: String!, date_to: String, group: String ): StatisticsResult!
@@ -57,6 +59,7 @@ type Mutation {
     updateReport(id: ID!, data: ReportUpdate!): ReportResult!
     updateMedia(id:ID!, data: MediaUpdate!): MediaResult!
     createMedia(data: MediaCreate!): MediaResult!
+    createCode(data: CodeCreate!): CodeResult!
     restoreMemoriae(id:ID!): RestoredResult!
     respondToReport(id: ID!, reporter: ReporterCreate!): ReportResult!
 }
@@ -380,6 +383,13 @@ type PaginatedMedias {
     pagination: Pagination!
 }
 
+type PaginatedCodes {
+    success: Boolean
+    error: Error
+    items: [Code]!
+    pagination: Pagination!
+}
+
 type NewTokenResult {
     success: Boolean!
     error: Error
@@ -406,6 +416,12 @@ type MediaResult {
     success: Boolean!
     error: Error
     media: Media
+}
+
+type CodeResult {
+    success: Boolean!
+    error: Error
+    code: Code
 }
 
 
@@ -473,6 +489,14 @@ type TreatmentResult {
     treatment: Treatment
     success: Boolean
     error: Error
+}
+
+type Code {
+    id: ID!
+    code: String!
+    ref_id: ID!
+    ref_table: String
+    created_at: String!
 }
 
 type Treatment {
@@ -602,6 +626,12 @@ input MediaCreate {
     type: String!
 }
 
+input CodeCreate {
+    code: String!
+    ref_id: String!
+    ref_table: String!
+}
+
 input ReportCreate {
     type: ReportType!
     place: String!
@@ -703,7 +733,6 @@ input PetCreate {
     diet: [String]
     intollerance: [String]
     disciplines: [String]
-
 }
 
 input TreatmentCreate{

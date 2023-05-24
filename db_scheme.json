@@ -188,6 +188,19 @@
 
             }
         },
+        "codes": {
+            "search_columns": [
+                "code"
+            ],
+            "alias": "cd",
+            "other_table_ref": "code_id",
+            "children": [
+
+            ],
+            "inherit_delete": {
+
+            }
+        },
         "statistics": {
             "search_columns": [
 

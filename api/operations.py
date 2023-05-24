@@ -20,6 +20,8 @@ from api.health_cards.mutations import *
 from api.health_cards.resolvers import health_card
 from api.medias.queries import * 
 from api.medias.mutations import * 
+from api.codes.queries import *
+from api.codes.mutations import * 
 from api.treatments.queries import * 
 from api.treatments.mutations import * 
 from api.treatments.resolvers import treatment
@@ -69,11 +71,14 @@ query.set_field("getReport", get_report_resolver)
 query.set_field("listReports", list_reports_resolver)
 query.set_field("listMedias", list_medias_resolver)
 query.set_field("getMedia", get_media_resolver)
+query.set_field("listCodes", list_codes_resolver)
+query.set_field("getCode", get_code_resolver)
 query.set_field("getDashboard", dashboard_resolver)
 query.set_field("getRealTimeStatistic", get_real_time_statistic_resolver)
 query.set_field("getGroupedStatistics", get_statistics_by_group)
 query.set_field("listDamnationesMemoriae", list_damnationes_memoriae_resolver)
 query.set_field("getUserDashboard", user_dashboard_resolver)
+
 
 mutation = MutationType()
 mutation.set_field('createUser', create_user_resolver)
@@ -101,6 +106,7 @@ mutation.set_field("updateReport", update_report_resolver)
 mutation.set_field("respondToReport", respond_to_report_resolver)
 mutation.set_field("updateMedia", update_media_resolver)
 mutation.set_field("createMedia", create_media_resolver)
+mutation.set_field("createCode", create_code_resolver)
 mutation.set_field("restoreMemoriae", restore_memoriae_resolver)
 
 object_types = [query, mutation, user, dashboard, pet, ownership, pet_body, coat, health_card, treatment, report]
