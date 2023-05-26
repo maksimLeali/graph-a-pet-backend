@@ -504,7 +504,8 @@ type Code {
     id: ID!
     code: String!
     ref_id: ID!
-    ref_table: String
+    ref_table: String!
+    created_by: String!
     created_at: String!
 }
 
