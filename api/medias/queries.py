@@ -18,6 +18,7 @@ def list_medias_resolver(obj, info, common_search):
             "pagination": pagination
         }
     except Exception as error:
+        logger.error(error)
         payload = {
             "success": False,
             "items": [],
@@ -35,9 +36,10 @@ def get_media_resolver(obj, info, id):
             "success": True,
             "media": media
         }
-    except AttributeError:  # todo not found
+    except Exception as error:  
+        logger.error(error)# todo not found
         payload = {
             "success": False,
-            "errors": ["media item matching {id} not found"]
+            "error": format_error(error)
         }
     return payload

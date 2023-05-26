@@ -17,7 +17,8 @@ def create_code(data):
             id=f"{uuid.uuid4()}",
             code=data.get('code'),
             ref_table=data.get('ref_table'),
-            ref_id=data.get('ref_id')
+            ref_id=data.get('ref_id'),
+            created_by=data.get('created_by')
         )
         db.session.add(code)
         db.session.commit()
