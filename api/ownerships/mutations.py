@@ -1,6 +1,6 @@
 from ariadne import convert_kwargs_to_snake_case
 from api.errors import format_error
-from api.middlewares import min_role
+from api.middlewares import min_role, auth_middleware
 import domain.ownerships as owsershis_domain
 from repository.users.models import UserRole
 from utils import get_request_user
@@ -44,7 +44,7 @@ def delete_ownership_resolver(obj, info, id):
 
 
 @convert_kwargs_to_snake_case
-@min_role(UserRole.USER.name)
+@auth_middleware
 def link_pet_to_me_resolver(obj, info, pet_id, custody_level):
     logger.api(f'linking pet {pet_id} to self as {custody_level}')
     try :
