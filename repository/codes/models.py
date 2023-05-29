@@ -13,5 +13,6 @@ class Code(Base):
             "code": self.code,
             "ref_id": self.ref_id,
             "ref_table": self.ref_table,
-            "created_at": str(self.created_at)
+            "created_at": str(self.created_at),
+            "created_by": self.created_by,
         }

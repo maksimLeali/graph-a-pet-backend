@@ -78,6 +78,7 @@ query.set_field("getRealTimeStatistic", get_real_time_statistic_resolver)
 query.set_field("getGroupedStatistics", get_statistics_by_group)
 query.set_field("listDamnationesMemoriae", list_damnationes_memoriae_resolver)
 query.set_field("getUserDashboard", user_dashboard_resolver)
+query.set_field("getOrCreateCode", get_or_create_code_resolver)
 
 
 mutation = MutationType()

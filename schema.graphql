@@ -29,6 +29,7 @@ type Query {
     getDamnatioMemoriae(id: ID!): DamnatioMemoriaeResult
     listDamnationesMemoriae(commonSearch: CommonSearch= {}): PaginatedDamnationesMemoriae
     getUserDashboard: UserDashboardResult!
+    getOrCreateCode(ref_id: String!, ref_table: String!, code: String): CodeResult
     
 }
 
@@ -503,7 +504,8 @@ type Code {
     id: ID!
     code: String!
     ref_id: ID!
-    ref_table: String
+    ref_table: String!
+    created_by: String!
     created_at: String!
 }
 

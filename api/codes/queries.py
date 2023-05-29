@@ -1,8 +1,9 @@
 from ariadne import convert_kwargs_to_snake_case
 import domain.codes as codes_domain
 from utils.logger import logger
-from utils import format_common_search
-from api.middlewares import min_role, RoleLevel
+from utils import format_common_search, get_request_user
+
+from api.middlewares import min_role, RoleLevel, auth_middleware
 from api.errors import format_error, error_pagination
 
 
@@ -39,4 +40,24 @@ def get_code_resolver(obj, info, id):
             "success": False,
             "errors": ["code item matching {id} not found"]
         }
+    return payload
+
+@convert_kwargs_to_snake_case
+@auth_middleware
+def get_or_create_code_resolver(obj, info, ref_id, ref_table, code): 
+    logger.api(f'get code for {ref_id} of{ref_table}')
+    try :
+        token =  info.context.headers['authorization']
+        current_user = get_request_user(token)
+        code = codes_domain.get_or_create(ref_id, ref_table, code, current_user)
+        payload = {
+            "success": True,
+            "code": code
+        }
+    except Exception as error:
+        logger.error(error)
+        payload = {
+            "success": False,
+            "error": format_error(error)
+        } 
     return payload

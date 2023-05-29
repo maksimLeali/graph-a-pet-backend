@@ -1,4 +1,6 @@
 from io import BytesIO
+import random
+import string
 import repository.codes as codes_data
 from utils.logger import logger, stringify
 from domain.pets import get_pets
@@ -15,6 +17,11 @@ from werkzeug.utils import secure_filename
 from utils import allowed_files
 
 
+def generate_random_string(length):
+    characters = string.ascii_letters + string.digits
+    random_string = ''.join(random.choice(characters) for _ in range(length))
+    return random_string
+
 def get_paginated_codes(common_search):
     logger.domain(f"common_search: {stringify(common_search)}")
     try:
@@ -29,6 +36,8 @@ def get_paginated_codes(common_search):
 def create_code(data, current_user):
     logger.domain(f'data {stringify(data)} user: {stringify(current_user)}')
     try: 
+        if data.get('code') == None :
+            data['code'] = generate_random_string(10);
         code_filter = {
             "pagination":{
                 "page":0,
@@ -129,6 +138,34 @@ def code_validation(code):
         codes = get_codes(code_filter)
         codes_length = len(codes)
         return len(codes) == 1, codes[0] if codes_length == 1 else None
+    except Exception as e:
+        logger.error(e)
+        raise e
+    
+def get_or_create(ref_id, ref_table, code, current_user ):
+    logger.domain(f'check if code already exist for {ref_id} of {ref_table}')
+    try: 
+        filters = {
+            "pagination" : {"page" : 0, "page_size" : 20},
+            "ordering":{
+                "order_by":"created_at",
+                "order_direction":"desc"
+            },
+            "filters" : {
+                "and" : {
+                    "fixed" : {
+                        "ref_id" : ref_id,
+                        "ref_table": ref_table
+                    }
+                }
+            }
+        }
+        codes= get_codes(filters)
+        if(len(codes)> 0) :
+            return codes[0]
+        return create_code( {"ref_id" : ref_id,
+                        "ref_table": ref_table,
+                        "code": code }, current_user)
     except Exception as e:
         logger.error(e)
         raise e
