@@ -3,7 +3,7 @@ import domain.pets as pets_domain
 from utils.logger import logger, stringify
 from utils import format_common_search
 from api.errors import InternalError, error_pagination, format_error
-from api.middlewares import min_role, RoleLevel
+from api.middlewares import min_role, RoleLevel, auth_middleware
 
 
 @convert_kwargs_to_snake_case
@@ -31,7 +31,7 @@ def list_pets_resolver(obj, info, common_search):
 
 
 @convert_kwargs_to_snake_case
-@min_role(RoleLevel.ADMIN.name)
+@auth_middleware
 def get_pet_resolver(obj, info, id):
     logger.api(f"id: {id}")
     try:
