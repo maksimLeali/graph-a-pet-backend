@@ -17,6 +17,7 @@ type Query {
     getHealthCard(id: ID!): HealthCardResult
     getTreatment(id: ID!): TreatmentResult
     listTreatments(commonSearch: CommonSearch = {}): PaginatedTreatments!
+    listMyTreatments(commonSearch: CommonSearch = {}): PaginatedTreatments!
     getReport(id: ID!): ReportResult
     listReports(commonSearch: CommonSearch = {}): PaginatedReports!
     getMedia(id: ID!): MediaResult!
