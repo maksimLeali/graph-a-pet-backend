@@ -6,7 +6,7 @@ class BadRequest(Exception):
     extension= {"code": 400, "extra": None}
 
 class AuthenticationError(Exception):
-    extensions = {"code": 401, "extra": None}
+    extension = {"code": 401, "extra": None}
 
 class ForbiddenError(Exception):
     extension = {"code" : 403 , "extra": None}
