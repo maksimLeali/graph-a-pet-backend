@@ -99,6 +99,15 @@ enum TreatmentType{
     REMINDER,
 }
 
+enum treatmentDuration{
+    TEN_MINUTES,
+    QUARTER_HOUR,
+    THREE_QUARTER,
+    HALF_HOUR,
+    HOUR_AND_HALF,
+    TWO_HOURS
+}
+
 enum CoatName {
     FUR,
     SCALES,
@@ -510,6 +519,14 @@ type Code {
     created_at: String!
 }
 
+type MinTreatment {
+    id: ID! 
+    type: TreatmentType!
+    name: String!
+    date: String!
+
+}
+
 type Treatment {
     id: ID! 
     created_at: String!
@@ -517,11 +534,13 @@ type Treatment {
     name: String!
     date: String!
     logs: [String]
+    duration: treatmentDuration
     frequency_value: Int
     frequency_times: Int
     frequency_unit: FrequencyUnit
     booster: Treatment
     health_card: HealthCard
+    related: [MinTreatment]
 }
 
 type Report {

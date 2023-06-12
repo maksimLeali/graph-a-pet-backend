@@ -10,6 +10,18 @@ import pydash as py_
 import pendulum as pdl
 
 
+def get_related(obj, info):
+    logger.domain(obj)
+    try:
+        related = treatments_data.get_releted_treatments(obj.get('id'))
+        logger.info(related)
+        return related
+    except Exception as e:
+        logger.error(e)
+        raise e
+    
+
+
 def setUnits(frequency_unit, value):
     years, months, weeks, days = 0, 0, 0, 0
     if (frequency_unit == FrequencyUnit.YEARLY.name):

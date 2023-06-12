@@ -11,6 +11,14 @@ class TreatmentType(Enum):
     OPERATION = "OPERATION",
     REMINDER = "REMINDER",
 
+class treatmentDuration(Enum):
+    TEN_MINUTES="TEN_MINUTES",
+    QUARTER_HOUR="QUARTER_HOUR",
+    THREE_QUARTER="THREE_QUARTER",
+    HALF_HOUR="HALF_HOUR",
+    HOUR_AND_HALF="HOUR_AND_HALF",
+    TWO_HOURS="TWO_HOURS"
+
 
 class FrequencyUnit(Enum):
     DAILY = "DAILY",
@@ -32,7 +40,8 @@ class Treatment(Base):
     frequency_value = db.Column(db.Integer)
     frequency_unit = db.Column(db.Enum(FrequencyUnit))
     frequency_times = db.Column(db.Integer)
-    
+    duration = db.Column(db.Enum(treatmentDuration),
+                     default=treatmentDuration.HALF_HOUR.name) 
     def to_dict(self):
         return {
             "id": self.id,
@@ -46,5 +55,6 @@ class Treatment(Base):
             "health_card_id": self.health_card_id,
             "updated_at": str(self.updated_at) if self.updated_at else None,
             "logs": self.logs,
-            "created_at": self.created_at.strftime('%Y-%m-%dT%H:%M:%SZ')
+            "created_at": self.created_at.strftime('%Y-%m-%dT%H:%M:%SZ'),
+            "duration": self.duration.name if (self.duration ) else treatmentDuration.HALF_HOUR.name
         }

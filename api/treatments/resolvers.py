@@ -26,4 +26,5 @@ def booster_resolver(obj, info):
         logger.error(e)
         resolved= None
     return resolved
-    
+
+treatment.set_field('related', treatments_domain.get_related )
