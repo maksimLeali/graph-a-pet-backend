@@ -104,6 +104,7 @@ enum treatmentDuration{
     QUARTER_HOUR,
     THREE_QUARTER,
     HALF_HOUR,
+    HOUR,
     HOUR_AND_HALF,
     TWO_HOURS
 }
