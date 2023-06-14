@@ -40,8 +40,15 @@ def graphql_server():
         debug=app.debug,
         logger="graph_a_pet"
     )
+    
     status_code = 200 if success else 400
-    return jsonify(result), status_code
+    response = jsonify(result)
+    response.status_code = status_code
+    
+    # Add Cache-Control header
+    response.headers['Cache-Control'] = 'public, max-age=3600'  # Cache for 1 hour
+    
+    return response
     
 
 app.register_blueprint(media)
