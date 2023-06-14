@@ -139,9 +139,10 @@ def get_pagination(common_search):
 #     except Exception as e:
 #         logger.error(e)
 #         raise e
-def get_resized_to_fit_media(id, size = { "width" : 400, "height" : 400}):
+def get_resized_to_fit_media(id, size = { "width" : 400, "height" : 400}, args = []):
     logger.domain(f"id: {id}, size: {stringify(size)}")
     try:
+        print(args)
         media = medias_data.get_media(id)
         logger.check(media)
         with urllib.request.urlopen(media["url"]) as url:
@@ -173,7 +174,7 @@ def get_resized_to_fit_media(id, size = { "width" : 400, "height" : 400}):
         logger.error(e)
         raise e
 
-def get_cropped_media(id, size = { "width" : 400, "height" : 400}):
+def get_cropped_media(id, size = { "width" : 400, "height" : 400}, args=[]):
     logger.domain(f"crop ->  id: {id}, size: {stringify(size)}")
     try:
         media = medias_data.get_media(id)
@@ -210,14 +211,23 @@ def get_cropped_media(id, size = { "width" : 400, "height" : 400}):
         logger.error(e)
         raise e
     
-def get_media_file(id): 
+def get_media_file(id, args): 
     logger.domain(f'id: {id}')
     try: 
         media = medias_data.get_media(id)
         with urllib.request.urlopen(media["url"]) as url:
             img = Image.open(url)
+        
+        format = args.get('format')    
         img_io = BytesIO()
-        img.save(img_io, "PNG", quality=100)
+        if(format != None) :
+            logger.critical(f'*********** {format}')
+            img = img.convert('RGB')
+            img.save(img_io, 'WEBP' , quality=100)
+        else : 
+            img.save(img_io, 'PNG' , quality=100)
+            
+        
         img_io.seek(0)
         return img_io, media["type"]
     except Exception as e:
