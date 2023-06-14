@@ -14,7 +14,7 @@ def get_media_no_size(id):
         print('\n\n\n\n')
         media,media_type = mediaDomain.get_media_file(id,request.args)
         logger.check(f"type: {media_type}")
-        return send_file(path_or_file=media, mimetype=media_type, max_age=300)
+        return send_file(path_or_file=media, mimetype=media_type, max_age=3600)
     except Exception as e:
         logger.error(e)
         formatted_error = format_error(e)
@@ -27,7 +27,7 @@ def get_resized_fit_media(id,size):
     try:
         media, media_type = mediaDomain.get_resized_to_fit_media(id, {"width": int(size.split("x")[0]) , "height": int(size.split("x")[1]) }, request.args)
         logger.check(f"type: {media_type}")
-        return send_file(path_or_file=media, mimetype=media_type, max_age=300)
+        return send_file(path_or_file=media, mimetype=media_type, max_age=3600)
     except Exception as e: 
         logger.error(e)
         formatted_error = format_error(e)
@@ -45,7 +45,7 @@ def get_resized_media(id,size):
         logger.check(f"type: {media_type}")
         logger.check(f"{type(media)}")
         
-        return send_file(path_or_file=media, mimetype=media_type, max_age=300)
+        return send_file(path_or_file=media, mimetype=media_type, max_age=3600)
     except Exception as e: 
         logger.error(e)
         formatted_error = format_error(e)
