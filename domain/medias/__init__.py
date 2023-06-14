@@ -15,6 +15,17 @@ from utils import allowed_files
 
 from colorthief import ColorThief
 
+mimeType = {
+    'WEBP': 'image/webp',
+    'PNG': 'image/png',
+    'JPEG': 'image/jpeg',
+    'JPG': 'image/jpeg'
+}
+mimeTypeReverse = {
+    'image/webp' : 'WEBP',
+    'image/png' : 'PNG',
+    'image/jpeg' : 'JPEG',
+}
 
 def get_luminance(hex_color):
     color = hex_color[1:]
@@ -166,10 +177,12 @@ def get_resized_to_fit_media(id, size = { "width" : 400, "height" : 400}, args =
         y = (transparent_box.height - img.height) / 2 if transparent_box.height > img.height else 0
         transparent_box.paste(img, (int(x), int(y)))
         img_io = BytesIO()
-        transparent_box.save(img_io, "PNG", quality=100)
+        format = args.get('format').upper() if args.get('format') is not None else mimeTypeReverse[media['type']]
+        transparent_box = transparent_box.convert('RGB')
+        transparent_box.save(img_io, format, quality=100)
         img_io.seek(0)
             
-        return img_io, media["type"]
+        return img_io, mimeType[format]
     except Exception as e:
         logger.error(e)
         raise e
@@ -201,12 +214,13 @@ def get_cropped_media(id, size = { "width" : 400, "height" : 400}, args=[]):
         lower = upper + size['height']
         
         im_cropped = img_resized.crop((left, upper,right, lower))    
-        
         img_io = BytesIO()
-        im_cropped.save(img_io, "PNG", quality=100)
+        format = args.get('format').upper() if args.get('format') is not None else mimeTypeReverse[media['type']]
+        im_cropped = im_cropped.convert('RGB')
+        im_cropped.save(img_io, format , quality=100)
         img_io.seek(0)
             
-        return img_io, media["type"]
+        return img_io, mimeType[format]
     except Exception as e:
         logger.error(e)
         raise e
@@ -217,19 +231,14 @@ def get_media_file(id, args):
         media = medias_data.get_media(id)
         with urllib.request.urlopen(media["url"]) as url:
             img = Image.open(url)
-        
-        format = args.get('format')    
-        img_io = BytesIO()
-        if(format != None) :
-            logger.critical(f'*********** {format}')
-            img = img.convert('RGB')
-            img.save(img_io, 'WEBP' , quality=100)
-        else : 
-            img.save(img_io, 'PNG' , quality=100)
             
-        
+        img_io = BytesIO()
+        format = args.get('format').upper() if args.get('format') is not None else mimeTypeReverse[media['type']]
+        img= img.convert('RGB')
+        img.save(img_io, format, quality=100)
+
         img_io.seek(0)
-        return img_io, media["type"]
+        return img_io, mimeType[format]
     except Exception as e:
         logger.error(e)
         raise e
