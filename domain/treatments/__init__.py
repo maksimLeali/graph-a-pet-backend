@@ -94,7 +94,7 @@ def create_treatment(data, props_booster_id=None):
         raise e
 
 
-def update_treatment(id, data):
+def update_treatment_old(id, data):
     logger.domain(
         f"id: {id}\n"
         f"data: {data}"
@@ -143,6 +143,21 @@ def update_treatment(id, data):
         if (len(py_.omit(data, 'booster_date').keys()) > 0 or booster != None):
             treatment = treatments_data.update_treatment(id, py_.omit(
                 {**data, "booster_id": booster['id'] if booster != None else None}, 'booster_date'))
+        logger.check(f"treatment {stringify(treatment)}")
+        return treatment
+    except Exception as e:
+        logger.error(e)
+        raise e
+    
+def update_treatment(id, data):
+    logger.domain(
+        f"id: {id}\n"
+        f"data: {data}"
+    )
+    try:
+        treatment = get_treatment(id)
+    
+        treatment = treatments_data.update_treatment(id, data))
         logger.check(f"treatment {stringify(treatment)}")
         return treatment
     except Exception as e:
