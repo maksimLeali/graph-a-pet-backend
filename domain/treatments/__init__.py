@@ -157,7 +157,7 @@ def update_treatment(id, data):
     try:
         treatment = get_treatment(id)
     
-        treatment = treatments_data.update_treatment(id, data))
+        treatment = treatments_data.update_treatment(id, data)
         logger.check(f"treatment {stringify(treatment)}")
         return treatment
     except Exception as e:
