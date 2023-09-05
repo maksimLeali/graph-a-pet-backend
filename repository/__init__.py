@@ -15,5 +15,5 @@ inspector = reflection.Inspector.from_engine(db.get_engine())
 class Base(db.Model):
     __abstract__= True
     id = db.Column(db.String, primary_key=True)
-    created_at = db.Column(db.DateTime, default= datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'))
+    created_at = db.Column(db.DateTime, default= datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%fZ'))
     updated_at = db.Column(db.DateTime)

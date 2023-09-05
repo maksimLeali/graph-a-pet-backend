@@ -5,7 +5,7 @@ from datetime import datetime
 class Statistic(db.Model): 
     __tablename__ = 'statistics'
     id = db.Column(db.String, primary_key=True)
-    date = db.Column(db.DateTime, default= datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ') )
+    date = db.Column(db.DateTime, default= datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%fZ') )
     active_users = db.Column(db.Integer)
     all_users = db.Column(db.Integer)
     all_pets = db.Column(db.Integer)

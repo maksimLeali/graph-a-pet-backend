@@ -14,7 +14,7 @@ def create_coat(data):
             length=data["length"], 
             pattern=data["pattern"], 
             colors= data['colors'],
-            created_at=today.strftime("%Y-%m-%dT%H:%M:%SZ")
+            created_at=today.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
         )
         db.session.add(coat)
         db.session.commit()

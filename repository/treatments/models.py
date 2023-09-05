@@ -47,7 +47,7 @@ class Treatment(Base):
         return {
             "id": self.id,
             "name": self.name,
-            "date": self.date.strftime('%Y-%m-%dT%H:%M:%SZ'),
+            "date": self.date.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
             "frequency_value": self.frequency_value,
             "frequency_unit": self.frequency_unit.name if self.frequency_unit else None,
             "frequency_times": self.frequency_times,
@@ -56,6 +56,6 @@ class Treatment(Base):
             "health_card_id": self.health_card_id,
             "updated_at": str(self.updated_at) if self.updated_at else None,
             "logs": self.logs,
-            "created_at": self.created_at.strftime('%Y-%m-%dT%H:%M:%SZ'),
+            "created_at": self.created_at.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
             "duration": self.duration.name if (self.duration ) else treatmentDuration.HALF_HOUR.name
         }

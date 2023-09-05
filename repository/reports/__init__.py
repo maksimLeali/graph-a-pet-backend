@@ -24,7 +24,7 @@ def create_report(data):
             place=data.get("place"),
             reporter=data.get("reporter"),
             responders=data.get("responders"),
-            created_at=today.strftime("%Y-%m-%dT%H:%M:%SZ")
+            created_at=today.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
         )
         db.session.add(report)
         db.session.commit()

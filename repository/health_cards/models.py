@@ -8,7 +8,7 @@ class HealthCard(Base):
     pet_id=  db.Column(db.String, db.ForeignKey('pets.id'))
     treatments= db.relationship("Treatment", uselist=True, backref='health_cards')
     notes =  db.Column(db.ARRAY(db.String))
-    created_at =  db.Column(db.DateTime, default= datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'))
+    created_at =  db.Column(db.DateTime, default= datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%fZ'))
     def to_dict(self) :
         return  {
             "id":  self.id,

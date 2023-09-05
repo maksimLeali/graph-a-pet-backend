@@ -27,7 +27,7 @@ def create_treatment(data: dict):
 
         treatment = Treatment(
             id=f"{uuid.uuid4()}",
-            date=datetime.strptime(data.get("date"), "%Y-%m-%dT%H:%M:%SZ"),
+            date=datetime.strptime(data.get("date"), "%Y-%m-%dT%H:%M:%S.%fZ"),
             booster_id=data.get('booster_id'),
             health_card_id=data.get("health_card_id"),
             type=data.get("type"),
@@ -35,7 +35,7 @@ def create_treatment(data: dict):
             logs=data.get("logs"),
             frequency_unit=data.get("frequency_unit"),
             frequency_value=data.get("frequency_value"),
-            created_at=today.strftime("%Y-%m-%dT%H:%M:%SZ")
+            created_at=today.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
         )
         db.session.add(treatment)
         db.session.commit()

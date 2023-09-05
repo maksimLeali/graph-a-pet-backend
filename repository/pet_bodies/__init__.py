@@ -12,7 +12,7 @@ def create_pet_body(data):
         breed=data["breed"], 
         family= data['family'],
         coat_id= data["coat_id"],
-        created_at=today.strftime("%Y-%m-%dT%H:%M:%SZ")
+        created_at=today.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
     )
     db.session.add(pet_body)
     db.session.commit()

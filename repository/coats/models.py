@@ -27,7 +27,7 @@ class Coat(Base):
     colors = db.Column(db.ARRAY(db.String))
     length = db.Column(db.Enum(CoatLength))
     pattern = db.Column(db.Enum(CoatPattern))
-    created_at = db.Column(db.DateTime, default= datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'))
+    created_at = db.Column(db.DateTime, default= datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%fZ'))
     pet_body= db.relationship('PetBody', backref="coats", lazy=True, uselist=False )
     
     def to_dict(self):

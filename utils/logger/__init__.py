@@ -61,7 +61,7 @@ class CustomFormatter(logging.Formatter):
     
     def format(self, record):
         log_fmt = self.FORMATS.get(record.levelno)
-        formatter = logging.Formatter(log_fmt, datefmt="%Y-%m-%dT%H:%M:%SZ.00Z")
+        formatter = logging.Formatter(log_fmt, datefmt="%Y-%m-%dT%H:%M:%S.%fZ.00Z")
         if (record.levelno in [logging.START, logging.SETUP]):
             return formatter.format(record)
         formatted_record = re.sub(f"{str(pathlib.Path().resolve())}/".replace('\\','/'), '',  formatter.format(record) )

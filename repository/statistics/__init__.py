@@ -15,7 +15,7 @@ def create_statistic(data):
     try:
         statistic_model = Statistic(
             id=f"{uuid.uuid4()}",
-            date=datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'),
+            date=datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
             all_users=data.get('all_users'),
             all_pets=data.get('all_pets'),
             active_users=data.get('active_users'),

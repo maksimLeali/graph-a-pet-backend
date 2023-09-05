@@ -25,7 +25,7 @@ def create_damnatio_memoriae(data):
             restore_after=data["restore_after"],
             restore_before=data["restore_before"],
             deleted_by=data["deleted_by"],
-            created_at=today.strftime("%Y-%m-%dT%H:%M:%SZ")
+            created_at=today.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
         )
         db.session.add(damnatio_memoriae)
         db.session.commit()

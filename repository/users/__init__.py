@@ -23,7 +23,7 @@ def create_user(data):
             email=data["email"],
             role=UserRole.USER.name,
             password=pbkdf2_sha256.hash(data["password"]),
-            created_at=today.strftime("%Y-%m-%dT%H:%M:%SZ")
+            created_at=today.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
         )
         db.session.add(user_model)
         db.session.commit()

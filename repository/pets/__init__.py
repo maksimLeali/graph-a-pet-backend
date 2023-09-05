@@ -37,7 +37,7 @@ def create_pet(data: dict):
         chip_code=data.get("chip_code") ,
         diet=data.get('diet'),
         intollerance=data.get("intollerance") ,
-        created_at=today.strftime("%Y-%m-%dT%H:%M:%SZ")
+        created_at=today.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
     )
     db.session.add(pet)
     db.session.commit()

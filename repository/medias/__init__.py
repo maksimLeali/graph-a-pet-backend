@@ -20,7 +20,7 @@ def create_media(data):
             scope = data.get('scope'),
             main_colors= data.get('main_colors'),
             main_color= data.get('main_color'),
-            created_at=today.strftime("%Y-%m-%dT%H:%M:%SZ"),
+            created_at=today.strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
             ref_id=data.get('ref_id')
         )
         db.session.add(media)

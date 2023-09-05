@@ -5,7 +5,7 @@ from datetime import datetime
 class DamnationesMemoriae(db.Model):
     id = db.Column(db.String, primary_key=True)
     original_table =  db.Column(db.String)
-    created_at =  db.Column(db.DateTime, default= datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'))
+    created_at =  db.Column(db.DateTime, default= datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%fZ'))
     original_data = db.Column(db.JSON)
     deleted_by = db.Column(db.String)
     restore_before  = db.Column(db.ARRAY(db.String))
