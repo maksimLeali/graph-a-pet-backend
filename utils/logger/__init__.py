@@ -4,7 +4,11 @@ from json import dumps
 from pydash import map_
 import pathlib
 import re
+import sys
 
+# Get the major and minor version of Python
+major_version = sys.version_info.major
+minor_version = sys.version_info.minor
 
 class CustomFormatter(logging.Formatter):    
     logging.INPUT = logging.DEBUG + 1
@@ -70,15 +74,18 @@ class CustomFormatter(logging.Formatter):
     
 level= cfg['logging']['level']
 logger = logging.getLogger('waitress')
-logger.check = lambda msg, *args: logger._log(logging.CHECK, msg, args)
-logger.input = lambda msg, *args: logger._log(logging.INPUT, msg, args)
-logger.output = lambda msg, *args: logger._log(logging.OUTPUT, msg, args)
-logger.middleware = lambda msg, *args: logger._log(logging.MIDDLEWARE, msg, args)
-logger.api = lambda msg, *args: logger._log(logging.API, msg, args)
-logger.domain = lambda msg, *args: logger._log(logging.DOMAIN, msg, args)
-logger.repository = lambda msg, *args: logger._log(logging.REPOSITORY, msg, args)
-logger.start = lambda msg, *args: logger._log(logging.START, msg, args)
-logger.setup = lambda msg, *args: logger._log(logging.SETUP, msg, args)
+stackLevelPerPyVersion = 2 if (major_version, minor_version) >= (3, 9) else 1
+
+print(f'python version:{(major_version, minor_version) } stacklevekl : {stackLevelPerPyVersion}')
+logger.check = lambda msg, *args: logger._log(logging.CHECK, msg, args, stacklevel=stackLevelPerPyVersion)
+logger.input = lambda msg, *args: logger._log(logging.INPUT, msg, args, stacklevel=stackLevelPerPyVersion)
+logger.output = lambda msg, *args: logger._log(logging.OUTPUT, msg, args, stacklevel=stackLevelPerPyVersion)
+logger.middleware = lambda msg, *args: logger._log(logging.MIDDLEWARE, msg, args, stacklevel=stackLevelPerPyVersion)
+logger.api = lambda msg, *args: logger._log(logging.API, msg, args, stacklevel=stackLevelPerPyVersion)
+logger.domain = lambda msg, *args: logger._log(logging.DOMAIN, msg, args, stacklevel=stackLevelPerPyVersion)
+logger.repository = lambda msg, *args: logger._log(logging.REPOSITORY, msg, args, stacklevel=stackLevelPerPyVersion)
+logger.start = lambda msg, *args: logger._log(logging.START, msg, args, stacklevel=stackLevelPerPyVersion)
+logger.setup = lambda msg, *args: logger._log(logging.SETUP, msg, args, stacklevel=stackLevelPerPyVersion)
 logger.setLevel(level)
 ch = logging.StreamHandler()
 

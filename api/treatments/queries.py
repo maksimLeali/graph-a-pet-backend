@@ -44,7 +44,6 @@ def list_my_treatments_resolver(obj, info, common_search):
             ** common_search['filters']['and']['join']['health_cards']['and']['join']['pets']['and']['join']['ownerships']['and']['fixed'],
             "user_id": current_user['id']
         }
-        logger.critical(f"{stringify(common_search)}")
         treatments, pagination = treatments_domain.get_paginated_treatments(
             common_search)
         payload = {

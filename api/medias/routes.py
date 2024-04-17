@@ -37,9 +37,7 @@ def get_resized_fit_media(id,size):
 @media.route('/<id>/<size>', methods=["GET"])
 def get_resized_media(id,size):
     try:
-        print('\n\n\n\n')
-        print(request.args.get('format'))
-        print('\n\n\n\n')
+        logger.critical(f"id: {id}, size: {stringify(size)}")
         logger.api(f"id: {id}, size: {stringify(size)}")
         media, media_type = mediaDomain.get_cropped_media(id, {"width": int(size.split("x")[0]) , "height": int(size.split("x")[1]) }, request.args)
         logger.check(f"type: {media_type}")

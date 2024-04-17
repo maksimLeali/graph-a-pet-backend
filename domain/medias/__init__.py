@@ -222,7 +222,7 @@ def get_cropped_media(id, size = { "width" : 400, "height" : 400}, args=[]):
             
         return img_io, mimeType[format]
     except Exception as e:
-        logger.error(e)
+        logger.error(f" getting : {id}")
         raise e
     
 def get_media_file(id, args): 

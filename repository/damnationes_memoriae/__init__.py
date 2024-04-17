@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime
-import psycopg2
+
 import sqlalchemy
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import ProgrammingError
