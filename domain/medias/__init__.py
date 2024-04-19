@@ -115,41 +115,6 @@ def get_pagination(common_search):
         logger.error(e)
         raise e
 
-# def get_resized_to_fit_media(id, size = { "width" : 400, "height" : 400}):
-#     logger.domain(f"id: {id}, size: {stringify(size)}")
-#     try:
-#         media = medias_data.get_media(id)
-#         logger.check(media)
-#         with urllib.request.urlopen(media["url"]) as url:
-#             img = Image.open(url)
-            
-#         orig_ratio = img.width / img.height
-#         orig_width, orig_height = img.size
-#         max_width = size["width"] if size["width"] > img.width else min(img.width, size["width"])
-#         max_height =  size["height"] if size["height"] > img.height else min(img.height,size["height"])
-#         new_dimension = max(max_width, max_height)
-        
-#         # Resize the image to fit within the box
-#         if orig_width <= orig_height:
-#             new_width = new_dimension
-#             new_height = int(new_dimension/ orig_ratio)
-#         else:
-#             new_width = int(new_dimension * orig_ratio)
-#             new_height = new_dimension
-#         # Resize the image
-#         img = img.resize((new_width, new_height), Image.ANTIALIAS)
-#         transparent_box = Image.new("RGBA", (new_width, new_height), (255, 255, 255, 0))
-#         x = (transparent_box.width - img.width )/ 2 if transparent_box.width > img.width else 0
-#         y = (transparent_box.height - img.height) / 2 if transparent_box.height > img.height else 0
-#         transparent_box.paste(img, (int(x), int(y)))
-#         img_io = BytesIO()
-#         transparent_box.save(img_io, "PNG", quality=100)
-#         img_io.seek(0)
-            
-#         return img_io, media["type"]
-#     except Exception as e:
-#         logger.error(e)
-#         raise e
 def get_resized_to_fit_media(id, size = { "width" : 400, "height" : 400}, args = []):
     logger.domain(f"id: {id}, size: {stringify(size)}")
     try:

@@ -18,6 +18,48 @@ def resolve_profile_picture(obj,info):
     except Exception as e:
         logger.error(e)
         
+@pet.field('pictures')
+@convert_kwargs_to_snake_case
+def resolve_pictures(obj,info, common_search):
+    common_search= format_common_search(common_search)
+    common_search['filters']['and']={
+         **(common_search['filters'].get('and') if common_search.get('filters').get('and')!= None else {}), 
+         **{
+            "fixed": {
+                **(common_search['filters'].get('and').get('fixed') if common_search.get('filters').get('and')!= None and common_search['filters'].get('and').get('fixed') != None else {}),
+                **{
+                    "scope": "pet_picture",
+                    "ref_id": obj["id"]
+                }
+            }
+         }
+    }
+    logger.api(
+        f"pet_id: {obj['id']}\n"\
+        f'common_search: {stringify(common_search)}'
+    )
+    try: 
+        pictures, pagination = pets_domain.get_pictures(common_search)
+        resolved = {
+            "items": pictures,
+            "pagination": pagination,
+            "success": True
+        }
+        logger.check(
+            f"pictures: {len(pictures)}\n"\
+            f"pagination: {stringify(pagination)}"
+        )
+
+    except Exception as  e: 
+        logger.error(e)
+        resolved= {
+            "items": [],
+            "pagination": error_pagination,
+            "success": False,
+            "errors":[str(e)] 
+        }
+    return resolved
+
 
 @pet.field('ownerships')
 @convert_kwargs_to_snake_case
@@ -26,7 +68,7 @@ def pet_ownerships_resolver(obj, info, common_search):
     common_search['filters']['and']= { 
         **(common_search['filters'].get('and') if common_search.get('filters').get('and')!= None else {}), 
         **{ 
-            'fixed' :  {
+            'fixed': {
                 **(common_search['filters'].get('and').get('fixed') if common_search.get('filters').get('and')!= None and common_search['filters'].get('and').get('fixed') != None else {}),
                 **{'pet_id' : obj['id'] }
             } 

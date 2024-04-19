@@ -35,6 +35,18 @@ def get_ownerships(common_search):
         logger.error(e)
         raise e
 
+@convert_kwargs_to_snake_case
+def get_pictures(common_search):
+    logger.domain(f"common_search: {stringify(common_search)}")
+    try:
+        pictures, pagination = media_domain.get_paginated_medias(common_search)
+
+        logger.check(f"response: {stringify({'pictures' : pictures , 'pagination': pagination}) }")
+        return (pictures, pagination)
+    except Exception as e : 
+        logger.error(e)
+        raise e
+
 def get_body(obj, info):
     try: 
         return pet_bodies_domain.get_pet_body(obj['body_id'])

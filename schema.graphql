@@ -237,6 +237,7 @@ type Pet {
     intollerance: [String]
     disciplines: [String]
     main_picture: Media
+    pictures(commonSearch: CommonSearch= {}): PaginatedMedias
 }
 
 type Media {
