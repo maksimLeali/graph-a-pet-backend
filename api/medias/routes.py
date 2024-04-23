@@ -41,8 +41,6 @@ def get_resized_media(id,size):
         logger.api(f"id: {id}, size: {stringify(size)}")
         media, media_type = mediaDomain.get_cropped_media(id, {"width": int(size.split("x")[0]) , "height": int(size.split("x")[1]) }, request.args)
         logger.check(f"type: {media_type}")
-        logger.check(f"{type(media)}")
-        
         return send_file(path_or_file=media, mimetype=media_type, max_age=3600)
     except Exception as e: 
         logger.error(e)

@@ -6,7 +6,6 @@ import domain.medias as media_domain
 import repository.damnationes_memoriae as damnatio
 import domain.damnationes_memoriae as damnatio_domain
 from utils.logger import logger, stringify
-from utils import format_common_search
 from math import ceil
 
 import pydash as py_
