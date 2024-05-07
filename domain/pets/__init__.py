@@ -64,6 +64,40 @@ def get_paginated_pets(common_search):
     except Exception as e:
         logger.error(e)
         raise e
+    
+def get_user_pets(user, common_search):
+    logger.domain(f"common_search: {stringify(common_search)}")
+
+    if 'filters' not in common_search:
+        common_search['filters'] = {}
+
+    if 'and' not in common_search['filters']:
+       common_search['filters']['and'] =  {}
+
+    if 'join' not in common_search['filters']['and']:
+        common_search['filters']['and']['join'] = {}
+
+    # Check if 'ownerships' key exists in common_search['join'], if not, initialize it as an empty dictionary
+    if 'ownerships' not in common_search['filters']['and']['join']:
+        common_search['filters']['and']['join']['ownerships'] = {}
+
+    # Check if 'fixed' key exists in common_search['join']['ownerships'], if not, initialize it as an empty dictionary
+    if 'and' not in common_search['filters']['and']['join']['ownerships']:
+        common_search['filters']['and']['join']['ownerships']['and'] = {}
+
+    if 'fixed' not in common_search['filters']['and']['join']['ownerships']['and']:
+        common_search['filters']['and']['join']['ownerships']['and']['fixed'] = {}
+        
+    common_search['filters']['and']['join']['ownerships']['and']['fixed'] =  {**common_search['filters']['and']['join']['ownerships']['and']['fixed'], "user_id" : user.get("id") }
+    logger.critical(stringify(common_search))
+    try:  
+        pagination = get_pagination(common_search)
+        pets = get_pets(common_search)
+        logger.check(f"pagination: {stringify(pagination)}")
+        return (pets, pagination)
+    except Exception as e:
+        logger.error(e)
+        raise e
 
 def create_pet(data):
     try:
