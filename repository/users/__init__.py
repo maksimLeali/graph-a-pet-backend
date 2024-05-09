@@ -11,7 +11,6 @@ from sqlalchemy import and_, not_, select, text
 from repository.users.models import User, UserRole
 from repository import db
 
-
 def create_user(data):
     logger.repository(f"data: {stringify(data)}")
     try:
@@ -136,7 +135,7 @@ def get_total_items(common_search):
 def get_user(id):
     logger.repository(f"id {id}")
     try:
-        user_model = User.query.filter( User.id == id).first()
+        user_model = User.query.filter( User.id == id).first()        
         if not user_model:
             raise NotFoundError(f"No user found with id {id}")
         user = user_model.to_dict()
@@ -147,11 +146,11 @@ def get_user(id):
         raise e
 
 
-def get_user_from_email(email) -> User:
+def get_user_from_email(email, verified=False) -> User:
     logger.repository(f'email: {email}')
     try:
         user_model = User.query.filter(
-            User.email == email).first()
+            User.email == email, User.verified==verified).first()
         if(user_model == None):
             raise NotFoundError('user_not_found')
         logger.check(f"user: {user_model}")

@@ -112,5 +112,7 @@ mutation.set_field("createMedia", create_media_resolver)
 mutation.set_field("createCode", create_code_resolver)
 mutation.set_field("checkCode", check_code_resolver)
 mutation.set_field("restoreMemoriae", restore_memoriae_resolver)
+mutation.set_field("verifyUser", verify_user_resolver)
+mutation.set_field("resendCode", resend_code_resolver)
 
 object_types = [query, mutation, user, dashboard, pet, ownership, pet_body, coat, health_card, treatment, report]

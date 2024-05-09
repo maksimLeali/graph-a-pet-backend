@@ -6,13 +6,16 @@ class Code(Base):
     ref_id = db.Column(db.String)
     ref_table= db.Column(db.String)
     created_by= db.Column(db.String, db.ForeignKey('users.id'))
-
+    scope= db.Column(db.String)
+    valid= db.Column(db.Boolean, default=True )
     def to_dict(self):
         return {
             "id" : self.id,
             "code": self.code,
             "ref_id": self.ref_id,
             "ref_table": self.ref_table,
+            "scope": self.scope,
+            "valid": self.valid,
             "created_at": str(self.created_at),
             "created_by": self.created_by,
         }

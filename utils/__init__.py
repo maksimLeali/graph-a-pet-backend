@@ -1,4 +1,5 @@
 import re
+import pendulum
 import pydash as py_
 import jwt
 from time import time
@@ -71,3 +72,17 @@ def allowed_files(file_name:str):
     logger.info(file_name)
     return '.' in file_name and \
            file_name.rsplit('.', 1)[1].lower() in {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
+
+
+def difference_in_minutes(date1, date2):
+    # Create Pendulum objects for the two dates
+    pendulum_date1 = pendulum.parse(date1)
+    pendulum_date2 = pendulum.parse(date2)
+
+    # Calculate the difference between the two dates
+    difference = pendulum_date2 - pendulum_date1
+
+    # Convert the difference to minutes
+    difference_in_minutes = difference.in_minutes()
+    logger.check(f'difference in minutes {difference_in_minutes}')
+    return difference_in_minutes

@@ -1,24 +1,29 @@
-project: 
-  name: ~
+project:
+    name: ~
 db:
-  host: ~
-  user: ~
-  port: ~
-  password: ~
-  table: ~
+    host: ~
+    user: ~
+    port: ~
+    password: ~
+    table: ~
 jwt:
-  secret: ~
+    secret: ~
+code:
+  minuts_valid: ~
 firebase:
-  bucket: ~
-logging: 
-  level: ~
+    bucket: ~
+logging:
+    level: ~
 cron:
-  active: ~
-  test_enabled: ~
-telegram: 
-  active: False
-  token: ~
-  admin_id: ~
+    active: ~
+    test_enabled: ~
+brevo:
+    api_key: ~
+    sender: ~
+telegram:
+    active: False
+    token: ~
+    admin_id: ~
 flask:
-  host: ~
-  port: ~
+    host: ~
+    port: ~

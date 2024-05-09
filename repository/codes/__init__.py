@@ -18,7 +18,8 @@ def create_code(data):
             code=data.get('code'),
             ref_table=data.get('ref_table'),
             ref_id=data.get('ref_id'),
-            created_by=data.get('created_by')
+            created_by=data.get('created_by'),
+            scope=data.get("scope")
         )
         db.session.add(code)
         db.session.commit()

@@ -11,11 +11,14 @@ import domain.pets as pets_domain
 import domain.ownerships as ownerships_domain
 import domain.reports as reports_domain
 import domain.medias as media_domain
+import domain.codes as codes_domain
+from utils.email_sender import send_confirmation_code_email
 from passlib.hash import pbkdf2_sha256
 import jwt
 from datetime import datetime
 import pydash as py_
 from config import cfg
+from utils import difference_in_minutes
 
 
 @convert_kwargs_to_snake_case
@@ -74,6 +77,7 @@ def create_user(data):
     logger.domain(f'data: {stringify(data)}')
     try:
         user = users_data.create_user(data)
+        generate_and_send_code(user);
         return user
     except Exception as e:
         logger.error(e)
@@ -192,8 +196,8 @@ def add_pet_to_user(user_id, pet, custody_level=CustodyLevel.SUB_OWNER.name):
 def login(email, password) -> str:
     logger.domain(f"email: {email}, password: {password}")
     try:
-        user = users_data.get_user_from_email(email)
-        logger.domain(f"verofiyg user: {user['email']}")
+        user = users_data.get_user_from_email(email, verified=True)
+        logger.domain(f"verifiyg user: {user['email']}")
         if(pbkdf2_sha256.verify(password, user['password'])):
             logger.check(f"user verified : {stringify(user)}")
             today = datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%fZ')
@@ -205,6 +209,53 @@ def login(email, password) -> str:
                  },
                 cfg['jwt']['secret'], algorithm="HS256"), user
         raise AuthenticationError('Credentials error')
+    except Exception as e:
+        logger.error(e)
+        raise e
+    
+
+def verify_user(email, code) -> str:
+    logger.domain(f"email: {email}, code: {code}")
+    try:
+        user = users_data.get_user_from_email(email)
+        logger.domain(f"verifiyg user: {user['email']}")
+        code = codes_domain.user_code_validation(code, user["id"])
+        today = datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+        minutes_valid = cfg.get('code').get('minutes_valid') 
+        valid = difference_in_minutes( code.get('created_at'),today ) < minutes_valid if minutes_valid is not None else 10
+
+        if(code and valid):
+            logger.check(f"user verified : {stringify(user)}")
+            
+            users_data.update_user(user.get('id'), {"last_login": today,"last_activity":today, "verified": True   })
+            return jwt.encode(
+                {"user": py_.omit(user, "password"),
+                 "iat": int(time()),
+                 "exp": int(time()) + 7 * 24*60*60
+                 },
+                cfg['jwt']['secret'], algorithm="HS256"), user
+        if(not valid):
+            logger.critical('remember to invalidate code')
+        raise AuthenticationError('Code not valid')
+    except Exception as e:
+        logger.error(e)
+        raise e
+
+def regenerate_code(email):
+    try:
+        user = users_data.get_user_from_email(email)
+        generate_and_send_code(user)
+    except Exception as e:
+        logger.error(e)
+        raise e
+
+
+def generate_and_send_code(user):
+    logger.domain(f'try generate code per user {user.get("email")}')
+    try:
+        code = codes_domain.generate_user_auth_code(user.get('id'))
+        logger.check(f"code: {stringify(code)}")
+        send_confirmation_code_email(user["email"], code["code"])   
     except Exception as e:
         logger.error(e)
         raise e

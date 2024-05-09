@@ -66,6 +66,8 @@ type Mutation {
     checkCode(code: String!): CodeValidationResult!
     restoreMemoriae(id:ID!): RestoredResult!
     respondToReport(id: ID!, reporter: ReporterCreate!): ReportResult!
+    verifyUser(email: String!,code:String): NewTokenResult!
+    resendCode(email: String!): GenericResult!
 }
 
 scalar Upload
@@ -261,6 +263,11 @@ type Ownership {
 type MainColor {
     color: String!
     contrast: String!
+}
+
+type GenericResult {
+    success: Boolean!
+    error: Error 
 }
 
 type UserResult {
@@ -517,6 +524,8 @@ type Code {
     id: ID!
     code: String!
     ref_id: ID!
+    scope:String!
+    valid:Boolean!
     ref_table: String!
     created_by: String!
     created_at: String!

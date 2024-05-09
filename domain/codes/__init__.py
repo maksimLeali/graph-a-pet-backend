@@ -1,4 +1,3 @@
-from io import BytesIO
 import random
 import string
 import repository.codes as codes_data
@@ -8,19 +7,18 @@ from domain.pets import get_pets
 from math import ceil
 from api.errors import BadRequest
 from utils.firebase.storage import upload_image
-import os
-# from config import cfg
-from PIL import Image, ImageDraw
-import urllib.request
 
-from werkzeug.utils import secure_filename
-from utils import allowed_files
 
 
 def generate_random_string(length):
     characters = string.ascii_letters + string.digits
     random_string = ''.join(random.choice(characters) for _ in range(length))
     return random_string
+
+def generate_authorization_code():
+    first_part = random.randrange(1000, 10000)
+    second_part = random.randrange(1000, 10000)
+    return f"{first_part}-{second_part}"
 
 def get_paginated_codes(common_search):
     logger.domain(f"common_search: {stringify(common_search)}")
@@ -67,7 +65,8 @@ def create_code(data, current_user):
             "filters" : {
                 "and" : {
                     "fixed" : { 
-                        "id": data.get("ref_id")
+                        "id": data.get("ref_id"),
+                        "valid": True
                     }, 
                     "join" : {
                         "ownerships" : {
@@ -90,6 +89,21 @@ def create_code(data, current_user):
     except Exception as e:
         logger.error(e)
         raise e
+
+def generate_user_auth_code(user_id):
+    logger.domain(f"generating code for user {user_id}")
+    try:
+        return codes_data.create_code({
+            "code" :generate_authorization_code(),
+            "scope": "authorization",
+            "ref_table" : "users",
+            "ref_id" : user_id,
+            "created_by": user_id
+        })
+    except Exception as e:
+        logger.error(e)
+        raise e
+
 
 def get_codes(common_search):
     try: 
@@ -133,11 +147,41 @@ def code_validation(code):
                 "order_direction":"desc"
             },
             "filters" : {
-                "and" : {"fixed" : { "code" : code }}
+                "and" : {"fixed" : { "code" : code, "valid": True }}
             }}
         codes = get_codes(code_filter)
         codes_length = len(codes)
         return len(codes) == 1, codes[0] if codes_length == 1 else None
+    except Exception as e:
+        logger.error(e)
+        raise e
+    
+def user_code_validation(code, user): 
+    logger.domain(f'checking if code :{code} id valid for user: {stringify(user)}')
+    try: 
+        code_filter = {
+            "pagination":{
+                "page":0,
+                "page_size":20
+            },
+            "ordering":{
+                "order_by":"created_at",
+                "order_direction":"desc"
+            },
+            "filters" : {
+                "and" : {
+                    "fixed" : { 
+                        "code" : code, 
+                        "ref_id": user, 
+                        "valid": True, 
+                        'scope': "authorization" 
+                    }
+                }
+            }
+        }
+        codes = get_codes(code_filter)
+        codes_length = len(codes)
+        return  codes[0] if codes_length == 1 else None
     except Exception as e:
         logger.error(e)
         raise e
@@ -155,7 +199,8 @@ def get_or_create(ref_id, ref_table, code, current_user ):
                 "and" : {
                     "fixed" : {
                         "ref_id" : ref_id,
-                        "ref_table": ref_table
+                        "ref_table": ref_table,
+                        "valid": True
                     }
                 }
             }

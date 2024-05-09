@@ -1,7 +1,7 @@
 # mutations.py
 
 from ariadne import convert_kwargs_to_snake_case
-from domain.users import create_user, update_user, login, add_pet_to_user, delete_user
+from domain.users import create_user, update_user, login, add_pet_to_user, delete_user, verify_user, regenerate_code
 from api.middlewares import auth_middleware, min_role
 from api.errors import format_error, NotFoundError
 from repository.users.models import UserRole
@@ -115,6 +115,27 @@ def login_resolver(obj, info, email, password):
     return payload
 
 @convert_kwargs_to_snake_case
+def verify_user_resolver(obj, info, email, code):
+    logger.api(f"email: {email}, code: {code}")
+    try :
+        token, user = verify_user(email, code)
+        payload = {
+            "success": True,
+            "token": token,
+            "user": user
+        }
+        logger.check(f"user: {stringify(user)}")
+    except Exception as e:  
+        logger.error(e)
+        payload = {
+            "success": False,
+            "token": None,
+            "user": None,
+            "error": format_error(e) 
+        }
+    return payload
+
+@convert_kwargs_to_snake_case
 @min_role(UserRole.ADMIN.name)
 def add_pet_to_user_resolver(obj, info, pet, user_id, custody_level):
     logger.api(
@@ -166,7 +187,6 @@ def add_pet_to_me_resolver(obj, info, pet, custody_level):
 @min_role(UserRole.ADMIN.name)
 def delete_user_resolver(obj, info, id):
     logger.api(f"id{id}  remove")
-    logger.check('here in api level')
     try: 
         token =  info.context.headers['authorization']
         current_user = get_request_user(token)
@@ -174,6 +194,22 @@ def delete_user_resolver(obj, info, id):
         payload= {
             "success": True,
             "id": memoriae_id
+        }  
+    except Exception as e: 
+        logger.error(e)
+        payload = {
+            "success": False,
+            "error": format_error(e, info.context.headers['authorization'])
+        }
+    return payload
+
+@convert_kwargs_to_snake_case
+def resend_code_resolver(obj, info, email):
+    logger.api(f"try to regenerate code for {email}")
+    try: 
+        regenerate_code(email)
+        payload= {
+            "success": True,
         }  
     except Exception as e: 
         logger.error(e)
