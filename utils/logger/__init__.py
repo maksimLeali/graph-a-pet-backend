@@ -11,15 +11,20 @@ major_version = sys.version_info.major
 minor_version = sys.version_info.minor
 
 class CustomFormatter(logging.Formatter):    
-    logging.INPUT = logging.DEBUG + 1
-    logging.OUTPUT = logging.DEBUG  + 2
-    logging.MIDDLEWARE = logging.INFO + 1
-    logging.API = logging.INFO + 2
-    logging.DOMAIN = logging.INFO + 3 
-    logging.REPOSITORY = logging.INFO + 4
-    logging.CHECK = logging.INFO + 5
-    logging.SETUP = logging.INFO + 6
-    logging.START = logging.INFO + 7
+    # DEBUG: 10, 
+    logging.INPUT = logging.DEBUG + 1  # Level 11
+    logging.OUTPUT = logging.DEBUG + 2  # Level 12
+    #INFO: 20, 
+    logging.MIDDLEWARE = logging.INFO + 1  # Level 21
+    logging.API = logging.INFO + 2  # Level 22
+    logging.DOMAIN = logging.INFO + 3  # Level 23
+    logging.REPOSITORY = logging.INFO + 4  # Level 24
+    logging.CHECK = logging.INFO + 5  # Level 25
+    logging.START = logging.INFO + 6  # Level 26
+    #WARNING: 30, 
+    #ERROR: 40, 
+    logging.SETUP = logging.ERROR + 1  # Level 41
+    #CRITICAL: 50
     logging.addLevelName(logging.INPUT, "INPUT")
     logging.addLevelName(logging.OUTPUT, "OUTPUT")
     logging.addLevelName(logging.MIDDLEWARE, "MIDDLEWARE")
@@ -57,7 +62,7 @@ class CustomFormatter(logging.Formatter):
         logging.REPOSITORY: blue_bold + "📁  " + extended_format + reset, #24
         logging.CHECK: green + "✅  " + extended_format + reset, #25
         logging.START:italic + green_bold + "🚀  "  + start_format + reset, #26
-        logging.SETUP:italic + cyan_bold + "⚙️  "  + start_format + reset, #26
+        logging.SETUP:italic + cyan_bold + "⚙️  "  + start_format + reset, #41
         logging.WARNING: yellow + "🟡  " + extended_format + reset, #30
         logging.ERROR: red + "❌  " + extended_format + reset, #40
         logging.CRITICAL: bold_red + "⛔  " + extended_format + reset, #50
