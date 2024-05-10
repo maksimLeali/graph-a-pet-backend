@@ -2,7 +2,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from utils.logger import logger
 from pyee import EventEmitter
 from config import cfg
-import os
+
 ee = EventEmitter()
 
 
@@ -20,20 +20,16 @@ def test():
     
 
 def start_scheduler (): 
-     if os.environ.get("SCHEDULER_STARTED") != "true":
-        # Mark that the scheduler has started
-        os.environ["SCHEDULER_STARTED"] = "true"
-
-        logger.setup('starting scheduler')
-        scheduler = BackgroundScheduler(timezone="Europe/Berlin")
-
-        # setting scheduler's interval
-        scheduler.add_job(daily, 'cron', hour=2)
-        scheduler.add_job(hourly, 'interval', hours=1)
-        scheduler.add_job(minutely, 'interval', minutes=1)
-        if cfg['cron']['test_enabled']:
-            logger.setup('test cron enabled')
-            scheduler.add_job(test, 'interval', seconds=5)
-
-        # starting scheduler
-        scheduler.start()
+    logger.setup('starting scheduler')
+    scheduler = BackgroundScheduler(timezone="Europe/Berlin")
+    
+    # setting scheduler's interval
+    scheduler.add_job(daily, 'cron', hour=2)
+    scheduler.add_job(hourly, 'interval', hours=1)
+    scheduler.add_job(minutely, 'interval', minutes=1 )
+    if(cfg['cron']['test_enabled']):
+        logger.setup('test cron enabled')
+        scheduler.add_job(test, 'interval', seconds=5)
+    
+    # starting scheduler
+    scheduler.start()

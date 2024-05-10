@@ -1,7 +1,7 @@
 
 from domain.statistics import get_real_time_statistic
 from utils.cron import ee
-from utils.logger import logger, stringify
+from utils.logger import logger
 from repository.statistics import create_statistic
 
 @ee.on('cron:hourly')

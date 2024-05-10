@@ -14,17 +14,39 @@ from utils.cron import start_scheduler
 import schedules
 from api.medias.routes import *
 from api.blueprints import media
+import redis
+import time
 
+# Connect to Redis
+redis_client = redis.Redis(host=cfg['redis']['host'], port=cfg['redis']['port'], db=0)
+
+# Function to acquire a lock
+def acquire_lock(lock_name, expire_time=60):
+    lock_acquired = redis_client.set(lock_name, 'LOCK', ex=expire_time, nx=True)
+    return lock_acquired
+
+# Function to release a lock
+def release_lock(lock_name):
+    redis_client.delete(lock_name)
+
+# Add a sleep period before starting the scheduler
+if (cfg['cron']['active']) and acquire_lock('scheduler_lock'):
+    try:
+        # Set an environment variable to indicate this process as the scheduler worker
+        os.environ['IS_SCHEDULER_WORKER'] = 'true'
+        
+        # Add a sleep period to ensure only one worker starts the scheduler
+        time.sleep(5)  # Adjust the sleep duration as needed
+        
+        start_scheduler()
+    finally:
+        release_lock('scheduler_lock')
+else:
+    logger.setup('cron disabled or already started by another worker')
 type_defs = load_schema_from_path("./")
 schema = make_executable_schema(
     type_defs, object_types,  snake_case_fallback_resolvers
 )
-
-if (cfg['cron']['active']):
-    start_scheduler()
-else :
-    logger.setup('cron disabled')
-
 
 @app.route("/graphql", methods=["GET"])
 def graphql_playground():

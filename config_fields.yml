@@ -27,3 +27,6 @@ telegram:
 flask:
     host: ~
     port: ~
+redis:
+    host: ~
+    port: ~
