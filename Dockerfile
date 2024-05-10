@@ -4,7 +4,7 @@ RUN pip install -r requirements.txt
 
 COPY db_scheme.json ./alembic/
 
-ENV GUNICORN_CMD_ARGS="--workers 4 --bind 0.0.0.0:5000 --preload"
+ENV GUNICORN_CMD_ARGS="--workers 4 --bind 0.0.0.0:5000 "
 COPY . /app/
 WORKDIR app/
 
