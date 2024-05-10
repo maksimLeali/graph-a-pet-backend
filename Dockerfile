@@ -8,6 +8,6 @@ ENV GUNICORN_CMD_ARGS="--workers 4 --bind 0.0.0.0:5000 --preload"
 COPY . /app/
 WORKDIR app/
 
-CMD ["gunicorn", "app:app"]
+CMD ["python", "app.py"]
 
 
