@@ -7,6 +7,7 @@ services:
             - 5000:5000
         depends_on:
             - postgres
+            - redis
         volumes:
             - .:/app
         environment:
@@ -27,6 +28,13 @@ services:
             - POSTGRES_DB=graph-a-pet
         networks:
             - gap-network
+    redis:
+        image: redis:latest
+        ports:
+            - "6379:6379"
+        networks:
+            - gap-network
+            
 volumes:
   postgres_data:
 
