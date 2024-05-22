@@ -81,7 +81,7 @@ level= cfg['logging']['level']
 logger = logging.getLogger('waitress')
 stackLevelPerPyVersion = 2 if (major_version, minor_version) >= (3, 9) else 1
 
-print(f'python version:{(major_version, minor_version) } stacklevekl : {stackLevelPerPyVersion}')
+
 logger.check = lambda msg, *args: logger._log(logging.CHECK, msg, args, stacklevel=stackLevelPerPyVersion)
 logger.input = lambda msg, *args: logger._log(logging.INPUT, msg, args, stacklevel=stackLevelPerPyVersion)
 logger.output = lambda msg, *args: logger._log(logging.OUTPUT, msg, args, stacklevel=stackLevelPerPyVersion)
@@ -98,6 +98,8 @@ ch.setLevel(level)
 ch.setFormatter(CustomFormatter())
 
 logger.addHandler(ch)
+
+logger.setup(f'python version:{(major_version, minor_version) } stacklevekl : {stackLevelPerPyVersion}')
 
 def stringify(obj: dict)-> str:
     return dumps(obj, separators=(',',':'), indent=2)
