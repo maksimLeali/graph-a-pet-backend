@@ -13,7 +13,8 @@ from utils.firebase.storage import upload_image
 from utils.cron import start_scheduler
 import schedules
 from api.medias.routes import *
-from api.blueprints import media
+from api.translations.routes import *
+from api.blueprints import media, translations
 import redis
 import time
 
@@ -74,6 +75,7 @@ def graphql_server():
     
 
 app.register_blueprint(media)
+app.register_blueprint(translations)
 
 if __name__ == "__main__":
     log = logging.getLogger('werkzeug')

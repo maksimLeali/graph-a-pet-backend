@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, abort, send_file
+from flask import request, jsonify, abort, send_file
 from utils.logger import logger, stringify
 import domain.medias as mediaDomain
 from api.blueprints import media
@@ -9,9 +9,6 @@ from api.errors import format_error
 def get_media_no_size(id):
     logger.api(f"id: {id}")
     try: 
-        print('\n\n\n\n')
-        print(request.args)
-        print('\n\n\n\n')
         media,media_type = mediaDomain.get_media_file(id,request.args)
         logger.check(f"type: {media_type}")
         return send_file(path_or_file=media, mimetype=media_type, max_age=3600)

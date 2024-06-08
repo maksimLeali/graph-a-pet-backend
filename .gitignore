@@ -11,3 +11,4 @@ venv
 serviceAccountKey.json
 **/__log__*
 test*.py
+translations.json
