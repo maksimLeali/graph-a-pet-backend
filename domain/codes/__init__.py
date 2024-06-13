@@ -6,7 +6,7 @@ from domain.pets import get_pets
 
 from math import ceil
 from api.errors import BadRequest
-from utils.firebase.storage import upload_image
+
 
 
 

@@ -7,7 +7,7 @@ config.yml
 /temp
 venv
 /alembic/db_scheme.json
-/alembic/alembic.ini
+alembic.ini
 serviceAccountKey.json
 **/__log__*
 test*.py

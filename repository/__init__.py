@@ -6,7 +6,8 @@ from sqlalchemy.engine import reflection
 import json
 from decimal import Decimal
 
-app.config["SQLALCHEMY_DATABASE_URI"] = f"postgresql://{cfg['db']['user']}:{cfg['db']['password']}@{cfg['db']['host']}:{cfg['db']['port']}/{cfg['db']['table']}"
+uri = f"postgresql://{cfg['db']['user']}:{cfg['db']['password']}@{cfg['db']['host']}:{cfg['db']['port']}/{cfg['db']['table']}"
+app.config["SQLALCHEMY_DATABASE_URI"] =uri
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config['UPLOAD_FOLDER']='temp'
 db = SQLAlchemy(app)
