@@ -7,6 +7,7 @@ import json
 from decimal import Decimal
 
 uri = f"postgresql://{cfg['db']['user']}:{cfg['db']['password']}@{cfg['db']['host']}:{cfg['db']['port']}/{cfg['db']['table']}"
+print(uri)
 app.config["SQLALCHEMY_DATABASE_URI"] =uri
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config['UPLOAD_FOLDER']='temp'
