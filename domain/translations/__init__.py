@@ -1,10 +1,14 @@
 import json
 from utils.logger import logger
 
-f= open ("translations.json")
-transslations = json.load(f)
-
 
 def get_translations():
     logger.domain('get translations')
-    return transslations
+    with open("translations.json") as f:
+        translations = json.load(f)
+    return translations
+
+def save_translations(data):
+    logger.domain('save translations')
+    with open("translations.json", 'w') as f:
+        json.dump(data, f, indent=4) 
