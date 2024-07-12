@@ -17,6 +17,7 @@ def get_translations():
         logger.info(formatted_error)
         return abort(formatted_error.get("code"), formatted_error.get("message"))
     
+    
 @translations.route('/update', methods=["PUT"])    
 def update_translations():
     logger.api('update translations')
@@ -25,6 +26,19 @@ def update_translations():
         logger.info('no ')
         translations_domain.save_translations(data)
         return {"message": "ok"}
+    except Exception as e:
+        logger.error(e)
+        formatted_error = format_error(e)
+        logger.info(formatted_error)
+        return abort(formatted_error.get("code"), formatted_error.get("message"))
+    
+    
+@translations.route('/app', methods=["GET"])
+def get_app_translations():
+    logger.api('get app translations')
+    try: 
+        translations = translations_domain.get_app_translations()
+        return {"data": translations}
     except Exception as e:
         logger.error(e)
         formatted_error = format_error(e)
