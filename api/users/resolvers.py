@@ -153,7 +153,7 @@ def resolve_profile_picture(obj,info):
 
 @user.field("reports")
 @convert_kwargs_to_snake_case
-def user_ownerships_resolver(obj, info, common_search):
+def user_reports_resolver(obj, info, common_search):
     common_search= format_common_search(common_search)
     common_search['filters']['and']= { 
         **(common_search['filters'].get('and') if common_search.get('filters').get('and')!= None else {}), 
@@ -185,7 +185,7 @@ def user_ownerships_resolver(obj, info, common_search):
 
 @dashboard.field("reports")
 @convert_kwargs_to_snake_case
-def user_ownerships_resolver(obj, info, common_search):
+def user_report_resolver(obj, info, common_search):
     common_search= format_common_search(common_search)
     common_search['filters']['and']= { 
         **(common_search['filters'].get('and') if common_search.get('filters').get('and')!= None else {}), 
