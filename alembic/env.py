@@ -1,12 +1,10 @@
 from logging.config import fileConfig
-import os
 
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
-from alembic import context
-import sys
 from repository.models import *
-from repository import db, schema
+from repository import db
+from alembic import context
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -21,6 +19,7 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
+
 target_metadata = db.metadata
 
 # other values from the config, defined by the needs of env.py,
@@ -47,7 +46,6 @@ def run_migrations_offline() -> None:
         target_metadata=target_metadata,
         literal_binds=True,
         include_schemas=True,
-        version_table_schema= schema,
         dialect_opts={"paramstyle": "named"},
     )
 
@@ -70,6 +68,8 @@ def run_migrations_online() -> None:
 
     with connectable.connect() as connection:
         context.configure(
+            include_schemas=True,
+            version_table_schema= target_metadata.schema,
             connection=connection, target_metadata=target_metadata
         )
 

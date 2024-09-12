@@ -7,6 +7,7 @@ class Code(Base):
     ref_table= db.Column(db.String)
     created_by= db.Column(db.String, db.ForeignKey('users.id'))
     scope= db.Column(db.String)
+    meta_tags = db.Column(db.ARRAY(db.String))
     valid= db.Column(db.Boolean, default=True )
     def to_dict(self):
         return {

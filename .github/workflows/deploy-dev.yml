@@ -18,7 +18,7 @@ jobs:
             cd projects/graph-a-pet-backend
             git pull
              
-            # alembic upgrade head
+            alembic upgrade head
             
             docker-compose up -d --build --remove-orphans
             echo 'Deployment finished succesfully'
