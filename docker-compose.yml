@@ -27,5 +27,5 @@ volumes:
 
 networks:
     gap-network:
-    shared-network:
+    shared-db_shared-network:
         external: true
