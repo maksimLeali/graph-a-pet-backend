@@ -13,10 +13,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the rest of the application code
 COPY . .
 
-# Copy and make alembic.sh executable
-COPY alembic.sh /app/alembic.sh
-RUN chmod +x /app/alembic.sh  # Ensure the script is executable inside the container
-
 # Expose the port the app will run on
 EXPOSE 5000
 
@@ -24,4 +20,4 @@ EXPOSE 5000
 ENV GUNICORN_CMD_ARGS="--workers 10 --bind 0.0.0.0:5000"
 
 # Run Alembic migrations before starting the app
-CMD ["gunicorn", "app:app"]
+CMD alembic upgrade head && gunicorn app:app
