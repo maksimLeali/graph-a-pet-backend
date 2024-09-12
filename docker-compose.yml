@@ -5,8 +5,7 @@ services:
         # command: "python3 -m gunicorn --workers 4 --bind 0.0.0.0:5000 app:app"
         ports:
             - 5000:5000
-        depends_on:
-            - postgres
+        depends_on:            
             - redis
         volumes:
             - .:/app
@@ -14,27 +13,15 @@ services:
             - FLASK_APP=app.py
             - FLASK_ENV=development
         networks:
-            - gap-network
-
-    postgres:
-        image: postgres:latest
-        volumes:
-            - postgres_data:/var/lib/postgresql/data/
-        ports:
-            - "5432:5432"
-        environment:
-            - POSTGRES_USER=myuser
-            - POSTGRES_PASSWORD=password
-            - POSTGRES_DB=graph-a-pet
-        networks:
-            - gap-network
+            - gap-network            
+            - shared-network
     redis:
         image: redis:latest
         ports:
             - "6379:6379"
         networks:
             - gap-network
-            
+    
 volumes:
   postgres_data:
 

@@ -1,9 +1,10 @@
 from enum import Enum
 from repository import db
 from datetime import datetime
-
+from config import cfg 
 class Statistic(db.Model): 
     __tablename__ = 'statistics'
+    __table_args__ = {'schema': cfg['db']['schema']}
     id = db.Column(db.String, primary_key=True)
     date = db.Column(db.DateTime, default= datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%fZ') )
     active_users = db.Column(db.Integer)

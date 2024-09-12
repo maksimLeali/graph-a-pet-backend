@@ -5,6 +5,7 @@ from utils import camel_to_snake
 from itertools import permutations
 from utils.logger import logger, stringify
 from config import cfg
+schema = cfg['db']['schema']+'.' if cfg['db']['schema'] else ""
 tables_common_properties = cfg.get('db_scheme').get('tables')
 
 def build_join (parent: str, join:  dict, already_joined: list, join_string: list):
@@ -23,9 +24,9 @@ def build_join (parent: str, join:  dict, already_joined: list, join_string: lis
                 join_alias = tables_common_properties[key]['alias']
                 already_joined.append(key)
                 if(parent in tables_common_properties[key]['children']):
-                    joining_string = f"JOIN {key} AS {join_alias} ON {parent_alias}.{tables_common_properties[key]['other_table_ref']} = {join_alias}.id " 
+                    joining_string = f"JOIN {schema}{key} AS {join_alias} ON {parent_alias}.{tables_common_properties[key]['other_table_ref']} = {join_alias}.id " 
                 elif (key in tables_common_properties[parent]['children']):
-                    joining_string = f"JOIN {key} AS {join_alias} ON {join_alias}.{tables_common_properties[parent]['other_table_ref']} = {parent_alias}.id " 
+                    joining_string = f"JOIN {schema}{key} AS {join_alias} ON {join_alias}.{tables_common_properties[parent]['other_table_ref']} = {parent_alias}.id " 
                 else :
                     logger.error(f'no links between {parent} and {key}')
                     error = BadRequest(f'no_links_between_tables')              
@@ -215,7 +216,7 @@ def build_count(table: str, filters: dict = {"fixed": [], "lists": [], "ranges":
         joins_to_print= '\n'.join(join_string)
 
         query_count = f"SELECT COUNT(DISTINCT({alias}.id)) " \
-            f"FROM {table} AS {alias} " \
+            f"FROM {schema}{table} AS {alias} " \
             f"{''.join(join_string)} " \
              f"{'WHERE' + formatted_filters if len(filters)> 0 else ''} "  \
  
@@ -242,7 +243,7 @@ def build_query(table: str,pagination: dict = {"page_size" : 20, "page": 0}, ord
         alias = tables_common_properties[table]['alias']
         
         query = f"SELECT {alias}.*  "\
-            f"FROM {table} AS {alias} "\
+            f"FROM {schema}{table} AS {alias} "\
             f"{''.join(join_string)} "\
             f"{'WHERE' + formatted_filters if len(filters)> 0  else ''} "  \
             f"GROUP BY ({alias}.id) " \
@@ -251,7 +252,7 @@ def build_query(table: str,pagination: dict = {"page_size" : 20, "page": 0}, ord
         
         logger.check(
             f"SELECT DISTINCT ({alias}.id), {alias}.*  \n" \
-            f"FROM {table} AS {alias} \n" \
+            f"FROM   {schema}{table} AS {alias} \n" \
             f"{''.join(join_string)} \n" \
              f"{'WHERE' + formatted_filters if len(filters)> 0 else ''} \n"  \
             f"GROUP BY ({alias}.id) \n" \

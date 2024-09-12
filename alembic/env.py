@@ -6,7 +6,7 @@ from sqlalchemy import pool
 from alembic import context
 import sys
 from repository.models import *
-from repository import db
+from repository import db, schema
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -46,6 +46,8 @@ def run_migrations_offline() -> None:
         url=url,
         target_metadata=target_metadata,
         literal_binds=True,
+        include_schemas=True,
+        version_table_schema= schema,
         dialect_opts={"paramstyle": "named"},
     )
 
