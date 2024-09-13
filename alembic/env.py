@@ -69,12 +69,25 @@ def run_migrations_online() -> None:
     with connectable.connect() as connection:
         context.configure(
             include_schemas=True,
+            include_object=include_object,
             version_table_schema= target_metadata.schema,
             connection=connection, target_metadata=target_metadata
         )
 
         with context.begin_transaction():
             context.run_migrations()
+
+
+def include_object(object, name, type_, reflected, compare_to):
+    # Only include tables in the 'msw' schema
+    if(type_ == 'table' and object.schema == target_metadata.schema): 
+        return True
+        
+    if(type_ == 'column' and object.table.schema == target_metadata.schema ): 
+        return True
+
+    return False
+
 
 
 if context.is_offline_mode():
