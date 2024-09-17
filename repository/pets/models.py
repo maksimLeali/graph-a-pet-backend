@@ -26,7 +26,6 @@ class Pet(Base):
     def to_dict(self):
         return {
             "id": self.id,
-          
             "name": self.name,
             "birthday": str(self.birthday),
             "neutered": self.neutered,

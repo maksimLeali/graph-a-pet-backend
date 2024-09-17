@@ -24,9 +24,9 @@ def build_join (parent: str, join:  dict, already_joined: list, join_string: lis
                 join_alias = tables_common_properties[key]['alias']
                 already_joined.append(key)
                 if(parent in tables_common_properties[key]['children']):
-                    joining_string = f"JOIN {schema}{key} AS {join_alias} ON {parent_alias}.{tables_common_properties[key]['other_table_ref']} = {join_alias}.id " 
+                    joining_string = f"LEFT JOIN {schema}{key} AS {join_alias} ON {parent_alias}.{tables_common_properties[key]['other_table_ref']} = {join_alias}.id " 
                 elif (key in tables_common_properties[parent]['children']):
-                    joining_string = f"JOIN {schema}{key} AS {join_alias} ON {join_alias}.{tables_common_properties[parent]['other_table_ref']} = {parent_alias}.id " 
+                    joining_string = f"LEFT JOIN {schema}{key} AS {join_alias} ON {join_alias}.{tables_common_properties[parent]['other_table_ref']} = {parent_alias}.id " 
                 else :
                     logger.error(f'no links between {parent} and {key}')
                     error = BadRequest(f'no_links_between_tables')              
@@ -131,9 +131,9 @@ def format_range_filters(alias, filters: Dict[str, Dict[str, str]], operator: st
             quote = "'"
             formatted_filters += \
                 f"{alias}.{camel_to_snake(key)}" \
-                f"{(' > ' + quote + str(filters[key]['min']) )+ quote if  'min' in filters[key] else '' }" \
+                f"{(' >= ' + quote + str(filters[key]['min']) )+ quote if  'min' in filters[key] else '' }" \
                 f"{ f' {operator} '  +alias+'.'+ camel_to_snake(key) if len(filters[key]) > 1 else '' }" \
-                f"{(' < '+ quote + str(filters[key]['max']) ) + quote if  'max' in filters[key] else '' }" \
+                f"{(' <= '+ quote + str(filters[key]['max']) ) + quote if  'max' in filters[key] else '' }" \
                 f"{f' {operator} ' if i < len(filters.keys()) else '' }"
         logger.input(f"formatted_range_filters: {stringify(formatted_filters)}")
     except Exception as e:
@@ -161,9 +161,9 @@ def format_search_filters(table, filters: Dict[str, list]) -> str:
             for k, field in enumerate(search_fields, start=1):
                 formatted_search += f"{'(' if i==1 and k==1 else ''} "  \
                 f"LOWER({alias}.{camel_to_snake(field)}) LIKE LOWER('%{value}%') "  \
-                    f"{'OR' if i <  len(search_list) or k < len(search_fields)  else ')'} "
-        formatted_search += f" OR {alias}.id =  LOWER('{value}')"
-        logger.output(f'formatted_search: {formatted_search}')
+                    f"{'OR' if i <  len(search_list) or k < len(search_fields)  else ''} "
+        formatted_search += f"OR {alias}.id =  LOWER('{value}') )"
+        logger.critical(f'formatted_search: {formatted_search}')
     except Exception as e: 
         logger.warning(e)
         pass
@@ -250,7 +250,7 @@ def build_query(table: str,pagination: dict = {"page_size" : 20, "page": 0}, ord
             f"ORDER BY {alias}.{ordering['order_by']} {ordering['order_direction'].upper()}, {alias}.id ASC " \
             f"LIMIT {pagination['page_size']} OFFSET {pagination['page_size'] * pagination['page']}"
         
-        logger.check(
+        logger.critical(
             f"SELECT DISTINCT ({alias}.id), {alias}.*  \n" \
             f"FROM   {schema}{table} AS {alias} \n" \
             f"{''.join(join_string)} \n" \

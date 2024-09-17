@@ -1,10 +1,10 @@
 {
     "tables": {
         "base_template": {
-            "columns" : {
-                "id" : "id!",
+            "columns": {
+                "id": "id!",
                 "created_at": "date",
-                "update_at": "date" 
+                "update_at": "date"
             }
         },
         "users": {
@@ -17,14 +17,15 @@
             "other_table_ref": "user_id",
             "children": [
                 "ownerships",
-                "reports"
+                "reports",
+                "user_pets_in_custody"
             ],
             "inherit_delete": {
                 "ownerships": {
                     "cond": "all"
                 },
                 "reports": {
-                    "cond":"all"
+                    "cond": "all"
                 }
             }
         },
@@ -70,7 +71,7 @@
                     "cond": "all"
                 },
                 "reports": {
-                    "cond":"all"
+                    "cond": "all"
                 }
             }
         },
@@ -80,18 +81,17 @@
                     "MISSING",
                     "FOUND"
                 ]
-                
             },
-            "columns" : {
+            "columns": {
                 "latutude": "number",
                 "longitude": "number",
                 "type": "enum(ReportsType)",
-                "place" : "string",
+                "place": "string",
                 "pet_id": "string",
                 "user_id": "string",
                 "reporter": "json",
                 "responders": "json[]",
-                "notes" : "string[]"
+                "notes": "string[]"
             },
             "other_table_ref": "report_id",
             "children": [],
@@ -100,7 +100,7 @@
                 "place",
                 "notes"
             ],
-            "inherit_delet" : {}
+            "inherit_delet": {}
         },
         "pet_bodies": {
             "search_columns": [
@@ -133,15 +133,13 @@
             ],
             "alias": "ow",
             "other_table_ref": "ownership_id",
-            "children": [
-
-            ],
+            "children": [],
             "inherit_delete": {
                 "pets": {
                     "cond": {
-                        
-                        "eq": { "custody_level" : "OWNER"}
-                        
+                        "eq": {
+                            "custody_level": "OWNER"
+                        }
                     }
                 }
             }
@@ -168,12 +166,8 @@
             ],
             "alias": "tr",
             "other_table_ref": "treatment_id",
-            "children": [
-
-            ],
-            "inherit_delete": {
-
-            }
+            "children": [],
+            "inherit_delete": {}
         },
         "medias": {
             "search_columns": [
@@ -181,12 +175,8 @@
             ],
             "alias": "md",
             "other_table_ref": "media_id",
-            "children": [
-
-            ],
-            "inherit_delete": {
-
-            }
+            "children": [],
+            "inherit_delete": {}
         },
         "codes": {
             "search_columns": [
@@ -194,38 +184,29 @@
             ],
             "alias": "cd",
             "other_table_ref": "code_id",
-            "children": [
-
-            ],
-            "inherit_delete": {
-
-            }
+            "children": [],
+            "inherit_delete": {}
         },
         "statistics": {
-            "search_columns": [
-
-            ],
+            "search_columns": [],
             "alias": "sts",
             "other_table_ref": "statistic_id",
-            "children": [
-
-            ],
-            "inherit_delete": {
-
-            }
+            "children": [],
+            "inherit_delete": {}
         },
         "damnationes_memoriae": {
-            "search_columns": [
-
-            ],
+            "search_columns": [],
             "alias": "dtm",
             "other_table_ref": "damnatio_memoriae_id",
-            "children": [
-
-            ],
-            "inherit_delete": {
-
-            }
+            "children": [],
+            "inherit_delete": {}
+        },
+        "user_pets_in_custody": {
+            "search_columns": [],
+            "alias" : "upic",
+            "other_table_ref": null,
+            "children":[],
+            "inherit_delete": {}
         }
     }
 }
