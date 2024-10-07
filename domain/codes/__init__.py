@@ -66,7 +66,6 @@ def create_code(data, current_user):
                 "and" : {
                     "fixed" : { 
                         "id": data.get("ref_id"),
-                        "valid": True
                     }, 
                     "join" : {
                         "ownerships" : {
@@ -75,6 +74,15 @@ def create_code(data, current_user):
                                     "user_id" : current_user.get('id'),
                                     "custody_level" : "OWNER"
                                 }
+                                },
+                                "join": {
+                                    "users": {
+                                        "and" : {
+                                            "fixes": {
+                                                "valid" : True
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
