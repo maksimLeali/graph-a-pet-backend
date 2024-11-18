@@ -7,7 +7,7 @@ from api.middlewares import min_role, RoleLevel
 
 
 @convert_kwargs_to_snake_case
-@min_role(RoleLevel.ADMIN.name)
+@min_role(RoleLevel.USER.name)
 def list_reports_resolver(obj, info, common_search):
     logger.api(f"common_search: {stringify(common_search)}")
     try:
@@ -31,7 +31,7 @@ def list_reports_resolver(obj, info, common_search):
 
 
 @convert_kwargs_to_snake_case
-@min_role(RoleLevel.ADMIN.name)
+@min_role(RoleLevel.USER.name)
 def get_report_resolver(obj, info, id):
     logger.api(f"id: {id}")
     try:
