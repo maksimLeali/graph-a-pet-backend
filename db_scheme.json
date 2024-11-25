@@ -21,9 +21,6 @@
                 "user_pets_in_custody"
             ],
             "inherit_delete": {
-                "codes": {
-                    "cond" : "all"
-                },
                 "ownerships": {
                     "cond": "all"
                 },

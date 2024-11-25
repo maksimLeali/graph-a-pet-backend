@@ -4,8 +4,7 @@ class Code(Base):
     __tablename__ = 'codes'
     code = db.Column(db.String)
     ref_id = db.Column(db.String)
-    ref_table= db.Column(db.String)
-    created_by= db.Column(db.String, db.ForeignKey('users.id'))
+    ref_table= db.Column(db.String)    
     scope= db.Column(db.String)
     valid= db.Column(db.Boolean, default=True )
     def to_dict(self):
