@@ -1,18 +1,23 @@
 import uuid
 from datetime import datetime
-
+from enum import Enum
 import sqlalchemy
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import ProgrammingError
 from sqlalchemy import select, text, Table, MetaData
 from datetime import datetime, date
-from repository import db, inspector
+from repository import db, inspector, metadata
 from repository.users.models import UserRole
 from utils.logger import logger, stringify
 from repository.damnationes_memoriae.models import DamnationesMemoriae
 from api.errors import BadRequest, NotFoundError
 from repository.query_builder import build_count,  build_query, build_restore, tables_common_properties
 import pydash as py_
+
+from config import cfg 
+
+schema = cfg["db"]["schema"]
+
 
 def create_damnatio_memoriae(data):
     logger.repository(f'putting {data} into the damnatio memoriae')
@@ -146,14 +151,16 @@ def get_tables_referencing_table(table_name):
     logger.info(f'getting al tables in which {table_name} is referenced')
     try:
         table_names = py_.keys(tables_common_properties)
+        logger.check(table_names)
         tables = []
-        for name in table_names:
-            candidates = inspector.get_foreign_keys(name)
-            for candidate in candidates:
-                if candidate['referred_table'] == table_name:
-                    logger.check(candidate)
-                    tables.append({"table": name, **candidate})
-
+        for name in table_names: 
+            if(name!="base_template" and name != "user_pets_in_custody"):
+                candidates = inspector.get_foreign_keys(name, schema=schema)
+                for candidate in candidates:
+                    if candidate['referred_table'] == table_name:
+                        logger.check(candidate)
+                        tables.append({"table": name, **candidate})
+            
         logger.check(f"found {len(tables)} tables")
         return tables
     except Exception as e:
@@ -166,7 +173,7 @@ def get_all_related(table):
 
         # Find the tables that have a foreign key referencing the selected row
         is_fk_in = get_tables_referencing_table(table)
-        has_fk_in = inspector.get_foreign_keys(table)
+        has_fk_in = inspector.get_foreign_keys(table, schema=schema)
 
         logger.check(f'destroy before itself {is_fk_in}')
         logger.check(f'destroy after itself {has_fk_in}')
@@ -195,7 +202,7 @@ def delete_row(id, table, data, user_id, skip_ids=[]):
         destroy_before, destroy_after = get_all_related(table)
         logger.info(f"removing {id} from {table}\n"\
                     f"skip: {skip_ids}")
-        metadata = MetaData(db.get_engine())
+        
         for item in destroy_before:
             if should_delete(table, item['table'], data) :
                 linked = Table(item["table"], metadata, autoload=True)
@@ -212,7 +219,7 @@ def delete_row(id, table, data, user_id, skip_ids=[]):
                         restore_after.append(temp_id)
                         skip = py_.uniq([*skip, *toskip])
         
-
+        data=clean_data(data);
         memoriae_id = create_damnatio_memoriae(
             {
                 "original_data": data,
@@ -230,6 +237,7 @@ def delete_row(id, table, data, user_id, skip_ids=[]):
         for item in destroy_after:
             if should_delete(table, item['referred_table'], data) :
                 linked = Table(item["referred_table"], metadata, autoload=True)
+                logger.check('linked')
                 rows = (
                     db.session.query(linked)
                     .filter(getattr(linked.c, "id") == data[item["constrained_columns"][0]])
@@ -250,18 +258,21 @@ def delete_row(id, table, data, user_id, skip_ids=[]):
         raise e
 
 def should_delete(base_table, related_table, data):
-    inherit_delete = tables_common_properties.get(base_table, {}).get(
-        "inherit_delete", {}).get(related_table, {})
-    if inherit_delete.get("cond") == "all":
-        return True
-    condition_eq = inherit_delete.get("cond").get('eq')
-    logger.critical(condition_eq)
-    for key in list(condition_eq.keys()):
-        logger.critical(f"{key} {data[key]} {condition_eq[key]}")
-        if data[key] != condition_eq[key] :
-            return False
-    return True 
-
+    try:
+        inherit_delete = tables_common_properties.get(base_table, {}).get(
+            "inherit_delete", {}).get(related_table, {})
+        if inherit_delete.get("cond") == "all":
+            return True
+        condition_eq = inherit_delete.get("cond").get('eq')
+        logger.critical(condition_eq)
+        for key in list(condition_eq.keys()):
+            logger.critical(f"{key} {data[key]} {condition_eq[key]}")
+            if data[key] != condition_eq[key] :
+                return False
+        return True 
+    except Exception as e:
+        logger.critical(e)
+        raise e
 
 def update_memoriae(id, data):
     logger.repository(
@@ -281,3 +292,14 @@ def update_memoriae(id, data):
     except Exception as e:
         logger.error(e)
         raise e
+    
+
+def clean_data(data):
+    if isinstance(data, dict):
+        return {key: clean_data(value) for key, value in data.items()}
+    elif isinstance(data, list):
+        return [clean_data(item) for item in data]
+    elif isinstance(data, Enum):
+        return data.name
+    else:
+        return data
