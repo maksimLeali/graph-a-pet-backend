@@ -11,8 +11,6 @@ from sqlalchemy.ext.declarative import declarative_base
 
 uri = f"postgresql://{cfg['db']['user']}:{cfg['db']['password']}@{cfg['db']['host']}:{cfg['db']['port']}/{cfg['db']['table']}"
 schema = cfg['db']['schema'] 
-print(schema)
-print('uri : ',uri)
 app.config["SQLALCHEMY_DATABASE_URI"] =uri
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config['UPLOAD_FOLDER']='temp'
