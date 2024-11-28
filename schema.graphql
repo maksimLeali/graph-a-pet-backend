@@ -689,7 +689,7 @@ input PetBodyCreate {
 input PetBodyUpdate {
     family: PetFamily
     breed: String
-    coat_length: coat_length
+    coat_length: CoatLength
 }
 
 
