@@ -111,22 +111,9 @@
             "children": [
                 "pets"
             ],
-            "inherit_delete": {
-                "coats": {
-                    "cond": "all"
-                }
+            "inherit_delete": {                
             }
-        },
-        "coats": {
-            "search_columns": [
-                "pattern"
-            ],
-            "alias": "ct",
-            "other_table_ref": "coat_id",
-            "children": [
-                "pet_bodies"
-            ]
-        },
+        },        
         "ownerships": {
             "search_columns": [
                 "custody_level"

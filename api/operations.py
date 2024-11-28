@@ -12,9 +12,7 @@ from api.ownerships.mutations import *
 from api.pet_bodies.resolvers import pet_body
 from api.pet_bodies.queries import *
 from api.pet_bodies.mutations import *
-from api.coats.resolvers import coat
-from api.coats.queries import *
-from api.coats.mutations import *
+
 from api.health_cards.queries import * 
 from api.health_cards.mutations import * 
 from api.health_cards.resolvers import health_card
@@ -115,4 +113,4 @@ mutation.set_field("restoreMemoriae", restore_memoriae_resolver)
 mutation.set_field("verifyUser", verify_user_resolver)
 mutation.set_field("resendCode", resend_code_resolver)
 
-object_types = [query, mutation, user, dashboard, pet, ownership, pet_body, coat, health_card, treatment, report]
+object_types = [query, mutation, user, dashboard, pet, ownership, pet_body, health_card, treatment, report]

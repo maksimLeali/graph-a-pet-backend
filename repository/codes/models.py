@@ -15,6 +15,5 @@ class Code(Base):
             "ref_table": self.ref_table,
             "scope": self.scope,
             "valid": self.valid,
-            "created_at": str(self.created_at),
-            "created_by": self.created_by,
+            "created_at": str(self.created_at)
         }

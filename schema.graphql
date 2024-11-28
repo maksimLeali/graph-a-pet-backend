@@ -112,15 +112,6 @@ enum treatmentDuration{
     TWO_HOURS
 }
 
-enum CoatName {
-    FUR,
-    SCALES,
-    FEATHERS,
-    SKIN,
-    SHED,
-    COAT
-}
-
 enum FrequencyUnit {
     DAILY,
     WEEKLY,
@@ -143,18 +134,6 @@ enum CoatLength {
     HAIRLESS
 }
 
-enum CoatPattern{
-    MERLE,
-    BRINDLE,
-    HARLEQUIN,
-    TICKED,
-    SPOTTED,
-    ROAN,
-    TRICOLOR,
-    BICOLOR,
-    SOLID,
-    COLORPOINT
-}
 type Error{
     code: String!
     message: String!
@@ -201,18 +180,9 @@ type DamnatioMemoriae {
     original_data: JSON
 }
 
-type Coat {
-    id: ID!
-    name: String!
-    length: CoatLength!
-    colors: [String]!
-    pattern: CoatPattern!
-    texture: String!
-}
-
 type PetBody {
     id: ID!
-    coat: Coat!
+    coat_length: CoatLength!
     image: Media!
     tags: [Tag]!
     family: PetFamily!
@@ -713,26 +683,15 @@ input CommonSearch {
 input PetBodyCreate {
     family: PetFamily!
     breed: String!
-    coat: CoatCreate!
+    coat_length: CoatLength
 }
 
 input PetBodyUpdate {
     family: PetFamily
     breed: String
-    coat: CoatUpdate
+    coat_length: coat_length
 }
 
-input CoatUpdate{
-    length: CoatLength
-    colors: [String]
-    pattern: CoatPattern
-}
-
-input CoatCreate{
-    length: CoatLength!
-    colors: [String]!
-    pattern: CoatPattern!
-}
 
 input UserUpdate {
     first_name: String

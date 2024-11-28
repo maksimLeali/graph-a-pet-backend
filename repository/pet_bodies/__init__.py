@@ -11,7 +11,7 @@ def create_pet_body(data):
         id = f"{uuid.uuid4()}",
         breed=data["breed"], 
         family= data['family'],
-        coat_id= data["coat_id"],
+        coat_lenght= data["coat_length"],
         created_at=today.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
     )
     db.session.add(pet_body)
