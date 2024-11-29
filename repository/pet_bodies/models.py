@@ -28,6 +28,6 @@ class PetBody(Base):
             "id": self.id,
             "breed": self.breed,
             "family": self.family.name,
-            "coat_length": self.coat_length,
+            "coat_length": self.coat_length.name,
             "created_at": str(self.created_at)
         }
