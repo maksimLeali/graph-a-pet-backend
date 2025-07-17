@@ -292,3 +292,4 @@ def build_restore(table, data):
          "VALUES \n\t(" + ','.join(values) + ")"
     logger.check(query)
     return query
+    

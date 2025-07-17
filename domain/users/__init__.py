@@ -10,6 +10,7 @@ from repository.ownerships.models import CustodyLevel
 import domain.pets as pets_domain
 import domain.ownerships as ownerships_domain
 import domain.reports as reports_domain
+import domain.health_cards as health_cards_domain
 import domain.medias as media_domain
 import domain.codes as codes_domain
 from utils.email_sender import send_confirmation_code_email
@@ -186,7 +187,9 @@ def add_pet_to_user(user_id, pet, custody_level=CustodyLevel.SUB_OWNER.name):
             "pet_id": new_pet['id'],
             "custody_level": custody_level
         }
+        health_cards_domain.create_health_card({"pet_id" : new_pet["id"]})
         new_ownership = ownerships_domain.create_ownership(ownership)
+        
         return (new_pet, new_ownership)
     except Exception as e:
         logger.error(e)

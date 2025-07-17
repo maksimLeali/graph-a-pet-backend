@@ -6,7 +6,7 @@ import logging
 from ariadne import graphql_sync, load_schema_from_path, make_executable_schema, \
     snake_case_fallback_resolvers
 from ariadne.constants import PLAYGROUND_HTML
-from flask import Blueprint, request, jsonify, abort
+from flask import request, jsonify
 from api.operations import object_types
 from config import cfg
 from utils.firebase.storage import upload_image
@@ -67,7 +67,6 @@ def graphql_server():
     status_code = 200 if success else 400
     response = jsonify(result)
     response.status_code = status_code
-    
     # Add Cache-Control header
     response.headers['Cache-Control'] = 'public, max-age=3600'  # Cache for 1 hour
     
