@@ -10,6 +10,7 @@ class TreatmentType(Enum):
     TABLET = "TABLET",
     OPERATION = "OPERATION",
     REMINDER = "REMINDER",
+    TRAINING = "TEAINING"
 
 class treatmentDuration(Enum):
     TEN_MINUTES="TEN_MINUTES",
