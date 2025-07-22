@@ -288,7 +288,7 @@ def build_restore(table, data):
     keys = py_.keys(parsed_data)
     values = format_values_to_restore(parsed_data)
     
-    query = f"INSERT INTO \n\t{table} ({','.join(keys)})\n"\
+    query = f"INSERT INTO \n\t{schema}{table} ({','.join(keys)})\n"\
          "VALUES \n\t(" + ','.join(values) + ")"
     logger.check(query)
     return query
