@@ -264,20 +264,22 @@ def build_query(table: str,pagination: dict = {"page_size" : 20, "page": 0}, ord
         logger.error(e)
         raise e
 
-def format_values_to_restore(data):
+def format_values_to_restore(data, table_scheme):
     formatted_values = []
-    for value in data.values():
+    for key, value in data.items():
         logger.info(f"value: {value} type {type(value)} {isinstance(value, list)}")
         if isinstance(value,list) : 
-            formatted_value= f'ARRAY{value}' if len(value) > 0 else 'ARRAY[]::varchar[]'
+            logger.critical(table_scheme)
+            to_append = '::json[]' if table_scheme['columns'][key] == "json[]" else '::varchar[]'
+            formatted_value= f'ARRAY{value}{to_append}' if len(value) > 0 else  f'ARRAY[]{to_append}' 
         elif isinstance(value, dict) : 
-            formatted_value= f'{stringify(value)}::json'
+            formatted_value= f"'{stringify(value)}'::json"
         elif isinstance(value, str) and value != 'NULL':
             formatted_value = f"'{value}'"
         else:
             formatted_value = str(value)
         formatted_values.append(formatted_value)
-    logger.error(formatted_values)
+    logger.check(formatted_values)
     return formatted_values
 
 def build_restore(table, data):
@@ -286,10 +288,11 @@ def build_restore(table, data):
     
     parsed_data = { k: "NULL" if v is None else v for k,v in data.items() }
     keys = py_.keys(parsed_data)
-    values = format_values_to_restore(parsed_data)
+    values = format_values_to_restore(parsed_data, tables_common_properties[table])
     
     query = f"INSERT INTO \n\t{schema}{table} ({','.join(keys)})\n"\
          "VALUES \n\t(" + ','.join(values) + ")"
-    logger.check(query)
+    logger.critical('*é*é*é*\né*é*é*é\n*é*é*é*é*\né*é*é\7*é*é*é*é*')
+    logger.critical(query)
     return query
     

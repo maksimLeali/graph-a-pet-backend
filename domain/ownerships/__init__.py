@@ -64,8 +64,8 @@ def link_pet_to_me(data):
         if(data.get("custody_level") == None):
             raise BadRequest(f'missing custody_level')
         
-        if(data.get("custody_level") == "OWNER" and user.get('role') != 'ADMIN'):
-            raise ForbiddenError(f"only admins can create ownerships of 'OWNER' level")
+        # if(data.get("custody_level") == "OWNER" and user.get('role') != 'ADMIN'):
+        #     raise ForbiddenError(f"only admins can create ownerships of 'OWNER' level")
         return create_ownership(data)
             
     except Exception as e:

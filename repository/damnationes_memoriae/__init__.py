@@ -1,6 +1,7 @@
 import uuid
 from datetime import datetime
 from enum import Enum
+import decimal
 import sqlalchemy
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import ProgrammingError
@@ -109,8 +110,11 @@ def restore_memoriae(id, user, force= False):
         for b_id in memoriae['restore_before']: 
             restore_memoriae(b_id, user, True)
         try:        
-            query = build_restore(
+            query= build_restore(
                 memoriae['original_table'], memoriae['original_data'])
+            logger.critical(query)
+            
+
             db.session.execute(query)
             db.session.commit()
         except Exception as e:
@@ -194,7 +198,7 @@ def row_to_dict(row):
 
 
 def delete_row(id, table, data, user_id, skip_ids=[]):
-    logger.repository(f"{user_id} is removing {id} from {table}")
+    logger.repository(f"{user_id} is removing {id} from {table}")    
     try:
         skip = [id, *skip_ids]
         restore_after = []
@@ -217,9 +221,8 @@ def delete_row(id, table, data, user_id, skip_ids=[]):
                             row["id"], item["table"], row_to_dict(row),user_id, skip
                         )
                         restore_after.append(temp_id)
-                        skip = py_.uniq([*skip, *toskip])
-        
-        data=clean_data(data);
+                        skip = py_.uniq([*skip, *toskip])        
+        data=clean_data(data)
         memoriae_id = create_damnatio_memoriae(
             {
                 "original_data": data,
@@ -234,6 +237,7 @@ def delete_row(id, table, data, user_id, skip_ids=[]):
         db.session.execute(stmt)
         db.session.commit()
         logger.check(f"memoriae created : {memoriae_id}")
+        logger.critical('here')
         for item in destroy_after:
             if should_delete(table, item['referred_table'], data) :
                 linked = Table(item["referred_table"], metadata, autoload=True)
@@ -295,11 +299,18 @@ def update_memoriae(id, data):
     
 
 def clean_data(data):
+    
     if isinstance(data, dict):
+        
         return {key: clean_data(value) for key, value in data.items()}
     elif isinstance(data, list):
+        
         return [clean_data(item) for item in data]
     elif isinstance(data, Enum):
+        
         return data.name
+    elif isinstance(data, decimal.Decimal):
+        return float(data)
     else:
+        logger.critical(f"else : {data}")
         return data

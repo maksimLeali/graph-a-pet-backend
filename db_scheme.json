@@ -106,6 +106,9 @@
             "search_columns": [
                 "breed"
             ],
+            "columns": {
+
+            },
             "alias": "ptb",
             "other_table_ref": "body_id",
             "children": [
@@ -119,6 +122,7 @@
                 "custody_level"
             ],
             "alias": "ow",
+            "columns": {},
             "other_table_ref": "ownership_id",
             "children": [],
             "inherit_delete": {
@@ -140,6 +144,9 @@
             "children": [
                 "treatments"
             ],
+            "columns": {
+                "notes":"string[]"
+            },
             "inherit_delete": {
                 "treatments": {
                     "cond": "all"
