@@ -210,3 +210,8 @@ in the property you want like
 
 in this exsmple the query will return every record that satisfy one of the filters
 added in the "or" field.
+
+
+il local to make a migration on the db: 
+alembic revision --autogenerate -m "<MIGRATION_NAME>" 
+alembic upgrade head

@@ -13,7 +13,7 @@ from datetime import datetime, timedelta
 def create_report(data):
     logger.repository(f"data: {stringify(data)}")
     try:
-        today = datetime.today()
+        today = datetime.today().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
         report = Report(
             id=f"{uuid.uuid4()}",
             pet_id=data.get('pet_id'),
@@ -22,9 +22,10 @@ def create_report(data):
             longitude=data.get("longitude"),
             type=data.get("type"),
             place=data.get("place"),
+            date=data.get("date", today),
             reporter=data.get("reporter"),
             responders=data.get("responders"),
-            created_at=today.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+            created_at=today
         )
         db.session.add(report)
         db.session.commit()

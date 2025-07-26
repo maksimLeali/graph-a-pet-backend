@@ -6,15 +6,15 @@ schema {
 }
 
 type Query {
-    listUsers(commonSearch: CommonSearch={}):PaginatedUsers!
+    listUsers(commonSearch: CommonSearch = {}): PaginatedUsers!
     getUser(id: ID!): UserResult!
-    listPets(commonSearch: CommonSearch={}): PaginatedPets!
-    listMyPets(commonSearch: CommonSearch={}): PaginatedPets!
+    listPets(commonSearch: CommonSearch = {}): PaginatedPets!
+    listMyPets(commonSearch: CommonSearch = {}): PaginatedPets!
     getPet(id: ID!): PetResult!
     me: UserResult!
     getOwnership(id: ID!): OwnershipResult!
-    listOwnerships(commonSearch: CommonSearch= {}):PaginatedOwnerships!
-    listHealthCards(commonSearch: CommonSearch= {}): PaginatedHealthCards!
+    listOwnerships(commonSearch: CommonSearch = {}): PaginatedOwnerships!
+    listHealthCards(commonSearch: CommonSearch = {}): PaginatedHealthCards!
     getHealthCard(id: ID!): HealthCardResult
     getTreatment(id: ID!): TreatmentResult
     listTreatments(commonSearch: CommonSearch = {}): PaginatedTreatments!
@@ -23,16 +23,25 @@ type Query {
     listReports(commonSearch: CommonSearch = {}): PaginatedReports!
     getMedia(id: ID!): MediaResult!
     getCode(id: ID!): CodeResult!
-    listMedias(commonSearch: CommonSearch= {}): PaginatedMedias!
-    listCodes(commonSearch: CommonSearch= {}): PaginatedCodes!
+    listMedias(commonSearch: CommonSearch = {}): PaginatedMedias!
+    listCodes(commonSearch: CommonSearch = {}): PaginatedCodes!
     getDashboard: DashboardResult!
     getRealTimeStatistic: RealTimeStatisticResult!
-    getGroupedStatistics(date_from: String!, date_to: String, group: String ): StatisticsResult!
+    getGroupedStatistics(
+        date_from: String!
+        date_to: String
+        group: String
+    ): StatisticsResult!
     getDamnatioMemoriae(id: ID!): DamnatioMemoriaeResult
-    listDamnationesMemoriae(commonSearch: CommonSearch= {}): PaginatedDamnationesMemoriae
+    listDamnationesMemoriae(
+        commonSearch: CommonSearch = {}
+    ): PaginatedDamnationesMemoriae
     getUserDashboard: UserDashboardResult!
-    getOrCreateCode(ref_id: String!, ref_table: String!, code: String): CodeResult
-    
+    getOrCreateCode(
+        ref_id: String!
+        ref_table: String!
+        code: String
+    ): CodeResult
 }
 
 type Mutation {
@@ -40,83 +49,87 @@ type Mutation {
     signUp(data: UserCreate!): UserResult!
     updateUser(id: ID!, data: UserUpdate!): UserResult!
     deleteUser(id: ID!): DeleteResult!
-    updateMe( data: UserUpdate!): UserResult!
+    updateMe(data: UserUpdate!): UserResult!
     createPet(data: PetCreate!): PetResult!
     updatePet(id: ID!, data: PetUpdate!): PetResult!
     deletePet(id: ID!): DeleteResult!
     deleteOwnership(id: ID!): DeleteResult!
     updateOwnership(id: ID!, data: OwnershipUpdate!): OwnershipResult!
-    login(email: String!, password: String!):NewTokenResult!
-    linkPetToUser(userId: ID!, petId: ID!,  custodyLevel:CustodyLevel): OwnershipResult!
-    linkPetToMe(petId: ID!,  custodyLevel:CustodyLevel): OwnershipResult!
+    login(email: String!, password: String!): NewTokenResult!
+    linkPetToUser(
+        userId: ID!
+        petId: ID!
+        custodyLevel: CustodyLevel
+    ): OwnershipResult!
+    linkPetToMe(petId: ID!, custodyLevel: CustodyLevel): OwnershipResult!
     logout: Boolean!
     addPet(pet: PetCreate!): PetResult!
     addPetToUser(pet: PetCreate!, userId: String!): PetAddedResult!
-    addPetToMe(pet: PetCreate!, custodyLevel:CustodyLevel ): PetAddedResult!
+    addPetToMe(pet: PetCreate!, custodyLevel: CustodyLevel): PetAddedResult!
     refreshToken: NewTokenResult!
-    createHealthCard(data: HealthCardCreate!): HealthCardResult! 
-    updateHealthCard(id: ID!, data:HealthCardUpdate!): HealthCardResult!
+    createHealthCard(data: HealthCardCreate!): HealthCardResult!
+    updateHealthCard(id: ID!, data: HealthCardUpdate!): HealthCardResult!
     createTreatment(data: TreatmentCreate!): TreatmentResult!
     updateTreatment(id: ID!, data: TreatmentUpdate!): TreatmentResult!
     createReport(data: ReportCreate!): ReportResult!
     updateReport(id: ID!, data: ReportUpdate!): ReportResult!
-    updateMedia(id:ID!, data: MediaUpdate!): MediaResult!
+    updateMedia(id: ID!, data: MediaUpdate!): MediaResult!
     createMedia(data: MediaCreate!): MediaResult!
     createCode(data: CodeCreate!): CodeResult!
     checkCode(code: String!): CodeValidationResult!
-    restoreMemoriae(id:ID!): RestoredResult!
+    restoreMemoriae(id: ID!): RestoredResult!
     respondToReport(id: ID!, reporter: ReporterCreate!): ReportResult!
-    verifyUser(email: String!,code:String): NewTokenResult!
+    verifyUser(email: String!, code: String): NewTokenResult!
     resendCode(email: String!): GenericResult!
 }
 
 scalar Upload
 
 enum UserRole {
-    USER,
+    USER
     ADMIN
 }
 
 enum CustodyLevel {
-    SUB_OWNER,
-    OWNER,
-    PET_SITTER,
+    SUB_OWNER
+    OWNER
+    PET_SITTER
 }
 
 enum Gender {
-    MALE,
-    FEMALE,
+    MALE
+    FEMALE
     NOT_SAID
 }
 
 enum ReportType {
-    MISSING,
+    MISSING
     FOUND
 }
 
-enum TreatmentType{
-    VACCINE ,
-    ANTIPARASITIC,
-    TABLET,
-    OPERATION,
-    REMINDER,
-    TRAINING,
+enum TreatmentType {
+    VACCINE
+    ANTIPARASITIC
+    TABLET
+    OPERATION
+    REMINDER
+    TRAINING
 }
 
-enum treatmentDuration{
-    TEN_MINUTES,
-    QUARTER_HOUR,
-    THREE_QUARTER,
-    HALF_HOUR,
-    HOUR,
-    HOUR_AND_HALF,
+enum treatmentDuration {
+    TEN_MINUTES
+    QUARTER_HOUR
+    THREE_QUARTER
+    HALF_HOUR
+    HOUR
+    HOUR_AND_HALF
     TWO_HOURS
 }
 
 enum FrequencyUnit {
-    DAILY,
-    WEEKLY,
-    MONTHLY,
+    DAILY
+    WEEKLY
+    MONTHLY
     YEARLY
 }
 
@@ -125,17 +138,17 @@ enum PetFamily {
     CANINE
     FELINE
     BIRDS
-    FISH 
-    }
+    FISH
+}
 
 enum CoatLength {
-    SHORT,
-    MEDIUM,
-    LONG,
+    SHORT
+    MEDIUM
+    LONG
     HAIRLESS
 }
 
-type Error{
+type Error {
     code: String!
     message: String!
     extra: String
@@ -144,7 +157,7 @@ type Error{
 """
 how a list is owganized by how many items has been found, in which page we are, the number of element per page and how many pages there are
 """
-type Pagination{
+type Pagination {
     total_items: Int
     total_pages: Int
     current_page: Int
@@ -198,7 +211,7 @@ type Tag {
 type Pet {
     id: ID!
     name: String!
-    ownerships(commonSearch: CommonSearch= {}): PaginatedOwnerships
+    ownerships(commonSearch: CommonSearch = {}): PaginatedOwnerships
     body: PetBody!
     birthday: String!
     neutered: Boolean!
@@ -211,7 +224,7 @@ type Pet {
     intollerance: [String]
     disciplines: [String]
     main_picture: Media
-    pictures(commonSearch: CommonSearch= {}): PaginatedMedias
+    pictures(commonSearch: CommonSearch = {}): PaginatedMedias
 }
 
 type Media {
@@ -221,7 +234,7 @@ type Media {
     scope: String!
     main_color: MainColor
     main_colors: [MainColor!]
-    ref_id: String! 
+    ref_id: String!
 }
 
 type Ownership {
@@ -238,7 +251,7 @@ type MainColor {
 
 type GenericResult {
     success: Boolean!
-    error: Error 
+    error: Error
 }
 
 type UserResult {
@@ -277,7 +290,6 @@ type DashboardResult {
     dashboard: Dashboard
 }
 
-
 type Statistics {
     labels: [String!]!
     active_users_mean: [Float!]!
@@ -313,8 +325,8 @@ type UsersResult {
     error: Error
     users: [User]!
 }
- 
-type  Dashboard {
+
+type Dashboard {
     active_users: Int!
     active_users_percent: Float!
     all_users: Int!
@@ -334,7 +346,7 @@ type PaginatedUsers {
     pagination: Pagination!
 }
 
-type PaginatedDamnationesMemoriae{
+type PaginatedDamnationesMemoriae {
     success: Boolean!
     error: Error
     items: [DamnatioMemoriae]!
@@ -390,19 +402,16 @@ type NewTokenResult {
     user: User
 }
 
-
 type PetResult {
     success: Boolean!
     error: Error
     pet: Pet
-    
-} 
+}
 
 type PetsResult {
     success: Boolean!
     error: Error
     pets: [Pet]!
-    
 }
 
 type MediaResult {
@@ -424,39 +433,33 @@ type CodeValidationResult {
     code: Code
 }
 
-
-
 type PaginatedPets {
     success: Boolean!
     error: Error
     items: [Pet]!
     pagination: Pagination!
-    
 }
 
 type OwnershipResult {
     success: Boolean!
     error: Error
     ownership: Ownership
-    
 }
 
 type OwnershipsResult {
     success: Boolean!
     error: Error
     ownerships: [Ownership]!
-    
 }
 type NewOwnership {
     pet: Pet!
     ownership: Ownership!
-    
 }
 
 type PetAddedResult {
     success: Boolean!
     error: Error
-    
+
     data: NewOwnership
 }
 
@@ -471,11 +474,10 @@ type UserDashboardResult {
     dashboard: UserDashboard
     error: Error
     success: Boolean
-
 }
 type UserDashboard {
     user_id: String
-    ownerships(commonSearch: CommonSearch ={}): PaginatedOwnerships
+    ownerships(commonSearch: CommonSearch = {}): PaginatedOwnerships
     reports(commonSearch: CommonSearch = {}): PaginatedReports
 }
 
@@ -495,23 +497,22 @@ type Code {
     id: ID!
     code: String!
     ref_id: ID!
-    scope:String!
-    valid:Boolean!
+    scope: String!
+    valid: Boolean!
     ref_table: String!
     created_by: String!
     created_at: String!
 }
 
 type MinTreatment {
-    id: ID! 
+    id: ID!
     type: TreatmentType!
     name: String!
     date: String!
-
 }
 
 type Treatment {
-    id: ID! 
+    id: ID!
     created_at: String!
     type: TreatmentType!
     name: String!
@@ -529,6 +530,7 @@ type Treatment {
 type Report {
     id: ID!
     created_at: String!
+    date: String!
     updated_at: String!
     type: ReportType!
     place: String!
@@ -539,7 +541,6 @@ type Report {
     responders: [Reporter]!
     notes: [String]
     pet: Pet
-    
 }
 
 type Reporter {
@@ -550,10 +551,9 @@ type Reporter {
 }
 
 type Coordinates {
-    latitude: Float,
+    latitude: Float
     longitude: Float
 }
-
 
 type DefaultResult {
     success: Boolean
@@ -572,7 +572,7 @@ input FixedFilter {
 }
 
 input ListFilter {
-    key: String,
+    key: String
     value: [String]!
 }
 
@@ -594,9 +594,8 @@ input Join {
     value: DeepFilters!
 }
 
-
 input SearchFilter {
-    value: String =""
+    value: String = ""
     fields: [String] = []
 }
 
@@ -608,15 +607,14 @@ input Filters {
     search: [SearchFilter]
 }
 input DeepFilters {
-    and: DeepFilters,
-    or: DeepFilters,
-    not: DeepFilters,
+    and: DeepFilters
+    or: DeepFilters
+    not: DeepFilters
     fixed: [FixedFilter] = []
     ranges: [RangeFilter] = []
-    search: SearchFilter = {value: "", fields: []}
+    search: SearchFilter = { value: "", fields: [] }
     lists: [ListFilter] = []
     join: [Join] = []
-   
 }
 
 input MainColorCreate {
@@ -656,6 +654,7 @@ input ReportCreate {
     reporter: ReporterCreate!
     notes: [String]
     pet_id: String
+    date: String
 }
 
 input ReportUpdate {
@@ -678,7 +677,15 @@ input CommonSearch {
     page_size: Int = 20
     order_by: String = "created_at"
     order_direction: String = "desc"
-    filters: DeepFilters = { fixed: [] , ranges: [], lists: [], join: [], and: [], or: [], not: []}
+    filters: DeepFilters = {
+        fixed: []
+        ranges: []
+        lists: []
+        join: []
+        and: []
+        or: []
+        not: []
+    }
 }
 
 input PetBodyCreate {
@@ -692,7 +699,6 @@ input PetBodyUpdate {
     breed: String
     coat_length: CoatLength
 }
-
 
 input UserUpdate {
     first_name: String
@@ -740,7 +746,7 @@ input PetCreate {
     disciplines: [String]
 }
 
-input TreatmentCreate{
+input TreatmentCreate {
     health_card_id: ID!
     name: String!
     date: String!
@@ -751,7 +757,7 @@ input TreatmentCreate{
     frequency_value: Int
     frequency_unit: FrequencyUnit
 }
-input TreatmentUpdate{
+input TreatmentUpdate {
     logs: [String]
     date: String
     name: String
@@ -770,4 +776,3 @@ input HealthCardCreate {
 input HealthCardUpdate {
     notes: [String]!
 }
-
