@@ -10,6 +10,8 @@ from math import ceil
 
 def get_pet(obj,info):
     logger.check(f"pet_id: {obj['pet_id']}")
+    if obj.get('type') == "FOUND":
+        return None
     return pets_domain.get_pet(obj['pet_id'])
 
 def get_coordinates(obj, info): 
