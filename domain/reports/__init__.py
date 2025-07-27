@@ -1,7 +1,9 @@
 
+from ariadne import convert_kwargs_to_snake_case
 import repository.reports as reports_data
 import domain.pets as pets_domain
 import domain.users as users_domain
+import domain.medias as media_domain
 from api.errors import NotFoundError
 from utils.logger import logger, stringify
 from math import ceil
@@ -13,6 +15,18 @@ def get_pet(obj,info):
 def get_coordinates(obj, info): 
     logger.check(f"id: {obj['id']}")
     return { "latitude" : obj["latitude"], "longitude": obj["longitude"]}
+
+@convert_kwargs_to_snake_case
+def get_report_medias(obj, info):
+    logger.domain(f"report_id {obj.get('id')}")
+    try: 
+        medias = media_domain.get_medias({"ordering": {"order_direction": "ASC", "order_by": "created_at"}, "pagination": {
+                                        "page_size": 10, "page": 0}, "filters": {"and": {"fixed": {"ref_id ": obj.get('id'), "scope": "report_medias"}}}})
+        return medias
+    except Exception as e:
+        logger.error(e)
+        raise(e)
+
 
 def get_report(id): 
     logger.domain(f"id: {id}")

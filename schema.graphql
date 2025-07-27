@@ -225,6 +225,7 @@ type Pet {
     disciplines: [String]
     main_picture: Media
     pictures(commonSearch: CommonSearch = {}): PaginatedMedias
+    report: Report
 }
 
 type Media {
@@ -541,6 +542,7 @@ type Report {
     responders: [Reporter]!
     notes: [String]
     pet: Pet
+    medias: [Media]
 }
 
 type Reporter {

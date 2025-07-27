@@ -53,10 +53,13 @@ def upload_file():
     if 'file' not in request.files:
             return abort(400, 'No file part')
     file = request.files['file']
+    
     if not file or file.filename == '':
         return abort(400, 'no file selected')
+    disable_colors = request.form.get('disable_colors', 'false').lower() == 'true'
+    print(disable_colors)
     try:
-        public_url, type, encoding, size, main_colors = mediaDomain.upload_media(file)
+        public_url, type, encoding, size, main_colors = mediaDomain.upload_media(file,disable_colors)
         return jsonify({"public_url" : public_url, "type": type, "size": size, "encodig": encoding, "main_colors":main_colors}), 200
     except Exception as e:
         logger.error(e)

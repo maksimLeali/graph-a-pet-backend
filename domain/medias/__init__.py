@@ -23,8 +23,12 @@ mimeType = {
 }
 mimeTypeReverse = {
     'image/webp' : 'WEBP',
+    'webp' : 'WEBP',
     'image/png' : 'PNG',
+    'png' : 'PNG',
     'image/jpeg' : 'JPEG',
+    'jpeg' : 'JPEG',
+    'jpg' : 'JPEG',
 }
 
 def get_luminance(hex_color):
@@ -34,18 +38,20 @@ def get_luminance(hex_color):
     hex_blue = int(color[4:6], base=16)
     return hex_red * 0.2126 + hex_green * 0.7152 + hex_blue * 0.0722
 
-def upload_media(file):
+def upload_media(file, disable_color):
     try: 
         logger.domain('try to upload media')
         if file and allowed_files(file.filename):
             filename = secure_filename(file.filename)
             file.save(os.path.join('temp', filename))
             ct = ColorThief('temp/'+filename)
-            palette = ct.get_palette(color_count=5)
-            main_colors = [("#"+f"{color[0]:02x}"+f"{color[1]:02x}"+f"{color[2]:02x}").upper() for color in palette]
-            colors = [ {"color" : color, "contrast" : "#FFFFFF" if get_luminance(color) < 140 else "#000000" } for color in main_colors]
-            logger.domain( "-".join([color.replace("#","") for color in main_colors]))
-            logger.domain(colors)
+            colors= []
+            if not disable_color :
+
+                palette = ct.get_palette(color_count=5)
+                main_colors = [("#"+f"{color[0]:02x}"+f"{color[1]:02x}"+f"{color[2]:02x}").upper() for color in palette]
+                colors = [ {"color" : color, "contrast" : "#FFFFFF" if get_luminance(color) < 140 else "#000000" } for color in main_colors]
+            
             public_url, type, encoding, size, = upload_image('temp/', filename)
             return public_url, type, encoding, size, colors
         error = BadRequest(f"file not allowed")
@@ -134,7 +140,7 @@ def get_resized_to_fit_media(id, size = { "width" : 400, "height" : 400}, args =
             new_height = size['height'] 
 
         resized =(new_width, new_height)
-        img = img.resize(resized,Image.ANTIALIAS)
+        img = img.resize(resized,Image.Resampling.LANCZOS)
         transparent_box = Image.new("RGBA", (size["width"], size["height"]), (255, 255, 255, 0))
         draw = ImageDraw.Draw(transparent_box)
         draw.rectangle([(0, 0), (size["width"], size["height"])], fill=(255, 525, 255, 0))
@@ -159,6 +165,7 @@ def get_cropped_media(id, size = { "width" : 400, "height" : 400}, args=[]):
         with urllib.request.urlopen(media["url"]) as url:
             img = Image.open(url)
         
+        
         logger.info(f"width: {img.width}, height: {img.height}")  
         orig_width, orig_height = img.size
         orig_ratio = orig_width / orig_height
@@ -180,13 +187,17 @@ def get_cropped_media(id, size = { "width" : 400, "height" : 400}, args=[]):
         
         im_cropped = img_resized.crop((left, upper,right, lower))    
         img_io = BytesIO()
+        logger.critical(stringify(media))
+        
         format = args.get('format').upper() if args.get('format') is not None else mimeTypeReverse[media['type']]
+        
         im_cropped = im_cropped.convert('RGB')
         im_cropped.save(img_io, format , quality=100)
         img_io.seek(0)
             
         return img_io, mimeType[format]
     except Exception as e:
+        logger.error(e)
         logger.error(f" getting : {id}")
         raise e
     

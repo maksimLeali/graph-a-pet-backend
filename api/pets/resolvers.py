@@ -1,6 +1,7 @@
 from ariadne import ObjectType, convert_kwargs_to_snake_case
 
 import domain.pets as pets_domain
+import domain.reports as reports_domain
 import domain.health_cards as health_cards_domain
 from utils.logger import logger, stringify
 from api.errors import error_pagination
@@ -122,5 +123,26 @@ def pet_health_card_resolver(obj, info):
         health_cards, pagination= health_cards_domain.get_paginated_health_cards(common_search)
         return health_cards[0]
     except Exception as e :
+        logger.error(e)
+        return None
+    
+@pet.field('report')
+@convert_kwargs_to_snake_case
+def pet_report_resolver(obj, info):
+    try:
+        common_search = {
+            "pagination":{"page_size" : 20, "page": 0},
+            "ordering": {"order_by": "created_at", "order_direction": "ASC"},
+            "filters" : {
+                "and" : {
+                    "fixed": {
+                        "pet_id" : obj['id']
+                    }
+                }
+            }
+        } 
+        reports, pagination= reports_domain.get_paginated_reports(common_search)
+        return reports[0]
+    except Exception as e:
         logger.error(e)
         return None
