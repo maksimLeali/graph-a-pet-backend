@@ -6,9 +6,27 @@ import domain.health_cards as health_cards_domain
 from utils.logger import logger, stringify
 from api.errors import error_pagination
 from utils import format_common_search
+from datetime import datetime
 
 pet = ObjectType("Pet")
 
+
+
+def years_from_now(date_str):
+    input_date = datetime.strptime(date_str, "%Y-%m-%d")
+    today = datetime.today()
+    years_passed = today.year - input_date.year
+
+    # Adjust if the anniversary hasn't occurred yet this year
+    if (today.month, today.day) < (input_date.month, input_date.day):
+        years_passed -= 1
+
+    return years_passed
+
+
+@pet.field('years')
+def resolve_profile_picture(obj,info):
+    return years_from_now(obj.get('birthday'))
 
 @pet.field('main_picture')
 def resolve_profile_picture(obj,info):
@@ -19,6 +37,7 @@ def resolve_profile_picture(obj,info):
     except Exception as e:
         logger.error(e)
         
+
 @pet.field('pictures')
 @convert_kwargs_to_snake_case
 def resolve_pictures(obj,info, common_search):

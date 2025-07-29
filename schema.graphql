@@ -220,6 +220,7 @@ type Pet {
     chip_code: String
     weight_kg: Float
     temperament: String
+    years: Int
     diet: [String]
     intollerance: [String]
     disciplines: [String]
