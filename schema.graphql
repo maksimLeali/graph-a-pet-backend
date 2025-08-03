@@ -194,14 +194,6 @@ type DamnatioMemoriae {
     original_data: JSON
 }
 
-type PetBody {
-    id: ID!
-    coat_length: CoatLength!
-    image: Media!
-    tags: [Tag]!
-    family: PetFamily!
-    breed: String!
-}
 
 type Tag {
     id: ID!
@@ -212,7 +204,6 @@ type Pet {
     id: ID!
     name: String!
     ownerships(commonSearch: CommonSearch = {}): PaginatedOwnerships
-    body: PetBody!
     birthday: String!
     neutered: Boolean!
     gender: Gender!
@@ -220,6 +211,8 @@ type Pet {
     chip_code: String
     weight_kg: Float
     temperament: String
+    coat_length: CoatLength!
+    breed: String!
     years: Int
     diet: [String]
     intollerance: [String]
@@ -691,18 +684,6 @@ input CommonSearch {
     }
 }
 
-input PetBodyCreate {
-    family: PetFamily!
-    breed: String!
-    coat_length: CoatLength
-}
-
-input PetBodyUpdate {
-    family: PetFamily
-    breed: String
-    coat_length: CoatLength
-}
-
 input UserUpdate {
     first_name: String
     last_name: String
@@ -722,14 +703,15 @@ input OwnershipUpdate {
 }
 
 input PetUpdate {
-    name: String
-    body: PetBodyUpdate
+    name: String    
     birthday: String
     neutered: Boolean
     gender: Gender
     chip_code: String
     weight_kg: Float
     temperament: String
+    breed: String
+    coat_length: CoatLength
     diet: [String]
     intollerance: [String]
     disciplines: [String]
@@ -737,12 +719,13 @@ input PetUpdate {
 
 input PetCreate {
     name: String!
-    body: PetBodyCreate!
     birthday: String!
     neutered: Boolean!
     gender: Gender!
     chip_code: String
     weight_kg: Float
+    breed: String!
+    coat_length: CoatLength
     temperament: String
     diet: [String]
     intollerance: [String]

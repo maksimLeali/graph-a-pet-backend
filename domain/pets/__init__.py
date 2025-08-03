@@ -1,7 +1,6 @@
 from ariadne import convert_kwargs_to_snake_case
 import repository.pets as pets_data
 import domain.ownerships as ownerships_domain
-import domain.pet_bodies as pet_bodies_domain
 import domain.medias as media_domain
 import repository.damnationes_memoriae as damnatio
 import domain.damnationes_memoriae as damnatio_domain
@@ -46,13 +45,6 @@ def get_pictures(common_search):
         logger.error(e)
         raise e
 
-def get_body(obj, info):
-    try: 
-        return pet_bodies_domain.get_pet_body(obj['body_id'])
-    except Exception as e: 
-        logger.error(e)
-        raise e
-    
     
 def get_paginated_pets(common_search):
     logger.domain(f"common_search: {stringify(common_search)}")
@@ -101,8 +93,6 @@ def get_user_pets(user, common_search):
 
 def create_pet(data):
     try:
-        body = pet_bodies_domain.create_pet_body(data['body'])
-        data['body_id'] = body['id']
         return pets_data.create_pet(data)
     except Exception as e:
         logger.error(e)
@@ -114,10 +104,8 @@ def update_pet(id, data):
         f"data: {data}"
     )
     try:
-        pet = pets_data.get_pet(id);
-        if(data['body'] != None):
-            pet_bodies_domain.update_pet_body(pet['body_id'], py_.omit(data['body'], 'id'))
-        pet= pets_data.update_pet(id, py_.omit(data, 'body'))
+        pet = pets_data.get_pet(id)
+        pet= pets_data.update_pet(id, data)
         logger.check(f"pet {stringify(pet)}")
         return pet
     except Exception as e:

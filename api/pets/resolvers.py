@@ -121,8 +121,6 @@ def pet_ownerships_resolver(obj, info, common_search):
     return resolved
 
 
-pet.set_field("body", pets_domain.get_body)
-
 
 @pet.field('health_card')
 @convert_kwargs_to_snake_case
