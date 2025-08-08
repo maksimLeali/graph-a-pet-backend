@@ -23,27 +23,31 @@ def build_where(filters) -> str:
 
 def create_pet(data: dict):
     today = datetime.today()
+    logger.repository(stringify(data))
+    try:
+        pet = Pet(
+            id=f"{uuid.uuid4()}",
+            name=data.get("name"),
+            birthday=data.get("birthday") ,
+            neutered=data.get("neutered") ,        
+            gender=data.get("gender") ,
+            breed=data.get("breed"), 
+            coat_length= data.get("coat_length") ,
+            disciplines=data.get('disciplines') ,
+            temperament=data.get('temperament') ,
+            weight_kg=data.get("weight_kg") ,
+            chip_code=data.get("chip_code") ,
+            diet=data.get('diet'),
+            intollerance=data.get("intollerance") ,
+            created_at=today.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+        )
+        db.session.add(pet)
+        db.session.commit()
 
-    pet = Pet(
-        id=f"{uuid.uuid4()}",
-        name=data.get("name"),
-        birthday=data.get("birthday") ,
-        neutered=data.get("neutered") ,        
-        gender=data.get("gender") ,
-        breed=data["breed"], 
-        coat_length= data["coat_length"] ,
-        disciplines=data.get('disciplines') ,
-        temperament=data.get('temperament') ,
-        weight_kg=data.get("weight_kg") ,
-        chip_code=data.get("chip_code") ,
-        diet=data.get('diet'),
-        intollerance=data.get("intollerance") ,
-        created_at=today.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
-    )
-    db.session.add(pet)
-    db.session.commit()
-
-    return pet.to_dict()
+        return pet.to_dict()
+    except Exception as e:
+        logger.error(e)
+        raise e
 
 
 def update_pet(id, data):

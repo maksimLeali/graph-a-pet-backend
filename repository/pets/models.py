@@ -16,8 +16,7 @@ class CoatLength(Enum) :
 
 class Pet(Base):
     __tablename__ = 'pets'
-    name = db.Column(db.String)
-  
+    name = db.Column(db.String)  
     ownerships = db.relationship("Ownership", uselist=True, backref='pets')
     birthday= db.Column(db.Date)
     neutered= db.Column(db.Boolean, default= False)    
@@ -35,14 +34,14 @@ class Pet(Base):
         return {
             "id": self.id,
             "name": self.name,
-            "birthday": str(self.birthday),
+            "birthday": str(self.birthday) if self.birthday else None,
             "neutered": self.neutered,
-            "gender": self.gender.name,        
+            "gender": self.gender.name if self.gender else None,         
             "chip_code": self.chip_code,        
             "weight_kg": self.weight_kg,        
             "temperament": self.temperament,     
             "breed": self.breed,            
-            "coat_length": self.coat_length.name,   
+            "coat_length": self.coat_length.name if self.coat_length else None,   
             "diet": self.diet,        
             "intollerance": self.intollerance,        
             "disciplines": self.disciplines,        

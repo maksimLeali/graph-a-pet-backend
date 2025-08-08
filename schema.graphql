@@ -204,15 +204,15 @@ type Pet {
     id: ID!
     name: String!
     ownerships(commonSearch: CommonSearch = {}): PaginatedOwnerships
-    birthday: String!
-    neutered: Boolean!
-    gender: Gender!
+    birthday: String
+    neutered: Boolean
+    gender: Gender
     health_card: HealthCard
     chip_code: String
     weight_kg: Float
     temperament: String
-    coat_length: CoatLength!
-    breed: String!
+    coat_length: CoatLength
+    breed: String
     years: Int
     diet: [String]
     intollerance: [String]
@@ -719,12 +719,12 @@ input PetUpdate {
 
 input PetCreate {
     name: String!
-    birthday: String!
-    neutered: Boolean!
-    gender: Gender!
+    birthday: String
+    neutered: Boolean
+    gender: Gender
     chip_code: String
     weight_kg: Float
-    breed: String!
+    breed: String
     coat_length: CoatLength
     temperament: String
     diet: [String]
