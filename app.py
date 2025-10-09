@@ -18,18 +18,17 @@ from api.blueprints import media, translations
 import redis
 import time
 
-print('redis################## : ')
-print('redis################## : ')
-print('redis################## : ')
-print('redis################## : ')
-print('redis################## : ')
-print('redis################## : ')
 # Connect to Redis
 redis_client = redis.Redis(host=cfg['redis']['host'], port=cfg['redis']['port'], db=0)
-print('redis : ', redis_client.ping())
+
 # Function to acquire a lock
 def acquire_lock(lock_name, expire_time=60):
+    logger.error('Acquiring lock for scheduler')
+
     lock_acquired = redis_client.set(lock_name, 'LOCK', ex=expire_time, nx=True)
+    
+    logger.error('Acquiried lock for scheduler')
+    
     return lock_acquired
 
 # Function to release a lock
