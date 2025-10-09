@@ -16,9 +16,7 @@ services:
             - gap-network
             - shared-db_shared-network
     redis:
-        image: redis:latest
-        ports:
-            - "6379:6379"
+        image: redis:latest        
         networks:
             - gap-network
 
