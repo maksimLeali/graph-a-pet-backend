@@ -20,7 +20,7 @@ import time
 
 # Connect to Redis
 redis_client = redis.Redis(host=cfg['redis']['host'], port=cfg['redis']['port'], db=0)
-
+print('redis : ', redis_client.ping())
 # Function to acquire a lock
 def acquire_lock(lock_name, expire_time=60):
     lock_acquired = redis_client.set(lock_name, 'LOCK', ex=expire_time, nx=True)
