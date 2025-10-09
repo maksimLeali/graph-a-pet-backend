@@ -1,37 +1,35 @@
 version: "3.1"
-services:
-    server:
-        build: ./
-        # command: "python3 -m gunicorn --workers 4 --bind 0.0.0.0:5000 app:app"
-        ports:
-            - 5000:5000
-        depends_on:
-            - redis
-        volumes:
-            - .:/app
-        environment:
-            - FLASK_APP=app.py
-            - FLASK_ENV=development
-        networks:
-            - gap-network
-            - shared-db_shared-network
-        redis:
-            image: redis:latest
-            expose:
-                - "6379"         # visibile solo ai container nella stessa rete
-            networks:
-                - gap-network
-            restart: unless-stopped
-            healthcheck:
-                test: ["CMD", "redis-cli", "ping"]
-                interval: 10s
-                timeout: 3s
-                retries: 5
 
-volumes:
-    postgres_data:
+services:
+  server:
+    build: ./
+    ports:
+      - "5000:5000"
+    depends_on:
+      - redis
+    volumes:
+      - .:/app
+    environment:
+      FLASK_APP: app.py
+      FLASK_ENV: development
+    networks:
+      - gap-network
+      - shared-db_shared-network
+
+  redis:
+    image: redis:latest
+    expose:
+      - "6379"               # visibile solo ai container nella stessa rete
+    networks:
+      - gap-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
 
 networks:
-    gap-network:
-    shared-db_shared-network:
-        external: true
+  gap-network: {}
+  shared-db_shared-network:
+    external: true
