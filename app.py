@@ -31,6 +31,7 @@ except Exception as e:
 def acquire_lock(lock_name, expire_time=60):
  
     try: 
+        logger.error('Acquiring lock for scheduler')
         lock_acquired = redis_client.set(lock_name, 'LOCK', ex=expire_time, nx=True)
     except Exception as e:
         logger.error(f"Error acquiring lock for scheduler: {e}")
