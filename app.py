@@ -18,6 +18,12 @@ from api.blueprints import media, translations
 import redis
 import time
 
+print('redis################## : ')
+print('redis################## : ')
+print('redis################## : ')
+print('redis################## : ')
+print('redis################## : ')
+print('redis################## : ')
 # Connect to Redis
 redis_client = redis.Redis(host=cfg['redis']['host'], port=cfg['redis']['port'], db=0)
 print('redis : ', redis_client.ping())
