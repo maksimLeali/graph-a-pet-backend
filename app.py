@@ -18,9 +18,15 @@ from api.blueprints import media, translations
 import redis
 import time
 
-# Connect to Redis
-redis_client = redis.Redis(host=cfg['redis']['host'], port=cfg['redis']['port'], db=0)
 
+# Connect to Redis
+try : 
+
+    redis_client = redis.Redis(host=cfg['redis']['host'], port=cfg['redis']['port'], db=0)
+except Exception as e:
+    logger.error(f"Error connecting to Redis: {e}")
+    redis_client = None
+    
 # Function to acquire a lock
 def acquire_lock(lock_name, expire_time=60):
     logger.error('Acquiring lock for scheduler')
