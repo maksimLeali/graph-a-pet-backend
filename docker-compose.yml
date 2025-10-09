@@ -15,12 +15,18 @@ services:
         networks:
             - gap-network
             - shared-db_shared-network
-    redis:
-        image: redis:latest
-        ports:
-            - "6379:6379"
-        networks:
-            - gap-network
+        redis:
+            image: redis:latest
+            expose:
+                - "6379"         # visibile solo ai container nella stessa rete
+            networks:
+                - gap-network
+            restart: unless-stopped
+            healthcheck:
+                test: ["CMD", "redis-cli", "ping"]
+                interval: 10s
+                timeout: 3s
+                retries: 5
 
 volumes:
     postgres_data:
