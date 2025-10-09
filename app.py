@@ -26,15 +26,16 @@ try :
 except Exception as e:
     logger.error(f"Error connecting to Redis: {e}")
     redis_client = None
-    
+
 # Function to acquire a lock
 def acquire_lock(lock_name, expire_time=60):
     logger.error('Acquiring lock for scheduler')
-
-    lock_acquired = redis_client.set(lock_name, 'LOCK', ex=expire_time, nx=True)
-    
+    try: 
+        lock_acquired = redis_client.set(lock_name, 'LOCK', ex=expire_time, nx=True)
+    except Exception as e:
+        logger.error(f"Error acquiring lock for scheduler: {e}")
+        lock_acquired = False
     logger.error('Acquiried lock for scheduler')
-    
     return lock_acquired
 
 # Function to release a lock
