@@ -114,6 +114,7 @@ enum TreatmentType {
     OPERATION
     REMINDER
     TRAINING
+    WALK
 }
 
 enum treatmentDuration {
