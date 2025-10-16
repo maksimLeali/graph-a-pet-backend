@@ -32,6 +32,7 @@ def create_treatment(data: dict):
             health_card_id=data.get("health_card_id"),
             type=data.get("type"),
             name=data.get("name"),
+            duration=data.get("duration"),
             logs=data.get("logs"),
             frequency_unit=data.get("frequency_unit"),
             frequency_value=data.get("frequency_value"),
@@ -56,7 +57,11 @@ def update_treatment(id, data):
             Treatment).filter(Treatment.id == id)
         if not treatment_model:
             raise NotFoundError(f"no treatment found with id: {id}")
+        
+        logger.check(f"treatment_model:")
         treatment_old = treatment_model.first().to_dict()
+
+        logger.check(f"updating treatment with data: {stringify(data)}")
         treatment_model.update(data)
         db.session.commit()
         treatment = {**treatment_old, **treatment_model.first().to_dict()}

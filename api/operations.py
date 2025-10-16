@@ -9,6 +9,10 @@ from api.pets.mutations import *
 from api.ownerships.resolvers import ownership
 from api.ownerships.queries import *
 from api.ownerships.mutations import *
+from api.walks.queries import *
+from api.walks.mutations import *
+from api.walks.resolvers import walk
+
 
 from api.health_cards.queries import * 
 from api.health_cards.mutations import * 
@@ -76,6 +80,8 @@ query.set_field("getGroupedStatistics", get_statistics_by_group)
 query.set_field("listDamnationesMemoriae", list_damnationes_memoriae_resolver)
 query.set_field("getUserDashboard", user_dashboard_resolver)
 query.set_field("getOrCreateCode", get_or_create_code_resolver)
+query.set_field("listWalks", list_walks_resolver)
+query.set_field("getWalk", get_walk_resolver)   
 
 
 mutation = MutationType()
@@ -109,5 +115,8 @@ mutation.set_field("checkCode", check_code_resolver)
 mutation.set_field("restoreMemoriae", restore_memoriae_resolver)
 mutation.set_field("verifyUser", verify_user_resolver)
 mutation.set_field("resendCode", resend_code_resolver)
+mutation.set_field("createWalk", create_walk_resolver)
+mutation.set_field("updateWalk", update_walk_resolver)
+mutation.set_field("deleteWalk", delete_walk_resolver)
 
-object_types = [query, mutation, user, dashboard, pet, ownership, health_card, treatment, report]
+object_types = [query, mutation, user, dashboard, pet, ownership, health_card, treatment, report,walk ]

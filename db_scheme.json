@@ -144,7 +144,11 @@
             "alias": "tr",
             "other_table_ref": "treatment_id",
             "children": [],
-            "inherit_delete": {}
+            "inherit_delete": {
+                "walks": {
+                    "cond": "all"
+                }
+            }
         },
         "medias": {
             "search_columns": [
@@ -152,6 +156,24 @@
             ],
             "alias": "md",
             "other_table_ref": "media_id",
+            "children": [],
+            "inherit_delete": {}
+        },
+        "walks": {
+            "columns": {
+                "date": "date",
+                "duration_minutes": "int",
+                "distance_km": "float",
+                "leash_pulling_rating": "int",
+                "behavior_rating": "int",
+                "overall_rating": "int",
+                "notes": "string[]"                
+            },
+            "search_columns": [
+                "notes"
+            ],
+            "alias": "wk",
+            "other_table_ref": "walk_id",
             "children": [],
             "inherit_delete": {}
         },

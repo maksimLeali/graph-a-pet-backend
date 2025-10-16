@@ -45,6 +45,7 @@ class Treatment(Base):
     frequency_times = db.Column(db.Integer)
     duration = db.Column(db.Enum(treatmentDuration),
                      default=treatmentDuration.HALF_HOUR.name) 
+    walks = db.relationship("Walk", uselist=True, backref='treatments')
     def to_dict(self):
         return {
             "id": self.id,

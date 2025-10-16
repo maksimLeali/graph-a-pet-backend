@@ -6,8 +6,10 @@ schema {
 }
 
 type Query {
-    listUsers(commonSearch: CommonSearch = {}): PaginatedUsers!
+    listUsers(commonSearch: CommonSearch = {}): PaginatedUsers!    
     getUser(id: ID!): UserResult!
+    listWalks(commonSearch: CommonSearch = {}): PaginatedWalks!
+    getWalk(id: ID!): Walk!
     listPets(commonSearch: CommonSearch = {}): PaginatedPets!
     listMyPets(commonSearch: CommonSearch = {}): PaginatedPets!
     getPet(id: ID!): PetResult!
@@ -49,6 +51,7 @@ type Mutation {
     signUp(data: UserCreate!): UserResult!
     updateUser(id: ID!, data: UserUpdate!): UserResult!
     deleteUser(id: ID!): DeleteResult!
+    deleteWalk(id: ID!): DeleteResult!
     updateMe(data: UserUpdate!): UserResult!
     createPet(data: PetCreate!): PetResult!
     updatePet(id: ID!, data: PetUpdate!): PetResult!
@@ -71,6 +74,8 @@ type Mutation {
     updateHealthCard(id: ID!, data: HealthCardUpdate!): HealthCardResult!
     createTreatment(data: TreatmentCreate!): TreatmentResult!
     updateTreatment(id: ID!, data: TreatmentUpdate!): TreatmentResult!
+    createWalk(data: WalkCreate!): WalkResult!
+    updateWalk(id: ID!, data: WalkUpdate!): WalkResult!  
     createReport(data: ReportCreate!): ReportResult!
     updateReport(id: ID!, data: ReportUpdate!): ReportResult!
     updateMedia(id: ID!, data: MediaUpdate!): MediaResult!
@@ -342,6 +347,13 @@ type PaginatedUsers {
     pagination: Pagination!
 }
 
+type PaginatedWalks {
+    success: Boolean
+    error: Error
+    items: [Walk]!
+    pagination: Pagination!
+}
+
 type PaginatedDamnationesMemoriae {
     success: Boolean!
     error: Error
@@ -488,6 +500,11 @@ type TreatmentResult {
     success: Boolean
     error: Error
 }
+type WalkResult {
+    walk: Walk
+    success: Boolean
+    error: Error
+}
 
 type Code {
     id: ID!
@@ -505,6 +522,7 @@ type MinTreatment {
     type: TreatmentType!
     name: String!
     date: String!
+    duration: treatmentDuration
 }
 
 type Treatment {
@@ -521,6 +539,18 @@ type Treatment {
     booster: Treatment
     health_card: HealthCard
     related: [MinTreatment]
+}
+
+type Walk {
+    id: ID!
+    created_at: String!
+    date: String!    
+    distance_km: Float!        
+    overall_rating: Int
+    leash_pulling_rating: Int
+    behavior_rating: Int
+    notes: [String]
+    treatment: MinTreatment!
 }
 
 type Report {
@@ -643,6 +673,29 @@ input CodeCreate {
     ref_table: String!
 }
 
+input WalkCreate {
+    date: String!
+    distance_km: Float!    
+    overall_rating: Int
+    leash_pulling_rating: Int
+    behavior_rating: Int
+    health_card_id: ID!
+    notes: [String]
+    duration: treatmentDuration
+    type: TreatmentType!    
+}
+
+input WalkUpdate {
+    date: String
+    distance_km: Float
+    overall_rating: Int
+    leash_pulling_rating: Int
+    behavior_rating: Int
+    duration: treatmentDuration
+    notes: [String]
+    type: TreatmentType
+}
+
 input ReportCreate {
     type: ReportType!
     place: String!
@@ -653,6 +706,7 @@ input ReportCreate {
     pet_id: String
     date: String
 }
+
 
 input ReportUpdate {
     place: String
@@ -738,6 +792,7 @@ input TreatmentCreate {
     name: String!
     date: String!
     type: TreatmentType!
+    duration: treatmentDuration
     logs: [String]
     booster_date: String
     frequency_times: Int
@@ -750,6 +805,7 @@ input TreatmentUpdate {
     name: String
     delete_old: Boolean
     booster_date: String
+    treatmentDuration: treatmentDuration
     type: TreatmentType
     frequency_times: Int
     frequency_value: Int
