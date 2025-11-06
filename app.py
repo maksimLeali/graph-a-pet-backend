@@ -5,7 +5,10 @@ import os
 import logging
 from ariadne import graphql_sync, load_schema_from_path, make_executable_schema, \
     snake_case_fallback_resolvers
-from ariadne.constants import PLAYGROUND_HTML
+"""NOTE:
+GraphQL Playground constant (PLAYGROUND_HTML) was removed in Ariadne >=0.19.
+We embed a minimal GraphiQL interface instead for interactive querying.
+"""
 from flask import request, jsonify
 from api.operations import object_types
 from config import cfg
@@ -55,14 +58,44 @@ if (cfg['cron']['active']) and acquire_lock('scheduler_lock'):
         release_lock('scheduler_lock')
 else:
     logger.setup('cron disabled or already started by another worker')
-type_defs = load_schema_from_path("./")
+type_defs = load_schema_from_path("schema.graphql")
 schema = make_executable_schema(
     type_defs, object_types,  snake_case_fallback_resolvers
 )
 
+# Minimal GraphiQL HTML (served on GET /graphql). Uses CDN assets.
+GRAPHIQL_HTML = """<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset=\"utf-8\" />
+        <title>GraphiQL</title>
+        <link rel=\"stylesheet\" href=\"https://unpkg.com/graphiql/graphiql.min.css\" />
+        <style>body { margin:0; height:100vh; }</style>
+    </head>
+    <body>
+        <div id=\"graphiql\" style=\"height:100vh;\"></div>
+        <script src=\"https://unpkg.com/react/umd/react.production.min.js\"></script>
+        <script src=\"https://unpkg.com/react-dom/umd/react-dom.production.min.js\"></script>
+        <script src=\"https://unpkg.com/graphiql/graphiql.min.js\"></script>
+        <script>
+            const fetcher = params => fetch('/graphql', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(params),
+                    credentials: 'same-origin'
+                }).then(r => r.json());
+            ReactDOM.render(
+                React.createElement(GraphiQL, { fetcher }),
+                document.getElementById('graphiql')
+            );
+        </script>
+    </body>
+</html>"""
+
 @app.route("/graphql", methods=["GET"])
-def graphql_playground():
-    return PLAYGROUND_HTML, 200
+def graphql_graphiql():
+    """Serve GraphiQL IDE for interactive GraphQL queries."""
+    return GRAPHIQL_HTML, 200
 
 @app.route("/graphql", methods=["POST"])
 def graphql_server():
@@ -93,6 +126,6 @@ if __name__ == "__main__":
     os.environ['WERKZEUG_RUN_MAIN'] = 'true'
     logger.start(
         f"Server is running on http://{cfg['flask']['host']}:{cfg['flask']['port']}\n" \
-        f"See playground on http://{cfg['flask']['host']}:{cfg['flask']['port']}/graphql\n"
+    f"GraphiQL IDE available at http://{cfg['flask']['host']}:{cfg['flask']['port']}/graphql\n"
         )
     app.run(host=cfg['flask']['host'], port=cfg['flask']['port'], debug=False)
