@@ -1,4 +1,4 @@
-from pendulum import SECONDS_PER_MINUTE
+SECONDS_PER_MINUTE = 60
 from api import app
 from utils.logger import logger
 import os
@@ -19,37 +19,40 @@ import redis
 import time
 
 
-# Connect to Redis
-try : 
-
-    redis_client = redis.Redis(host=cfg['redis']['host'], port=cfg['redis']['port'], db=0)
-except Exception as e:
-    logger.error(f"Error connecting to Redis: {e}")
-    redis_client = None
+# Connect to Redis (optional)
+redis_client = None
+if cfg.get('redis', {}).get('active', False):
+    try:
+        redis_client = redis.Redis(host=cfg['redis']['host'], port=cfg['redis']['port'], db=0)
+    except Exception as e:
+        logger.error(f"Error connecting to Redis: {e}")
 
 # Function to acquire a lock
 def acquire_lock(lock_name, expire_time=60):
- 
-    try: 
+    if redis_client is None:
+        return True  # No Redis: allow scheduler to start freely
+    try:
         lock_acquired = redis_client.set(lock_name, 'LOCK', ex=expire_time, nx=True)
     except Exception as e:
         logger.error(f"Error acquiring lock for scheduler: {e}")
-        lock_acquired = False    
+        lock_acquired = False
     return lock_acquired
 
 # Function to release a lock
 def release_lock(lock_name):
-    redis_client.delete(lock_name)
+    if redis_client is not None:
+        redis_client.delete(lock_name)
 
 # Add a sleep period before starting the scheduler
 if (cfg['cron']['active']) and acquire_lock('scheduler_lock'):
     try:
         # Set an environment variable to indicate this process as the scheduler worker
         os.environ['IS_SCHEDULER_WORKER'] = 'true'
-        
-        # Add a sleep period to ensure only one worker starts the scheduler
-        time.sleep(5)  # Adjust the sleep duration as needed
-        
+
+        # Sleep only when using Redis to ensure only one worker starts the scheduler
+        if redis_client is not None:
+            time.sleep(5)
+
         start_scheduler()
     finally:
         release_lock('scheduler_lock')

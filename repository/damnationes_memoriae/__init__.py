@@ -17,7 +17,7 @@ import pydash as py_
 
 from config import cfg 
 
-schema = cfg["db"]["schema"]
+schema = cfg['db']['schema'] if 'schema' in cfg['db'] else ""
 
 
 def create_damnatio_memoriae(data):
