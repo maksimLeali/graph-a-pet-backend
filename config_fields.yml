@@ -28,5 +28,6 @@ flask:
     host: ~
     port: ~
 redis:
+    active: ~
     host: ~
     port: ~
