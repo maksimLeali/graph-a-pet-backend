@@ -11,7 +11,8 @@ class TreatmentType(Enum):
     OPERATION = "OPERATION",
     REMINDER = "REMINDER",
     WALK = "WALK",
-    TRAINING = "TEAINING"
+    TRAINING = "TRAINING",
+    CURE = "CURE"
 
 class treatmentDuration(Enum):
     TEN_MINUTES="TEN_MINUTES",
@@ -23,11 +24,6 @@ class treatmentDuration(Enum):
     TWO_HOURS="TWO_HOURS"
 
 
-class FrequencyUnit(Enum):
-    DAILY = "DAILY",
-    WEEKLY = "WEEKLY",
-    MONTHLY = "MONTHLY",
-    YEARLY = "YEARLY"
 
 
 class Treatment(Base):
@@ -40,9 +36,7 @@ class Treatment(Base):
                      default=TreatmentType.REMINDER.name)
     health_card_id = db.Column(db.String, db.ForeignKey('health_cards.id'))
     logs = db.Column(db.ARRAY(db.String))
-    frequency_value = db.Column(db.Integer)
-    frequency_unit = db.Column(db.Enum(FrequencyUnit))
-    frequency_times = db.Column(db.Integer)
+
     duration = db.Column(db.Enum(treatmentDuration),
                      default=treatmentDuration.HALF_HOUR.name) 
     walks = db.relationship("Walk", uselist=True, backref='treatments')
@@ -50,10 +44,7 @@ class Treatment(Base):
         return {
             "id": self.id,
             "name": self.name,
-            "date": self.date.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
-            "frequency_value": self.frequency_value,
-            "frequency_unit": self.frequency_unit.name if self.frequency_unit else None,
-            "frequency_times": self.frequency_times,
+            "date": self.date.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),            
             "booster_id": self.booster_id,
             "type": self.type.name,
             "health_card_id": self.health_card_id,

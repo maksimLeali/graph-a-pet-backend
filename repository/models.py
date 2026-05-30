@@ -9,3 +9,6 @@ from .damnationes_memoriae.models import *
 from .reports.models import *
 from .codes.models import * 
 from .walks.models import *
+from .cures.models import *
+from .shelters.models import *
+from .shelter_roles.models import *

@@ -34,8 +34,8 @@ def create_treatment(data: dict):
             name=data.get("name"),
             duration=data.get("duration"),
             logs=data.get("logs"),
-            frequency_unit=data.get("frequency_unit"),
-            frequency_value=data.get("frequency_value"),
+            # frequency_unit=data.get("frequency_unit"),
+            # frequency_value=data.get("frequency_value"),
             created_at=today.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
         )
         db.session.add(treatment)

@@ -1,15 +1,102 @@
+############################
+# Scalars
+############################
 scalar JSON
+scalar Upload
 
+############################
+# Directives
+############################
+directive @subset(of: String!, values: [String!]!) on ENUM
+
+############################
+# Enums
+############################
+enum CoatLength {
+    SHORT
+    MEDIUM
+    LONG
+    HAIRLESS
+}
+
+enum CustodyLevel {
+    SUB_OWNER
+    OWNER
+    PET_SITTER
+}
+
+enum FrequencyUnit {
+    DAILY
+    WEEKLY
+    MONTHLY
+    YEARLY
+}
+
+enum Gender {
+    MALE
+    FEMALE
+    NOT_SAID
+}
+
+enum PetFamily {
+    REPTILE
+    CANINE
+    FELINE
+    BIRDS
+    FISH
+}
+
+enum ReportType {
+    MISSING
+    FOUND
+}
+
+enum TreatmentType {
+    VACCINE
+    ANTIPARASITIC
+    TABLET
+    OPERATION
+    REMINDER
+    TRAINING
+    WALK
+    CHECK
+    CURE
+}
+
+enum treatmentDuration {
+    TEN_MINUTES
+    QUARTER_HOUR
+    THREE_QUARTER
+    HALF_HOUR
+    HOUR
+    HOUR_AND_HALF
+    TWO_HOURS
+}
+
+enum UserRole {
+    USER
+    ADMIN
+}
+
+############################
+# Schema
+############################
 schema {
     query: Query
     mutation: Mutation
 }
 
+############################
+# Types
+############################
+
 type Query {
-    listUsers(commonSearch: CommonSearch = {}): PaginatedUsers!    
+    listUsers(commonSearch: CommonSearch = {}): PaginatedUsers!
     getUser(id: ID!): UserResult!
     listWalks(commonSearch: CommonSearch = {}): PaginatedWalks!
+    listCures(commonSearch: CommonSearch = {}): PaginatedCures!
     getWalk(id: ID!): Walk!
+    getCure(id: ID!): Cure!
     listPets(commonSearch: CommonSearch = {}): PaginatedPets!
     listMyPets(commonSearch: CommonSearch = {}): PaginatedPets!
     getPet(id: ID!): PetResult!
@@ -46,12 +133,14 @@ type Query {
     ): CodeResult
 }
 
+
 type Mutation {
     createUser(data: UserCreate!): UserResult!
     signUp(data: UserCreate!): UserResult!
     updateUser(id: ID!, data: UserUpdate!): UserResult!
     deleteUser(id: ID!): DeleteResult!
     deleteWalk(id: ID!): DeleteResult!
+    deleteCure(id: ID!): DeleteResult!
     updateMe(data: UserUpdate!): UserResult!
     createPet(data: PetCreate!): PetResult!
     updatePet(id: ID!, data: PetUpdate!): PetResult!
@@ -75,7 +164,9 @@ type Mutation {
     createTreatment(data: TreatmentCreate!): TreatmentResult!
     updateTreatment(id: ID!, data: TreatmentUpdate!): TreatmentResult!
     createWalk(data: WalkCreate!): WalkResult!
-    updateWalk(id: ID!, data: WalkUpdate!): WalkResult!  
+    updateWalk(id: ID!, data: WalkUpdate!): WalkResult!    
+    createCure(data: CureCreate!): CureResult!
+    updateCure(id: ID!, data: CureUpdate!): CureResult!
     createReport(data: ReportCreate!): ReportResult!
     updateReport(id: ID!, data: ReportUpdate!): ReportResult!
     updateMedia(id: ID!, data: MediaUpdate!): MediaResult!
@@ -88,76 +179,263 @@ type Mutation {
     resendCode(email: String!): GenericResult!
 }
 
-scalar Upload
 
-enum UserRole {
-    USER
-    ADMIN
+type Code {
+    id: ID!
+    code: String!
+    ref_id: ID!
+    scope: String!
+    valid: Boolean!
+    ref_table: String!
+    created_by: String!
+    created_at: String!
 }
 
-enum CustodyLevel {
-    SUB_OWNER
-    OWNER
-    PET_SITTER
+type CodeResult {
+    success: Boolean!
+    error: Error
+    code: Code
 }
 
-enum Gender {
-    MALE
-    FEMALE
-    NOT_SAID
+type CodeValidationResult {
+    success: Boolean!
+    error: Error
+    is_valid: Boolean
+    code: Code
 }
 
-enum ReportType {
-    MISSING
-    FOUND
+type Coordinates {
+    latitude: Float
+    longitude: Float
 }
 
-enum TreatmentType {
-    VACCINE
-    ANTIPARASITIC
-    TABLET
-    OPERATION
-    REMINDER
-    TRAINING
-    WALK
+type Cure {
+    id: ID!
+    created_at: String!
+    date: String!
+    treatment: MinTreatment!
+    frequency_times: Int
+    frequency_value: Int
+    frequency_unit: FrequencyUnit
 }
 
-enum treatmentDuration {
-    TEN_MINUTES
-    QUARTER_HOUR
-    THREE_QUARTER
-    HALF_HOUR
-    HOUR
-    HOUR_AND_HALF
-    TWO_HOURS
+type CureResult {
+    cure: Cure
+    success: Boolean
+    error: Error
 }
 
-enum FrequencyUnit {
-    DAILY
-    WEEKLY
-    MONTHLY
-    YEARLY
+type Dashboard {
+    active_users: Int!
+    active_users_percent: Float!
+    all_users: Int!
+    all_pets: Int!
+    labels: [String!]!
+    active_users_mean: Int!
+    active_users_percent_stats: [Float!]!
+    active_users_stats: [Int!]!
+    all_pet_stats: [Int!]!
+    all_users_stats: [Int!]!
 }
 
-enum PetFamily {
-    REPTILE
-    CANINE
-    FELINE
-    BIRDS
-    FISH
+type DashboardResult {
+    success: Boolean!
+    error: Error
+    dashboard: Dashboard
 }
 
-enum CoatLength {
-    SHORT
-    MEDIUM
-    LONG
-    HAIRLESS
+type DailyStats {
+    all_users: Int!
+    active_users: Int!
+    all_pets: Int!
+    all_reports: Int!
+    daily_reports: Int!
+    active_users_percent: Float!
+}
+
+type DamnatioMemoriae {
+    id: ID!
+    created_at: String!
+    original_table: String!
+    original_data: JSON
+}
+
+type DamnatioMemoriaeResult {
+    success: Boolean!
+    error: Error
+    DamnatioMemoriae: DamnatioMemoriae
+}
+
+type DefaultResult {
+    success: Boolean
+    error: Error
+}
+
+type DeleteResult {
+    success: Boolean
+    id: ID
+    error: Error
 }
 
 type Error {
     code: String!
     message: String!
     extra: String
+}
+
+type GenericResult {
+    success: Boolean!
+    error: Error
+}
+
+type HealthCard {
+    id: ID!
+    pet: Pet!
+    treatments(commonSearch: CommonSearch = {}): PaginatedTreatments!
+    notes: [String]!
+}
+
+type HealthCardResult {
+    health_card: HealthCard
+    success: Boolean
+    error: Error
+}
+
+type MainColor {
+    color: String!
+    contrast: String!
+}
+
+type Media {
+    id: ID!
+    url: String!
+    type: String!
+    scope: String!
+    main_color: MainColor
+    main_colors: [MainColor!]
+    ref_id: String!
+}
+
+type MediaResult {
+    success: Boolean!
+    error: Error
+    media: Media
+}
+
+type MinTreatment {
+    id: ID!
+    type: TreatmentType!
+    name: String!
+    date: String!
+    duration: treatmentDuration
+}
+
+type NewOwnership {
+    pet: Pet!
+    ownership: Ownership!
+}
+
+type NewTokenResult {
+    success: Boolean!
+    error: Error
+    token: String
+    user: User
+}
+
+type Ownership {
+    id: ID!
+    user: User!
+    pet: Pet!
+    custody_level: CustodyLevel!
+}
+
+type OwnershipResult {
+    success: Boolean!
+    error: Error
+    ownership: Ownership
+}
+
+type OwnershipsResult {
+    success: Boolean!
+    error: Error
+    ownerships: [Ownership]!
+}
+
+type PaginatedCodes {
+    success: Boolean
+    error: Error
+    items: [Code]!
+    pagination: Pagination!
+}
+
+type PaginatedCures {
+    success: Boolean
+    error: Error
+    items: [Cure]!
+    pagination: Pagination!
+}
+
+type PaginatedDamnationesMemoriae {
+    success: Boolean!
+    error: Error
+    items: [DamnatioMemoriae]!
+    pagination: Pagination!
+}
+
+type PaginatedHealthCards {
+    success: Boolean
+    error: Error
+    items: [HealthCard]!
+    pagination: Pagination!
+}
+
+type PaginatedMedias {
+    success: Boolean
+    error: Error
+    items: [Media]!
+    pagination: Pagination!
+}
+
+type PaginatedOwnerships {
+    success: Boolean
+    error: Error
+    items: [Ownership]!
+    pagination: Pagination!
+}
+
+type PaginatedPets {
+    success: Boolean!
+    error: Error
+    items: [Pet]!
+    pagination: Pagination!
+}
+
+type PaginatedReports {
+    success: Boolean
+    error: Error
+    items: [Report]!
+    pagination: Pagination!
+}
+
+type PaginatedTreatments {
+    success: Boolean
+    error: Error
+    items: [Treatment]!
+    pagination: Pagination!
+}
+
+type PaginatedUsers {
+    success: Boolean
+    error: Error
+    items: [User]!
+    pagination: Pagination!
+}
+
+type PaginatedWalks {
+    success: Boolean
+    error: Error
+    items: [Walk]!
+    pagination: Pagination!
 }
 
 """
@@ -168,42 +446,6 @@ type Pagination {
     total_pages: Int
     current_page: Int
     page_size: Int
-}
-
-type Statistic {
-    id: ID!
-    date: String!
-    all_user: Int!
-    all_pets: Int!
-    all_active_users: Int!
-}
-
-type User {
-    id: ID!
-    first_name: String!
-    last_name: String!
-    email: String!
-    role: UserRole!
-    created_at: String!
-    ownerships(commonSearch: CommonSearch = {}): PaginatedOwnerships
-    pets_owned: Int!
-    pets_on_loan: Int!
-    last_activity: String
-    profile_picture: Media
-    reports(commonSearch: CommonSearch = {}): PaginatedReports
-}
-
-type DamnatioMemoriae {
-    id: ID!
-    created_at: String!
-    original_table: String!
-    original_data: JSON
-}
-
-
-type Tag {
-    id: ID!
-    text: String!
 }
 
 type Pet {
@@ -228,186 +470,10 @@ type Pet {
     report: Report
 }
 
-type Media {
-    id: ID!
-    url: String!
-    type: String!
-    scope: String!
-    main_color: MainColor
-    main_colors: [MainColor!]
-    ref_id: String!
-}
-
-type Ownership {
-    id: ID!
-    user: User!
-    pet: Pet!
-    custody_level: CustodyLevel!
-}
-
-type MainColor {
-    color: String!
-    contrast: String!
-}
-
-type GenericResult {
+type PetAddedResult {
     success: Boolean!
     error: Error
-}
-
-type UserResult {
-    success: Boolean!
-    error: Error
-    user: User
-}
-type ReportResult {
-    success: Boolean!
-    error: Error
-    report: Report
-}
-
-type DamnatioMemoriaeResult {
-    success: Boolean!
-    error: Error
-    DamnatioMemoriae: DamnatioMemoriae
-}
-
-type RestoredResult {
-    success: Boolean!
-    error: Error
-    table: String
-    restored: JSON
-}
-
-type StatisticResult {
-    success: Boolean!
-    error: Error
-    statistic: Statistic
-}
-
-type DashboardResult {
-    success: Boolean!
-    error: Error
-    dashboard: Dashboard
-}
-
-type Statistics {
-    labels: [String!]!
-    active_users_mean: [Float!]!
-    active_users_min: [Float!]!
-    active_users_max: [Float!]!
-    all_users: [Float!]!
-    all_pets: [Float!]!
-}
-
-type StatisticsResult {
-    success: Boolean!
-    error: Error
-    statistics: Statistics
-}
-
-type RealTimeStatisticResult {
-    success: Boolean!
-    error: Error
-    statistics: DailyStats
-}
-
-type DailyStats {
-    all_users: Int!
-    active_users: Int!
-    all_pets: Int!
-    all_reports: Int!
-    daily_reports: Int!
-    active_users_percent: Float!
-}
-
-type UsersResult {
-    success: Boolean!
-    error: Error
-    users: [User]!
-}
-
-type Dashboard {
-    active_users: Int!
-    active_users_percent: Float!
-    all_users: Int!
-    all_pets: Int!
-    labels: [String!]!
-    active_users_mean: Int!
-    active_users_percent_stats: [Float!]!
-    active_users_stats: [Int!]!
-    all_pet_stats: [Int!]!
-    all_users_stats: [Int!]!
-}
-
-type PaginatedUsers {
-    success: Boolean
-    error: Error
-    items: [User]!
-    pagination: Pagination!
-}
-
-type PaginatedWalks {
-    success: Boolean
-    error: Error
-    items: [Walk]!
-    pagination: Pagination!
-}
-
-type PaginatedDamnationesMemoriae {
-    success: Boolean!
-    error: Error
-    items: [DamnatioMemoriae]!
-    pagination: Pagination!
-}
-
-type PaginatedOwnerships {
-    success: Boolean
-    error: Error
-    items: [Ownership]!
-    pagination: Pagination!
-}
-
-type PaginatedReports {
-    success: Boolean
-    error: Error
-    items: [Report]!
-    pagination: Pagination!
-}
-
-type PaginatedTreatments {
-    success: Boolean
-    error: Error
-    items: [Treatment]!
-    pagination: Pagination!
-}
-
-type PaginatedHealthCards {
-    success: Boolean
-    error: Error
-    items: [HealthCard]!
-    pagination: Pagination!
-}
-
-type PaginatedMedias {
-    success: Boolean
-    error: Error
-    items: [Media]!
-    pagination: Pagination!
-}
-
-type PaginatedCodes {
-    success: Boolean
-    error: Error
-    items: [Code]!
-    pagination: Pagination!
-}
-
-type NewTokenResult {
-    success: Boolean!
-    error: Error
-    token: String
-    user: User
+    data: NewOwnership
 }
 
 type PetResult {
@@ -422,135 +488,10 @@ type PetsResult {
     pets: [Pet]!
 }
 
-type MediaResult {
+type RealTimeStatisticResult {
     success: Boolean!
     error: Error
-    media: Media
-}
-
-type CodeResult {
-    success: Boolean!
-    error: Error
-    code: Code
-}
-
-type CodeValidationResult {
-    success: Boolean!
-    error: Error
-    is_valid: Boolean
-    code: Code
-}
-
-type PaginatedPets {
-    success: Boolean!
-    error: Error
-    items: [Pet]!
-    pagination: Pagination!
-}
-
-type OwnershipResult {
-    success: Boolean!
-    error: Error
-    ownership: Ownership
-}
-
-type OwnershipsResult {
-    success: Boolean!
-    error: Error
-    ownerships: [Ownership]!
-}
-type NewOwnership {
-    pet: Pet!
-    ownership: Ownership!
-}
-
-type PetAddedResult {
-    success: Boolean!
-    error: Error
-
-    data: NewOwnership
-}
-
-type HealthCard {
-    id: ID!
-    pet: Pet!
-    treatments(commonSearch: CommonSearch = {}): PaginatedTreatments!
-    notes: [String]!
-}
-
-type UserDashboardResult {
-    dashboard: UserDashboard
-    error: Error
-    success: Boolean
-}
-type UserDashboard {
-    user_id: String
-    ownerships(commonSearch: CommonSearch = {}): PaginatedOwnerships
-    reports(commonSearch: CommonSearch = {}): PaginatedReports
-}
-
-type HealthCardResult {
-    health_card: HealthCard
-    success: Boolean
-    error: Error
-}
-
-type TreatmentResult {
-    treatment: Treatment
-    success: Boolean
-    error: Error
-}
-type WalkResult {
-    walk: Walk
-    success: Boolean
-    error: Error
-}
-
-type Code {
-    id: ID!
-    code: String!
-    ref_id: ID!
-    scope: String!
-    valid: Boolean!
-    ref_table: String!
-    created_by: String!
-    created_at: String!
-}
-
-type MinTreatment {
-    id: ID!
-    type: TreatmentType!
-    name: String!
-    date: String!
-    duration: treatmentDuration
-}
-
-type Treatment {
-    id: ID!
-    created_at: String!
-    type: TreatmentType!
-    name: String!
-    date: String!
-    logs: [String]
-    duration: treatmentDuration
-    frequency_value: Int
-    frequency_times: Int
-    frequency_unit: FrequencyUnit
-    booster: Treatment
-    health_card: HealthCard
-    related: [MinTreatment]
-}
-
-type Walk {
-    id: ID!
-    created_at: String!
-    date: String!    
-    distance_km: Float!        
-    overall_rating: Int
-    leash_pulling_rating: Int
-    behavior_rating: Int
-    notes: [String]
-    treatment: MinTreatment!
+    statistics: DailyStats
 }
 
 type Report {
@@ -570,6 +511,12 @@ type Report {
     medias: [Media]
 }
 
+type ReportResult {
+    success: Boolean!
+    error: Error
+    report: Report
+}
+
 type Reporter {
     email: String!
     first_name: String!
@@ -577,150 +524,130 @@ type Reporter {
     user_id: String
 }
 
-type Coordinates {
-    latitude: Float
-    longitude: Float
+type RestoredResult {
+    success: Boolean!
+    error: Error
+    table: String
+    restored: JSON
 }
 
-type DefaultResult {
+type Statistic {
+    id: ID!
+    date: String!
+    all_user: Int!
+    all_pets: Int!
+    all_active_users: Int!
+}
+
+type StatisticResult {
+    success: Boolean!
+    error: Error
+    statistic: Statistic
+}
+
+type Statistics {
+    labels: [String!]!
+    active_users_mean: [Float!]!
+    active_users_min: [Float!]!
+    active_users_max: [Float!]!
+    all_users: [Float!]!
+    all_pets: [Float!]!
+}
+
+type StatisticsResult {
+    success: Boolean!
+    error: Error
+    statistics: Statistics
+}
+
+type Tag {
+    id: ID!
+    text: String!
+}
+
+type Treatment {
+    id: ID!
+    created_at: String!
+    type: TreatmentType!
+    name: String!
+    date: String!
+    logs: [String]
+    duration: treatmentDuration
+    booster: Treatment
+    health_card: HealthCard
+    related: [MinTreatment]
+}
+
+type TreatmentResult {
+    treatment: Treatment
     success: Boolean
     error: Error
 }
 
-type DeleteResult {
+type User {
+    id: ID!
+    first_name: String!
+    last_name: String!
+    email: String!
+    role: UserRole!
+    created_at: String!
+    ownerships(commonSearch: CommonSearch = {}): PaginatedOwnerships
+    pets_owned: Int!
+    pets_on_loan: Int!
+    last_activity: String
+    profile_picture: Media
+    reports(commonSearch: CommonSearch = {}): PaginatedReports
+}
+
+type UserDashboard {
+    user_id: String
+    ownerships(commonSearch: CommonSearch = {}): PaginatedOwnerships
+    reports(commonSearch: CommonSearch = {}): PaginatedReports
+}
+
+type UserDashboardResult {
+    dashboard: UserDashboard
+    error: Error
     success: Boolean
-    id: ID
+}
+
+type UserResult {
+    success: Boolean!
+    error: Error
+    user: User
+}
+
+type UsersResult {
+    success: Boolean!
+    error: Error
+    users: [User]!
+}
+
+type Walk {
+    id: ID!
+    created_at: String!
+    date: String!
+    distance_km: Float!
+    overall_rating: Int
+    leash_pulling_rating: Int
+    behavior_rating: Int
+    treatment: MinTreatment!
+}
+
+type WalkResult {
+    walk: Walk
+    success: Boolean
     error: Error
 }
 
-input FixedFilter {
-    key: String!
-    value: String!
-}
-
-input ListFilter {
-    key: String
-    value: [String]!
-}
-
-input RangeFilterValue {
-    min: String
-    max: String
-}
-
-input RangeFilter {
-    key: String!
-    value: RangeFilterValue
-}
-
-"""
-just see
-"""
-input Join {
-    key: String!
-    value: DeepFilters!
-}
-
-input SearchFilter {
-    value: String = ""
-    fields: [String] = []
-}
-
-input Filters {
-    fixed: [FixedFilter] = []
-    ranges: [RangeFilter] = []
-    lists: [ListFilter] = []
-    join: [Join] = []
-    search: [SearchFilter]
-}
-input DeepFilters {
-    and: DeepFilters
-    or: DeepFilters
-    not: DeepFilters
-    fixed: [FixedFilter] = []
-    ranges: [RangeFilter] = []
-    search: SearchFilter = { value: "", fields: [] }
-    lists: [ListFilter] = []
-    join: [Join] = []
-}
-
-input MainColorCreate {
-    color: String!
-    contrast: String
-}
-
-input MediaUpdate {
-    url: String
-    scope: String
-    ref_id: String
-    main_colors: [MainColorCreate] = []
-    main_color: MainColorCreate
-    type: String
-}
-
-input MediaCreate {
-    url: String!
-    scope: String!
-    ref_id: String!
-    main_colors: [MainColorCreate] = []
-    main_color: MainColorCreate
-    type: String!
-}
+############################
+# Inputs
+############################
 
 input CodeCreate {
     code: String!
     ref_id: String!
     ref_table: String!
-}
-
-input WalkCreate {
-    date: String!
-    distance_km: Float!    
-    overall_rating: Int
-    leash_pulling_rating: Int
-    behavior_rating: Int
-    health_card_id: ID!
-    notes: [String]
-    duration: treatmentDuration
-    type: TreatmentType!    
-}
-
-input WalkUpdate {
-    date: String
-    distance_km: Float
-    overall_rating: Int
-    leash_pulling_rating: Int
-    behavior_rating: Int
-    duration: treatmentDuration
-    notes: [String]
-    type: TreatmentType
-}
-
-input ReportCreate {
-    type: ReportType!
-    place: String!
-    latitude: Float!
-    longitude: Float!
-    reporter: ReporterCreate!
-    notes: [String]
-    pet_id: String
-    date: String
-}
-
-
-input ReportUpdate {
-    place: String
-    latitude: Float
-    longitude: Float
-    notes: [String]
-    responders: [ReporterCreate]
-}
-
-input ReporterCreate {
-    email: String!
-    first_name: String!
-    last_name: String!
-    user_id: String
 }
 
 input CommonSearch {
@@ -739,37 +666,94 @@ input CommonSearch {
     }
 }
 
-input UserUpdate {
-    first_name: String
-    last_name: String
-    email: String
-    last_activity: String
+input CureCreate {
+    date: String!
+    distance_km: Float!
+    health_card_id: ID!
+    frequency_times: Int
+    frequency_value: Int
+    frequency_unit: FrequencyUnit
+    notes: [String]
 }
 
-input UserCreate {
-    first_name: String!
-    last_name: String!
-    email: String!
-    password: String!
+input CureUpdate {
+    date: String
+    frequency_times: Int
+    frequency_value: Int
+    frequency_unit: FrequencyUnit
+    notes: [String]
+}
+
+input DeepFilters {
+    and: DeepFilters
+    or: DeepFilters
+    not: DeepFilters
+    fixed: [FixedFilter] = []
+    ranges: [RangeFilter] = []
+    search: SearchFilter = { value: "", fields: [] }
+    lists: [ListFilter] = []
+    join: [Join] = []
+}
+
+input FixedFilter {
+    key: String!
+    value: String!
+}
+
+input Filters {
+    fixed: [FixedFilter] = []
+    ranges: [RangeFilter] = []
+    lists: [ListFilter] = []
+    join: [Join] = []
+    search: [SearchFilter]
+}
+
+input HealthCardCreate {
+    pet_id: ID!
+}
+
+input HealthCardUpdate {
+    notes: [String]!
+}
+
+"""
+just see
+"""
+input Join {
+    key: String!
+    value: DeepFilters!
+}
+
+input ListFilter {
+    key: String
+    value: [String]!
+}
+
+input MainColorCreate {
+    color: String!
+    contrast: String
+}
+
+input MediaCreate {
+    url: String!
+    scope: String!
+    ref_id: String!
+    main_colors: [MainColorCreate] = []
+    main_color: MainColorCreate
+    type: String!
+}
+
+input MediaUpdate {
+    url: String
+    scope: String
+    ref_id: String
+    main_colors: [MainColorCreate] = []
+    main_color: MainColorCreate
+    type: String
 }
 
 input OwnershipUpdate {
     custody_level: CustodyLevel!
-}
-
-input PetUpdate {
-    name: String    
-    birthday: String
-    neutered: Boolean
-    gender: Gender
-    chip_code: String
-    weight_kg: Float
-    temperament: String
-    breed: String
-    coat_length: CoatLength
-    diet: [String]
-    intollerance: [String]
-    disciplines: [String]
 }
 
 input PetCreate {
@@ -787,6 +771,62 @@ input PetCreate {
     disciplines: [String]
 }
 
+input PetUpdate {
+    name: String
+    birthday: String
+    neutered: Boolean
+    gender: Gender
+    chip_code: String
+    weight_kg: Float
+    temperament: String
+    breed: String
+    coat_length: CoatLength
+    diet: [String]
+    intollerance: [String]
+    disciplines: [String]
+}
+
+input RangeFilter {
+    key: String!
+    value: RangeFilterValue
+}
+
+input RangeFilterValue {
+    min: String
+    max: String
+}
+
+input ReportCreate {
+    type: ReportType!
+    place: String!
+    latitude: Float!
+    longitude: Float!
+    reporter: ReporterCreate!
+    notes: [String]
+    pet_id: String
+    date: String
+}
+
+input ReportUpdate {
+    place: String
+    latitude: Float
+    longitude: Float
+    notes: [String]
+    responders: [ReporterCreate]
+}
+
+input ReporterCreate {
+    email: String!
+    first_name: String!
+    last_name: String!
+    user_id: String
+}
+
+input SearchFilter {
+    value: String = ""
+    fields: [String] = []
+}
+
 input TreatmentCreate {
     health_card_id: ID!
     name: String!
@@ -795,10 +835,8 @@ input TreatmentCreate {
     duration: treatmentDuration
     logs: [String]
     booster_date: String
-    frequency_times: Int
-    frequency_value: Int
-    frequency_unit: FrequencyUnit
 }
+
 input TreatmentUpdate {
     logs: [String]
     date: String
@@ -807,15 +845,39 @@ input TreatmentUpdate {
     booster_date: String
     treatmentDuration: treatmentDuration
     type: TreatmentType
-    frequency_times: Int
-    frequency_value: Int
-    frequency_unit: FrequencyUnit
 }
 
-input HealthCardCreate {
-    pet_id: ID!
+input UserCreate {
+    first_name: String!
+    last_name: String!
+    email: String!
+    password: String!
 }
 
-input HealthCardUpdate {
-    notes: [String]!
+input UserUpdate {
+    first_name: String
+    last_name: String
+    email: String
+    last_activity: String
+}
+
+input WalkCreate {
+    date: String!
+    distance_km: Float!
+    overall_rating: Int
+    leash_pulling_rating: Int
+    behavior_rating: Int
+    health_card_id: ID!
+    notes: [String]
+    duration: treatmentDuration
+}
+
+input WalkUpdate {
+    date: String
+    distance_km: Float
+    overall_rating: Int
+    leash_pulling_rating: Int
+    behavior_rating: Int
+    duration: treatmentDuration
+    notes: [String]
 }

@@ -16,7 +16,7 @@ class User(Base):
     last_login = db.Column(db.DateTime)
     last_activity  = db.Column(db.DateTime)
     verified = db.Column(db.Boolean, default=False)
-
+    shelters_roles = db.relationship("ShelterRole", uselist=True, backref='users')
     def to_dict(self):
         return {
             "id": self.id,

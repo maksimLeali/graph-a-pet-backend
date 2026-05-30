@@ -22,7 +22,6 @@ def create_walk(data):
             overall_rating=data.get("overall_rating"),
             leash_pulling_rating=data.get("leash_pulling_rating"),
             behavior_rating=data.get("behavior_rating"),
-            notes=data.get("notes"),
             created_at=today.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
         )
         db.session.add(walk_model)

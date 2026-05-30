@@ -8,7 +8,6 @@ class Walk(Base):
     overall_rating = db.Column(db.Integer)
     leash_pulling_rating = db.Column(db.Integer)
     behavior_rating = db.Column(db.Integer)
-    notes = db.Column(db.ARRAY(db.String))
 
     def to_dict(self):
         return {
@@ -19,5 +18,4 @@ class Walk(Base):
             "overall_rating": self.overall_rating,
             "leash_pulling_rating": self.leash_pulling_rating,
             "behavior_rating": self.behavior_rating,
-            "notes": self.notes
         }

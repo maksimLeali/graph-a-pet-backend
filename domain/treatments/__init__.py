@@ -1,7 +1,7 @@
 from api.errors import NotFoundError
 from ariadne import convert_kwargs_to_snake_case
 import repository.treatments as treatments_data
-from repository.treatments.models import FrequencyUnit
+from repository.cures.models import FrequencyUnit
 import domain.health_cards as health_cards_domain
 from utils.logger import logger, stringify
 from utils import format_common_search
