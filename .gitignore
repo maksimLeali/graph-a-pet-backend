@@ -5,6 +5,7 @@ lib
 config.yml
 /app/
 /temp
+/media
 venv
 /alembic/db_scheme.json
 alembic.ini
@@ -12,3 +13,4 @@ serviceAccountKey.json
 **/__log__*
 test*.py
 translations.json
+/tools

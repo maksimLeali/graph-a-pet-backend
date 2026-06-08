@@ -10,8 +10,6 @@ jwt:
     secret: ~
 code:
   minuts_valid: ~
-firebase:
-    bucket: ~
 logging:
     level: ~
 cron:

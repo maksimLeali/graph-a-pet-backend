@@ -12,7 +12,6 @@ We embed a minimal GraphiQL interface instead for interactive querying.
 from flask import request, jsonify
 from api.operations import object_types
 from config import cfg
-from utils.firebase.storage import upload_image
 from utils.cron import start_scheduler
 import schedules
 from api.medias.routes import *

@@ -13,7 +13,8 @@ class Media(Base):
         return {
             "id" : self.id,
             "type": self.type,
-            "url": self.url,
+            "url": f"/media/{self.id}/",
+            "file_path": self.url,
             "scope": self.scope,
             "ref_id": self.ref_id,
             "main_color": self.main_color,

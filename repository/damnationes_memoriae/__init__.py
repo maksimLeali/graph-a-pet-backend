@@ -17,7 +17,7 @@ import pydash as py_
 
 from config import cfg 
 
-schema = cfg['db']['schema'] if 'schema' in cfg['db'] else ""
+schema = cfg['db']['schema'] if 'schema' in cfg['db'] else None
 
 
 def create_damnatio_memoriae(data):
@@ -157,14 +157,17 @@ def get_tables_referencing_table(table_name):
         table_names = py_.keys(tables_common_properties)
         logger.check(table_names)
         tables = []
+        logger.critical(f"table_names: {stringify(table_names)}")
         for name in table_names: 
             if(name!="base_template" and name != "user_pets_in_custody"):
+                logger.critical(f"checking {name} {schema}-")
                 candidates = inspector.get_foreign_keys(name, schema=schema)
+                logger.critical(f"candidates for {name} : {stringify(candidates)}")
                 for candidate in candidates:
                     if candidate['referred_table'] == table_name:
                         logger.check(candidate)
                         tables.append({"table": name, **candidate})
-            
+        logger.critical(f"tables: {stringify(tables)}") 
         logger.check(f"found {len(tables)} tables")
         return tables
     except Exception as e:
@@ -177,10 +180,12 @@ def get_all_related(table):
 
         # Find the tables that have a foreign key referencing the selected row
         is_fk_in = get_tables_referencing_table(table)
+        logger.critical(f"is_fk_in: {stringify(is_fk_in)}")
         has_fk_in = inspector.get_foreign_keys(table, schema=schema)
 
         logger.check(f'destroy before itself {is_fk_in}')
         logger.check(f'destroy after itself {has_fk_in}')
+        logger.critical(f"tables_common_properties: {stringify(tables_common_properties)}")
         inherit_delete = py_.keys(
             tables_common_properties.get(table).get('inherit_delete'))
         logger.check(inherit_delete)
@@ -204,6 +209,9 @@ def delete_row(id, table, data, user_id, skip_ids=[]):
         restore_after = []
         restore_before = []
         destroy_before, destroy_after = get_all_related(table)
+
+        logger.critical(f"destroy before itself {destroy_before}")
+        logger.critical(f"destroy after itself {destroy_after}")
         logger.info(f"removing {id} from {table}\n"\
                     f"skip: {skip_ids}")
         
@@ -301,16 +309,16 @@ def update_memoriae(id, data):
 def clean_data(data):
     
     if isinstance(data, dict):
-        
         return {key: clean_data(value) for key, value in data.items()}
+    
     elif isinstance(data, list):
-        
         return [clean_data(item) for item in data]
+    
     elif isinstance(data, Enum):
-        
         return data.name
+    
     elif isinstance(data, decimal.Decimal):
         return float(data)
+    
     else:
-        logger.critical(f"else : {data}")
         return data

@@ -3,6 +3,7 @@ from utils.logger import logger, stringify
 import domain.medias as mediaDomain
 from api.blueprints import media
 from api.errors import format_error
+from utils import get_request_user
 
 
 @media.route('/<id>/', methods=["GET"])
@@ -50,6 +51,7 @@ def get_resized_media(id,size):
     
 @media.route('/upload', methods=['POST'])
 def upload_file():
+    print("here")
     if 'file' not in request.files:
             return abort(400, 'No file part')
     file = request.files['file']
@@ -58,8 +60,32 @@ def upload_file():
         return abort(400, 'no file selected')
     disable_colors = request.form.get('disable_colors', 'false').lower() == 'true'
     print(disable_colors)
+
+    user_id = 'anonymous'
+    token = request.headers.get('Authorization') or request.headers.get('authorization')
+    logger.info(f"upload auth header present: {bool(token)}")
+    if token:
+        try:
+            user = get_request_user(token)
+            logger.info(f"resolved user from token: {stringify(user)}")
+            user_id = str(user.get('id') or 'anonymous')
+        except Exception as e:
+            logger.warn(f"could not resolve user from token, using 'anonymous': {e}")
+    logger.info(f"upload user_id: {user_id}")
+
     try:
-        public_url, type, encoding, size, main_colors = mediaDomain.upload_media(file,disable_colors)
-        return jsonify({"public_url" : public_url, "type": type, "size": size, "encodig": encoding, "main_colors":main_colors}), 200
+        disk_path, mime, encoding, size, colors = mediaDomain.upload_media(file, disable_colors, user_id)
+        main_color = colors[0] if colors else None
+        return jsonify({
+            "public_url": disk_path,
+            "url": disk_path,
+            "type": mime,
+            "encoding": encoding,
+            "size": size,
+            "main_colors": colors,
+            "main_color": main_color,
+        }), 200
     except Exception as e:
         logger.error(e)
+        formatted_error = format_error(e)
+        return abort(formatted_error.get("code"), formatted_error.get("message"))

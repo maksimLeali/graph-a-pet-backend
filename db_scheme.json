@@ -56,7 +56,7 @@
             "search_columns": ["name"],
             "alias": "pt",
             "other_table_ref": "pet_id",
-            "children": ["ownerships", "health_cards", "reports"],
+            "children": ["ownerships", "health_cards", "reports", "shelter_pets"],
             "inherit_delete": {
                 "ownerships": {
                     "cond": "all"
@@ -65,6 +65,9 @@
                     "cond": "all"
                 },
                 "reports": {
+                    "cond": "all"
+                },
+                "shelter_pets": {
                     "cond": "all"
                 }
             }
@@ -193,14 +196,30 @@
             "columns": {
                 "treatment_id": "string",
                 "distance_km": "float",
-                "leash_pulling_rating": "int",
-                "behavior_rating": "int",
-                "overall_rating": "int",
                 "duration_minutes": "int"
             },
             "search_columns": [],
             "alias": "wk",
             "other_table_ref": "walk_id",
+            "children": ["walk_ratings"],
+            "inherit_delete": {
+                "walk_ratings": {
+                    "cond": "all"
+                }
+            }
+        },
+        "walk_ratings": {
+            "enums": {
+                "WalkRatingType": ["OVERALL", "LEASH_PULLING", "BEHAVIOR", "AGGRESSION", "CALM"]
+            },
+            "columns": {
+                "walk_id": "string",
+                "type": "enum(WalkRatingType)",
+                "rating": "int"
+            },
+            "search_columns": ["type"],
+            "alias": "rtg",
+            "other_table_ref": "walk_rating_id",
             "children": [],
             "inherit_delete": {}
         },
@@ -269,14 +288,17 @@
                 "postal_code": "string",
                 "region": "string",
                 "district": "string",
-                "contacts": "json[]"
+                "contacts": "json"
             },
             "search_columns": ["name", "city", "region","district"],
             "alias": "sh",
             "other_table_ref": "shelter_id",
-            "children": ["shelter_roles"],
+            "children": ["shelter_roles", "shelter_pets"],
             "inherit_delete": {
                 "shelter_roles": {
+                    "cond": "all"
+                },
+                "shelter_pets": {
                     "cond": "all"
                 }
             }
@@ -293,6 +315,17 @@
             "search_columns": ["role"],
             "alias": "srl",
             "other_table_ref": "shelter_role_id",
+            "children": [],
+            "inherit_delete": {}
+        },
+        "shelter_pets": {
+            "columns": {
+                "shelter_id": "string",
+                "pet_id": "string"
+            },
+            "search_columns": [],
+            "alias": "shp",
+            "other_table_ref": "shelter_pet_id",
             "children": [],
             "inherit_delete": {}
         }

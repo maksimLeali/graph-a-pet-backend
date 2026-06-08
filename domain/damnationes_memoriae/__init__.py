@@ -72,6 +72,7 @@ def restore_memoriae(id, user):
 
 def delete_row(id, table, data, user_id ):
     logger.domain(f"{user_id} is removing {id} from {table}")
+    logger.critical(f"{user_id} is removing {id} from {table}")
     try:
         memoriae_id, skip = damnationes_memoriae_data.delete_row(id, table,data, user_id)
         

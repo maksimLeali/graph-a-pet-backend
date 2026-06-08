@@ -1,7 +1,7 @@
 from ariadne import convert_kwargs_to_snake_case
 from graphql import GraphQLError, GraphQLResolveInfo
-import domain.shelters as shelters_domain
-from api.errors import format_error, error_pagination
+import domain.shelter_pets as shelter_pets_domain
+from api.errors import format_error
 from api.middlewares import auth_middleware
 from utils.logger import logger, stringify
 from utils import format_common_search
@@ -9,15 +9,14 @@ from utils import format_common_search
 
 @convert_kwargs_to_snake_case
 @auth_middleware
-def list_shelters_resolver(obj, info: GraphQLResolveInfo, common_search):
+def list_shelter_pets_resolver(obj, info: GraphQLResolveInfo, common_search):
     logger.api(f"common_search: {stringify(common_search)}")
     common_search = format_common_search(common_search)
     try:
-        shelters, pagination = shelters_domain.get_paginated_shelters(common_search)
-        logger.check(f"pagination: {stringify(pagination)}")
+        shelter_pets, pagination = shelter_pets_domain.get_paginated_shelter_pets(common_search)
         payload = {
             "success": True,
-            "items": shelters,
+            "items": shelter_pets,
             "pagination": pagination,
         }
     except Exception as e:
@@ -29,20 +28,19 @@ def list_shelters_resolver(obj, info: GraphQLResolveInfo, common_search):
 
 @convert_kwargs_to_snake_case
 @auth_middleware
-def get_shelter_resolver(obj, info, id):
+def get_shelter_pet_resolver(obj, info, id):
     logger.api(f"id: {id}")
     try:
-        shelter = shelters_domain.get_shelter(id)
+        shelter_pet = shelter_pets_domain.get_shelter_pet(id)
         payload = {
             "success": True,
-            "shelter": shelter,
+            "shelter_pet": shelter_pet,
         }
-        logger.check(f"shelter: {stringify(shelter)}")
     except Exception as e:
         logger.error(e)
         payload = {
             "success": False,
+            "shelter_pet": None,
             "error": format_error(e, info.context.headers['authorization']),
-            "shelter": None,
         }
     return payload

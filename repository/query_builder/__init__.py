@@ -1,5 +1,5 @@
 from typing import Dict
-import pydash as py_
+import pydash as py_ # type: ignore
 from api.errors import BadRequest
 from utils import camel_to_snake
 from itertools import permutations
@@ -270,8 +270,16 @@ def format_values_to_restore(data, table_scheme):
         logger.info(f"value: {value} type {type(value)} {isinstance(value, list)}")
         if isinstance(value,list) : 
             logger.critical(table_scheme)
-            to_append = '::json[]' if table_scheme['columns'][key] == "json[]" else '::varchar[]'
-            formatted_value= f'ARRAY{value}{to_append}' if len(value) > 0 else  f'ARRAY[]{to_append}' 
+            col_type = table_scheme['columns'].get(key, '')
+            if col_type == 'json':
+                import json as _json
+                formatted_value = f"'{_json.dumps(value)}'::json"
+            elif col_type == 'json[]':
+                to_append = '::json[]'
+                formatted_value= f'ARRAY{value}{to_append}' if len(value) > 0 else  f'ARRAY[]{to_append}'
+            else:
+                to_append = '::varchar[]'
+                formatted_value= f'ARRAY{value}{to_append}' if len(value) > 0 else  f'ARRAY[]{to_append}'
         elif isinstance(value, dict) : 
             formatted_value= f"'{stringify(value)}'::json"
         elif isinstance(value, str) and value != 'NULL':

@@ -41,7 +41,7 @@ def signup_resolver(obj, info, data):
         payload = {
             "success": False,
             "user": None,
-            "error": format_error(e, info.context.headers['authorization']) 
+            "error": format_error(e, info.context.headers.get('authorization'))
         }
     return payload
 
@@ -215,6 +215,6 @@ def resend_code_resolver(obj, info, email):
         logger.error(e)
         payload = {
             "success": False,
-            "error": format_error(e, info.context.headers['authorization'])
+            "error": format_error(e, info.context.headers.get('authorization'))
         }
     return payload

@@ -39,7 +39,7 @@ def update_cure(id, data):
         f"data: {stringify(data)}"
     )
     try:
-        cure = cures_data.update_cure(id, py_.pick(data, ["distance_km", "treatment_id", "overall_rating", "leash_pulling_rating", "behavior_rating", "notes"]))
+        cure = cures_data.update_cure(id, py_.pick(data, ["treatment_id", "frequency_value", "frequency_unit", "frequency_times"]))
 
         treatment_from_cures = {                       
         }

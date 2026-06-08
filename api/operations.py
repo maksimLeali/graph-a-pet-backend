@@ -12,6 +12,9 @@ from api.ownerships.mutations import *
 from api.walks.queries import *
 from api.walks.mutations import *
 from api.walks.resolvers import walk
+from api.walk_ratings.queries import *
+from api.walk_ratings.mutations import *
+from api.walk_ratings.resolvers import walk_rating
 from api.cures.queries import *
 from api.cures.mutations import *
 from api.cures.resolvers import cure
@@ -31,6 +34,15 @@ from api.reports.resolvers import report
 from api.statistics.queries import * 
 from api.damnationes_memoriae.queries import * 
 from api.damnationes_memoriae.mutation import * 
+from api.shelters.queries import *
+from api.shelters.mutations import *
+from api.shelters.resolvers import shelter
+from api.shelter_roles.queries import *
+from api.shelter_roles.mutations import *
+from api.shelter_roles.resolvers import shelter_role
+from api.shelter_pets.queries import *
+from api.shelter_pets.mutations import *
+from api.shelter_pets.resolvers import shelter_pet
 from domain import refresh_token
 from api.middlewares import auth_middleware
 
@@ -83,8 +95,16 @@ query.set_field("getUserDashboard", user_dashboard_resolver)
 query.set_field("getOrCreateCode", get_or_create_code_resolver)
 query.set_field("listWalks", list_walks_resolver)
 query.set_field("getWalk", get_walk_resolver)   
+query.set_field("listWalkRatings", list_walk_ratings_resolver)
+query.set_field("getWalkRating", get_walk_rating_resolver)
 query.set_field("getCure", get_cure_resolver)
 query.set_field("listCures", list_cures_resolver)
+query.set_field("getShelter", get_shelter_resolver)
+query.set_field("listShelters", list_shelters_resolver)
+query.set_field("getShelterRole", get_shelter_role_resolver)
+query.set_field("listShelterRoles", list_shelter_roles_resolver)
+query.set_field("getShelterPet", get_shelter_pet_resolver)
+query.set_field("listShelterPets", list_shelter_pets_resolver)
 
 
 mutation = MutationType()
@@ -121,8 +141,20 @@ mutation.set_field("resendCode", resend_code_resolver)
 mutation.set_field("createWalk", create_walk_resolver)
 mutation.set_field("updateWalk", update_walk_resolver)
 mutation.set_field("deleteWalk", delete_walk_resolver)
+mutation.set_field("createWalkRating", create_walk_rating_resolver)
+mutation.set_field("updateWalkRating", update_walk_rating_resolver)
+mutation.set_field("deleteWalkRating", delete_walk_rating_resolver)
 mutation.set_field("createCure", create_cure_resolver)
 mutation.set_field("updateCure", update_cure_resolver)
 mutation.set_field("deleteCure", delete_cure_resolver)
+mutation.set_field("createShelter", create_shelter_resolver)
+mutation.set_field("updateShelter", update_shelter_resolver)
+mutation.set_field("deleteShelter", delete_shelter_resolver)
+mutation.set_field("createShelterRole", create_shelter_role_resolver)
+mutation.set_field("updateShelterRole", update_shelter_role_resolver)
+mutation.set_field("deleteShelterRole", delete_shelter_role_resolver)
+mutation.set_field("createShelterPet", create_shelter_pet_resolver)
+mutation.set_field("createShelterPets", create_shelter_pets_resolver)
+mutation.set_field("deleteShelterPet", delete_shelter_pet_resolver)
 
-object_types = [query, mutation, user, dashboard, pet, ownership, health_card, treatment, report,walk, cure ]
+object_types = [query, mutation, user, dashboard, pet, ownership, health_card, treatment, report,walk, cure, shelter, shelter_role, shelter_pet, walk_rating ]

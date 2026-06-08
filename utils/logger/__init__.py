@@ -40,6 +40,14 @@ def _format_path(pathname: str) -> str:
     segments = [p.upper() for p in parts[:-1]] + [parts[-1].lower()]
     return " | ".join(segments)
 
+def _relative_path(pathname: str) -> str:
+    """Return the project-relative posix path, all lowercase, no spaces."""
+    try:
+        rel = pathlib.Path(pathname).resolve().relative_to(_PROJECT_ROOT)
+        return rel.as_posix().lower()
+    except ValueError:
+        return pathlib.Path(pathname).name.lower()
+
 # ---------------------------------------------------------------------------
 # Formatter
 # ---------------------------------------------------------------------------
@@ -59,7 +67,7 @@ class CustomFormatter(logging.Formatter):
     _cyan_bold   = "\033[1;36m"
 
     _BASE_FMT     = "%(asctime)s %(levelname)s: %(pathname)s | %(funcName)s()" + _reset + "\n%(message)s\n"
-    _EXTENDED_FMT = _BASE_FMT + _italic + "[ %(pathname)s:%(lineno)d ]\n"
+    _EXTENDED_FMT = _BASE_FMT + _italic + "[ %(relpath)s:%(lineno)d ]\n"
     _START_FMT    = "%(message)s"
 
     _FORMATS = {
@@ -81,9 +89,10 @@ class CustomFormatter(logging.Formatter):
 
     def format(self, record: logging.LogRecord) -> str:
         fmt = self._FORMATS.get(record.levelno, self._BASE_FMT)
-        formatter = logging.Formatter(fmt, datefmt="%Y-%m-%dT%H:%M:%S.%fZ.00Z")
+        formatter = logging.Formatter(fmt, datefmt="%Y-%m-%dT%H:%M:%S")
         # Work on a shallow copy so we never mutate the original record
         copy = logging.makeLogRecord(record.__dict__)
+        copy.relpath = _relative_path(record.pathname)
         copy.pathname = _format_path(record.pathname)
         return formatter.format(copy)
 

@@ -5,38 +5,61 @@ from sqlalchemy import select, text
 from api.errors import InternalError, BadRequest, NotFoundError
 from repository import db
 from utils.logger import logger, stringify
-from repository.shelter_roles.models import ShelterRole
+from repository.shelter_roles.models import ShelterRole, RoleLevel
 from repository.query_builder import build_query, build_count, build_where
 
 
 def create_shelter_role(data):
-    today = datetime.today()
-    shelter_role = ShelterRole(
-        id = f"{uuid.uuid4()}",
-        user_id=data["user_id"], 
-        pet_id=data["pet_id"], 
-        custody_level= data['custody_level'],
-        created_at=today.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
-    )
-    db.session.add(shelter_role)
-    db.session.commit()
-    return shelter_role.to_dict()
-    
-def update_shelter_role(id,data):
+    logger.repository(f"data: {stringify(data)}")
+    try:
+        today = datetime.today()
+
+        role_raw = data.get("role")
+        enum_value = None
+        if role_raw is not None:
+            if isinstance(role_raw, RoleLevel):
+                enum_value = role_raw
+            else:
+                try:
+                    enum_value = RoleLevel[role_raw.upper()]
+                except KeyError:
+                    raise BadRequest(f"Invalid role: {role_raw}")
+
+        shelter_role = ShelterRole(
+            id=f"{uuid.uuid4()}",
+            user_id=data["user_id"],
+            shelter_id=data["shelter_id"],
+            role=enum_value,
+            created_at=today.strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
+        )
+        db.session.add(shelter_role)
+        db.session.commit()
+        return shelter_role.to_dict()
+    except Exception as e:
+        logger.error(e)
+        raise e
+
+def update_shelter_role(id, data):
     logger.repository(
-        f"id: {id}\n"\
-        f"dta: {stringify(data)}"
+        f"id: {id}\n"
+        f"data: {stringify(data)}"
     )
-    try: 
-        shelter_role_model = db.session.query(ShelterRole).filter(ShelterRole.id== id)
-        if not shelter_role_model:
+    try:
+        if "role" in data and data["role"] is not None and not isinstance(data["role"], RoleLevel):
+            try:
+                data["role"] = RoleLevel[data["role"].upper()]
+            except KeyError:
+                raise BadRequest(f"Invalid role: {data['role']}")
+
+        shelter_role_model = db.session.query(ShelterRole).filter(ShelterRole.id == id)
+        if not shelter_role_model.first():
             raise NotFoundError(f"no shelter_role found with id: {id}")
         shelter_role_old = shelter_role_model.first().to_dict()
         shelter_role_model.update(data)
         db.session.commit()
-        shelter_role= {**shelter_role_old, **shelter_role_model.first().to_dict()}
+        shelter_role = {**shelter_role_old, **shelter_role_model.first().to_dict()}
         logger.check(f'shelter_role: {stringify(shelter_role)}')
-        return  shelter_role
+        return shelter_role
     except Exception as e:
         logger.error(e)
         raise e

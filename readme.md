@@ -75,13 +75,13 @@ telegram:
 
 If you don't want or can't use telegram just set the `active` field to `False`
 
-### firebase bucket
+### media storage
 
-to save the media that users will send, I usually create a bucket on firebase.
-So create your project on the firebae console and get your authentication key
-( i usually store it in the root folder )
-
-Then from the firebase console create a new bucket and save the uri.
+Uploaded media are stored locally under the `media/` folder (already gitignored),
+organised as `media/<user_id>/<YYYY-MM-DD>/<uuid>_<filename>`. The folder is
+created automatically at runtime. Files are served back by the API via
+`GET /media/<id>/` (optionally with `/<width>x<height>` for crop or
+`/<width>x<height>/fit` for fit).
 
 ## Basic structure
 

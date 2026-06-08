@@ -39,7 +39,7 @@ def update_walk(id, data):
         f"data: {stringify(data)}"
     )
     try:
-        walk = walks_data.update_walk(id, py_.pick(data, ["distance_km", "treatment_id", "overall_rating", "leash_pulling_rating", "behavior_rating", "notes"]))
+        walk = walks_data.update_walk(id, py_.pick(data, ["distance_km", "treatment_id", "notes"]))
 
         treatment_from_walks = {                       
         }

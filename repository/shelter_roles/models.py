@@ -13,12 +13,13 @@ class ShelterRole(Base):
     user_id = db.Column(db.String, db.ForeignKey('users.id'))
     shelter_id = db.Column(db.String, db.ForeignKey('shelters.id'))
     role = db.Column(db.Enum(RoleLevel))
+
     def to_dict(self):
         return {
             "id": self.id,
             "user_id": self.user_id,
-            "pet_id": self.pet_id,
-            "custody_level": self.custody_level.name,
+            "shelter_id": self.shelter_id,
+            "role": self.role.name if self.role else None,
             "created_at": str(self.created_at),
             "updated_at": str(self.updated_at) if self.updated_at else None,
         }

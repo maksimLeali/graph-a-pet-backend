@@ -1,0 +1,2616 @@
+type: collection.insomnia.rest/5.0
+schema_version: "5.1"
+name: GAP
+meta:
+  id: wrk_9917789f88834676878d1bfed72e9c54
+  created: 1748736000000
+  modified: 1748736000000
+  description: ""
+collection:
+  - name: 'User'
+    meta:
+      id: fld_user
+      created: 1748736000000
+      modified: 1748736000000
+      sortKey: -1748736000000
+      description: ""
+    children:
+      - url: "{{base_url}}"
+        name: 'Login'
+        meta:
+          id: req_8ad42f9f52814f5abbe2dccea7750a5d
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000001
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "mutation Login($email: String!, $password: String!) {\n  login(email: $email, password: $password) {\n    error { message code }\n    token\n    user { id first_name last_name email }\n  }\n}", "operationName": "Login", "variables": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"password\"\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Sign Up'
+        meta:
+          id: req_signup
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000002
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "mutation SignUp($data: UserCreate!) {\n  signUp(data: $data) {\n    success\n    error { message code }\n    user { id email }\n  }\n}", "operationName": "SignUp", "variables": "{\n  \"data\": {\n    \"first_name\": \"First\",\n    \"last_name\": \"Last\",\n    \"email\": \"new@example.com\",\n    \"password\": \"password\"\n  }\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Verify User'
+        meta:
+          id: req_verify
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000003
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "mutation Verify($email: String!, $code: String!) {\n  verifyUser(email: $email, code: $code) {\n    token\n    error { message }\n    user { id email }\n  }\n}", "operationName": "Verify", "variables": "{\n  \"email\": \"new@example.com\",\n  \"code\": \"0000-0000\"\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Resend Code'
+        meta:
+          id: req_resend
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000004
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "mutation ResendCode($email: String!) {\n  resendCode(email: $email) {\n    success\n    error { message code }\n  }\n}", "operationName": "ResendCode", "variables": "{\n  \"email\": \"new@example.com\"\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Refresh Token'
+        meta:
+          id: req_refresh
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000005
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "mutation RefreshToken {\n  refreshToken {\n    success\n    token\n  }\n}", "operationName": "RefreshToken"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Me'
+        meta:
+          id: req_me
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000006
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "query Me {\n  me { id email first_name last_name }\n}", "operationName": "Me"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'List Users'
+        meta:
+          id: req_list_users
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000007
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "query ListUsers($commonSearch: CommonSearch) {\n  listUsers(commonSearch: $commonSearch) {\n    items { id email first_name last_name }\n    pagination { total_items current_page page_size total_pages }\n  }\n}", "operationName": "ListUsers", "variables": "{\n  \"commonSearch\": {}\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Get User'
+        meta:
+          id: req_get_user
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000008
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "query GetUser($id: ID!) {\n  getUser(id: $id) {\n    success\n    error { message code }\n    user { id email first_name last_name }\n  }\n}", "operationName": "GetUser", "variables": "{\n  \"id\": \"USER_ID\"\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Create User'
+        meta:
+          id: req_create_user
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000009
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "mutation CreateUser($data: UserCreate!) {\n  createUser(data: $data) {\n    success\n    error { message code }\n    user { id email }\n  }\n}", "operationName": "CreateUser", "variables": "{\n  \"data\": {\n    \"first_name\": \"First\",\n    \"last_name\": \"Last\",\n    \"email\": \"user@example.com\",\n    \"password\": \"password\"\n  }\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Update User'
+        meta:
+          id: req_update_user
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000010
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "mutation UpdateUser($id: ID!, $data: UserUpdate!) {\n  updateUser(id: $id, data: $data) {\n    success\n    error { message code }\n    user { id email first_name last_name }\n  }\n}", "operationName": "UpdateUser", "variables": "{\n  \"id\": \"USER_ID\",\n  \"data\": {\n    \"first_name\": \"Updated\"\n  }\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Update Me'
+        meta:
+          id: req_update_me
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000011
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "mutation UpdateMe($data: UserUpdate!) {\n  updateMe(data: $data) {\n    success\n    error { message code }\n    user { id email first_name last_name }\n  }\n}", "operationName": "UpdateMe", "variables": "{\n  \"data\": {\n    \"first_name\": \"Updated\"\n  }\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Delete User'
+        meta:
+          id: req_delete_user
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000012
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "mutation DeleteUser($id: ID!) {\n  deleteUser(id: $id) {\n    success\n    error { message code }\n    id\n  }\n}", "operationName": "DeleteUser", "variables": "{\n  \"id\": \"USER_ID\"\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: 'Pets'
+    meta:
+      id: fld_pets
+      created: 1748736000000
+      modified: 1748736000000
+      sortKey: -1748736001000
+      description: ""
+    children:
+      - url: "{{base_url}}"
+        name: 'List Pets'
+        meta:
+          id: req_list_pets
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000013
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "query ListPets($commonSearch: CommonSearch) {\n  listPets(commonSearch: $commonSearch) {\n    items { id name birthday gender }\n    pagination { total_items current_page page_size total_pages }\n  }\n}", "operationName": "ListPets", "variables": "{\n  \"commonSearch\": {}\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'List My Pets'
+        meta:
+          id: req_list_my_pets
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000014
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "query ListMyPets {\n  listMyPets {\n    success\n    items { id name birthday gender }\n  }\n}", "operationName": "ListMyPets"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Get Pet'
+        meta:
+          id: req_get_pet
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000015
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "query GetPet($id: ID!) {\n  getPet(id: $id) {\n    success\n    error { message code }\n    pet { id name birthday gender weight_kg }\n  }\n}", "operationName": "GetPet", "variables": "{\n  \"id\": \"PET_ID\"\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Create Pet'
+        meta:
+          id: req_create_pet
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000016
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "mutation CreatePet($data: PetCreate!) {\n  createPet(data: $data) {\n    success\n    error { message code }\n    pet { id name }\n  }\n}", "operationName": "CreatePet", "variables": "{\n  \"data\": {\n    \"name\": \"Pippo\",\n    \"birthday\": \"2020-01-01T00:00:00\",\n    \"gender\": \"MALE\",\n    \"neutered\": false,\n    \"weight_kg\": 10.0\n  }\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Update Pet'
+        meta:
+          id: req_update_pet
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000017
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "mutation UpdatePet($id: ID!, $data: PetUpdate!) {\n  updatePet(id: $id, data: $data) {\n    success\n    error { message code }\n    pet { id name }\n  }\n}", "operationName": "UpdatePet", "variables": "{\n  \"id\": \"PET_ID\",\n  \"data\": {\n    \"name\": \"Pippo Updated\"\n  }\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Delete Pet'
+        meta:
+          id: req_delete_pet
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000018
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "mutation DeletePet($id: ID!) {\n  deletePet(id: $id) {\n    success\n    error { message code }\n    id\n  }\n}", "operationName": "DeletePet", "variables": "{\n  \"id\": \"PET_ID\"\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Add Pet To Me'
+        meta:
+          id: req_add_pet_to_me
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000019
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "mutation AddPetToMe($pet: PetCreate!, $custodyLevel: CustodyLevel) {\n  addPetToMe(pet: $pet, custodyLevel: $custodyLevel) {\n    success\n    error { message code }\n    data { pet { id name } }\n  }\n}", "operationName": "AddPetToMe", "variables": "{\n  \"custodyLevel\": \"OWNER\",\n  \"pet\": {\n    \"name\": \"Rinti\",\n    \"birthday\": \"2020-01-01T00:00:00\",\n    \"gender\": \"MALE\",\n    \"neutered\": false,\n    \"weight_kg\": 12.0\n  }\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Add Pet To User'
+        meta:
+          id: req_add_pet_to_user
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000020
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "mutation AddPetToUser($userId: ID!, $pet: PetCreate!, $custodyLevel: CustodyLevel) {\n  addPetToUser(userId: $userId, pet: $pet, custodyLevel: $custodyLevel) {\n    success\n    error { message code }\n    data { pet { id name } }\n  }\n}", "operationName": "AddPetToUser", "variables": "{\n  \"userId\": \"USER_ID\",\n  \"custodyLevel\": \"OWNER\",\n  \"pet\": {\n    \"name\": \"Rinti\",\n    \"birthday\": \"2020-01-01T00:00:00\",\n    \"gender\": \"MALE\",\n    \"neutered\": false,\n    \"weight_kg\": 12.0\n  }\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Link Pet To Me'
+        meta:
+          id: req_link_pet_to_me
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000021
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "mutation LinkPetToMe($petId: ID!, $custodyLevel: CustodyLevel) {\n  linkPetToMe(petId: $petId, custodyLevel: $custodyLevel) {\n    success\n    error { message code }\n  }\n}", "operationName": "LinkPetToMe", "variables": "{\n  \"petId\": \"PET_ID\",\n  \"custodyLevel\": \"OWNER\"\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Link Pet To User'
+        meta:
+          id: req_link_pet_to_user
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000022
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "mutation LinkPetToUser($petId: ID!, $userId: ID!, $custodyLevel: CustodyLevel) {\n  linkPetToUser(petId: $petId, userId: $userId, custodyLevel: $custodyLevel) {\n    success\n    error { message code }\n  }\n}", "operationName": "LinkPetToUser", "variables": "{\n  \"petId\": \"PET_ID\",\n  \"userId\": \"USER_ID\",\n  \"custodyLevel\": \"OWNER\"\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: 'Ownerships'
+    meta:
+      id: fld_ownerships
+      created: 1748736000000
+      modified: 1748736000000
+      sortKey: -1748736002000
+      description: ""
+    children:
+      - url: "{{base_url}}"
+        name: 'List Ownerships'
+        meta:
+          id: req_list_ownerships
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000023
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "query ListOwnerships($commonSearch: CommonSearch) {\n  listOwnerships(commonSearch: $commonSearch) {\n    items { id custody_level user { id } pet { id name } }\n    pagination { total_items current_page page_size total_pages }\n  }\n}", "operationName": "ListOwnerships", "variables": "{\n  \"commonSearch\": {}\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Get Ownership'
+        meta:
+          id: req_get_ownership
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000024
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "query GetOwnership($id: ID!) {\n  getOwnership(id: $id) {\n    success\n    error { message code }\n    ownership { id custody_level }\n  }\n}", "operationName": "GetOwnership", "variables": "{\n  \"id\": \"OWNERSHIP_ID\"\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Update Ownership'
+        meta:
+          id: req_update_ownership
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000025
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "mutation UpdateOwnership($id: ID!, $data: OwnershipUpdate!) {\n  updateOwnership(id: $id, data: $data) {\n    success\n    error { message code }\n    ownership { id custody_level }\n  }\n}", "operationName": "UpdateOwnership", "variables": "{\n  \"id\": \"OWNERSHIP_ID\",\n  \"data\": {\n    \"custody_level\": \"SUB_OWNER\"\n  }\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Delete Ownership'
+        meta:
+          id: req_delete_ownership
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000026
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "mutation DeleteOwnership($id: ID!) {\n  deleteOwnership(id: $id) {\n    success\n    error { message code }\n    id\n  }\n}", "operationName": "DeleteOwnership", "variables": "{\n  \"id\": \"OWNERSHIP_ID\"\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: 'Health Cards'
+    meta:
+      id: fld_health_cards
+      created: 1748736000000
+      modified: 1748736000000
+      sortKey: -1748736003000
+      description: ""
+    children:
+      - url: "{{base_url}}"
+        name: 'List Health Cards'
+        meta:
+          id: req_list_health_cards
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000027
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "query ListHealthCards($commonSearch: CommonSearch) {\n  listHealthCards(commonSearch: $commonSearch) {\n    items { id pet { id name } }\n    pagination { total_items current_page page_size total_pages }\n  }\n}", "operationName": "ListHealthCards", "variables": "{\n  \"commonSearch\": {}\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Get Health Card'
+        meta:
+          id: req_get_health_card
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000028
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "query GetHealthCard($id: ID!) {\n  getHealthCard(id: $id) {\n    success\n    error { message code }\n    health_card { id pet { id } }\n  }\n}", "operationName": "GetHealthCard", "variables": "{\n  \"id\": \"HEALTH_CARD_ID\"\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Create Health Card'
+        meta:
+          id: req_create_health_card
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000029
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "mutation CreateHealthCard($data: HealthCardCreate!) {\n  createHealthCard(data: $data) {\n    success\n    error { message code }\n    health_card { id }\n  }\n}", "operationName": "CreateHealthCard", "variables": "{\n  \"data\": {\n    \"pet_id\": \"PET_ID\"\n  }\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Update Health Card'
+        meta:
+          id: req_update_health_card
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000030
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "mutation UpdateHealthCard($id: ID!, $data: HealthCardUpdate!) {\n  updateHealthCard(id: $id, data: $data) {\n    success\n    error { message code }\n    health_card { id }\n  }\n}", "operationName": "UpdateHealthCard", "variables": "{\n  \"id\": \"HEALTH_CARD_ID\",\n  \"data\": {\n    \"notes\": [\n      \"note\"\n    ]\n  }\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: 'Treatments'
+    meta:
+      id: fld_treatments
+      created: 1748736000000
+      modified: 1748736000000
+      sortKey: -1748736004000
+      description: ""
+    children:
+      - url: "{{base_url}}"
+        name: 'List Treatments'
+        meta:
+          id: req_list_treatments
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000031
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "query ListTreatments($commonSearch: CommonSearch) {\n  listTreatments(commonSearch: $commonSearch) {\n    items { id name type date }\n    pagination { total_items current_page page_size total_pages }\n  }\n}", "operationName": "ListTreatments", "variables": "{\n  \"commonSearch\": {}\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'List My Treatments'
+        meta:
+          id: req_list_my_treatments
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000032
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "query ListMyTreatments($commonSearch: CommonSearch) {\n  listMyTreatments(commonSearch: $commonSearch) {\n    items { id name type date }\n    pagination { total_items current_page page_size total_pages }\n  }\n}", "operationName": "ListMyTreatments", "variables": "{\n  \"commonSearch\": {}\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Get Treatment'
+        meta:
+          id: req_get_treatment
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000033
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "query GetTreatment($id: ID!) {\n  getTreatment(id: $id) {\n    success\n    error { message code }\n    treatment { id name type date }\n  }\n}", "operationName": "GetTreatment", "variables": "{\n  \"id\": \"TREATMENT_ID\"\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Create Treatment'
+        meta:
+          id: req_create_treatment
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000034
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "mutation CreateTreatment($data: TreatmentCreate!) {\n  createTreatment(data: $data) {\n    success\n    error { message code }\n    treatment { id }\n  }\n}", "operationName": "CreateTreatment", "variables": "{\n  \"data\": {\n    \"health_card_id\": \"HEALTH_CARD_ID\",\n    \"name\": \"Vaccino\",\n    \"type\": \"VACCINE\",\n    \"date\": \"2026-01-01T10:00:00\"\n  }\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Update Treatment'
+        meta:
+          id: req_update_treatment
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000035
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "mutation UpdateTreatment($id: ID!, $data: TreatmentUpdate!) {\n  updateTreatment(id: $id, data: $data) {\n    success\n    error { message code }\n    treatment { id name }\n  }\n}", "operationName": "UpdateTreatment", "variables": "{\n  \"id\": \"TREATMENT_ID\",\n  \"data\": {\n    \"name\": \"Updated\"\n  }\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: 'Walks'
+    meta:
+      id: fld_walks
+      created: 1748736000000
+      modified: 1748736000000
+      sortKey: -1748736005000
+      description: ""
+    children:
+      - url: "{{base_url}}"
+        name: 'List Walks'
+        meta:
+          id: req_list_walks
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000036
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "query ListWalks($commonSearch: CommonSearch) {\n  listWalks(commonSearch: $commonSearch) {\n    items { id distance_km duration_minutes overall_rating }\n    pagination { total_items current_page page_size total_pages }\n  }\n}", "operationName": "ListWalks", "variables": "{\n  \"commonSearch\": {}\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Get Walk'
+        meta:
+          id: req_get_walk
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000037
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "query GetWalk($id: ID!) {\n  getWalk(id: $id) {\n    success\n    error { message code }\n    walk { id distance_km duration_minutes }\n  }\n}", "operationName": "GetWalk", "variables": "{\n  \"id\": \"WALK_ID\"\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Create Walk'
+        meta:
+          id: req_create_walk
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000038
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "mutation CreateWalk($data: WalkCreate!) {\n  createWalk(data: $data) {\n    success\n    error { message code }\n    walk { id }\n  }\n}", "operationName": "CreateWalk", "variables": "{\n  \"data\": {\n    \"treatment_id\": \"TREATMENT_ID\",\n    \"distance_km\": 1.5,\n    \"duration_minutes\": 30,\n    \"behavior_rating\": 4,\n    \"leash_pulling_rating\": 2,\n    \"overall_rating\": 4\n  }\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Update Walk'
+        meta:
+          id: req_update_walk
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000039
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "mutation UpdateWalk($id: ID!, $data: WalkUpdate!) {\n  updateWalk(id: $id, data: $data) {\n    success\n    error { message code }\n    walk { id distance_km }\n  }\n}", "operationName": "UpdateWalk", "variables": "{\n  \"id\": \"WALK_ID\",\n  \"data\": {\n    \"distance_km\": 2.0\n  }\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Delete Walk'
+        meta:
+          id: req_delete_walk
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000040
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "mutation DeleteWalk($id: ID!) {\n  deleteWalk(id: $id) {\n    success\n    error { message code }\n    id\n  }\n}", "operationName": "DeleteWalk", "variables": "{\n  \"id\": \"WALK_ID\"\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: 'Cures'
+    meta:
+      id: fld_cures
+      created: 1748736000000
+      modified: 1748736000000
+      sortKey: -1748736006000
+      description: ""
+    children:
+      - url: "{{base_url}}"
+        name: 'List Cures'
+        meta:
+          id: req_list_cures
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000041
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "query ListCures($commonSearch: CommonSearch) {\n  listCures(commonSearch: $commonSearch) {\n    items { id frequency_value frequency_unit frequency_times }\n    pagination { total_items current_page page_size total_pages }\n  }\n}", "operationName": "ListCures", "variables": "{\n  \"commonSearch\": {}\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Get Cure'
+        meta:
+          id: req_get_cure
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000042
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "query GetCure($id: ID!) {\n  getCure(id: $id) {\n    success\n    error { message code }\n    cure { id frequency_value frequency_unit frequency_times }\n  }\n}", "operationName": "GetCure", "variables": "{\n  \"id\": \"CURE_ID\"\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Create Cure'
+        meta:
+          id: req_create_cure
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000043
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "mutation CreateCure($data: CureCreate!) {\n  createCure(data: $data) {\n    success\n    error { message code }\n    cure { id }\n  }\n}", "operationName": "CreateCure", "variables": "{\n  \"data\": {\n    \"treatment_id\": \"TREATMENT_ID\",\n    \"frequency_value\": 1,\n    \"frequency_unit\": \"DAY\",\n    \"frequency_times\": 2\n  }\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Update Cure'
+        meta:
+          id: req_update_cure
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000044
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "mutation UpdateCure($id: ID!, $data: CureUpdate!) {\n  updateCure(id: $id, data: $data) {\n    success\n    error { message code }\n    cure { id }\n  }\n}", "operationName": "UpdateCure", "variables": "{\n  \"id\": \"CURE_ID\",\n  \"data\": {\n    \"frequency_value\": 2\n  }\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Delete Cure'
+        meta:
+          id: req_delete_cure
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000045
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "mutation DeleteCure($id: ID!) {\n  deleteCure(id: $id) {\n    success\n    error { message code }\n    id\n  }\n}", "operationName": "DeleteCure", "variables": "{\n  \"id\": \"CURE_ID\"\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: 'Reports'
+    meta:
+      id: fld_reports
+      created: 1748736000000
+      modified: 1748736000000
+      sortKey: -1748736007000
+      description: ""
+    children:
+      - url: "{{base_url}}"
+        name: 'List Reports'
+        meta:
+          id: req_list_reports
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000046
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "query ListReports($commonSearch: CommonSearch) {\n  listReports(commonSearch: $commonSearch) {\n    items { id type place latitude longitude }\n    pagination { total_items current_page page_size total_pages }\n  }\n}", "operationName": "ListReports", "variables": "{\n  \"commonSearch\": {}\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Get Report'
+        meta:
+          id: req_get_report
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000047
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "query GetReport($id: ID!) {\n  getReport(id: $id) {\n    success\n    error { message code }\n    report { id type place latitude longitude }\n  }\n}", "operationName": "GetReport", "variables": "{\n  \"id\": \"REPORT_ID\"\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Create Report'
+        meta:
+          id: req_create_report
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000048
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "mutation CreateReport($data: ReportCreate!) {\n  createReport(data: $data) {\n    success\n    error { message code }\n    report { id }\n  }\n}", "operationName": "CreateReport", "variables": "{\n  \"data\": {\n    \"latitude\": 45.5,\n    \"longitude\": 10.4,\n    \"place\": \"Place\",\n    \"type\": \"FOUND\",\n    \"notes\": [],\n    \"reporter\": {\n      \"email\": \"report@example.com\",\n      \"first_name\": \"First\",\n      \"last_name\": \"Last\"\n    }\n  }\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Update Report'
+        meta:
+          id: req_update_report
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000049
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "mutation UpdateReport($id: ID!, $data: ReportUpdate!) {\n  updateReport(id: $id, data: $data) {\n    success\n    error { message code }\n    report { id }\n  }\n}", "operationName": "UpdateReport", "variables": "{\n  \"id\": \"REPORT_ID\",\n  \"data\": {\n    \"place\": \"Updated\"\n  }\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Respond To Report'
+        meta:
+          id: req_respond_to_report
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000050
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "mutation RespondToReport($id: ID!, $data: ReportResponder!) {\n  respondToReport(id: $id, data: $data) {\n    success\n    error { message code }\n    report { id }\n  }\n}", "operationName": "RespondToReport", "variables": "{\n  \"id\": \"REPORT_ID\",\n  \"data\": {\n    \"email\": \"responder@example.com\",\n    \"first_name\": \"First\",\n    \"last_name\": \"Last\"\n  }\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: 'Medias'
+    meta:
+      id: fld_medias
+      created: 1748736000000
+      modified: 1748736000000
+      sortKey: -1748736008000
+      description: ""
+    children:
+      - url: "{{base_url}}"
+        name: 'List Medias'
+        meta:
+          id: req_list_medias
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000051
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "query ListMedias($commonSearch: CommonSearch) {\n  listMedias(commonSearch: $commonSearch) {\n    items { id url scope ref_id }\n    pagination { total_items current_page page_size total_pages }\n  }\n}", "operationName": "ListMedias", "variables": "{\n  \"commonSearch\": {}\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Get Media'
+        meta:
+          id: req_get_media
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000052
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "query GetMedia($id: ID!) {\n  getMedia(id: $id) {\n    success\n    error { message code }\n    media { id url scope }\n  }\n}", "operationName": "GetMedia", "variables": "{\n  \"id\": \"MEDIA_ID\"\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Create Media'
+        meta:
+          id: req_create_media
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000053
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "mutation CreateMedia($data: MediaCreate!) {\n  createMedia(data: $data) {\n    success\n    error { message code }\n    media { id url }\n  }\n}", "operationName": "CreateMedia", "variables": "{\n  \"data\": {\n    \"type\": \"jpg\",\n    \"scope\": \"pet_main_picture\",\n    \"ref_id\": \"PET_ID\",\n    \"url\": \"https://example.com/img.jpg\",\n    \"main_color\": {\n      \"color\": \"#000000\",\n      \"contrast\": \"#FFFFFF\"\n    },\n    \"main_colors\": []\n  }\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Update Media'
+        meta:
+          id: req_update_media
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000054
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "mutation UpdateMedia($id: ID!, $data: MediaUpdate!) {\n  updateMedia(id: $id, data: $data) {\n    success\n    error { message code }\n    media { id }\n  }\n}", "operationName": "UpdateMedia", "variables": "{\n  \"id\": \"MEDIA_ID\",\n  \"data\": {\n    \"url\": \"https://example.com/new.jpg\"\n  }\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{media_url}}/upload"
+        name: 'Upload Media (REST)'
+        meta:
+          id: req_upload_media
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000055
+        method: POST
+        body:
+          mimeType: multipart/form-data
+          params:
+            - name: file
+              value: ""
+              description: ""
+              type: file
+        headers:
+          - name: Content-Type
+            value: multipart/form-data
+          - name: User-Agent
+            value: insomnia/9.3.3
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{media_url}}/MEDIA_ID"
+        name: 'Get Image (REST)'
+        meta:
+          id: req_get_media_rest
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000056
+        method: GET
+        parameters:
+          - name: format
+            value: webp
+            disabled: true
+        headers:
+          - name: User-Agent
+            value: insomnia/9.3.3
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{media_url}}/MEDIA_ID/500x200"
+        name: 'Get Image Resized (REST)'
+        meta:
+          id: req_get_media_resize
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000057
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/9.3.3
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: 'Codes'
+    meta:
+      id: fld_codes
+      created: 1748736000000
+      modified: 1748736000000
+      sortKey: -1748736009000
+      description: ""
+    children:
+      - url: "{{base_url}}"
+        name: 'List Codes'
+        meta:
+          id: req_list_codes
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000058
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "query ListCodes($commonSearch: CommonSearch) {\n  listCodes(commonSearch: $commonSearch) {\n    items { id code ref_id ref_table scope valid }\n    pagination { total_items current_page page_size total_pages }\n  }\n}", "operationName": "ListCodes", "variables": "{\n  \"commonSearch\": {}\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Get Code'
+        meta:
+          id: req_get_code
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000059
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "query GetCode($id: ID!) {\n  getCode(id: $id) {\n    success\n    error { message code }\n    code { id code ref_id ref_table }\n  }\n}", "operationName": "GetCode", "variables": "{\n  \"id\": \"CODE_ID\"\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Create Code'
+        meta:
+          id: req_create_code
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000060
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "mutation CreateCode($data: CodeCreate!) {\n  createCode(data: $data) {\n    success\n    error { message code }\n    code { id code }\n  }\n}", "operationName": "CreateCode", "variables": "{\n  \"data\": {\n    \"ref_id\": \"PET_ID\",\n    \"ref_table\": \"pets\",\n    \"scope\": \"share\"\n  }\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Check Code'
+        meta:
+          id: req_check_code
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000061
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "mutation CheckCode($code: String!) {\n  checkCode(code: $code) {\n    success\n    error { message code }\n    code { id ref_id ref_table }\n  }\n}", "operationName": "CheckCode", "variables": "{\n  \"code\": \"0000-0000\"\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Get Or Create Code'
+        meta:
+          id: req_get_or_create_code
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000062
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "query GetOrCreateCode {\n  getOrCreateCode {\n    success\n    error { message code }\n    code { id code ref_table ref_id }\n  }\n}", "operationName": "GetOrCreateCode"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: 'Damnationes Memoriae'
+    meta:
+      id: fld_damnationes
+      created: 1748736000000
+      modified: 1748736000000
+      sortKey: -1748736010000
+      description: ""
+    children:
+      - url: "{{base_url}}"
+        name: 'List Damnationes Memoriae'
+        meta:
+          id: req_list_damnationes
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000063
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "query ListDamnationes($commonSearch: CommonSearch) {\n  listDamnationesMemoriae(commonSearch: $commonSearch) {\n    items { id original_table deleted_by created_at }\n    pagination { total_items current_page page_size total_pages }\n  }\n}", "operationName": "ListDamnationes", "variables": "{\n  \"commonSearch\": {}\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Restore Memoriae'
+        meta:
+          id: req_restore_memoriae
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000064
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "mutation RestoreMemoriae($id: ID!) {\n  restoreMemoriae(id: $id) {\n    success\n    error { message code }\n  }\n}", "operationName": "RestoreMemoriae", "variables": "{\n  \"id\": \"DAMNATIO_ID\"\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: 'Statistics'
+    meta:
+      id: fld_statistics
+      created: 1748736000000
+      modified: 1748736000000
+      sortKey: -1748736011000
+      description: ""
+    children:
+      - url: "{{base_url}}"
+        name: 'Get Real Time Statistic'
+        meta:
+          id: req_get_real_time_stat
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000065
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "query GetRealTimeStatistic($key: String!) {\n  getRealTimeStatistic(key: $key) {\n    success\n    error { message code }\n  }\n}", "operationName": "GetRealTimeStatistic", "variables": "{\n  \"key\": \"active_users\"\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Get Grouped Statistics'
+        meta:
+          id: req_get_grouped_stats
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000066
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "query GetGroupedStatistics($key: String!, $groupBy: String!) {\n  getGroupedStatistics(key: $key, groupBy: $groupBy) {\n    success\n    error { message code }\n  }\n}", "operationName": "GetGroupedStatistics", "variables": "{\n  \"key\": \"active_users\",\n  \"groupBy\": \"day\"\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: 'Dashboard'
+    meta:
+      id: fld_dashboard
+      created: 1748736000000
+      modified: 1748736000000
+      sortKey: -1748736012000
+      description: ""
+    children:
+      - url: "{{base_url}}"
+        name: 'Get Dashboard'
+        meta:
+          id: req_get_dashboard
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000067
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "query GetDashboard {\n  getDashboard {\n    error { message code }\n    dashboard { user_id }\n  }\n}", "operationName": "GetDashboard"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Get User Dashboard'
+        meta:
+          id: req_get_user_dashboard
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000068
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "query GetUserDashboard {\n  getUserDashboard {\n    error { message code }\n    dashboard {\n      ownerships { items { pet { id name } } }\n      reports { items { id place created_at } }\n    }\n  }\n}", "operationName": "GetUserDashboard"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: 'Shelters'
+    meta:
+      id: fld_shelters
+      created: 1748736000000
+      modified: 1748736000000
+      sortKey: -1748736013000
+      description: ""
+    children:
+      - url: "{{base_url}}"
+        name: 'List Shelters'
+        meta:
+          id: req_list_shelters
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000069
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "query ListShelters($commonSearch: CommonSearch) {\n  listShelters(commonSearch: $commonSearch) {\n    items { id name city region }\n    pagination { total_items current_page page_size total_pages }\n  }\n}", "operationName": "ListShelters", "variables": "{\n  \"commonSearch\": {}\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Get Shelter'
+        meta:
+          id: req_get_shelter
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000070
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "query GetShelter($id: ID!) {\n  getShelter(id: $id) {\n    success\n    error { message code }\n    shelter { id name city region }\n  }\n}", "operationName": "GetShelter", "variables": "{\n  \"id\": \"SHELTER_ID\"\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Create Shelter'
+        meta:
+          id: req_create_shelter
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000071
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "mutation CreateShelter($data: ShelterCreate!) {\n  createShelter(data: $data) {\n    success\n    error { message code }\n    shelter { id name }\n  }\n}", "operationName": "CreateShelter", "variables": "{\n  \"data\": {\n    \"name\": \"Shelter Name\",\n    \"street\": \"Via Roma\",\n    \"street_number\": \"1\",\n    \"city\": \"City\",\n    \"province_code\": \"BS\",\n    \"postal_code\": \"25000\",\n    \"region\": \"Lombardia\",\n    \"contacts\": []\n  }\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Update Shelter'
+        meta:
+          id: req_update_shelter
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000072
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "mutation UpdateShelter($id: ID!, $data: ShelterUpdate!) {\n  updateShelter(id: $id, data: $data) {\n    success\n    error { message code }\n    shelter { id name }\n  }\n}", "operationName": "UpdateShelter", "variables": "{\n  \"id\": \"SHELTER_ID\",\n  \"data\": {\n    \"name\": \"Updated\"\n  }\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Delete Shelter'
+        meta:
+          id: req_delete_shelter
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000073
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "mutation DeleteShelter($id: ID!) {\n  deleteShelter(id: $id) {\n    success\n    error { message code }\n    id\n  }\n}", "operationName": "DeleteShelter", "variables": "{\n  \"id\": \"SHELTER_ID\"\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: 'Shelter Roles'
+    meta:
+      id: fld_shelter_roles
+      created: 1748736000000
+      modified: 1748736000000
+      sortKey: -1748736014000
+      description: ""
+    children:
+      - url: "{{base_url}}"
+        name: 'List Shelter Roles'
+        meta:
+          id: req_list_shelter_roles
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000074
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "query ListShelterRoles($commonSearch: CommonSearch) {\n  listShelterRoles(commonSearch: $commonSearch) {\n    items { id role user { id } shelter { id name } }\n    pagination { total_items current_page page_size total_pages }\n  }\n}", "operationName": "ListShelterRoles", "variables": "{\n  \"commonSearch\": {}\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Get Shelter Role'
+        meta:
+          id: req_get_shelter_role
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000075
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "query GetShelterRole($id: ID!) {\n  getShelterRole(id: $id) {\n    success\n    error { message code }\n    shelter_role { id role user { id } shelter { id } }\n  }\n}", "operationName": "GetShelterRole", "variables": "{\n  \"id\": \"SHELTER_ROLE_ID\"\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Create Shelter Role'
+        meta:
+          id: req_create_shelter_role
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000076
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "mutation CreateShelterRole($data: ShelterRoleCreate!) {\n  createShelterRole(data: $data) {\n    success\n    error { message code }\n    shelter_role { id role }\n  }\n}", "operationName": "CreateShelterRole", "variables": "{\n  \"data\": {\n    \"user_id\": \"USER_ID\",\n    \"shelter_id\": \"SHELTER_ID\",\n    \"role\": \"STAFF\"\n  }\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Update Shelter Role'
+        meta:
+          id: req_update_shelter_role
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000077
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "mutation UpdateShelterRole($id: ID!, $data: ShelterRoleUpdate!) {\n  updateShelterRole(id: $id, data: $data) {\n    success\n    error { message code }\n    shelter_role { id role }\n  }\n}", "operationName": "UpdateShelterRole", "variables": "{\n  \"id\": \"SHELTER_ROLE_ID\",\n  \"data\": {\n    \"role\": \"MANAGER\"\n  }\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Delete Shelter Role'
+        meta:
+          id: req_delete_shelter_role
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000078
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "mutation DeleteShelterRole($id: ID!) {\n  deleteShelterRole(id: $id) {\n    success\n    error { message code }\n    id\n  }\n}", "operationName": "DeleteShelterRole", "variables": "{\n  \"id\": \"SHELTER_ROLE_ID\"\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: 'Shelter Pets'
+    meta:
+      id: fld_shelter_pets
+      created: 1748736000000
+      modified: 1748736000000
+      sortKey: -1748736015000
+      description: ""
+    children:
+      - url: "{{base_url}}"
+        name: 'List Shelter Pets'
+        meta:
+          id: req_list_shelter_pets
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000079
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "query ListShelterPets($commonSearch: CommonSearch) {\n  listShelterPets(commonSearch: $commonSearch) {\n    items { id shelter { id name } pet { id name } }\n    pagination { total_items current_page page_size total_pages }\n  }\n}", "operationName": "ListShelterPets", "variables": "{\n  \"commonSearch\": {}\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Get Shelter Pet'
+        meta:
+          id: req_get_shelter_pet
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000080
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "query GetShelterPet($id: ID!) {\n  getShelterPet(id: $id) {\n    success\n    error { message code }\n    shelter_pet { id shelter { id } pet { id } }\n  }\n}", "operationName": "GetShelterPet", "variables": "{\n  \"id\": \"SHELTER_PET_ID\"\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Create Shelter Pet'
+        meta:
+          id: req_create_shelter_pet
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000081
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "mutation CreateShelterPet($data: ShelterPetCreate!) {\n  createShelterPet(data: $data) {\n    success\n    error { message code }\n    shelter_pet { id }\n  }\n}", "operationName": "CreateShelterPet", "variables": "{\n  \"data\": {\n    \"shelter_id\": \"SHELTER_ID\",\n    \"pet_id\": \"PET_ID\"\n  }\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{base_url}}"
+        name: 'Delete Shelter Pet'
+        meta:
+          id: req_delete_shelter_pet
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000082
+        method: POST
+        body:
+          mimeType: application/graphql
+          text: '{"query": "mutation DeleteShelterPet($id: ID!) {\n  deleteShelterPet(id: $id) {\n    success\n    error { message code }\n    id\n  }\n}", "operationName": "DeleteShelterPet", "variables": "{\n  \"id\": \"SHELTER_PET_ID\"\n}"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+          - name: Authorization
+            value: 'Bearer {% response ''body'', ''req_8ad42f9f52814f5abbe2dccea7750a5d'', ''b64::JC5kYXRhLmxvZ2luLnRva2Vu::46b'', ''never'', 60 %}'
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: 'Translations'
+    meta:
+      id: fld_translations
+      created: 1748736000000
+      modified: 1748736000000
+      sortKey: -1748736016000
+      description: ""
+    children:
+      - url: "{{translations_url}}"
+        name: 'Read Translations (REST)'
+        meta:
+          id: req_read_translations
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000083
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/9.3.3
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{translations_url}}/app"
+        name: 'Read Translations App (REST)'
+        meta:
+          id: req_read_translations_app
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000084
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/9.3.3
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{translations_url}}/update"
+        name: 'Update Translations (REST)'
+        meta:
+          id: req_update_translations
+          created: 1748736000000
+          modified: 1748736000000
+          isPrivate: false
+          description: ""
+          sortKey: -1748736000085
+        method: PUT
+        body:
+          mimeType: application/json
+          text: '{"it": {}}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.3.3
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_5e85b71631d8d54ee2cbf1c43842d7eb3c5dd07a
+    created: 1748736000000
+    modified: 1748736000000
+environments:
+  name: Base Environment
+  meta:
+    id: env_5e85b71631d8d54ee2cbf1c43842d7eb3c5dd07a
+    created: 1748736000000
+    modified: 1748736000000
+    isPrivate: false
+  subEnvironments:
+    - name: LOCAL
+      meta:
+        id: env_9e5028ad4b0d46fab98a693a75511ad6
+        created: 1748736000000
+        modified: 1748736000000
+        isPrivate: false
+        sortKey: 1748736000000
+      data:
+        base_url: http://localhost:5000/graphql
+        media_url: http://localhost:5000/media
+        translations_url: http://localhost:5000/translations
+      color: "#0090a3"
+    - name: DEV
+      meta:
+        id: env_36aa1fb7c41543dab32e6b2abc5ecc18
+        created: 1748736000000
+        modified: 1748736000000
+        isPrivate: false
+        sortKey: 1748736000001
+      data:
+        base_url: https://graph-a-pet.makso.me/graphql
+        media_url: https://graph-a-pet.makso.me/media
+        translations_url: https://graph-a-pet.makso.me/translations
+      color: "#0bad1e"
+

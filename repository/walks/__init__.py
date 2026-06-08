@@ -19,9 +19,6 @@ def create_walk(data):
             id=str(uuid.uuid4()),
             distance_km=data["distance_km"],
             treatment_id=data.get("treatment_id"),
-            overall_rating=data.get("overall_rating"),
-            leash_pulling_rating=data.get("leash_pulling_rating"),
-            behavior_rating=data.get("behavior_rating"),
             created_at=today.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
         )
         db.session.add(walk_model)

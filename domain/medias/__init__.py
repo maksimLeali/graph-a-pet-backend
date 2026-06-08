@@ -4,13 +4,11 @@ from utils.logger import logger, stringify
 
 from math import ceil
 from api.errors import BadRequest
-from utils.firebase.storage import upload_image
+from utils.local_storage import save_image
 import os
 # from config import cfg
 from PIL import Image, ImageDraw
-import urllib.request
 
-from werkzeug.utils import secure_filename
 from utils import allowed_files
 
 from colorthief import ColorThief
@@ -38,27 +36,26 @@ def get_luminance(hex_color):
     hex_blue = int(color[4:6], base=16)
     return hex_red * 0.2126 + hex_green * 0.7152 + hex_blue * 0.0722
 
-def upload_media(file, disable_color):
-    try: 
-        logger.domain('try to upload media')
-        if file and allowed_files(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join('temp', filename))
-            ct = ColorThief('temp/'+filename)
-            colors= []
-            if not disable_color :
+def upload_media(file, disable_color, user_id='anonymous'):
+    try:
+        logger.domain(f'try to upload media for user {user_id}')
+        if not (file and allowed_files(file.filename)):
+            raise BadRequest("file not allowed")
 
-                palette = ct.get_palette(color_count=5)
-                main_colors = [("#"+f"{color[0]:02x}"+f"{color[1]:02x}"+f"{color[2]:02x}").upper() for color in palette]
-                colors = [ {"color" : color, "contrast" : "#FFFFFF" if get_luminance(color) < 140 else "#000000" } for color in main_colors]
-            
-            public_url, type, encoding, size, = upload_image('temp/', filename)
-            return public_url, type, encoding, size, colors
-        error = BadRequest(f"file not allowed")
-        raise error
-    except Exception as e: 
+        disk_path, mime, encoding, size = save_image(file, user_id)
+
+        colors = []
+        if not disable_color:
+            ct = ColorThief(disk_path)
+            palette = ct.get_palette(color_count=5)
+            main_colors = [("#" + f"{c[0]:02x}" + f"{c[1]:02x}" + f"{c[2]:02x}").upper() for c in palette]
+            colors = [{"color": c, "contrast": "#FFFFFF" if get_luminance(c) < 140 else "#000000"} for c in main_colors]
+
+        return disk_path, mime, encoding, size, colors
+    except Exception as e:
         logger.error(e)
         raise e
+
 
 def get_paginated_medias(common_search):
     logger.domain(f"common_search: {stringify(common_search)}")
@@ -127,8 +124,7 @@ def get_resized_to_fit_media(id, size = { "width" : 400, "height" : 400}, args =
         print(args)
         media = medias_data.get_media(id)
         logger.check(media)
-        with urllib.request.urlopen(media["url"]) as url:
-            img = Image.open(url)
+        img = Image.open(media["file_path"])
             
         orig_width, orig_height = img.size
         orig_ratio = orig_width / orig_height
@@ -162,8 +158,7 @@ def get_cropped_media(id, size = { "width" : 400, "height" : 400}, args=[]):
     logger.domain(f"crop ->  id: {id}, size: {stringify(size)}")
     try:
         media = medias_data.get_media(id)
-        with urllib.request.urlopen(media["url"]) as url:
-            img = Image.open(url)
+        img = Image.open(media["file_path"])
         
         
         logger.info(f"width: {img.width}, height: {img.height}")  
@@ -205,9 +200,8 @@ def get_media_file(id, args):
     logger.domain(f'id: {id}')
     try: 
         media = medias_data.get_media(id)
-        with urllib.request.urlopen(media["url"]) as url:
-            img = Image.open(url)
-            
+        img = Image.open(media["file_path"])
+
         img_io = BytesIO()
         format = args.get('format').upper() if args.get('format') is not None else mimeTypeReverse[media['type']]
         img= img.convert('RGB')
