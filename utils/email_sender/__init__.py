@@ -2,7 +2,7 @@ import sib_api_v3_sdk
 from sib_api_v3_sdk.rest import ApiException
 from config import cfg
 import os
-
+from utils.logger import logger
 
 
 def send_confirmation_code_email(recipient_email,  code):
@@ -10,7 +10,7 @@ def send_confirmation_code_email(recipient_email,  code):
     configuration = sib_api_v3_sdk.Configuration()
     configuration.api_key['api-key'] = cfg['brevo']['api_key']
     current_directory = os.getcwd()
-    
+    logger.info("Current directory: %s", current_directory)
 
     # Initialize the API instance
     api_instance = sib_api_v3_sdk.TransactionalEmailsApi(sib_api_v3_sdk.ApiClient(configuration))
@@ -30,9 +30,11 @@ def send_confirmation_code_email(recipient_email,  code):
         html_content=email_content
     )
 
+    logger.info("Sending email to: %s with code: %s", recipient_email, code)
     # Send email
     try:
         api_response = api_instance.send_transac_email(send_smtp_email)
         print("Email sent successfully. Message ID: %s" % api_response.message_id)
     except ApiException as e:
+        logger.error("Exception when calling TransactionalEmailsApi->send_transac_email: %s\n" % e)
         print("Exception when calling TransactionalEmailsApi->s end_transac_email: %s\n" % e)
