@@ -9,6 +9,7 @@ def send_confirmation_code_email(recipient_email,  code):
     # Configure API key authorization: api-key
     configuration = sib_api_v3_sdk.Configuration()
     configuration.api_key['api-key'] = cfg['brevo']['api_key']
+    logger.info("Configured Brevo API key for sending emails: %s", cfg['brevo']['api_key'])
     current_directory = os.getcwd()
     logger.info("Current directory: %s", current_directory)
 
