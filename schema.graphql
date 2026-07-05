@@ -669,6 +669,7 @@ input WalkCreate {
     date: String!
     distance_km: Float!
     health_card_id: ID!
+    name: String
     notes: [String]
     duration: treatmentDuration
 }

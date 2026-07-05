@@ -7,7 +7,6 @@ from api.middlewares import min_role, RoleLevel, auth_middleware
 
 
 @convert_kwargs_to_snake_case
-@min_role(RoleLevel.ADMIN.name)
 def list_treatments_resolver(obj, info, common_search):
     logger.api(f"common_search: {stringify(common_search)}")
     try:
@@ -64,7 +63,7 @@ def list_my_treatments_resolver(obj, info, common_search):
 
 
 @convert_kwargs_to_snake_case
-@min_role(RoleLevel.ADMIN.name)
+@auth_middleware
 def get_treatment_resolver(obj, info, id):
     logger.api(f"id: {id}")
     try:

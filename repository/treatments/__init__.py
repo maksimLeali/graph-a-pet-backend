@@ -4,7 +4,9 @@ import pydash as py_
 from sqlalchemy import select, text, delete
 from sqlalchemy.exc import ProgrammingError
 from .models import Treatment, Gender
-from repository import db
+from repository import db, schema
+
+_t = f"{schema}.treatments" if schema else "treatments"
 from repository.query_builder import build_query, build_count
 from utils import camel_to_snake
 from utils.logger import logger, stringify
@@ -123,16 +125,16 @@ def get_releted_treatments(id):
     try:
         query = f"WITH RECURSIVE treatment_hierarchy AS ( "\
                     "SELECT t1.booster_id, t1.id "\
-                    "FROM treatments t1 "\
+                    f"FROM {_t} t1 "\
                     f"WHERE t1.id = '{id}' "\
                     "UNION ALL "\
                     "SELECT t2.booster_id, t2.id "\
-                    "FROM treatments t2 "\
+                    f"FROM {_t} t2 "\
                     "INNER JOIN treatment_hierarchy th ON t2.id = th.booster_id "\
                 ")"\
                 "SELECT * "\
                 "FROM treatment_hierarchy th "\
-                "left join treatments tr on tr.id = th.id "\
+                f"left join {_t} tr on tr.id = th.id "\
                 f"where tr.id != '{id}'"
         results = select(Treatment).from_statement(text(query))
         treatments = db.session.execute(results).scalars() 
@@ -146,7 +148,7 @@ def get_filtered_ownerships(filters,):
     results = select(Treatment).from_statement(text(
         f"\
             SELECT  * \
-            FROM treatments \
+            FROM {_t} \
             { '' if len(filters)== 0 else build_where(filters) } \
         "))
     ownerships = db.session.execute(results).scalars()

@@ -12,6 +12,7 @@ class TreatmentType(Enum):
     REMINDER = "REMINDER",
     WALK = "WALK",
     TRAINING = "TRAINING",
+    CHECK = "CHECK",
     CURE = "CURE"
 
 class treatmentDuration(Enum):

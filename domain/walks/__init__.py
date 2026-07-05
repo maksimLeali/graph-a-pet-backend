@@ -17,9 +17,9 @@ def create_walk(data):
     try:
 
         treatment_from_walks = {
-            "name": "walks",
+            "name": data.get("name") or "walks",
             "date": data.get("date"),
-            "type": data.get("type"),
+            "type": "WALK",
             "duration": data.get("duration"),
             "health_card_id": data.get("health_card_id"),
         }

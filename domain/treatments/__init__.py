@@ -79,7 +79,7 @@ def create_treatment(data, props_booster_id=None):
                 logger.check(f'\n\n\n\n {new_date} \n\n\n\n')
                 temp_booster = create_treatment(py_.omit({
                     **data,
-                    "date": str(new_date).replace('+00:00', 'Z'),
+                    "date": new_date.strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
                     "booster_id": props_booster_id,
                 },
                     ['frequency_value', 'frequency_unit', 'frequency_times']
