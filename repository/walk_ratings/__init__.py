@@ -96,6 +96,17 @@ def delete_walk_rating(id, soft=True):
         raise e
 
 
+def get_walk_ratings_by_walk(walk_id):
+    logger.repository(f"walk_id: {walk_id}")
+    try:
+        walk_rating_models = db.session.query(WalkRating).filter(
+            WalkRating.walk_id == walk_id).all()
+        return [walk_rating.to_dict() for walk_rating in walk_rating_models]
+    except Exception as e:
+        logger.error(e)
+        raise e
+
+
 def get_total_items(common_search):
     try:
         query = build_count(table="walk_ratings", filters=common_search['filters'])

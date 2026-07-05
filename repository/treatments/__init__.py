@@ -123,19 +123,32 @@ def get_total_items(common_search):
 def get_releted_treatments(id):
     logger.repository(f"fetching related to{id}")
     try:
-        query = f"WITH RECURSIVE treatment_hierarchy AS ( "\
+        query = f"WITH RECURSIVE ancestors AS ( "\
                     "SELECT t1.booster_id, t1.id "\
                     f"FROM {_t} t1 "\
                     f"WHERE t1.id = '{id}' "\
                     "UNION ALL "\
                     "SELECT t2.booster_id, t2.id "\
                     f"FROM {_t} t2 "\
-                    "INNER JOIN treatment_hierarchy th ON t2.id = th.booster_id "\
+                    "INNER JOIN ancestors a ON t2.id = a.booster_id "\
+                "), "\
+                "descendants AS ( "\
+                    "SELECT t1.booster_id, t1.id "\
+                    f"FROM {_t} t1 "\
+                    f"WHERE t1.id = '{id}' "\
+                    "UNION ALL "\
+                    "SELECT t2.booster_id, t2.id "\
+                    f"FROM {_t} t2 "\
+                    "INNER JOIN descendants d ON t2.booster_id = d.id "\
                 ")"\
                 "SELECT * "\
-                "FROM treatment_hierarchy th "\
-                f"left join {_t} tr on tr.id = th.id "\
-                f"where tr.id != '{id}'"
+                f"FROM {_t} tr "\
+                "WHERE tr.id IN ( "\
+                    "SELECT id FROM ancestors "\
+                    "UNION "\
+                    "SELECT id FROM descendants "\
+                ") "\
+                f"AND tr.id != '{id}'"
         results = select(Treatment).from_statement(text(query))
         treatments = db.session.execute(results).scalars() 
         return [treatment.to_dict() for treatment in treatments]

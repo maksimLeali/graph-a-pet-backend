@@ -135,6 +135,7 @@ type Mutation {
     # Treatment
     createTreatment(data: TreatmentCreate!): TreatmentResult!
     updateTreatment(id: ID!, data: TreatmentUpdate!): TreatmentResult!
+    deleteTreatment(id: ID!): DeleteResult!
 
     # Walk
     createWalk(data: WalkCreate!): WalkResult!
@@ -762,6 +763,7 @@ type PaginatedCures {
 }
 
 input CureCreate {
+    name: String!
     date: String!
     health_card_id: ID!
     frequency_times: Int

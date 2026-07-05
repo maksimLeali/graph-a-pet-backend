@@ -8,6 +8,7 @@ from utils import format_common_search
 from math import ceil
 import pydash as py_
 import pendulum as pdl
+import domain.damnationes_memoriae as damnatio_domain
 
 
 def get_related(obj, info):
@@ -163,6 +164,19 @@ def update_treatment(id, data):
     except Exception as e:
         logger.error(e)
         raise e
+
+def delete_treatment(id, user_id):
+    logger.domain(f"id {id} remove")
+    try:
+        treatment = treatments_data.get_treatment(id)
+        # inherit_delete cascades the linked walks (+ walk_ratings) and cures
+        damnatio_id = damnatio_domain.delete_row(
+            id, 'treatments', treatment, user_id)
+        return damnatio_id
+    except Exception as e:
+        logger.error(e)
+        raise e
+
 
 def delete_boosters(treatment):
     booster_id = treatment.get('booster_id')

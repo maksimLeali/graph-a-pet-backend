@@ -17,9 +17,9 @@ def create_cure(data):
     try:
 
         treatment_from_cures = {
-            "name": "cures",
+            "name": data.get("name"),
             "date": data.get("date"),
-            "type": data.get("type"),
+            "type": "CURE",
             "duration": data.get("duration"),
             "health_card_id": data.get("health_card_id"),
             # frequency drives the booster chain generation in the treatment domain

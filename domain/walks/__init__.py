@@ -1,6 +1,7 @@
 
 import repository.walks as walks_data
 import repository.treatments as treatments_data
+import repository.walk_ratings as walk_ratings_data
 import domain.treatments as treatments_domain
 import repository.health_cards as health_cards_data
 from math import ceil
@@ -59,8 +60,14 @@ def update_walk(id, data):
 
 def delete_walk(id, walk_id ):
     logger.domain(f"id {id} remove ")
-    try: 
+    try:
         walk = walks_data.get_walk(id)
+        # cascade: remove the walk_ratings linked to this walk first
+        ratings = walk_ratings_data.get_walk_ratings_by_walk(id)
+        logger.check(f"deleting {len(ratings)} linked walk_ratings")
+        for rating in ratings:
+            damnatio_domain.delete_row(
+                rating['id'], 'walk_ratings', rating, walk_id)
         damnatio_id  =damnatio_domain.delete_row(id, 'walks', walk , walk_id)
         return damnatio_id
     except Exception as e:
