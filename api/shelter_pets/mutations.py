@@ -1,5 +1,5 @@
 from ariadne import convert_kwargs_to_snake_case
-from domain.shelter_pets import create_shelter_pet, create_shelter_pets, delete_shelter_pet
+from domain.shelter_pets import create_shelter_pet, create_shelter_pets, change_shelter, delete_shelter_pet
 from api.middlewares import auth_middleware, min_role
 from api.errors import format_error
 from repository.users.models import UserRole
@@ -35,6 +35,25 @@ def create_shelter_pets_resolver(obj, info, data):
         payload = {
             "success": True,
             "shelter_pets": shelter_pets,
+        }
+    except Exception as e:
+        logger.error(e)
+        payload = {
+            "success": False,
+            "error": format_error(e, info.context.headers['authorization']),
+        }
+    return payload
+
+
+@convert_kwargs_to_snake_case
+@auth_middleware
+def change_shelter_resolver(obj, info, data):
+    logger.api(f"data: {stringify(data)}")
+    try:
+        shelter_pet = change_shelter(data)
+        payload = {
+            "success": True,
+            "shelter_pet": shelter_pet,
         }
     except Exception as e:
         logger.error(e)

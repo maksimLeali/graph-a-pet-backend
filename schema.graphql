@@ -95,6 +95,40 @@ type Query {
     # ShelterPet
     getShelterPet(id: ID!): ShelterPetResult!
     listShelterPets(commonSearch: CommonSearch = {}): PaginatedShelterPets!
+
+    # ShelterTask
+    getShelterTask(id: ID!): ShelterTaskResult!
+    listShelterTasks(commonSearch: CommonSearch = {}): PaginatedShelterTasks!
+
+    # ShelterWalk
+    getShelterWalk(id: ID!): ShelterWalkResult!
+    listShelterWalks(commonSearch: CommonSearch = {}): PaginatedShelterWalks!
+    listPetsNeedingWalk(shelter_id: ID!, hours: Int = 24): PaginatedShelterPets!
+
+    # ShelterMap / Box / Occupancy
+    getShelterMap(id: ID!): ShelterMapResult!
+    listShelterMaps(commonSearch: CommonSearch = {}): PaginatedShelterMaps!
+    getShelterBox(id: ID!): ShelterBoxResult!
+    listShelterBoxes(commonSearch: CommonSearch = {}): PaginatedShelterBoxes!
+    listShelterBoxOccupancies(commonSearch: CommonSearch = {}): PaginatedBoxOccupancies!
+    getCurrentBoxForPet(shelter_pet_id: ID!): ShelterBoxResult!
+
+    # ShelterArea
+    getShelterArea(id: ID!): ShelterAreaResult!
+    listShelterAreas(commonSearch: CommonSearch = {}): PaginatedShelterAreas!
+
+    # ShelterMapElement
+    getShelterMapElement(id: ID!): ShelterMapElementResult!
+    listShelterMapElements(commonSearch: CommonSearch = {}): PaginatedMapElements!
+
+    # ShelterInventory
+    getShelterInventoryItem(id: ID!): ShelterInventoryItemResult!
+    listShelterInventoryItems(commonSearch: CommonSearch = {}): PaginatedInventoryItems!
+    listShelterInventoryMovements(commonSearch: CommonSearch = {}): PaginatedInventoryMovements!
+    listLowStockItems(shelter_id: ID!): PaginatedInventoryItems!
+
+    # Shelter dashboard operativa
+    getShelterOperationalDashboard(shelter_id: ID!): ShelterOperationalDashboardResult!
 }
 
 type Mutation {
@@ -181,7 +215,53 @@ type Mutation {
     # ShelterPet
     createShelterPet(data: ShelterPetCreate!): ShelterPetResult!
     createShelterPets(data: ShelterPetsCreate!): ShelterPetsResult!
+    changeShelter(data: ChangeShelterInput!): ShelterPetResult!
     deleteShelterPet(id: ID!): DeleteResult!
+
+    # ShelterTask
+    createShelterTask(data: ShelterTaskCreate!): ShelterTaskResult!
+    updateShelterTask(id: ID!, data: ShelterTaskUpdate!): ShelterTaskResult!
+    completeShelterTask(id: ID!, notes: String): ShelterTaskResult!
+    skipShelterTask(id: ID!, reason: String): ShelterTaskResult!
+    deleteShelterTask(id: ID!): DeleteResult!
+
+    # ShelterWalk
+    createShelterWalk(data: ShelterWalkCreate!): ShelterWalkResult!
+    updateShelterWalk(id: ID!, data: ShelterWalkUpdate!): ShelterWalkResult!
+    startShelterWalk(id: ID!): ShelterWalkResult!
+    completeShelterWalk(id: ID!, notes: String): ShelterWalkResult!
+    cancelShelterWalk(id: ID!, reason: String): ShelterWalkResult!
+    deleteShelterWalk(id: ID!): DeleteResult!
+
+    # ShelterMap / Box / Occupancy
+    createShelterMap(data: ShelterMapCreate!): ShelterMapResult!
+    updateShelterMap(id: ID!, data: ShelterMapUpdate!): ShelterMapResult!
+    deleteShelterMap(id: ID!): DeleteResult!
+    createShelterBox(data: ShelterBoxCreate!): ShelterBoxResult!
+    updateShelterBox(id: ID!, data: ShelterBoxUpdate!): ShelterBoxResult!
+    deleteShelterBox(id: ID!): DeleteResult!
+    assignPetToBox(box_id: ID!, shelter_pet_id: ID!, reason: String): ShelterBoxOccupancyResult!
+    releasePetFromBox(occupancy_id: ID!, reason: String): ShelterBoxOccupancyResult!
+    movePetBetweenBoxes(shelter_pet_id: ID!, to_box_id: ID!, reason: String): ShelterBoxOccupancyResult!
+    markBoxCleaned(box_id: ID!): ShelterBoxResult!
+    setBoxOutOfService(box_id: ID!, out_of_service: Boolean!): ShelterBoxResult!
+
+    # ShelterArea + layout batch
+    createShelterArea(data: ShelterAreaCreate!): ShelterAreaResult!
+    updateShelterArea(id: ID!, data: ShelterAreaUpdate!): ShelterAreaResult!
+    deleteShelterArea(id: ID!): DeleteResult!
+    saveShelterMapLayout(map_id: ID!, data: ShelterMapLayoutInput!): ShelterMapResult!
+
+    # ShelterMapElement
+    createShelterMapElement(data: ShelterMapElementCreate!): ShelterMapElementResult!
+    updateShelterMapElement(id: ID!, data: ShelterMapElementUpdate!): ShelterMapElementResult!
+    deleteShelterMapElement(id: ID!): DeleteResult!
+
+    # ShelterInventory
+    createShelterInventoryItem(data: ShelterInventoryItemCreate!): ShelterInventoryItemResult!
+    updateShelterInventoryItem(id: ID!, data: ShelterInventoryItemUpdate!): ShelterInventoryItemResult!
+    deleteShelterInventoryItem(id: ID!): DeleteResult!
+    createShelterInventoryMovement(data: ShelterInventoryMovementCreate!): ShelterInventoryMovementResult!
 }
 
 
@@ -1201,5 +1281,506 @@ input ShelterPetCreate {
 input ShelterPetsCreate {
     shelter_id: ID!
     pet_ids: [ID!]!
+}
+
+input ChangeShelterInput {
+    pet_id: ID!
+    shelter_id_from: ID!
+    shelter_id_to: ID!
+}
+
+# ShelterTask
+############################
+
+enum ShelterTaskType { CLEANING DEEP_CLEANING FEEDING MEDICATION GROOMING OTHER }
+enum TaskStatus { PENDING IN_PROGRESS COMPLETED SKIPPED }
+
+type ShelterTask {
+    id: ID!
+    created_at: String!
+    shelter: Shelter!
+    shelter_pet: ShelterPet
+    task_type: ShelterTaskType!
+    area: String
+    status: TaskStatus!
+    assigned_to: User
+    scheduled_at: String
+    completed_at: String
+    completed_by: User
+    is_recurring: Boolean!
+    recurrence_rule: String
+    notes: String
+}
+
+type ShelterTaskResult {
+    success: Boolean!
+    error: Error
+    shelter_task: ShelterTask
+}
+
+type PaginatedShelterTasks {
+    success: Boolean
+    error: Error
+    items: [ShelterTask]!
+    pagination: Pagination!
+}
+
+input ShelterTaskCreate {
+    shelter_id: ID!
+    shelter_pet_id: ID
+    shelter_box_id: ID
+    task_type: ShelterTaskType!
+    area: String
+    assigned_to_id: ID
+    scheduled_at: String
+    is_recurring: Boolean = false
+    recurrence_rule: String
+    notes: String
+}
+
+input ShelterTaskUpdate {
+    task_type: ShelterTaskType
+    area: String
+    assigned_to_id: ID
+    scheduled_at: String
+    is_recurring: Boolean
+    recurrence_rule: String
+    notes: String
+}
+
+# ShelterWalk
+############################
+
+enum ShelterWalkStatus { PLANNED IN_PROGRESS COMPLETED CANCELLED }
+
+type ShelterWalk {
+    id: ID!
+    created_at: String!
+    shelter_pet: ShelterPet!
+    walker: User!
+    status: ShelterWalkStatus!
+    scheduled_at: String
+    started_at: String
+    ended_at: String
+    duration_minutes: Int
+    notes: String
+}
+
+type ShelterWalkResult {
+    success: Boolean!
+    error: Error
+    shelter_walk: ShelterWalk
+}
+
+type PaginatedShelterWalks {
+    success: Boolean
+    error: Error
+    items: [ShelterWalk]!
+    pagination: Pagination!
+}
+
+input ShelterWalkCreate {
+    shelter_pet_id: ID!
+    walker_id: ID
+    scheduled_at: String
+    notes: String
+}
+
+input ShelterWalkUpdate {
+    scheduled_at: String
+    notes: String
+}
+
+# ShelterMap / ShelterBox / ShelterBoxOccupancy
+############################
+
+enum MapUnit { METERS PIXELS }
+enum BoxStatus { FREE OCCUPIED FULL OUT_OF_SERVICE }
+
+type ShelterMap {
+    id: ID!
+    created_at: String!
+    shelter: Shelter!
+    name: String!
+    width: Float!
+    height: Float!
+    unit: MapUnit!
+    background_media: Media
+    areas: [ShelterArea!]!
+    boxes: [ShelterBox!]!
+    elements: [ShelterMapElement!]!
+}
+
+type ShelterMapResult {
+    success: Boolean!
+    error: Error
+    map: ShelterMap
+}
+
+type PaginatedShelterMaps {
+    success: Boolean
+    error: Error
+    items: [ShelterMap]!
+    pagination: Pagination!
+}
+
+input ShelterMapCreate {
+    shelter_id: ID!
+    name: String!
+    width: Float!
+    height: Float!
+    unit: MapUnit = METERS
+    background_media_id: ID
+}
+
+input ShelterMapUpdate {
+    name: String
+    width: Float
+    height: Float
+    unit: MapUnit
+    background_media_id: ID
+}
+
+type ShelterBox {
+    id: ID!
+    created_at: String!
+    map_id: ID!
+    area: ShelterArea
+    label: String!
+    x: Float!
+    y: Float!
+    width: Float!
+    height: Float!
+    rotation: Float!
+    capacity: Int!
+    status: BoxStatus!
+    is_out_of_service: Boolean!
+    current_occupants: [ShelterPet!]!
+    occupancy_history(commonSearch: CommonSearch = {}): PaginatedBoxOccupancies
+    last_cleaned_at: String
+    notes: String
+}
+
+type ShelterBoxResult {
+    success: Boolean!
+    error: Error
+    box: ShelterBox
+}
+
+type PaginatedShelterBoxes {
+    success: Boolean
+    error: Error
+    items: [ShelterBox]!
+    pagination: Pagination!
+}
+
+input ShelterBoxCreate {
+    map_id: ID!
+    area_id: ID
+    label: String!
+    x: Float!
+    y: Float!
+    width: Float!
+    height: Float!
+    rotation: Float = 0
+    capacity: Int = 1
+    notes: String
+}
+
+input ShelterBoxUpdate {
+    area_id: ID
+    label: String
+    x: Float
+    y: Float
+    width: Float
+    height: Float
+    rotation: Float
+    capacity: Int
+    is_out_of_service: Boolean
+    notes: String
+}
+
+type ShelterBoxOccupancy {
+    id: ID!
+    created_at: String!
+    box: ShelterBox!
+    shelter_pet: ShelterPet!
+    entered_at: String!
+    exited_at: String
+    moved_by: User
+    reason: String
+}
+
+type ShelterBoxOccupancyResult {
+    success: Boolean!
+    error: Error
+    occupancy: ShelterBoxOccupancy
+}
+
+type PaginatedBoxOccupancies {
+    success: Boolean
+    error: Error
+    items: [ShelterBoxOccupancy]!
+    pagination: Pagination!
+}
+
+# ShelterArea
+############################
+
+enum AreaType { KENNEL QUARANTINE PLAYGROUND MEDICAL STORAGE OFFICE COMMON OUTDOOR OTHER }
+
+type ShelterArea {
+    id: ID!
+    created_at: String!
+    map_id: ID!
+    name: String!
+    area_type: AreaType!
+    x: Float!
+    y: Float!
+    width: Float!
+    height: Float!
+    color: String
+    boxes: [ShelterBox!]!
+}
+
+type ShelterAreaResult {
+    success: Boolean!
+    error: Error
+    area: ShelterArea
+}
+
+type PaginatedShelterAreas {
+    success: Boolean
+    error: Error
+    items: [ShelterArea]!
+    pagination: Pagination!
+}
+
+input ShelterAreaCreate {
+    map_id: ID!
+    name: String!
+    area_type: AreaType!
+    x: Float!
+    y: Float!
+    width: Float!
+    height: Float!
+    color: String
+}
+
+input ShelterAreaUpdate {
+    name: String
+    area_type: AreaType
+    x: Float
+    y: Float
+    width: Float
+    height: Float
+    color: String
+}
+
+# saveShelterMapLayout — batch atomico dell'editor
+input ShelterMapLayoutInput {
+    areas: [ShelterAreaUpsert!]!
+    boxes: [ShelterBoxUpsert!]!
+    elements: [ShelterMapElementUpsert!]
+    deleted_area_ids: [ID!]
+    deleted_box_ids: [ID!]
+    deleted_element_ids: [ID!]
+}
+
+input ShelterAreaUpsert {
+    id: ID
+    name: String!
+    area_type: AreaType!
+    x: Float!
+    y: Float!
+    width: Float!
+    height: Float!
+    color: String
+}
+
+input ShelterBoxUpsert {
+    id: ID
+    area_id: ID
+    label: String!
+    x: Float!
+    y: Float!
+    width: Float!
+    height: Float!
+    rotation: Float = 0
+    capacity: Int = 1
+}
+
+# ShelterMapElement
+############################
+
+enum MapElementType { WALL DOOR GATE WATER_POINT FEEDING_POINT BENCH TREE OTHER }
+
+type ShelterMapElement {
+    id: ID!
+    created_at: String!
+    map_id: ID!
+    element_type: MapElementType!
+    x: Float!
+    y: Float!
+    width: Float!
+    height: Float!
+    rotation: Float!
+    color: String
+    label: String
+}
+
+type ShelterMapElementResult {
+    success: Boolean!
+    error: Error
+    element: ShelterMapElement
+}
+
+type PaginatedMapElements {
+    success: Boolean
+    error: Error
+    items: [ShelterMapElement]!
+    pagination: Pagination!
+}
+
+input ShelterMapElementCreate {
+    map_id: ID!
+    element_type: MapElementType!
+    x: Float!
+    y: Float!
+    width: Float!
+    height: Float!
+    rotation: Float = 0
+    color: String
+    label: String
+}
+
+input ShelterMapElementUpdate {
+    element_type: MapElementType
+    x: Float
+    y: Float
+    width: Float
+    height: Float
+    rotation: Float
+    color: String
+    label: String
+}
+
+input ShelterMapElementUpsert {
+    id: ID
+    element_type: MapElementType!
+    x: Float!
+    y: Float!
+    width: Float!
+    height: Float!
+    rotation: Float = 0
+    color: String
+    label: String
+}
+
+# ShelterInventory
+############################
+
+enum InventoryCategory { FOOD_DRY FOOD_WET MEDICINE HYGIENE EQUIPMENT OTHER }
+enum MovementType { RESTOCK CONSUMPTION DONATION WASTE ADJUSTMENT }
+
+type ShelterInventoryItem {
+    id: ID!
+    created_at: String!
+    shelter: Shelter!
+    name: String!
+    category: InventoryCategory!
+    unit: String!
+    minimum_threshold: Float
+    current_quantity: Float!
+    is_below_threshold: Boolean!
+    notes: String
+    movements(commonSearch: CommonSearch = {}): PaginatedInventoryMovements
+}
+
+type ShelterInventoryMovement {
+    id: ID!
+    created_at: String!
+    item: ShelterInventoryItem!
+    movement_type: MovementType!
+    quantity: Float!
+    registered_by: User!
+    notes: String
+}
+
+type ShelterInventoryItemResult {
+    success: Boolean!
+    error: Error
+    item: ShelterInventoryItem
+}
+
+type ShelterInventoryMovementResult {
+    success: Boolean!
+    error: Error
+    movement: ShelterInventoryMovement
+}
+
+type PaginatedInventoryItems {
+    success: Boolean
+    error: Error
+    items: [ShelterInventoryItem]!
+    pagination: Pagination!
+}
+
+type PaginatedInventoryMovements {
+    success: Boolean
+    error: Error
+    items: [ShelterInventoryMovement]!
+    pagination: Pagination!
+}
+
+input ShelterInventoryItemCreate {
+    shelter_id: ID!
+    name: String!
+    category: InventoryCategory!
+    unit: String!
+    minimum_threshold: Float
+    notes: String
+    initial_quantity: Float
+}
+
+input ShelterInventoryItemUpdate {
+    name: String
+    category: InventoryCategory
+    unit: String
+    minimum_threshold: Float
+    notes: String
+}
+
+input ShelterInventoryMovementCreate {
+    item_id: ID!
+    movement_type: MovementType!
+    quantity: Float!
+    notes: String
+}
+
+# Shelter dashboard operativa
+############################
+
+type ShelterOperationalDashboard {
+    shelter_id: ID!
+    walks_completed_today: Int!
+    walks_planned_today: Int!
+    pets_needing_walk: Int!
+    tasks_pending: Int!
+    tasks_overdue: Int!
+    tasks_completed_today: Int!
+    boxes_total: Int!
+    boxes_free: Int!
+    boxes_occupied: Int!
+    boxes_full: Int!
+    boxes_out_of_service: Int!
+    pets_total: Int!
+    low_stock_count: Int!
+}
+
+type ShelterOperationalDashboardResult {
+    success: Boolean!
+    error: Error
+    dashboard: ShelterOperationalDashboard
 }
 

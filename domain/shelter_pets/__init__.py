@@ -1,7 +1,7 @@
 import repository.shelter_pets as shelter_pets_data
 import domain.pets as pets_domain
 import domain.shelters as shelters_domain
-from api.errors import NotFoundError
+from api.errors import NotFoundError, BadRequest
 import domain.damnationes_memoriae as damnatio_domain
 from utils.logger import logger, stringify
 from math import ceil
@@ -43,6 +43,29 @@ def create_shelter_pets(data):
             if pet is None:
                 raise NotFoundError(f'no pet found with id {pet_id}')
         return shelter_pets_data.create_shelter_pets(data)
+    except Exception as e:
+        logger.error(e)
+        raise e
+
+
+def change_shelter(data):
+    logger.domain(f"data: {stringify(data)}")
+    try:
+        pet_id = data.get('pet_id')
+        shelter_id_from = data.get('shelter_id_from')
+        shelter_id_to = data.get('shelter_id_to')
+        if shelter_id_from == shelter_id_to:
+            raise BadRequest('shelter_id_from and shelter_id_to must differ')
+        pet = pets_domain.get_pet(pet_id)
+        if pet is None:
+            raise NotFoundError(f'no pet found with id {pet_id}')
+        shelter_from = shelters_domain.get_shelter(shelter_id_from)
+        if shelter_from is None:
+            raise NotFoundError(f'no shelter found with id {shelter_id_from}')
+        shelter_to = shelters_domain.get_shelter(shelter_id_to)
+        if shelter_to is None:
+            raise NotFoundError(f'no shelter found with id {shelter_id_to}')
+        return shelter_pets_data.change_shelter(pet_id, shelter_id_from, shelter_id_to)
     except Exception as e:
         logger.error(e)
         raise e

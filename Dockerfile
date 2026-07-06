@@ -20,5 +20,5 @@ EXPOSE 5000
 ENV GUNICORN_CMD_ARGS="--workers 4 --bind 0.0.0.0:5000"
 
 # Run Alembic migrations before starting the app
-# CMD alembic upgrade head && gunicorn app:app
-CMD gunicorn app:app
+CMD alembic upgrade head && gunicorn app:app
+# CMD gunicorn app:app

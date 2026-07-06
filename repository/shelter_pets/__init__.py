@@ -70,6 +70,38 @@ def update_shelter_pet(id, data):
         raise e
 
 
+def change_shelter(pet_id, shelter_id_from, shelter_id_to):
+    logger.repository(
+        f"pet_id: {pet_id}\n"
+        f"shelter_id_from: {shelter_id_from}\n"
+        f"shelter_id_to: {shelter_id_to}"
+    )
+    try:
+        query = db.session.query(ShelterPet).filter(
+            ShelterPet.pet_id == pet_id,
+            ShelterPet.shelter_id == shelter_id_from,
+        )
+        shelter_pet_model = query.first()
+        if not shelter_pet_model:
+            raise NotFoundError(
+                f"no shelter_pet found for pet {pet_id} in shelter {shelter_id_from}"
+            )
+        query.update({
+            "shelter_id": shelter_id_to,
+            "updated_at": datetime.today().strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
+        })
+        db.session.commit()
+        return ShelterPet.query.get(shelter_pet_model.id).to_dict()
+    except Exception as e:
+        db.session.rollback()
+        logger.error(e)
+        raise e
+
+
+def count_in_shelter(shelter_id):
+    return db.session.query(ShelterPet).filter(ShelterPet.shelter_id == shelter_id).count()
+
+
 def get_shelter_pets(common_search):
     try:
         query = build_query(table="shelter_pets", ordering=common_search["ordering"], filters=common_search['filters'], pagination=common_search['pagination'])

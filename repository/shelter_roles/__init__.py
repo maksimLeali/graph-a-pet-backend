@@ -9,6 +9,15 @@ from repository.shelter_roles.models import ShelterRole, RoleLevel
 from repository.query_builder import build_query, build_count, build_where
 
 
+def get_roles_for_user_on_shelter(user_id, shelter_id):
+    logger.repository(f"user_id: {user_id} shelter_id: {shelter_id}")
+    models = db.session.query(ShelterRole).filter(
+        ShelterRole.user_id == user_id,
+        ShelterRole.shelter_id == shelter_id,
+    ).all()
+    return [m.to_dict() for m in models]
+
+
 def create_shelter_role(data):
     logger.repository(f"data: {stringify(data)}")
     try:

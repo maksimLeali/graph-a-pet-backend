@@ -2,6 +2,7 @@ from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
+from sqlalchemy import text
 from repository.models import *
 from repository import db
 from alembic import context
@@ -67,6 +68,15 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
+        # Ensure unqualified table / FK references in migrations resolve
+        # to the target schema (models declare schema='graph_a_pet' but
+        # migrations use bare names like op.create_table('shelter_tasks', ...)
+        # and ForeignKeyConstraint([...], ['shelters.id'])).
+        if target_metadata.schema:
+            connection.execute(
+                text(f'SET search_path TO "{target_metadata.schema}", public')
+            )
+
         context.configure(
             include_schemas=True,
             include_object=include_object,

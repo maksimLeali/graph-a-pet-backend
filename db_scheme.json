@@ -1,336 +1,679 @@
 {
-    "tables": {
-        "base_template": {
-            "columns": {
-                "id": "id!",
-                "created_at": "date",
-                "updated_at": "date"
-            }
-        },
-        "users": {
-            "enums": {
-                "UserRole": ["USER", "ADMIN"]
-            },
-            "columns": {
-                "first_name": "string",
-                "last_name": "string",
-                "email": "string",
-                "password": "string",
-                "role": "enum(UserRole)",
-                "last_login": "date",
-                "last_activity": "date",
-                "verified": "bool"
-            },
-            "search_columns": ["first_name", "last_name", "email"],
-            "alias": "us",
-            "other_table_ref": "user_id",
-            "children": ["ownerships", "reports", "user_pets_in_custody"],
-            "inherit_delete": {
-                "ownerships": {
-                    "cond": "all"
-                },
-                "reports": {
-                    "cond": "all"
-                }
-            }
-        },
-        "pets": {
-            "enums": {
-                "Gender": ["MALE", "FEMALE", "NOT_SAID"],
-                "CoatLength": ["SHORT", "MEDIUM", "LENGHT", "HAIRLESS"]
-            },
-            "columns": {
-                "name": "string",
-                "birthday": "date",
-                "neutered": "bool",
-                "chip_code": "string",
-                "gender": "enum(Gender)",
-                "breed": "string",
-                "coat_length": "enum(CoatLength)",
-                "weight_kg": "float",
-                "temperament": "string",
-                "diet": "string[]",
-                "intollerance": "string[]",
-                "disciplines": "string[]"
-            },
-            "search_columns": ["name"],
-            "alias": "pt",
-            "other_table_ref": "pet_id",
-            "children": ["ownerships", "health_cards", "reports", "shelter_pets"],
-            "inherit_delete": {
-                "ownerships": {
-                    "cond": "all"
-                },
-                "health_cards": {
-                    "cond": "all"
-                },
-                "reports": {
-                    "cond": "all"
-                },
-                "shelter_pets": {
-                    "cond": "all"
-                }
-            }
-        },
-        "reports": {
-            "enums": {
-                "ReportsType": ["MISSING", "FOUND"]
-            },
-            "columns": {
-                "latitude": "number",
-                "longitude": "number",
-                "type": "enum(ReportsType)",
-                "place": "string",
-                "pet_id": "string",
-                "reporter": "json",
-                "responders": "json[]",
-                "notes": "string[]",
-                "date": "date"
-            },
-            "other_table_ref": "report_id",
-            "children": [],
-            "alias": "rp",
-            "search_columns": ["place", "notes"],
-            "inherit_delete": {}
-        },
-        "ownerships": {
-            "enums": {
-                "CustodyLevel": [
-                    "OWNER",
-                    "SHELTER_OWNER",
-                    "SUB_OWNER",
-                    "PET_SITTER"
-                ]
-            },
-            "columns": {
-                "user_id": "string",
-                "pet_id": "string",
-                "custody_level": "enum(CustodyLevel)"
-            },
-            "search_columns": ["custody_level"],
-            "alias": "ow",
-            "other_table_ref": "ownership_id",
-            "children": [],
-            "inherit_delete": {
-                "pets": {
-                    "cond": {
-                        "eq": {
-                            "custody_level": "OWNER"
-                        }
-                    }
-                }
-            }
-        },
-        "health_cards": {
-            "columns": {
-                "pet_id": "string",
-                "notes": "string[]"
-            },
-            "search_columns": ["logs"],
-            "alias": "hlc",
-            "other_table_ref": "health_card_id",
-            "children": ["treatments"],
-            "inherit_delete": {
-                "treatments": {
-                    "cond": "all"
-                }
-            }
-        },
-        "treatments": {
-            "enums": {
-                "TreatmentType": [
-                    "VACCINE",
-                    "ANTIPARASITIC",
-                    "TABLET",
-                    "OPERATION",
-                    "REMINDER",
-                    "WALK",
-                    "TRAINING",
-                    "CURE"
-                ],
-                "treatmentDuration": [
-                    "TEN_MINUTES",
-                    "QUARTER_HOUR",
-                    "THREE_QUARTER",
-                    "HALF_HOUR",
-                    "HOUR",
-                    "HOUR_AND_HALF",
-                    "TWO_HOURS"
-                ]
-            },
-            "columns": {
-                "name": "string",
-                "date": "date",
-                "booster_id": "string",
-                "type": "enum(TreatmentType)",
-                "health_card_id": "string",
-                "logs": "string[]",
-                "duration": "enum(treatmentDuration)"
-            },
-            "search_columns": ["logs", "name"],
-            "alias": "tr",
-            "other_table_ref": "treatment_id",
-            "children": ["walks", "cures"],
-            "inherit_delete": {
-                "walks": {
-                    "cond": "all"
-                },
-                "cures": {
-                    "cond": "all"
-                }
-            }
-        },
-        "medias": {
-            "columns": {
-                "type": "string",
-                "scope": "string",
-                "ref_id": "string",
-                "main_colors": "json[]",
-                "main_color": "json",
-                "url": "string"
-            },
-            "search_columns": ["url"],
-            "alias": "md",
-            "other_table_ref": "media_id",
-            "children": [],
-            "inherit_delete": {}
-        },
-        "walks": {
-            "columns": {
-                "treatment_id": "string",
-                "distance_km": "float",
-                "duration_minutes": "int"
-            },
-            "search_columns": [],
-            "alias": "wk",
-            "other_table_ref": "walk_id",
-            "children": ["walk_ratings"],
-            "inherit_delete": {
-                "walk_ratings": {
-                    "cond": "all"
-                }
-            }
-        },
-        "walk_ratings": {
-            "enums": {
-                "WalkRatingType": ["OVERALL", "LEASH_PULLING", "BEHAVIOR", "AGGRESSION", "CALM"]
-            },
-            "columns": {
-                "walk_id": "string",
-                "type": "enum(WalkRatingType)",
-                "rating": "int"
-            },
-            "search_columns": ["type"],
-            "alias": "rtg",
-            "other_table_ref": "walk_rating_id",
-            "children": [],
-            "inherit_delete": {}
-        },
-        "cures": {
-            "columns": {
-                "treatment_id": "string",
-                "frequency_value": "int",
-                "frequency_unit": "enum(FrequencyUnit)",
-                "frequency_times": "int"
-            },
-            "search_columns": [],
-            "alias": "cr",
-            "other_table_ref": "cure_id",
-            "children": [],
-            "inherit_delete": {}
-        },
-        "codes": {
-            "columns": {
-                "code": "string",
-                "ref_id": "string",
-                "ref_table": "string",
-                "scope": "string",
-                "valid": "bool"
-            },
-            "search_columns": ["code"],
-            "alias": "cd",
-            "other_table_ref": "code_id",
-            "children": [],
-            "inherit_delete": {}
-        },
-        "statistics": {
-            "search_columns": [],
-            "alias": "sts",
-            "other_table_ref": "statistic_id",
-            "children": [],
-            "inherit_delete": {}
-        },
-        "damnationes_memoriae": {
-            "columns": {
-                "original_table": "string",
-                "original_data": "json",
-                "deleted_by": "string",
-                "restore_before": "string[]",
-                "restore_after": "string[]"
-            },
-            "search_columns": [],
-            "alias": "dtm",
-            "other_table_ref": "damnatio_memoriae_id",
-            "children": [],
-            "inherit_delete": {}
-        },
-        "user_pets_in_custody": {
-            "search_columns": [],
-            "alias": "upic",
-            "other_table_ref": null,
-            "children": [],
-            "inherit_delete": {}
-        },
-        "shelters": {
-            "columns": {
-                "name": "string",
-                "street": "string",
-                "street_number": "string",
-                "city": "string",
-                "province_code": "string",
-                "postal_code": "string",
-                "region": "string",
-                "district": "string",
-                "contacts": "json"
-            },
-            "search_columns": ["name", "city", "region","district"],
-            "alias": "sh",
-            "other_table_ref": "shelter_id",
-            "children": ["shelter_roles", "shelter_pets"],
-            "inherit_delete": {
-                "shelter_roles": {
-                    "cond": "all"
-                },
-                "shelter_pets": {
-                    "cond": "all"
-                }
-            }
-        },
-        "shelter_roles": {
-            "enums": {
-                "Role": ["OWNER", "MANAGER", "STAFF", "VOLUNTEER"]
-            },
-            "columns": {
-                "user_id": "string",
-                "shelter_id": "string",
-                "role": "enum(Role)"
-            },
-            "search_columns": ["role"],
-            "alias": "srl",
-            "other_table_ref": "shelter_role_id",
-            "children": [],
-            "inherit_delete": {}
-        },
-        "shelter_pets": {
-            "columns": {
-                "shelter_id": "string",
-                "pet_id": "string"
-            },
-            "search_columns": [],
-            "alias": "shp",
-            "other_table_ref": "shelter_pet_id",
-            "children": [],
-            "inherit_delete": {}
-        }
+ "tables": {
+  "base_template": {
+   "columns": {
+    "id": "id!",
+    "created_at": "date",
+    "updated_at": "date"
+   }
+  },
+  "users": {
+   "enums": {
+    "UserRole": [
+     "USER",
+     "ADMIN"
+    ]
+   },
+   "columns": {
+    "first_name": "string",
+    "last_name": "string",
+    "email": "string",
+    "password": "string",
+    "role": "enum(UserRole)",
+    "last_login": "date",
+    "last_activity": "date",
+    "verified": "bool"
+   },
+   "search_columns": [
+    "first_name",
+    "last_name",
+    "email"
+   ],
+   "alias": "us",
+   "other_table_ref": "user_id",
+   "children": [
+    "ownerships",
+    "reports",
+    "user_pets_in_custody"
+   ],
+   "inherit_delete": {
+    "ownerships": {
+     "cond": "all"
+    },
+    "reports": {
+     "cond": "all"
     }
+   }
+  },
+  "pets": {
+   "enums": {
+    "Gender": [
+     "MALE",
+     "FEMALE",
+     "NOT_SAID"
+    ],
+    "CoatLength": [
+     "SHORT",
+     "MEDIUM",
+     "LENGHT",
+     "HAIRLESS"
+    ]
+   },
+   "columns": {
+    "name": "string",
+    "birthday": "date",
+    "neutered": "bool",
+    "chip_code": "string",
+    "gender": "enum(Gender)",
+    "breed": "string",
+    "coat_length": "enum(CoatLength)",
+    "weight_kg": "float",
+    "temperament": "string",
+    "diet": "string[]",
+    "intollerance": "string[]",
+    "disciplines": "string[]"
+   },
+   "search_columns": [
+    "name"
+   ],
+   "alias": "pt",
+   "other_table_ref": "pet_id",
+   "children": [
+    "ownerships",
+    "health_cards",
+    "reports",
+    "shelter_pets"
+   ],
+   "inherit_delete": {
+    "ownerships": {
+     "cond": "all"
+    },
+    "health_cards": {
+     "cond": "all"
+    },
+    "reports": {
+     "cond": "all"
+    },
+    "shelter_pets": {
+     "cond": "all"
+    }
+   }
+  },
+  "reports": {
+   "enums": {
+    "ReportsType": [
+     "MISSING",
+     "FOUND"
+    ]
+   },
+   "columns": {
+    "latitude": "number",
+    "longitude": "number",
+    "type": "enum(ReportsType)",
+    "place": "string",
+    "pet_id": "string",
+    "reporter": "json",
+    "responders": "json[]",
+    "notes": "string[]",
+    "date": "date"
+   },
+   "other_table_ref": "report_id",
+   "children": [],
+   "alias": "rp",
+   "search_columns": [
+    "place",
+    "notes"
+   ],
+   "inherit_delete": {}
+  },
+  "ownerships": {
+   "enums": {
+    "CustodyLevel": [
+     "OWNER",
+     "SHELTER_OWNER",
+     "SUB_OWNER",
+     "PET_SITTER"
+    ]
+   },
+   "columns": {
+    "user_id": "string",
+    "pet_id": "string",
+    "custody_level": "enum(CustodyLevel)"
+   },
+   "search_columns": [
+    "custody_level"
+   ],
+   "alias": "ow",
+   "other_table_ref": "ownership_id",
+   "children": [],
+   "inherit_delete": {
+    "pets": {
+     "cond": {
+      "eq": {
+       "custody_level": "OWNER"
+      }
+     }
+    }
+   }
+  },
+  "health_cards": {
+   "columns": {
+    "pet_id": "string",
+    "notes": "string[]"
+   },
+   "search_columns": [
+    "logs"
+   ],
+   "alias": "hlc",
+   "other_table_ref": "health_card_id",
+   "children": [
+    "treatments"
+   ],
+   "inherit_delete": {
+    "treatments": {
+     "cond": "all"
+    }
+   }
+  },
+  "treatments": {
+   "enums": {
+    "TreatmentType": [
+     "VACCINE",
+     "ANTIPARASITIC",
+     "TABLET",
+     "OPERATION",
+     "REMINDER",
+     "WALK",
+     "TRAINING",
+     "CURE"
+    ],
+    "treatmentDuration": [
+     "TEN_MINUTES",
+     "QUARTER_HOUR",
+     "THREE_QUARTER",
+     "HALF_HOUR",
+     "HOUR",
+     "HOUR_AND_HALF",
+     "TWO_HOURS"
+    ]
+   },
+   "columns": {
+    "name": "string",
+    "date": "date",
+    "booster_id": "string",
+    "type": "enum(TreatmentType)",
+    "health_card_id": "string",
+    "logs": "string[]",
+    "duration": "enum(treatmentDuration)"
+   },
+   "search_columns": [
+    "logs",
+    "name"
+   ],
+   "alias": "tr",
+   "other_table_ref": "treatment_id",
+   "children": [
+    "walks",
+    "cures"
+   ],
+   "inherit_delete": {
+    "walks": {
+     "cond": "all"
+    },
+    "cures": {
+     "cond": "all"
+    }
+   }
+  },
+  "medias": {
+   "columns": {
+    "type": "string",
+    "scope": "string",
+    "ref_id": "string",
+    "main_colors": "json[]",
+    "main_color": "json",
+    "url": "string"
+   },
+   "search_columns": [
+    "url"
+   ],
+   "alias": "md",
+   "other_table_ref": "media_id",
+   "children": [],
+   "inherit_delete": {}
+  },
+  "walks": {
+   "columns": {
+    "treatment_id": "string",
+    "distance_km": "float",
+    "duration_minutes": "int"
+   },
+   "search_columns": [],
+   "alias": "wk",
+   "other_table_ref": "walk_id",
+   "children": [
+    "walk_ratings"
+   ],
+   "inherit_delete": {
+    "walk_ratings": {
+     "cond": "all"
+    }
+   }
+  },
+  "walk_ratings": {
+   "enums": {
+    "WalkRatingType": [
+     "OVERALL",
+     "LEASH_PULLING",
+     "BEHAVIOR",
+     "AGGRESSION",
+     "CALM"
+    ]
+   },
+   "columns": {
+    "walk_id": "string",
+    "type": "enum(WalkRatingType)",
+    "rating": "int"
+   },
+   "search_columns": [
+    "type"
+   ],
+   "alias": "rtg",
+   "other_table_ref": "walk_rating_id",
+   "children": [],
+   "inherit_delete": {}
+  },
+  "cures": {
+   "columns": {
+    "treatment_id": "string",
+    "frequency_value": "int",
+    "frequency_unit": "enum(FrequencyUnit)",
+    "frequency_times": "int"
+   },
+   "search_columns": [],
+   "alias": "cr",
+   "other_table_ref": "cure_id",
+   "children": [],
+   "inherit_delete": {}
+  },
+  "codes": {
+   "columns": {
+    "code": "string",
+    "ref_id": "string",
+    "ref_table": "string",
+    "scope": "string",
+    "valid": "bool"
+   },
+   "search_columns": [
+    "code"
+   ],
+   "alias": "cd",
+   "other_table_ref": "code_id",
+   "children": [],
+   "inherit_delete": {}
+  },
+  "statistics": {
+   "search_columns": [],
+   "alias": "sts",
+   "other_table_ref": "statistic_id",
+   "children": [],
+   "inherit_delete": {}
+  },
+  "damnationes_memoriae": {
+   "columns": {
+    "original_table": "string",
+    "original_data": "json",
+    "deleted_by": "string",
+    "restore_before": "string[]",
+    "restore_after": "string[]"
+   },
+   "search_columns": [],
+   "alias": "dtm",
+   "other_table_ref": "damnatio_memoriae_id",
+   "children": [],
+   "inherit_delete": {}
+  },
+  "user_pets_in_custody": {
+   "search_columns": [],
+   "alias": "upic",
+   "other_table_ref": null,
+   "children": [],
+   "inherit_delete": {}
+  },
+  "shelters": {
+   "columns": {
+    "name": "string",
+    "street": "string",
+    "street_number": "string",
+    "city": "string",
+    "province_code": "string",
+    "postal_code": "string",
+    "region": "string",
+    "district": "string",
+    "contacts": "json"
+   },
+   "search_columns": [
+    "name",
+    "city",
+    "region",
+    "district"
+   ],
+   "alias": "sh",
+   "other_table_ref": "shelter_id",
+   "children": [
+    "shelter_roles",
+    "shelter_pets",
+    "shelter_tasks",
+    "shelter_inventory_items"
+   ],
+   "inherit_delete": {
+    "shelter_roles": {
+     "cond": "all"
+    },
+    "shelter_pets": {
+     "cond": "all"
+    }
+   }
+  },
+  "shelter_roles": {
+   "enums": {
+    "Role": [
+     "OWNER",
+     "MANAGER",
+     "STAFF",
+     "VOLUNTEER"
+    ]
+   },
+   "columns": {
+    "user_id": "string",
+    "shelter_id": "string",
+    "role": "enum(Role)"
+   },
+   "search_columns": [
+    "role"
+   ],
+   "alias": "srl",
+   "other_table_ref": "shelter_role_id",
+   "children": [],
+   "inherit_delete": {}
+  },
+  "shelter_pets": {
+   "columns": {
+    "shelter_id": "string",
+    "pet_id": "string"
+   },
+   "search_columns": [],
+   "alias": "shp",
+   "other_table_ref": "shelter_pet_id",
+   "children": [
+    "shelter_walks",
+    "shelter_box_occupancies"
+   ],
+   "inherit_delete": {}
+  },
+  "shelter_tasks": {
+   "enums": {
+    "ShelterTaskType": [
+     "CLEANING",
+     "DEEP_CLEANING",
+     "FEEDING",
+     "MEDICATION",
+     "GROOMING",
+     "OTHER"
+    ],
+    "TaskStatus": [
+     "PENDING",
+     "IN_PROGRESS",
+     "COMPLETED",
+     "SKIPPED"
+    ]
+   },
+   "columns": {
+    "shelter_id": "string",
+    "shelter_pet_id": "string",
+    "shelter_box_id": "string",
+    "task_type": "enum(ShelterTaskType)",
+    "area": "string",
+    "status": "enum(TaskStatus)",
+    "assigned_to_id": "string",
+    "scheduled_at": "date",
+    "completed_at": "date",
+    "completed_by_id": "string",
+    "is_recurring": "boolean",
+    "recurrence_rule": "string",
+    "notes": "string",
+    "template_id": "string"
+   },
+   "search_columns": [
+    "area",
+    "notes"
+   ],
+   "alias": "sht",
+   "other_table_ref": "shelter_task_id",
+   "children": [],
+   "inherit_delete": {}
+  },
+  "shelter_walks": {
+   "enums": {
+    "ShelterWalkStatus": [
+     "PLANNED",
+     "IN_PROGRESS",
+     "COMPLETED",
+     "CANCELLED"
+    ]
+   },
+   "columns": {
+    "shelter_pet_id": "string",
+    "walker_id": "string",
+    "status": "enum(ShelterWalkStatus)",
+    "scheduled_at": "date",
+    "started_at": "date",
+    "ended_at": "date",
+    "duration_minutes": "integer",
+    "notes": "string"
+   },
+   "search_columns": [
+    "notes"
+   ],
+   "alias": "shw",
+   "other_table_ref": "shelter_walk_id",
+   "children": [],
+   "inherit_delete": {}
+  },
+  "shelter_maps": {
+   "enums": {
+    "MapUnit": [
+     "METERS",
+     "PIXELS"
+    ]
+   },
+   "columns": {
+    "shelter_id": "string",
+    "name": "string",
+    "width": "float",
+    "height": "float",
+    "unit": "enum(MapUnit)",
+    "background_media_id": "string"
+   },
+   "search_columns": [
+    "name"
+   ],
+   "alias": "shm",
+   "other_table_ref": "shelter_map_id",
+   "children": [
+    "shelter_boxes",
+    "shelter_areas",
+    "shelter_map_elements"
+   ],
+   "inherit_delete": {
+    "shelter_boxes": {
+     "cond": "all"
+    }
+   }
+  },
+  "shelter_boxes": {
+   "columns": {
+    "map_id": "string",
+    "area_id": "string",
+    "label": "string",
+    "x": "float",
+    "y": "float",
+    "width": "float",
+    "height": "float",
+    "rotation": "float",
+    "capacity": "integer",
+    "is_out_of_service": "boolean",
+    "last_cleaned_at": "date",
+    "notes": "string"
+   },
+   "search_columns": [
+    "label",
+    "notes"
+   ],
+   "alias": "shb",
+   "other_table_ref": "shelter_box_id",
+   "children": [
+    "shelter_box_occupancies"
+   ],
+   "inherit_delete": {}
+  },
+  "shelter_box_occupancies": {
+   "columns": {
+    "box_id": "string",
+    "shelter_pet_id": "string",
+    "entered_at": "date",
+    "exited_at": "date",
+    "moved_by_id": "string",
+    "reason": "string"
+   },
+   "search_columns": [
+    "reason"
+   ],
+   "alias": "sho",
+   "other_table_ref": "shelter_box_occupancy_id",
+   "children": [],
+   "inherit_delete": {}
+  },
+  "shelter_areas": {
+   "enums": {
+    "AreaType": [
+     "KENNEL",
+     "QUARANTINE",
+     "PLAYGROUND",
+     "MEDICAL",
+     "STORAGE",
+     "OFFICE",
+     "COMMON",
+     "OUTDOOR",
+     "OTHER"
+    ]
+   },
+   "columns": {
+    "map_id": "string",
+    "name": "string",
+    "area_type": "enum(AreaType)",
+    "x": "float",
+    "y": "float",
+    "width": "float",
+    "height": "float",
+    "color": "string"
+   },
+   "search_columns": [
+    "name"
+   ],
+   "alias": "sha",
+   "other_table_ref": "shelter_area_id",
+   "children": [
+    "shelter_boxes"
+   ],
+   "inherit_delete": {}
+  },
+  "shelter_inventory_items": {
+   "enums": {
+    "InventoryCategory": [
+     "FOOD_DRY",
+     "FOOD_WET",
+     "MEDICINE",
+     "HYGIENE",
+     "EQUIPMENT",
+     "OTHER"
+    ]
+   },
+   "columns": {
+    "shelter_id": "string",
+    "name": "string",
+    "category": "enum(InventoryCategory)",
+    "unit": "string",
+    "minimum_threshold": "float",
+    "notes": "string"
+   },
+   "search_columns": [
+    "name",
+    "notes"
+   ],
+   "alias": "sii",
+   "other_table_ref": "item_id",
+   "children": [
+    "shelter_inventory_movements"
+   ],
+   "inherit_delete": {}
+  },
+  "shelter_inventory_movements": {
+   "enums": {
+    "MovementType": [
+     "RESTOCK",
+     "CONSUMPTION",
+     "DONATION",
+     "WASTE",
+     "ADJUSTMENT"
+    ]
+   },
+   "columns": {
+    "item_id": "string",
+    "movement_type": "enum(MovementType)",
+    "quantity": "float",
+    "registered_by_id": "string",
+    "notes": "string"
+   },
+   "search_columns": [
+    "notes"
+   ],
+   "alias": "sim",
+   "other_table_ref": "movement_id",
+   "children": [],
+   "inherit_delete": {}
+  },
+  "shelter_map_elements": {
+   "enums": {
+    "MapElementType": [
+     "WALL",
+     "DOOR",
+     "GATE",
+     "WATER_POINT",
+     "FEEDING_POINT",
+     "BENCH",
+     "TREE",
+     "OTHER"
+    ]
+   },
+   "columns": {
+    "map_id": "string",
+    "element_type": "enum(MapElementType)",
+    "x": "float",
+    "y": "float",
+    "width": "float",
+    "height": "float",
+    "rotation": "float",
+    "color": "string",
+    "label": "string"
+   },
+   "search_columns": [
+    "label"
+   ],
+   "alias": "sme",
+   "other_table_ref": "shelter_map_element_id",
+   "children": [],
+   "inherit_delete": {}
+  }
+ }
 }

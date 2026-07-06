@@ -88,6 +88,10 @@ def get_filtered_shelter_roles(filters):
     return shelter_roles_data.get_filtered_shelter_roles(filters)
 
 
+def get_user_roles_on_shelter(user_id, shelter_id):
+    return shelter_roles_data.get_roles_for_user_on_shelter(user_id, shelter_id)
+
+
 def get_pagination(common_search):
     try:
         total_items = shelter_roles_data.get_total_items(common_search)
