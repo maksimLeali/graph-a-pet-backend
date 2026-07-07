@@ -50,23 +50,23 @@ Attività ricorrenti o una-tantum svolte nel canile: pulizie, disinfezioni, dist
 
 **Colonne DB** (`repository/shelter_tasks/models.py`):
 
-| Campo | Tipo | Note |
-|---|---|---|
-| `id` | UUID PK | |
-| `created_at` | timestamptz | default now |
-| `shelter_id` | UUID FK → `shelters.id` | not null, index |
-| `shelter_pet_id` | UUID FK → `shelter_pets.id` | nullable — task legata a un cane specifico |
-| `shelter_box_id` | UUID FK → `shelter_boxes.id` | nullable — task legata a un box |
-| `task_type` | enum `shelter_task_type` | vedi sotto |
-| `area` | varchar(120) | descrizione libera ("Box 12", "Reparto cuccioli") |
-| `status` | enum `shelter_task_status` | default `PENDING` |
-| `assigned_to_id` | UUID FK → `users.id` | nullable |
-| `scheduled_at` | timestamptz | nullable |
-| `completed_at` | timestamptz | nullable |
-| `completed_by_id` | UUID FK → `users.id` | nullable |
-| `is_recurring` | boolean | default false |
-| `recurrence_rule` | varchar(120) | es. `DAILY`, `WEEKLY:MON,WED,FRI`, o cron |
-| `notes` | text | nullable |
+| Campo             | Tipo                         | Note                                              |
+| ----------------- | ---------------------------- | ------------------------------------------------- |
+| `id`              | UUID PK                      |                                                   |
+| `created_at`      | timestamptz                  | default now                                       |
+| `shelter_id`      | UUID FK → `shelters.id`      | not null, index                                   |
+| `shelter_pet_id`  | UUID FK → `shelter_pets.id`  | nullable — task legata a un cane specifico        |
+| `shelter_box_id`  | UUID FK → `shelter_boxes.id` | nullable — task legata a un box                   |
+| `task_type`       | enum `shelter_task_type`     | vedi sotto                                        |
+| `area`            | varchar(120)                 | descrizione libera ("Box 12", "Reparto cuccioli") |
+| `status`          | enum `shelter_task_status`   | default `PENDING`                                 |
+| `assigned_to_id`  | UUID FK → `users.id`         | nullable                                          |
+| `scheduled_at`    | timestamptz                  | nullable                                          |
+| `completed_at`    | timestamptz                  | nullable                                          |
+| `completed_by_id` | UUID FK → `users.id`         | nullable                                          |
+| `is_recurring`    | boolean                      | default false                                     |
+| `recurrence_rule` | varchar(120)                 | es. `DAILY`, `WEEKLY:MON,WED,FRI`, o cron         |
+| `notes`           | text                         | nullable                                          |
 
 **Enum**:
 
@@ -91,8 +91,20 @@ Aggiungere un `CHECK constraint` su entrambe le enum in stile [alembic/versions/
 **GraphQL** (schema.graphql):
 
 ```graphql
-enum ShelterTaskType { CLEANING DEEP_CLEANING FEEDING MEDICATION GROOMING OTHER }
-enum TaskStatus { PENDING IN_PROGRESS COMPLETED SKIPPED }
+enum ShelterTaskType {
+    CLEANING
+    DEEP_CLEANING
+    FEEDING
+    MEDICATION
+    GROOMING
+    OTHER
+}
+enum TaskStatus {
+    PENDING
+    IN_PROGRESS
+    COMPLETED
+    SKIPPED
+}
 
 type ShelterTask {
     id: ID!
@@ -112,8 +124,17 @@ type ShelterTask {
     notes: String
 }
 
-type ShelterTaskResult { success: Boolean! error: Error shelter_task: ShelterTask }
-type PaginatedShelterTasks { success: Boolean error: Error items: [ShelterTask]! pagination: Pagination! }
+type ShelterTaskResult {
+    success: Boolean!
+    error: Error
+    shelter_task: ShelterTask
+}
+type PaginatedShelterTasks {
+    success: Boolean
+    error: Error
+    items: [ShelterTask]!
+    pagination: Pagination!
+}
 
 input ShelterTaskCreate {
     shelter_id: ID!
@@ -162,18 +183,18 @@ Passeggiate dei cani del rifugio. **Distinta** dall'entità `Walk` esistente (ch
 
 **Colonne DB** (`repository/shelter_walks/models.py`):
 
-| Campo | Tipo | Note |
-|---|---|---|
-| `id` | UUID PK | |
-| `created_at` | timestamptz | |
-| `shelter_pet_id` | UUID FK → `shelter_pets.id` | not null, index |
-| `walker_id` | UUID FK → `users.id` | not null — volontario/staff |
-| `status` | enum `shelter_walk_status` | default `PLANNED` |
-| `scheduled_at` | timestamptz | nullable |
-| `started_at` | timestamptz | nullable |
-| `ended_at` | timestamptz | nullable |
-| `duration_minutes` | int | derivato (opzionale in DB, computato dal resolver) |
-| `notes` | text | nullable |
+| Campo              | Tipo                        | Note                                               |
+| ------------------ | --------------------------- | -------------------------------------------------- |
+| `id`               | UUID PK                     |                                                    |
+| `created_at`       | timestamptz                 |                                                    |
+| `shelter_pet_id`   | UUID FK → `shelter_pets.id` | not null, index                                    |
+| `walker_id`        | UUID FK → `users.id`        | not null — volontario/staff                        |
+| `status`           | enum `shelter_walk_status`  | default `PLANNED`                                  |
+| `scheduled_at`     | timestamptz                 | nullable                                           |
+| `started_at`       | timestamptz                 | nullable                                           |
+| `ended_at`         | timestamptz                 | nullable                                           |
+| `duration_minutes` | int                         | derivato (opzionale in DB, computato dal resolver) |
+| `notes`            | text                        | nullable                                           |
 
 **Enum**:
 
@@ -188,7 +209,12 @@ class ShelterWalkStatus(str, Enum):
 **GraphQL**:
 
 ```graphql
-enum ShelterWalkStatus { PLANNED IN_PROGRESS COMPLETED CANCELLED }
+enum ShelterWalkStatus {
+    PLANNED
+    IN_PROGRESS
+    COMPLETED
+    CANCELLED
+}
 
 type ShelterWalk {
     id: ID!
@@ -203,12 +229,21 @@ type ShelterWalk {
     notes: String
 }
 
-type ShelterWalkResult { success: Boolean! error: Error shelter_walk: ShelterWalk }
-type PaginatedShelterWalks { success: Boolean error: Error items: [ShelterWalk]! pagination: Pagination! }
+type ShelterWalkResult {
+    success: Boolean!
+    error: Error
+    shelter_walk: ShelterWalk
+}
+type PaginatedShelterWalks {
+    success: Boolean
+    error: Error
+    items: [ShelterWalk]!
+    pagination: Pagination!
+}
 
 input ShelterWalkCreate {
     shelter_pet_id: ID!
-    walker_id: ID              # se omesso: current user
+    walker_id: ID # se omesso: current user
     scheduled_at: String
     notes: String
 }
@@ -242,28 +277,28 @@ Catalogo articoli (cibo, farmaci, materiali) + movimenti a saldo. La quantità c
 
 #### `shelter_inventory_items`
 
-| Campo | Tipo | Note |
-|---|---|---|
-| `id` | UUID PK | |
-| `created_at` | timestamptz | |
-| `shelter_id` | UUID FK → `shelters.id` | not null, index |
-| `name` | varchar(160) | not null |
-| `category` | enum `inventory_category` | |
-| `unit` | varchar(20) | "kg", "l", "pz" |
-| `minimum_threshold` | numeric(10,3) | nullable — soglia alert |
-| `notes` | text | nullable |
+| Campo               | Tipo                      | Note                    |
+| ------------------- | ------------------------- | ----------------------- |
+| `id`                | UUID PK                   |                         |
+| `created_at`        | timestamptz               |                         |
+| `shelter_id`        | UUID FK → `shelters.id`   | not null, index         |
+| `name`              | varchar(160)              | not null                |
+| `category`          | enum `inventory_category` |                         |
+| `unit`              | varchar(20)               | "kg", "l", "pz"         |
+| `minimum_threshold` | numeric(10,3)             | nullable — soglia alert |
+| `notes`             | text                      | nullable                |
 
 #### `shelter_inventory_movements`
 
-| Campo | Tipo | Note |
-|---|---|---|
-| `id` | UUID PK | |
-| `created_at` | timestamptz | |
-| `item_id` | UUID FK → `shelter_inventory_items.id` | not null, index |
-| `movement_type` | enum `movement_type` | |
-| `quantity` | numeric(10,3) | segno secondo `movement_type` |
-| `registered_by_id` | UUID FK → `users.id` | not null |
-| `notes` | text | nullable |
+| Campo              | Tipo                                   | Note                          |
+| ------------------ | -------------------------------------- | ----------------------------- |
+| `id`               | UUID PK                                |                               |
+| `created_at`       | timestamptz                            |                               |
+| `item_id`          | UUID FK → `shelter_inventory_items.id` | not null, index               |
+| `movement_type`    | enum `movement_type`                   |                               |
+| `quantity`         | numeric(10,3)                          | segno secondo `movement_type` |
+| `registered_by_id` | UUID FK → `users.id`                   | not null                      |
+| `notes`            | text                                   | nullable                      |
 
 **Enum**:
 
@@ -287,8 +322,21 @@ class MovementType(str, Enum):
 **GraphQL**:
 
 ```graphql
-enum InventoryCategory { FOOD_DRY FOOD_WET MEDICINE HYGIENE EQUIPMENT OTHER }
-enum MovementType { RESTOCK CONSUMPTION DONATION WASTE ADJUSTMENT }
+enum InventoryCategory {
+    FOOD_DRY
+    FOOD_WET
+    MEDICINE
+    HYGIENE
+    EQUIPMENT
+    OTHER
+}
+enum MovementType {
+    RESTOCK
+    CONSUMPTION
+    DONATION
+    WASTE
+    ADJUSTMENT
+}
 
 type ShelterInventoryItem {
     id: ID!
@@ -298,8 +346,8 @@ type ShelterInventoryItem {
     category: InventoryCategory!
     unit: String!
     minimum_threshold: Float
-    current_quantity: Float!          # derivato: SUM(movements.quantity)
-    is_below_threshold: Boolean!      # derivato
+    current_quantity: Float! # derivato: SUM(movements.quantity)
+    is_below_threshold: Boolean! # derivato
     notes: String
     movements(commonSearch: CommonSearch = {}): PaginatedInventoryMovements
 }
@@ -314,10 +362,28 @@ type ShelterInventoryMovement {
     notes: String
 }
 
-type ShelterInventoryItemResult { success: Boolean! error: Error item: ShelterInventoryItem }
-type ShelterInventoryMovementResult { success: Boolean! error: Error movement: ShelterInventoryMovement }
-type PaginatedInventoryItems { success: Boolean error: Error items: [ShelterInventoryItem]! pagination: Pagination! }
-type PaginatedInventoryMovements { success: Boolean error: Error items: [ShelterInventoryMovement]! pagination: Pagination! }
+type ShelterInventoryItemResult {
+    success: Boolean!
+    error: Error
+    item: ShelterInventoryItem
+}
+type ShelterInventoryMovementResult {
+    success: Boolean!
+    error: Error
+    movement: ShelterInventoryMovement
+}
+type PaginatedInventoryItems {
+    success: Boolean
+    error: Error
+    items: [ShelterInventoryItem]!
+    pagination: Pagination!
+}
+type PaginatedInventoryMovements {
+    success: Boolean
+    error: Error
+    items: [ShelterInventoryMovement]!
+    pagination: Pagination!
+}
 
 input ShelterInventoryItemCreate {
     shelter_id: ID!
@@ -326,7 +392,7 @@ input ShelterInventoryItemCreate {
     unit: String!
     minimum_threshold: Float
     notes: String
-    initial_quantity: Float           # se >0 crea automaticamente un movimento RESTOCK
+    initial_quantity: Float # se >0 crea automaticamente un movimento RESTOCK
 }
 
 input ShelterInventoryItemUpdate {
@@ -340,7 +406,7 @@ input ShelterInventoryItemUpdate {
 input ShelterInventoryMovementCreate {
     item_id: ID!
     movement_type: MovementType!
-    quantity: Float!                  # sempre positivo, il segno è imposto dal type
+    quantity: Float! # sempre positivo, il segno è imposto dal type
     notes: String
 }
 ```
@@ -371,21 +437,24 @@ Un canvas del rifugio. Un rifugio può avere più mappe (piano terra, piano 1, g
 
 **Colonne DB** (`repository/shelter_maps/models.py`):
 
-| Campo | Tipo | Note |
-|---|---|---|
-| `id` | UUID PK | |
-| `created_at` | timestamptz | |
-| `shelter_id` | UUID FK → `shelters.id` | not null, index |
-| `name` | varchar(120) | |
-| `width` | numeric(10,2) | dimensione canvas |
-| `height` | numeric(10,2) | |
-| `unit` | enum `map_unit` | `METERS` \| `PIXELS` |
-| `background_media_id` | UUID FK → `medias.id` | nullable — planimetria di riferimento |
+| Campo                 | Tipo                    | Note                                  |
+| --------------------- | ----------------------- | ------------------------------------- |
+| `id`                  | UUID PK                 |                                       |
+| `created_at`          | timestamptz             |                                       |
+| `shelter_id`          | UUID FK → `shelters.id` | not null, index                       |
+| `name`                | varchar(120)            |                                       |
+| `width`               | numeric(10,2)           | dimensione canvas                     |
+| `height`              | numeric(10,2)           |                                       |
+| `unit`                | enum `map_unit`         | `METERS` \| `PIXELS`                  |
+| `background_media_id` | UUID FK → `medias.id`   | nullable — planimetria di riferimento |
 
 **GraphQL**:
 
 ```graphql
-enum MapUnit { METERS PIXELS }
+enum MapUnit {
+    METERS
+    PIXELS
+}
 
 type ShelterMap {
     id: ID!
@@ -401,8 +470,17 @@ type ShelterMap {
     elements: [ShelterMapElement!]!
 }
 
-type ShelterMapResult { success: Boolean! error: Error map: ShelterMap }
-type PaginatedShelterMaps { success: Boolean error: Error items: [ShelterMap]! pagination: Pagination! }
+type ShelterMapResult {
+    success: Boolean!
+    error: Error
+    map: ShelterMap
+}
+type PaginatedShelterMaps {
+    success: Boolean
+    error: Error
+    items: [ShelterMap]!
+    pagination: Pagination!
+}
 
 input ShelterMapCreate {
     shelter_id: ID!
@@ -428,15 +506,15 @@ Zona logica (rettangolo colorato) che raggruppa più box.
 
 **Colonne**:
 
-| Campo | Tipo | Note |
-|---|---|---|
-| `id` | UUID PK | |
-| `created_at` | timestamptz | |
-| `map_id` | UUID FK → `shelter_maps.id` | not null, index, `ON DELETE CASCADE` |
-| `name` | varchar(120) | |
-| `area_type` | enum `area_type` | |
-| `x`, `y`, `width`, `height` | numeric(10,2) | |
-| `color` | varchar(20) | esadecimale + alfa, es. `#4CAF5033` |
+| Campo                       | Tipo                        | Note                                 |
+| --------------------------- | --------------------------- | ------------------------------------ |
+| `id`                        | UUID PK                     |                                      |
+| `created_at`                | timestamptz                 |                                      |
+| `map_id`                    | UUID FK → `shelter_maps.id` | not null, index, `ON DELETE CASCADE` |
+| `name`                      | varchar(120)                |                                      |
+| `area_type`                 | enum `area_type`            |                                      |
+| `x`, `y`, `width`, `height` | numeric(10,2)               |                                      |
+| `color`                     | varchar(20)                 | esadecimale + alfa, es. `#4CAF5033`  |
 
 **Enum**:
 
@@ -456,7 +534,17 @@ class AreaType(str, Enum):
 **GraphQL**:
 
 ```graphql
-enum AreaType { KENNEL QUARANTINE PLAYGROUND MEDICAL STORAGE OFFICE COMMON OUTDOOR OTHER }
+enum AreaType {
+    KENNEL
+    QUARANTINE
+    PLAYGROUND
+    MEDICAL
+    STORAGE
+    OFFICE
+    COMMON
+    OUTDOOR
+    OTHER
+}
 
 type ShelterArea {
     id: ID!
@@ -500,19 +588,19 @@ Il box fisico. Ha posizione, dimensione, capienza e uno **stato derivato** dagli
 
 **Colonne**:
 
-| Campo | Tipo | Note |
-|---|---|---|
-| `id` | UUID PK | |
-| `created_at` | timestamptz | |
-| `map_id` | UUID FK → `shelter_maps.id` | not null, index, `ON DELETE CASCADE` |
-| `area_id` | UUID FK → `shelter_areas.id` | nullable |
-| `label` | varchar(60) | not null; unique per `map_id` |
-| `x`, `y`, `width`, `height` | numeric(10,2) | |
-| `rotation` | numeric(6,2) | default 0 (gradi) |
-| `capacity` | int | default 1, > 0 (CHECK) |
-| `is_out_of_service` | boolean | default false |
-| `last_cleaned_at` | timestamptz | nullable |
-| `notes` | text | nullable |
+| Campo                       | Tipo                         | Note                                 |
+| --------------------------- | ---------------------------- | ------------------------------------ |
+| `id`                        | UUID PK                      |                                      |
+| `created_at`                | timestamptz                  |                                      |
+| `map_id`                    | UUID FK → `shelter_maps.id`  | not null, index, `ON DELETE CASCADE` |
+| `area_id`                   | UUID FK → `shelter_areas.id` | nullable                             |
+| `label`                     | varchar(60)                  | not null; unique per `map_id`        |
+| `x`, `y`, `width`, `height` | numeric(10,2)                |                                      |
+| `rotation`                  | numeric(6,2)                 | default 0 (gradi)                    |
+| `capacity`                  | int                          | default 1, > 0 (CHECK)               |
+| `is_out_of_service`         | boolean                      | default false                        |
+| `last_cleaned_at`           | timestamptz                  | nullable                             |
+| `notes`                     | text                         | nullable                             |
 
 **Enum** (solo GraphQL, non persistito):
 
@@ -529,7 +617,12 @@ Il valore è calcolato dal resolver in base a `current_occupants` e `is_out_of_s
 **GraphQL**:
 
 ```graphql
-enum BoxStatus { FREE OCCUPIED FULL OUT_OF_SERVICE }
+enum BoxStatus {
+    FREE
+    OCCUPIED
+    FULL
+    OUT_OF_SERVICE
+}
 
 type ShelterBox {
     id: ID!
@@ -543,9 +636,9 @@ type ShelterBox {
     height: Float!
     rotation: Float!
     capacity: Int!
-    status: BoxStatus!                       # derivato
+    status: BoxStatus! # derivato
     is_out_of_service: Boolean!
-    current_occupants: [ShelterPet!]!        # derivato (join su occupancies attive)
+    current_occupants: [ShelterPet!]! # derivato (join su occupancies attive)
     occupancy_history(commonSearch: CommonSearch = {}): PaginatedBoxOccupancies
     last_cleaned_at: String
     notes: String
@@ -584,16 +677,16 @@ Tabella "ponte" con validità temporale tra `ShelterBox` e `ShelterPet`. Verità
 
 **Colonne**:
 
-| Campo | Tipo | Note |
-|---|---|---|
-| `id` | UUID PK | |
-| `created_at` | timestamptz | |
-| `box_id` | UUID FK → `shelter_boxes.id` | not null, index |
-| `shelter_pet_id` | UUID FK → `shelter_pets.id` | not null, index |
-| `entered_at` | timestamptz | default now |
-| `exited_at` | timestamptz | nullable; NULL = attiva |
-| `moved_by_id` | UUID FK → `users.id` | nullable |
-| `reason` | varchar(200) | nullable |
+| Campo            | Tipo                         | Note                    |
+| ---------------- | ---------------------------- | ----------------------- |
+| `id`             | UUID PK                      |                         |
+| `created_at`     | timestamptz                  |                         |
+| `box_id`         | UUID FK → `shelter_boxes.id` | not null, index         |
+| `shelter_pet_id` | UUID FK → `shelter_pets.id`  | not null, index         |
+| `entered_at`     | timestamptz                  | default now             |
+| `exited_at`      | timestamptz                  | nullable; NULL = attiva |
+| `moved_by_id`    | UUID FK → `users.id`         | nullable                |
+| `reason`         | varchar(200)                 | nullable                |
 
 **Vincoli DB critici**:
 
@@ -619,8 +712,17 @@ type ShelterBoxOccupancy {
     reason: String
 }
 
-type ShelterBoxOccupancyResult { success: Boolean! error: Error occupancy: ShelterBoxOccupancy }
-type PaginatedBoxOccupancies { success: Boolean error: Error items: [ShelterBoxOccupancy]! pagination: Pagination! }
+type ShelterBoxOccupancyResult {
+    success: Boolean!
+    error: Error
+    occupancy: ShelterBoxOccupancy
+}
+type PaginatedBoxOccupancies {
+    success: Boolean
+    error: Error
+    items: [ShelterBoxOccupancy]!
+    pagination: Pagination!
+}
 ```
 
 ### 2.5 ShelterMapElement (opzionale)
@@ -629,14 +731,14 @@ Elementi decorativi non interattivi per una planimetria "vera": muri, porte, arr
 
 **Colonne**:
 
-| Campo | Tipo | Note |
-|---|---|---|
-| `id` | UUID PK | |
-| `map_id` | UUID FK → `shelter_maps.id` | ON DELETE CASCADE |
-| `element_type` | enum | `WALL` \| `DOOR` \| `GATE` \| `WATER_POINT` \| `FEEDING_POINT` \| `BENCH` \| `TREE` \| `OTHER` |
-| `x`, `y`, `width`, `height`, `rotation` | numeric | |
-| `color` | varchar(20) | |
-| `label` | varchar(120) | nullable |
+| Campo                                   | Tipo                        | Note                                                                                           |
+| --------------------------------------- | --------------------------- | ---------------------------------------------------------------------------------------------- |
+| `id`                                    | UUID PK                     |                                                                                                |
+| `map_id`                                | UUID FK → `shelter_maps.id` | ON DELETE CASCADE                                                                              |
+| `element_type`                          | enum                        | `WALL` \| `DOOR` \| `GATE` \| `WATER_POINT` \| `FEEDING_POINT` \| `BENCH` \| `TREE` \| `OTHER` |
+| `x`, `y`, `width`, `height`, `rotation` | numeric                     |                                                                                                |
+| `color`                                 | varchar(20)                 |                                                                                                |
+| `label`                                 | varchar(120)                | nullable                                                                                       |
 
 ---
 
@@ -662,12 +764,26 @@ extend type Mutation {
     deleteShelterBox(id: ID!): DeleteResult!
 
     # Batch atomico — usato dall'editor visuale
-    saveShelterMapLayout(map_id: ID!, data: ShelterMapLayoutInput!): ShelterMapResult!
+    saveShelterMapLayout(
+        map_id: ID!
+        data: ShelterMapLayoutInput!
+    ): ShelterMapResult!
 
     # Occupancy (uso operativo)
-    assignPetToBox(box_id: ID!, shelter_pet_id: ID!, reason: String): ShelterBoxOccupancyResult!
-    releasePetFromBox(occupancy_id: ID!, reason: String): ShelterBoxOccupancyResult!
-    movePetBetweenBoxes(shelter_pet_id: ID!, to_box_id: ID!, reason: String): ShelterBoxOccupancyResult!
+    assignPetToBox(
+        box_id: ID!
+        shelter_pet_id: ID!
+        reason: String
+    ): ShelterBoxOccupancyResult!
+    releasePetFromBox(
+        occupancy_id: ID!
+        reason: String
+    ): ShelterBoxOccupancyResult!
+    movePetBetweenBoxes(
+        shelter_pet_id: ID!
+        to_box_id: ID!
+        reason: String
+    ): ShelterBoxOccupancyResult!
 
     # Manutenzione
     markBoxCleaned(box_id: ID!): ShelterBoxResult!
@@ -684,10 +800,13 @@ input ShelterMapLayoutInput {
 }
 
 input ShelterAreaUpsert {
-    id: ID                # null = create
+    id: ID # null = create
     name: String!
     area_type: AreaType!
-    x: Float! y: Float! width: Float! height: Float!
+    x: Float!
+    y: Float!
+    width: Float!
+    height: Float!
     color: String
 }
 
@@ -695,7 +814,10 @@ input ShelterBoxUpsert {
     id: ID
     area_id: ID
     label: String!
-    x: Float! y: Float! width: Float! height: Float!
+    x: Float!
+    y: Float!
+    width: Float!
+    height: Float!
     rotation: Float = 0
     capacity: Int = 1
 }
@@ -703,7 +825,10 @@ input ShelterBoxUpsert {
 input ShelterMapElementUpsert {
     id: ID
     element_type: MapElementType!
-    x: Float! y: Float! width: Float! height: Float!
+    x: Float!
+    y: Float!
+    width: Float!
+    height: Float!
     rotation: Float = 0
     color: String
     label: String
@@ -725,7 +850,9 @@ extend type Query {
     getShelterMap(id: ID!): ShelterMapResult!
     listShelterBoxes(commonSearch: CommonSearch = {}): PaginatedShelterBoxes!
     getShelterBox(id: ID!): ShelterBoxResult!
-    listShelterBoxOccupancies(commonSearch: CommonSearch = {}): PaginatedBoxOccupancies!
+    listShelterBoxOccupancies(
+        commonSearch: CommonSearch = {}
+    ): PaginatedBoxOccupancies!
     getCurrentBoxForPet(shelter_pet_id: ID!): ShelterBoxResult!
 }
 ```
@@ -872,14 +999,14 @@ Estendere i blocchi `type Query` e `type Mutation` esistenti con i nuovi field (
 
 Creare una migration per fase (workflow documentato in [backend.md §9](backend.md)):
 
-| Ordine | Migration | Contenuto |
-|---|---|---|
-| 1 | `xxxx_shelter_tasks.py` | Tabella `shelter_tasks` + enum + CHECK constraints |
-| 2 | `xxxx_shelter_walks.py` | Tabella `shelter_walks` + enum |
-| 3 | `xxxx_shelter_inventory.py` | `shelter_inventory_items` + `shelter_inventory_movements` + enum |
-| 4 | `xxxx_shelter_maps_boxes.py` | `shelter_maps` + `shelter_areas` + `shelter_boxes` + FK con `ON DELETE CASCADE` |
-| 5 | `xxxx_shelter_box_occupancies.py` | `shelter_box_occupancies` + unique parziale + CHECK |
-| 6 | `xxxx_shelter_map_elements.py` (opz.) | `shelter_map_elements` |
+| Ordine | Migration                             | Contenuto                                                                       |
+| ------ | ------------------------------------- | ------------------------------------------------------------------------------- |
+| 1      | `xxxx_shelter_tasks.py`               | Tabella `shelter_tasks` + enum + CHECK constraints                              |
+| 2      | `xxxx_shelter_walks.py`               | Tabella `shelter_walks` + enum                                                  |
+| 3      | `xxxx_shelter_inventory.py`           | `shelter_inventory_items` + `shelter_inventory_movements` + enum                |
+| 4      | `xxxx_shelter_maps_boxes.py`          | `shelter_maps` + `shelter_areas` + `shelter_boxes` + FK con `ON DELETE CASCADE` |
+| 5      | `xxxx_shelter_box_occupancies.py`     | `shelter_box_occupancies` + unique parziale + CHECK                             |
+| 6      | `xxxx_shelter_map_elements.py` (opz.) | `shelter_map_elements`                                                          |
 
 Comando (dal readme):
 
@@ -896,15 +1023,15 @@ Ricordarsi di ispezionare l'autogenerazione: le enum e i CHECK constraint spesso
 
 Applicare i decoratori esistenti (`@auth_middleware`, `@min_role`) definiti in [api/middlewares.py](api/middlewares.py):
 
-| Operazione | Ruolo minimo |
-|---|---|
-| Query di lettura (`list*`, `get*`) | Membro dello shelter (`STAFF` o superiore) |
-| Task/Walk CRUD, completamento task/walk | `STAFF` |
-| Assegnazione occupancy, spostamento pet | `STAFF` |
-| Movimenti inventario | `STAFF` |
-| Creazione/modifica item inventario | `MANAGER` |
-| Editor mappa (`saveShelterMapLayout`, CRUD `Map`/`Area`/`Box`/`Element`) | `MANAGER` |
-| Delete di `Shelter*` | `OWNER` |
+| Operazione                                                               | Ruolo minimo                               |
+| ------------------------------------------------------------------------ | ------------------------------------------ |
+| Query di lettura (`list*`, `get*`)                                       | Membro dello shelter (`STAFF` o superiore) |
+| Task/Walk CRUD, completamento task/walk                                  | `STAFF`                                    |
+| Assegnazione occupancy, spostamento pet                                  | `STAFF`                                    |
+| Movimenti inventario                                                     | `STAFF`                                    |
+| Creazione/modifica item inventario                                       | `MANAGER`                                  |
+| Editor mappa (`saveShelterMapLayout`, CRUD `Map`/`Area`/`Box`/`Element`) | `MANAGER`                                  |
+| Delete di `Shelter*`                                                     | `OWNER`                                    |
 
 Poiché `@min_role` attuale valuta solo il `UserRole` globale (`ADMIN`/`USER`), va aggiunto un decoratore specifico:
 
@@ -954,16 +1081,19 @@ src/modules/shelters/components/
 Aggiungere in [src/modules/shelters/operations/](../graph-a-pet-app/src/modules/shelters/operations/):
 
 **Fragments**:
+
 - `MinShelterTask.graphql`, `MinShelterWalk.graphql`, `MinInventoryItem.graphql`
 - `FullShelterMap.graphql`, `MinShelterBox.graphql`, `MinShelterArea.graphql`
 
 **Queries**:
+
 - `listShelterTasks.graphql`, `getShelterTask.graphql`
 - `listShelterWalks.graphql`, `listPetsNeedingWalk.graphql`
 - `listShelterInventoryItems.graphql`, `listLowStockItems.graphql`
 - `getShelterMap.graphql`, `listShelterMaps.graphql`
 
 **Mutations**:
+
 - `createShelterTask.graphql`, `completeShelterTask.graphql`
 - `startShelterWalk.graphql`, `completeShelterWalk.graphql`
 - `createInventoryMovement.graphql`
@@ -973,11 +1103,11 @@ Aggiungere in [src/modules/shelters/operations/](../graph-a-pet-app/src/modules/
 
 Aggiungere in [src/modules/shelters/router.tsx](../graph-a-pet-app/src/modules/shelters/router.tsx):
 
-| Path | Componente |
-|---|---|
-| `/shelters/detail/:id/tasks` | `ShelterTasksList` |
-| `/shelters/detail/:id/walks` | `ShelterWalksList` |
-| `/shelters/detail/:id/inventory` | `ShelterInventory` |
+| Path                              | Componente         |
+| --------------------------------- | ------------------ |
+| `/shelters/detail/:id/tasks`      | `ShelterTasksList` |
+| `/shelters/detail/:id/walks`      | `ShelterWalksList` |
+| `/shelters/detail/:id/inventory`  | `ShelterInventory` |
 | `/shelters/detail/:id/map/:mapId` | `ShelterMapEditor` |
 
 ### 7.5 Editor mappa
@@ -997,16 +1127,16 @@ Aggiornare `codegen` con `yarn fetch:graphql && yarn generate` dopo il deploy ba
 
 Ordine consigliato, ogni fase è indipendentemente rilasciabile:
 
-| Fase | Contenuto | Complessità |
-|---|---|---|
-| **1** | `ShelterTask` (CRUD + completamento) | Bassa |
-| **2** | `ShelterWalk` + `listPetsNeedingWalk` | Bassa |
-| **3** | `ShelterMap` + `ShelterBox` + `ShelterBoxOccupancy` (CRUD singoli + assign/release/move) | Media |
-| **4** | `ShelterArea` + `saveShelterMapLayout` (batch) + editor frontend | Alta |
-| **5** | `ShelterInventoryItem` + `ShelterInventoryMovement` + alert soglia | Media |
-| **6** | Ricorrenze `ShelterTask` via APScheduler + notifiche Telegram | Bassa |
-| **7** (opz.) | `ShelterMapElement` (muri, porte, arredi) | Bassa |
-| **8** (opz.) | Dashboard operativa del canile (statistiche: passeggiate/giorno, task overdue, box occupati/liberi, item sotto soglia) | Media |
+| Fase         | Contenuto                                                                                                              | Complessità |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------- | ----------- |
+| **1**        | `ShelterTask` (CRUD + completamento)                                                                                   | Bassa       |
+| **2**        | `ShelterWalk` + `listPetsNeedingWalk`                                                                                  | Bassa       |
+| **3**        | `ShelterMap` + `ShelterBox` + `ShelterBoxOccupancy` (CRUD singoli + assign/release/move)                               | Media       |
+| **4**        | `ShelterArea` + `saveShelterMapLayout` (batch) + editor frontend                                                       | Alta        |
+| **5**        | `ShelterInventoryItem` + `ShelterInventoryMovement` + alert soglia                                                     | Media       |
+| **6**        | Ricorrenze `ShelterTask` via APScheduler + notifiche Telegram                                                          | Bassa       |
+| **7** (opz.) | `ShelterMapElement` (muri, porte, arredi)                                                                              | Bassa       |
+| **8** (opz.) | Dashboard operativa del canile (statistiche: passeggiate/giorno, task overdue, box occupati/liberi, item sotto soglia) | Media       |
 
 ---
 
