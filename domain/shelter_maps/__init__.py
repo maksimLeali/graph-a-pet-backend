@@ -3,6 +3,7 @@ from math import ceil
 import repository.shelter_maps as shelter_maps_data
 import repository.shelter_boxes as shelter_boxes_data
 import repository.shelter_areas as shelter_areas_data
+import repository.shelter_zones as shelter_zones_data
 import repository.shelter_map_elements as shelter_map_elements_data
 import domain.shelters as shelters_domain
 import domain.medias as medias_domain
@@ -14,6 +15,10 @@ from utils.logger import logger, stringify
 # --- field resolvers ---
 def get_shelter(obj, info):
     return shelters_domain.get_shelter(obj["shelter_id"])
+
+
+def get_zones(obj, info):
+    return shelter_zones_data.get_zones_by_map(obj["id"])
 
 
 def get_areas(obj, info):

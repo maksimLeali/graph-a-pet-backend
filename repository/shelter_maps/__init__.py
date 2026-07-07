@@ -6,6 +6,7 @@ from api.errors import BadRequest, NotFoundError
 from repository import db
 from utils.logger import logger, stringify
 from repository.shelter_maps.models import ShelterMap, MapUnit
+from repository.shelter_zones.models import ShelterZone
 from repository.shelter_areas.models import ShelterArea
 from repository.shelter_boxes.models import ShelterBox
 from repository.shelter_map_elements.models import ShelterMapElement
@@ -114,8 +115,9 @@ def delete_shelter_map(id):
         raise e
 
 
-AREA_FIELDS = ["name", "area_type", "x", "y", "width", "height", "color"]
-BOX_FIELDS = ["area_id", "label", "x", "y", "width", "height", "rotation", "capacity"]
+ZONE_FIELDS = ["name", "x", "y", "width", "height", "color"]
+AREA_FIELDS = ["zone_id", "name", "area_type", "x", "y", "width", "height", "color"]
+BOX_FIELDS = ["zone_id", "area_id", "label", "x", "y", "width", "height", "rotation", "capacity"]
 ELEMENT_FIELDS = ["element_type", "x", "y", "width", "height", "rotation", "color", "label"]
 
 
@@ -123,6 +125,26 @@ def save_layout(map_id, data):
     """Upsert atomico di aree e box + delete per id, un solo commit (rollback totale su errore)."""
     logger.repository(f"map_id: {map_id} data: {stringify(data)}")
     try:
+        # --- zone (prima di aree/box: sono il loro FK non-null) ---
+        # id lato client su insert consentito, così aree/box nello stesso batch possono referenziarle
+        for z in (data.get("zones") or []):
+            existing = None
+            if z.get("id"):
+                existing = db.session.query(ShelterZone).filter(ShelterZone.id == z["id"]).first()
+            if existing:
+                for f in ZONE_FIELDS:
+                    if f in z:
+                        setattr(existing, f, z[f])
+            else:
+                db.session.add(ShelterZone(
+                    id=z.get("id") or f"{uuid.uuid4()}",
+                    created_at=datetime.today().strftime(DATE_FMT),
+                    map_id=map_id,
+                    **{f: z.get(f) for f in ZONE_FIELDS},
+                ))
+        # flush così le zone nuove esistono prima degli insert di aree/box (vincolo FK)
+        db.session.flush()
+
         # --- aree ---
         for a in (data.get("areas") or []):
             if a.get("id"):
@@ -154,6 +176,7 @@ def save_layout(map_id, data):
                     id=f"{uuid.uuid4()}",
                     created_at=datetime.today().strftime(DATE_FMT),
                     map_id=map_id,
+                    zone_id=b["zone_id"],
                     area_id=b.get("area_id"),
                     label=b["label"],
                     x=b.get("x"), y=b.get("y"), width=b.get("width"), height=b.get("height"),
@@ -188,6 +211,9 @@ def save_layout(map_id, data):
             db.session.query(ShelterBox).filter(ShelterBox.id == box_id).delete()
         for element_id in (data.get("deleted_element_ids") or []):
             db.session.query(ShelterMapElement).filter(ShelterMapElement.id == element_id).delete()
+        # zone per ultime: il CASCADE rimuove eventuali aree/box residui
+        for zone_id in (data.get("deleted_zone_ids") or []):
+            db.session.query(ShelterZone).filter(ShelterZone.id == zone_id).delete()
 
         db.session.commit()
         return get_shelter_map(map_id)

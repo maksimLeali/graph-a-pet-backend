@@ -117,6 +117,10 @@ type Query {
     getShelterArea(id: ID!): ShelterAreaResult!
     listShelterAreas(commonSearch: CommonSearch = {}): PaginatedShelterAreas!
 
+    # ShelterZone
+    getShelterZone(id: ID!): ShelterZoneResult!
+    listShelterZones(commonSearch: CommonSearch = {}): PaginatedShelterZones!
+
     # ShelterMapElement
     getShelterMapElement(id: ID!): ShelterMapElementResult!
     listShelterMapElements(commonSearch: CommonSearch = {}): PaginatedMapElements!
@@ -250,6 +254,12 @@ type Mutation {
     createShelterArea(data: ShelterAreaCreate!): ShelterAreaResult!
     updateShelterArea(id: ID!, data: ShelterAreaUpdate!): ShelterAreaResult!
     deleteShelterArea(id: ID!): DeleteResult!
+
+    # ShelterZone
+    createShelterZone(data: ShelterZoneCreate!): ShelterZoneResult!
+    updateShelterZone(id: ID!, data: ShelterZoneUpdate!): ShelterZoneResult!
+    deleteShelterZone(id: ID!): DeleteResult!
+
     saveShelterMapLayout(map_id: ID!, data: ShelterMapLayoutInput!): ShelterMapResult!
 
     # ShelterMapElement
@@ -1406,6 +1416,7 @@ type ShelterMap {
     height: Float!
     unit: MapUnit!
     background_media: Media
+    zones: [ShelterZone!]!
     areas: [ShelterArea!]!
     boxes: [ShelterBox!]!
     elements: [ShelterMapElement!]!
@@ -1445,6 +1456,8 @@ type ShelterBox {
     id: ID!
     created_at: String!
     map_id: ID!
+    zone_id: ID!
+    zone: ShelterZone
     area: ShelterArea
     label: String!
     x: Float!
@@ -1476,6 +1489,7 @@ type PaginatedShelterBoxes {
 
 input ShelterBoxCreate {
     map_id: ID!
+    zone_id: ID!
     area_id: ID
     label: String!
     x: Float!
@@ -1488,6 +1502,7 @@ input ShelterBoxCreate {
 }
 
 input ShelterBoxUpdate {
+    zone_id: ID
     area_id: ID
     label: String
     x: Float
@@ -1533,6 +1548,8 @@ type ShelterArea {
     id: ID!
     created_at: String!
     map_id: ID!
+    zone_id: ID!
+    zone: ShelterZone
     name: String!
     area_type: AreaType!
     x: Float!
@@ -1558,6 +1575,7 @@ type PaginatedShelterAreas {
 
 input ShelterAreaCreate {
     map_id: ID!
+    zone_id: ID!
     name: String!
     area_type: AreaType!
     x: Float!
@@ -1568,6 +1586,7 @@ input ShelterAreaCreate {
 }
 
 input ShelterAreaUpdate {
+    zone_id: ID
     name: String
     area_type: AreaType
     x: Float
@@ -1579,16 +1598,29 @@ input ShelterAreaUpdate {
 
 # saveShelterMapLayout — batch atomico dell'editor
 input ShelterMapLayoutInput {
+    zones: [ShelterZoneUpsert!]
     areas: [ShelterAreaUpsert!]!
     boxes: [ShelterBoxUpsert!]!
     elements: [ShelterMapElementUpsert!]
+    deleted_zone_ids: [ID!]
     deleted_area_ids: [ID!]
     deleted_box_ids: [ID!]
     deleted_element_ids: [ID!]
 }
 
+input ShelterZoneUpsert {
+    id: ID
+    name: String!
+    x: Float!
+    y: Float!
+    width: Float!
+    height: Float!
+    color: String
+}
+
 input ShelterAreaUpsert {
     id: ID
+    zone_id: ID!
     name: String!
     area_type: AreaType!
     x: Float!
@@ -1600,6 +1632,7 @@ input ShelterAreaUpsert {
 
 input ShelterBoxUpsert {
     id: ID
+    zone_id: ID!
     area_id: ID
     label: String!
     x: Float!
@@ -1608,6 +1641,55 @@ input ShelterBoxUpsert {
     height: Float!
     rotation: Float = 0
     capacity: Int = 1
+}
+
+# ShelterZone
+############################
+
+type ShelterZone {
+    id: ID!
+    created_at: String!
+    map_id: ID!
+    name: String!
+    x: Float!
+    y: Float!
+    width: Float!
+    height: Float!
+    color: String
+    areas: [ShelterArea!]!
+    boxes: [ShelterBox!]!
+}
+
+type ShelterZoneResult {
+    success: Boolean!
+    error: Error
+    zone: ShelterZone
+}
+
+type PaginatedShelterZones {
+    success: Boolean
+    error: Error
+    items: [ShelterZone]!
+    pagination: Pagination!
+}
+
+input ShelterZoneCreate {
+    map_id: ID!
+    name: String!
+    x: Float!
+    y: Float!
+    width: Float!
+    height: Float!
+    color: String
+}
+
+input ShelterZoneUpdate {
+    name: String
+    x: Float
+    y: Float
+    width: Float
+    height: Float
+    color: String
 }
 
 # ShelterMapElement

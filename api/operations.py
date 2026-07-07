@@ -61,6 +61,9 @@ from api.shelter_occupancies.resolvers import shelter_box_occupancy
 from api.shelter_areas.queries import *
 from api.shelter_areas.mutations import *
 from api.shelter_areas.resolvers import shelter_area
+from api.shelter_zones.queries import *
+from api.shelter_zones.mutations import *
+from api.shelter_zones.resolvers import shelter_zone
 from api.shelter_inventory.queries import *
 from api.shelter_inventory.mutations import *
 from api.shelter_inventory.resolvers import shelter_inventory_item, shelter_inventory_movement
@@ -142,6 +145,8 @@ query.set_field("listShelterBoxOccupancies", list_shelter_box_occupancies_resolv
 query.set_field("getCurrentBoxForPet", get_current_box_for_pet_resolver)
 query.set_field("getShelterArea", get_shelter_area_resolver)
 query.set_field("listShelterAreas", list_shelter_areas_resolver)
+query.set_field("getShelterZone", get_shelter_zone_resolver)
+query.set_field("listShelterZones", list_shelter_zones_resolver)
 query.set_field("getShelterInventoryItem", get_shelter_inventory_item_resolver)
 query.set_field("listShelterInventoryItems", list_shelter_inventory_items_resolver)
 query.set_field("listShelterInventoryMovements", list_shelter_inventory_movements_resolver)
@@ -227,6 +232,9 @@ mutation.set_field("setBoxOutOfService", set_box_out_of_service_resolver)
 mutation.set_field("createShelterArea", create_shelter_area_resolver)
 mutation.set_field("updateShelterArea", update_shelter_area_resolver)
 mutation.set_field("deleteShelterArea", delete_shelter_area_resolver)
+mutation.set_field("createShelterZone", create_shelter_zone_resolver)
+mutation.set_field("updateShelterZone", update_shelter_zone_resolver)
+mutation.set_field("deleteShelterZone", delete_shelter_zone_resolver)
 mutation.set_field("saveShelterMapLayout", save_shelter_map_layout_resolver)
 mutation.set_field("createShelterInventoryItem", create_shelter_inventory_item_resolver)
 mutation.set_field("updateShelterInventoryItem", update_shelter_inventory_item_resolver)
@@ -236,4 +244,4 @@ mutation.set_field("createShelterMapElement", create_shelter_map_element_resolve
 mutation.set_field("updateShelterMapElement", update_shelter_map_element_resolver)
 mutation.set_field("deleteShelterMapElement", delete_shelter_map_element_resolver)
 
-object_types = [query, mutation, user, dashboard, pet, ownership, health_card, treatment, report,walk, cure, shelter, shelter_role, shelter_pet, shelter_task, shelter_walk, shelter_map, shelter_box, shelter_box_occupancy, shelter_area, shelter_inventory_item, shelter_inventory_movement, walk_rating ]
+object_types = [query, mutation, user, dashboard, pet, ownership, health_card, treatment, report,walk, cure, shelter, shelter_role, shelter_pet, shelter_task, shelter_walk, shelter_map, shelter_box, shelter_box_occupancy, shelter_area, shelter_zone, shelter_inventory_item, shelter_inventory_movement, walk_rating ]

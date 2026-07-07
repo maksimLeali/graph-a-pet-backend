@@ -503,6 +503,7 @@
    "children": [
     "shelter_boxes",
     "shelter_areas",
+    "shelter_zones",
     "shelter_map_elements"
    ],
    "inherit_delete": {
@@ -514,6 +515,7 @@
   "shelter_boxes": {
    "columns": {
     "map_id": "string",
+    "zone_id": "string",
     "area_id": "string",
     "label": "string",
     "x": "float",
@@ -570,6 +572,7 @@
    },
    "columns": {
     "map_id": "string",
+    "zone_id": "string",
     "name": "string",
     "area_type": "enum(AreaType)",
     "x": "float",
@@ -584,6 +587,27 @@
    "alias": "sha",
    "other_table_ref": "shelter_area_id",
    "children": [
+    "shelter_boxes"
+   ],
+   "inherit_delete": {}
+  },
+  "shelter_zones": {
+   "columns": {
+    "map_id": "string",
+    "name": "string",
+    "x": "float",
+    "y": "float",
+    "width": "float",
+    "height": "float",
+    "color": "string"
+   },
+   "search_columns": [
+    "name"
+   ],
+   "alias": "shz",
+   "other_table_ref": "shelter_zone_id",
+   "children": [
+    "shelter_areas",
     "shelter_boxes"
    ],
    "inherit_delete": {}

@@ -28,6 +28,7 @@ def create_shelter_box(data):
             id=f"{uuid.uuid4()}",
             created_at=today.strftime(DATE_FMT),
             map_id=data["map_id"],
+            zone_id=data["zone_id"],
             area_id=data.get("area_id"),
             label=data["label"],
             x=data.get("x"),
@@ -92,6 +93,16 @@ def get_boxes_by_area(area_id):
     logger.repository(f"area_id: {area_id}")
     try:
         models = db.session.query(ShelterBox).filter(ShelterBox.area_id == area_id).all()
+        return [m.to_dict() for m in models]
+    except Exception as e:
+        logger.error(e)
+        raise e
+
+
+def get_boxes_by_zone(zone_id):
+    logger.repository(f"zone_id: {zone_id}")
+    try:
+        models = db.session.query(ShelterBox).filter(ShelterBox.zone_id == zone_id).all()
         return [m.to_dict() for m in models]
     except Exception as e:
         logger.error(e)

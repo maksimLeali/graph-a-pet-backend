@@ -10,6 +10,7 @@ class ShelterBox(Base):
     )
 
     map_id = db.Column(db.String, db.ForeignKey('shelter_maps.id', ondelete='CASCADE'), nullable=False, index=True)
+    zone_id = db.Column(db.String, db.ForeignKey('shelter_zones.id', ondelete='CASCADE'), nullable=False, index=True)
     area_id = db.Column(db.String, db.ForeignKey('shelter_areas.id', ondelete='SET NULL'), nullable=True)
     label = db.Column(db.String(60), nullable=False)
     x = db.Column(db.Numeric(10, 2))
@@ -32,6 +33,7 @@ class ShelterBox(Base):
             "created_at": dt(self.created_at),
             "updated_at": dt(self.updated_at),
             "map_id": self.map_id,
+            "zone_id": self.zone_id,
             "area_id": self.area_id,
             "label": self.label,
             "x": fl(self.x),

@@ -3,7 +3,9 @@ from math import ceil
 import repository.shelter_boxes as shelter_boxes_data
 import repository.shelter_maps as shelter_maps_data
 import repository.shelter_areas as shelter_areas_data
+import repository.shelter_zones as shelter_zones_data
 import repository.shelter_box_occupancies as occupancies_data
+import domain.shelter_zones as shelter_zones_domain
 import domain.shelter_pets as shelter_pets_domain
 import domain.damnationes_memoriae as damnatio_domain
 from api.errors import NotFoundError
@@ -15,6 +17,12 @@ def get_area(obj, info):
     if not obj.get("area_id"):
         return None
     return shelter_areas_data.get_shelter_area(obj["area_id"])
+
+
+def get_zone(obj, info):
+    if not obj.get("zone_id"):
+        return None
+    return shelter_zones_data.get_shelter_zone(obj["zone_id"])
 
 
 def get_status(obj, info):
@@ -64,6 +72,7 @@ def create_shelter_box(data):
         shelter_map = shelter_maps_data.get_shelter_map(data.get("map_id"))
         if shelter_map is None:
             raise NotFoundError(f'no shelter_map found with id {data.get("map_id")}')
+        shelter_zones_domain.assert_zone_on_map(data.get("zone_id"), data.get("map_id"))
         return shelter_boxes_data.create_shelter_box(data)
     except Exception as e:
         logger.error(e)
