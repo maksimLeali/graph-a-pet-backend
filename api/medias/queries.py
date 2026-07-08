@@ -7,7 +7,7 @@ from api.errors import format_error, error_pagination
 
 
 @convert_kwargs_to_snake_case
-@min_role(RoleLevel.ADMIN.name)
+# @min_role(RoleLevel.ADMIN.name)
 def list_medias_resolver(obj, info, common_search):
     try:
         common_search= format_common_search(common_search)
