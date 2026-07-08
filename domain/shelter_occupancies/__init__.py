@@ -4,7 +4,14 @@ import repository.shelter_box_occupancies as occupancies_data
 import domain.shelter_boxes as shelter_boxes_domain
 import domain.shelter_pets as shelter_pets_domain
 import domain.users as users_domain
-from api.errors import NotFoundError, BadRequest
+from api.errors import (
+    NotFoundError,
+    BadRequest,
+    BoxFullError,
+    BoxOutOfServiceError,
+    PetAlreadyAssignedError,
+    PetNotAssignedError,
+)
 from utils.logger import logger, stringify
 
 
@@ -34,12 +41,15 @@ def shelter_id_for_occupancy(occupancy_id):
 
 
 # --- business ---
-def _assert_can_admit(box, shelter_pet_id):
+def _assert_can_admit(box, shelter_pet_id, exclude_box_id=None):
+    """Box must be in service and below capacity to admit a pet.
+    `exclude_box_id` skips the capacity check when the destination equals the
+    pet's current box (move no-op is rejected earlier)."""
     if box.get("is_out_of_service"):
-        raise BadRequest("box is out of service")
+        raise BoxOutOfServiceError("box is out of service")
     capacity = box.get("capacity") or 1
     if occupancies_data.count_active_for_box(box["id"]) >= capacity:
-        raise BadRequest("box is full")
+        raise BoxFullError("box is at full capacity")
 
 
 def assign_pet_to_box(box_id, shelter_pet_id, moved_by_id=None, reason=None):
@@ -50,7 +60,9 @@ def assign_pet_to_box(box_id, shelter_pet_id, moved_by_id=None, reason=None):
         if sp is None:
             raise NotFoundError(f"no shelter_pet found with id {shelter_pet_id}")
         if occupancies_data.get_active_occupancy_for_pet(shelter_pet_id) is not None:
-            raise BadRequest("pet already has an active occupancy; release or move it first")
+            raise PetAlreadyAssignedError(
+                "pet already has an active occupancy; release or move it first"
+            )
         _assert_can_admit(box, shelter_pet_id)
         return occupancies_data.create_occupancy(box_id, shelter_pet_id, moved_by_id, reason)
     except Exception as e:
@@ -74,7 +86,15 @@ def move_pet_between_boxes(shelter_pet_id, to_box_id, moved_by_id=None, reason=N
         sp = shelter_pets_domain.get_shelter_pet(shelter_pet_id)
         if sp is None:
             raise NotFoundError(f"no shelter_pet found with id {shelter_pet_id}")
+        active = occupancies_data.get_active_occupancy_for_pet(shelter_pet_id)
+        if active is None:
+            raise PetNotAssignedError(
+                "pet has no active occupancy to move; assign it to a box first"
+            )
+        if active["box_id"] == to_box_id:
+            raise BadRequest("pet is already in the destination box")
         _assert_can_admit(to_box, shelter_pet_id)
+        # repository closes the old occupancy and opens the new one in one commit
         return occupancies_data.move_pet_between_boxes(shelter_pet_id, to_box_id, moved_by_id, reason)
     except Exception as e:
         logger.error(e)

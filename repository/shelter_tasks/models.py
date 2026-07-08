@@ -1,5 +1,5 @@
 from enum import Enum
-from repository import db, Base
+from repository import db, Base, schema
 
 
 class ShelterTaskType(Enum):
@@ -16,10 +16,20 @@ class TaskStatus(Enum):
     IN_PROGRESS = "IN_PROGRESS"
     COMPLETED = "COMPLETED"
     SKIPPED = "SKIPPED"
+    CANCELLED = "CANCELLED"
+    OVERDUE = "OVERDUE"
 
 
 class ShelterTask(Base):
     __tablename__ = 'shelter_tasks'
+    __table_args__ = (
+        # One materialized instance per template per scheduled day. Rows with a
+        # NULL template_id (one-off tasks) are exempt: Postgres treats NULLs as
+        # distinct, so this only constrains recurring instances.
+        db.UniqueConstraint('template_id', 'scheduled_date',
+                            name='ux_shelter_task_template_scheduled_date'),
+        {'schema': schema},
+    )
 
     shelter_id = db.Column(db.String, db.ForeignKey('shelters.id'), nullable=False, index=True)
     shelter_pet_id = db.Column(db.String, db.ForeignKey('shelter_pets.id'), nullable=True)
@@ -30,8 +40,12 @@ class ShelterTask(Base):
     status = db.Column(db.Enum(TaskStatus), default=TaskStatus.PENDING.name)
     assigned_to_id = db.Column(db.String, db.ForeignKey('users.id'), nullable=True)
     scheduled_at = db.Column(db.DateTime, nullable=True)
+    # calendar day the instance is scheduled for; anchors cron idempotency
+    scheduled_date = db.Column(db.Date, nullable=True, index=True)
     completed_at = db.Column(db.DateTime, nullable=True)
     completed_by_id = db.Column(db.String, db.ForeignKey('users.id'), nullable=True)
+    skipped_at = db.Column(db.DateTime, nullable=True)
+    skipped_by_id = db.Column(db.String, db.ForeignKey('users.id'), nullable=True)
     is_recurring = db.Column(db.Boolean, default=False)
     # --- ricorrenza (template con is_recurring=True) ---
     recurrence_freq = db.Column(db.String(10))          # DAILY | WEEKLY | MONTHLY
@@ -59,8 +73,11 @@ class ShelterTask(Base):
             "status": self.status.name if self.status else TaskStatus.PENDING.name,
             "assigned_to_id": self.assigned_to_id,
             "scheduled_at": dt(self.scheduled_at),
+            "scheduled_date": self.scheduled_date.strftime('%Y-%m-%d') if self.scheduled_date else None,
             "completed_at": dt(self.completed_at),
             "completed_by_id": self.completed_by_id,
+            "skipped_at": dt(self.skipped_at),
+            "skipped_by_id": self.skipped_by_id,
             "is_recurring": bool(self.is_recurring),
             "recurrence_freq": self.recurrence_freq,
             "recurrence_interval": self.recurrence_interval,

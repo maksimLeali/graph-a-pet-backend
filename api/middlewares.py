@@ -37,16 +37,13 @@ def auth_middleware(f):
         return f(obj, info, **args)
     return function_wrapper
 
-SHELTER_ROLE_LEVEL = {"OWNER": 4, "MANAGER": 3, "STAFF": 2, "VOLUNTEER": 1}
+# single source of truth lives in api.permissions
+from api.permissions import ROLE_LEVEL as SHELTER_ROLE_LEVEL, user_shelter_level
 
 
 def get_user_shelter_level(user_id, shelter_id):
     """Livello massimo (int) dello user su uno shelter; 0 se nessun ruolo."""
-    # import ritardato: evita import circolare middlewares -> domain -> api
-    import domain.shelter_roles as shelter_roles_domain
-    roles = shelter_roles_domain.get_user_roles_on_shelter(user_id, shelter_id) or []
-    levels = [SHELTER_ROLE_LEVEL.get((r.get("role") or "").upper(), 0) for r in roles]
-    return max(levels) if levels else 0
+    return user_shelter_level(user_id, shelter_id)
 
 
 def assert_shelter_role(token, shelter_id, role: str):

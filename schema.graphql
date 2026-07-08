@@ -272,6 +272,7 @@ type Mutation {
     # ShelterInventory
     createShelterInventoryItem(data: ShelterInventoryItemCreate!): ShelterInventoryItemResult!
     updateShelterInventoryItem(id: ID!, data: ShelterInventoryItemUpdate!): ShelterInventoryItemResult!
+    archiveShelterInventoryItem(id: ID!): ShelterInventoryItemResult!
     deleteShelterInventoryItem(id: ID!): DeleteResult!
     createShelterInventoryMovement(data: ShelterInventoryMovementCreate!): ShelterInventoryMovementResult!
 }
@@ -283,6 +284,7 @@ type Mutation {
 
 type Error {
     code: String!
+    errorCode: String
     message: String!
     extra: String
 }
@@ -1264,6 +1266,8 @@ type ShelterPet {
     created_at: String!
     shelter: Shelter!
     pet: Pet!
+    is_active: Boolean!
+    left_at: String
 }
 
 type ShelterPetResult {
@@ -1324,7 +1328,7 @@ input ChangeShelterInput {
 ############################
 
 enum ShelterTaskType { CLEANING DEEP_CLEANING FEEDING MEDICATION GROOMING OTHER }
-enum TaskStatus { PENDING IN_PROGRESS COMPLETED SKIPPED }
+enum TaskStatus { PENDING IN_PROGRESS COMPLETED SKIPPED CANCELLED OVERDUE }
 enum RecurrenceFreq { DAILY WEEKLY MONTHLY }
 enum Weekday { MON TUE WED THU FRI SAT SUN }
 
@@ -1357,8 +1361,11 @@ type ShelterTask {
     status: TaskStatus!
     assigned_to: User
     scheduled_at: String
+    scheduled_date: String
     completed_at: String
     completed_by: User
+    skipped_at: String
+    skipped_by: User
     is_recurring: Boolean!
     recurrence: Recurrence
     notes: String
@@ -1447,7 +1454,7 @@ input ShelterWalkUpdate {
 ############################
 
 enum MapUnit { METERS PIXELS }
-enum BoxStatus { FREE OCCUPIED FULL OUT_OF_SERVICE }
+enum BoxStatus { AVAILABLE OCCUPIED FULL OUT_OF_SERVICE NEEDS_CLEANING }
 
 type ShelterMap {
     id: ID!
@@ -1817,6 +1824,9 @@ type ShelterInventoryItem {
     minimum_threshold: Float
     current_quantity: Float!
     is_below_threshold: Boolean!
+    is_active: Boolean!
+    archived_at: String
+    archived_by: User
     notes: String
     movements(commonSearch: CommonSearch = {}): PaginatedInventoryMovements
 }
@@ -1880,6 +1890,8 @@ input ShelterInventoryMovementCreate {
     movement_type: MovementType!
     quantity: Float!
     notes: String
+    # MANAGER+ only: permit a movement that drives stock below zero
+    allow_negative: Boolean
 }
 
 # Shelter dashboard operativa
@@ -1889,21 +1901,27 @@ type ShelterOperationalDashboard {
     shelter_id: ID!
     walks_completed_today: Int!
     walks_planned_today: Int!
+    walks_in_progress: Int!
     pets_needing_walk: Int!
     tasks_pending: Int!
     tasks_overdue: Int!
     tasks_completed_today: Int!
+    tasks_skipped_today: Int!
     tasks_total: Int!
     tasks_recurring: Int!
     tasks_due_this_week: Int!
     boxes_total: Int!
     boxes_free: Int!
+    boxes_available: Int!
     boxes_occupied: Int!
     boxes_full: Int!
     boxes_out_of_service: Int!
+    boxes_needing_cleaning: Int!
+    occupancy_rate: Float!
     pets_total: Int!
     pets_without_box: Int!
     low_stock_count: Int!
+    low_stock_items: [ShelterInventoryItem!]!
 }
 
 type ShelterOperationalDashboardResult {

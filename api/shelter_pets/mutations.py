@@ -1,6 +1,6 @@
 from ariadne import convert_kwargs_to_snake_case
 from domain.shelter_pets import create_shelter_pet, create_shelter_pets, create_shelter_pets_with_data, change_shelter, delete_shelter_pet
-from api.middlewares import auth_middleware, min_role
+from api.middlewares import auth_middleware, min_role, assert_shelter_role
 from api.errors import format_error
 from repository.users.models import UserRole
 from utils.logger import logger, stringify
@@ -69,7 +69,12 @@ def create_shelter_pets_with_data_resolver(obj, info, data):
 def change_shelter_resolver(obj, info, data):
     logger.api(f"data: {stringify(data)}")
     try:
-        shelter_pet = change_shelter(data)
+        token = info.context.headers['authorization']
+        # STAFF+ required on BOTH source and destination shelters
+        assert_shelter_role(token, data["shelter_id_from"], "STAFF")
+        assert_shelter_role(token, data["shelter_id_to"], "STAFF")
+        me = get_request_user(token)
+        shelter_pet = change_shelter(data, me["id"])
         payload = {
             "success": True,
             "shelter_pet": shelter_pet,

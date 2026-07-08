@@ -57,13 +57,34 @@ def delete_shelter_inventory_item_resolver(obj, info, id):
 
 @convert_kwargs_to_snake_case
 @auth_middleware
+def archive_shelter_inventory_item_resolver(obj, info, id):
+    logger.api(f"id: {id} archive")
+    try:
+        token = info.context.headers['authorization']
+        assert_shelter_role(token, inventory_domain.shelter_id_for_item(id), "MANAGER")
+        me = get_request_user(token)
+        item = inventory_domain.archive_shelter_inventory_item(id, me["id"])
+        return {"success": True, "item": item}
+    except Exception as e:
+        return _err(e, info)
+
+
+@convert_kwargs_to_snake_case
+@auth_middleware
 def create_shelter_inventory_movement_resolver(obj, info, data):
     logger.api(f"data: {stringify(data)}")
     try:
         token = info.context.headers['authorization']
-        assert_shelter_role(token, inventory_domain.shelter_id_for_item(data["item_id"]), "STAFF")
+        shelter_id = inventory_domain.shelter_id_for_item(data["item_id"])
+        assert_shelter_role(token, shelter_id, "STAFF")
+        # negative-stock override is a privileged action (MANAGER+)
+        allow_negative = bool(data.pop("allow_negative", False))
+        if allow_negative:
+            assert_shelter_role(token, shelter_id, "MANAGER")
         me = get_request_user(token)
-        movement = inventory_domain.create_shelter_inventory_movement(data, me["id"])
+        movement = inventory_domain.create_shelter_inventory_movement(
+            data, me["id"], allow_negative=allow_negative
+        )
         return {"success": True, "movement": movement}
     except Exception as e:
         return _err(e, info)

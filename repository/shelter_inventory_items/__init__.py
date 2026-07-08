@@ -78,6 +78,31 @@ def get_current_quantity(item_id):
     return float(total or 0)
 
 
+def count_movements(item_id):
+    return db.session.query(ShelterInventoryMovement).filter(
+        ShelterInventoryMovement.item_id == item_id
+    ).count()
+
+
+def archive_shelter_inventory_item(id, user_id):
+    logger.repository(f"id: {id} archive by {user_id}")
+    try:
+        query = db.session.query(ShelterInventoryItem).filter(ShelterInventoryItem.id == id)
+        if not query.first():
+            raise NotFoundError(f"no inventory item found with id: {id}")
+        query.update({
+            "is_active": False,
+            "archived_at": datetime.today(),
+            "archived_by_id": user_id,
+        })
+        db.session.commit()
+        return query.first().to_dict()
+    except Exception as e:
+        db.session.rollback()
+        logger.error(e)
+        raise e
+
+
 def get_shelter_inventory_items(common_search):
     try:
         query = build_query(

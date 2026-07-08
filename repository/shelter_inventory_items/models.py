@@ -19,6 +19,10 @@ class ShelterInventoryItem(Base):
     category = db.Column(db.Enum(InventoryCategory))
     unit = db.Column(db.String(20))
     minimum_threshold = db.Column(db.Numeric(10, 3))
+    # archive flow: items with movement history are archived, never hard-deleted
+    is_active = db.Column(db.Boolean, nullable=False, default=True, server_default='true')
+    archived_at = db.Column(db.DateTime, nullable=True)
+    archived_by_id = db.Column(db.String, db.ForeignKey('users.id'), nullable=True)
     notes = db.Column(db.Text)
 
     def to_dict(self):
@@ -35,5 +39,8 @@ class ShelterInventoryItem(Base):
             "category": self.category.name if self.category else None,
             "unit": self.unit,
             "minimum_threshold": fl(self.minimum_threshold),
+            "is_active": bool(self.is_active) if self.is_active is not None else True,
+            "archived_at": dt(self.archived_at),
+            "archived_by_id": self.archived_by_id,
             "notes": self.notes,
         }

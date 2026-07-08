@@ -63,7 +63,8 @@ def skip_shelter_task_resolver(obj, info, id, reason=None):
         token = info.context.headers['authorization']
         task = shelter_tasks_domain.get_shelter_task(id)
         assert_shelter_role(token, task["shelter_id"], "STAFF")
-        return _ok(shelter_tasks_domain.skip_shelter_task(id, reason))
+        me = get_request_user(token)
+        return _ok(shelter_tasks_domain.skip_shelter_task(id, me["id"], reason))
     except Exception as e:
         return _err(e, info)
 

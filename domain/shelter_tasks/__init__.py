@@ -6,7 +6,7 @@ import domain.shelters as shelters_domain
 import domain.shelter_pets as shelter_pets_domain
 import domain.users as users_domain
 import domain.damnationes_memoriae as damnatio_domain
-from api.errors import NotFoundError
+from api.errors import NotFoundError, BadRequest
 from repository.shelter_tasks.models import TaskStatus
 from domain.shelter_tasks import recurrence as rec
 from utils.logger import logger, stringify
@@ -35,6 +35,12 @@ def get_completed_by(obj, info):
     if not obj.get("completed_by_id"):
         return None
     return users_domain.get_user(obj["completed_by_id"])
+
+
+def get_skipped_by(obj, info):
+    if not obj.get("skipped_by_id"):
+        return None
+    return users_domain.get_user(obj["skipped_by_id"])
 
 
 def get_recurrence(obj, info):
@@ -70,9 +76,18 @@ def update_shelter_task(id, data):
         raise e
 
 
+def _assert_actionable_instance(task):
+    """complete/skip act on task instances, never on recurring templates."""
+    if task is None:
+        raise NotFoundError("no shelter_task found")
+    if task.get("is_recurring"):
+        raise BadRequest("cannot complete/skip a recurring template; act on its instances")
+
+
 def complete_shelter_task(id, user_id, notes=None):
     logger.domain(f"id: {id} complete by {user_id}")
     try:
+        _assert_actionable_instance(shelter_tasks_data.get_shelter_task(id))
         payload = {
             "status": TaskStatus.COMPLETED.name,
             "completed_at": datetime.today().strftime(DATE_FMT),
@@ -86,10 +101,15 @@ def complete_shelter_task(id, user_id, notes=None):
         raise e
 
 
-def skip_shelter_task(id, reason=None):
-    logger.domain(f"id: {id} skip")
+def skip_shelter_task(id, user_id=None, reason=None):
+    logger.domain(f"id: {id} skip by {user_id}")
     try:
-        payload = {"status": TaskStatus.SKIPPED.name}
+        _assert_actionable_instance(shelter_tasks_data.get_shelter_task(id))
+        payload = {
+            "status": TaskStatus.SKIPPED.name,
+            "skipped_at": datetime.today().strftime(DATE_FMT),
+            "skipped_by_id": user_id,
+        }
         if reason is not None:
             payload["notes"] = reason
         return shelter_tasks_data.update_shelter_task(id, payload)
@@ -128,13 +148,14 @@ def materialize_recurring_tasks(target_date=None):
         for tpl in shelter_tasks_data.get_recurring_templates():
             if not rec.occurs_on(tpl, target_date):
                 continue
-            if shelter_tasks_data.has_occurrence_on(tpl["id"], day_start, day_end):
+            # idempotency: one instance per template per scheduled day
+            if shelter_tasks_data.has_instance_on_date(tpl["id"], target_date):
                 continue
             hour, minute = rec.rule_time(tpl)
             scheduled = datetime(
                 target_date.year, target_date.month, target_date.day, hour, minute
             )
-            shelter_tasks_data.create_shelter_task({
+            row = shelter_tasks_data.create_task_instance({
                 "shelter_id": tpl["shelter_id"],
                 "shelter_pet_id": tpl.get("shelter_pet_id"),
                 "shelter_box_id": tpl.get("shelter_box_id"),
@@ -143,11 +164,13 @@ def materialize_recurring_tasks(target_date=None):
                 "status": TaskStatus.PENDING.name,
                 "assigned_to_id": tpl.get("assigned_to_id"),
                 "scheduled_at": scheduled.strftime(DATE_FMT),
+                "scheduled_date": target_date.strftime("%Y-%m-%d"),
                 "is_recurring": False,
                 "template_id": tpl["id"],
                 "notes": tpl.get("notes"),
             })
-            created += 1
+            if row is not None:
+                created += 1
         logger.check(f"materialized {created} recurring shelter tasks")
         return created
     except Exception as e:

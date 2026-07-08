@@ -107,28 +107,80 @@ def update_shelter_pet(id, data):
         raise e
 
 
-def change_shelter(pet_id, shelter_id_from, shelter_id_to):
+def change_shelter(pet_id, shelter_id_from, shelter_id_to, actor_id=None):
+    """Transfer a pet between shelters atomically (single commit):
+      1. locate the active membership in the source shelter
+      2. close any active box occupancy
+      3. cancel planned / in-progress walks
+      4. cancel pending / in-progress tasks tied to the membership
+      5. deactivate the old ShelterPet
+      6. create a new active ShelterPet in the destination
+      7. write an audit log
+    Any failure rolls the whole thing back — no ambiguous pet state.
+    """
+    from repository.shelter_box_occupancies.models import ShelterBoxOccupancy
+    from repository.shelter_walks.models import ShelterWalk, ShelterWalkStatus
+    from repository.shelter_tasks.models import ShelterTask, TaskStatus
     logger.repository(
-        f"pet_id: {pet_id}\n"
-        f"shelter_id_from: {shelter_id_from}\n"
-        f"shelter_id_to: {shelter_id_to}"
+        f"transfer pet_id: {pet_id} from {shelter_id_from} to {shelter_id_to}"
     )
     try:
-        query = db.session.query(ShelterPet).filter(
+        now = datetime.today()
+        now_s = now.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+
+        old_sp = db.session.query(ShelterPet).filter(
             ShelterPet.pet_id == pet_id,
             ShelterPet.shelter_id == shelter_id_from,
-        )
-        shelter_pet_model = query.first()
-        if not shelter_pet_model:
+            ShelterPet.is_active == True,
+        ).first()
+        if not old_sp:
             raise NotFoundError(
-                f"no shelter_pet found for pet {pet_id} in shelter {shelter_id_from}"
+                f"no active shelter_pet found for pet {pet_id} in shelter {shelter_id_from}"
             )
-        query.update({
-            "shelter_id": shelter_id_to,
-            "updated_at": datetime.today().strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
-        })
+
+        # 2. close active box occupancy for this membership
+        db.session.query(ShelterBoxOccupancy).filter(
+            ShelterBoxOccupancy.shelter_pet_id == old_sp.id,
+            ShelterBoxOccupancy.exited_at.is_(None),
+        ).update(
+            {"exited_at": now, "moved_by_id": actor_id, "reason": "shelter transfer"},
+            synchronize_session=False,
+        )
+
+        # 3. cancel planned / in-progress walks
+        db.session.query(ShelterWalk).filter(
+            ShelterWalk.shelter_pet_id == old_sp.id,
+            ShelterWalk.status.in_([ShelterWalkStatus.PLANNED, ShelterWalkStatus.IN_PROGRESS]),
+        ).update({"status": ShelterWalkStatus.CANCELLED}, synchronize_session=False)
+
+        # 4. cancel pending / in-progress tasks
+        db.session.query(ShelterTask).filter(
+            ShelterTask.shelter_pet_id == old_sp.id,
+            ShelterTask.status.in_([TaskStatus.PENDING, TaskStatus.IN_PROGRESS]),
+        ).update({"status": TaskStatus.CANCELLED}, synchronize_session=False)
+
+        # 5. deactivate old membership
+        old_sp.is_active = False
+        old_sp.left_at = now
+        old_sp.updated_at = now_s
+
+        # 6. create new active membership in destination
+        new_sp = ShelterPet(
+            id=f"{uuid.uuid4()}",
+            shelter_id=shelter_id_to,
+            pet_id=pet_id,
+            is_active=True,
+            created_at=now_s,
+        )
+        db.session.add(new_sp)
+
         db.session.commit()
-        return ShelterPet.query.get(shelter_pet_model.id).to_dict()
+        # 7. audit log
+        logger.check(
+            f"AUDIT pet_transfer pet={pet_id} from={shelter_id_from} "
+            f"to={shelter_id_to} actor={actor_id} old_sp={old_sp.id} new_sp={new_sp.id}"
+        )
+        return new_sp.to_dict()
     except Exception as e:
         db.session.rollback()
         logger.error(e)
@@ -136,7 +188,10 @@ def change_shelter(pet_id, shelter_id_from, shelter_id_to):
 
 
 def count_in_shelter(shelter_id):
-    return db.session.query(ShelterPet).filter(ShelterPet.shelter_id == shelter_id).count()
+    return db.session.query(ShelterPet).filter(
+        ShelterPet.shelter_id == shelter_id,
+        ShelterPet.is_active == True,
+    ).count()
 
 
 def get_shelter_pets(common_search):

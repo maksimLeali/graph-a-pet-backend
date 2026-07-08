@@ -3,6 +3,7 @@ from graphql import GraphQLError, GraphQLResolveInfo
 import domain.shelter_tasks as shelter_tasks_domain
 from api.errors import format_error
 from api.middlewares import auth_middleware
+from api.permissions import assert_capability, Cap
 from utils.logger import logger, stringify
 from utils import format_common_search
 
@@ -32,6 +33,7 @@ def get_shelter_task_resolver(obj, info, id):
     logger.api(f"id: {id}")
     try:
         task = shelter_tasks_domain.get_shelter_task(id)
+        assert_capability(info.context.headers['authorization'], task["shelter_id"], Cap.READ)
         payload = {
             "success": True,
             "shelter_task": task,

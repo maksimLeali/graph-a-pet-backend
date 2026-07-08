@@ -81,7 +81,7 @@ def create_shelter_pets_with_data(data):
         raise e
 
 
-def change_shelter(data):
+def change_shelter(data, actor_id=None):
     logger.domain(f"data: {stringify(data)}")
     try:
         pet_id = data.get('pet_id')
@@ -98,7 +98,7 @@ def change_shelter(data):
         shelter_to = shelters_domain.get_shelter(shelter_id_to)
         if shelter_to is None:
             raise NotFoundError(f'no shelter found with id {shelter_id_to}')
-        return shelter_pets_data.change_shelter(pet_id, shelter_id_from, shelter_id_to)
+        return shelter_pets_data.change_shelter(pet_id, shelter_id_from, shelter_id_to, actor_id)
     except Exception as e:
         logger.error(e)
         raise e

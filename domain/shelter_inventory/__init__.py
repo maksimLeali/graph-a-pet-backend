@@ -5,7 +5,12 @@ import repository.shelter_inventory_movements as movements_data
 import domain.shelters as shelters_domain
 import domain.users as users_domain
 import domain.damnationes_memoriae as damnatio_domain
-from api.errors import NotFoundError
+from api.errors import (
+    NotFoundError,
+    BadRequest,
+    InsufficientStockError,
+    CannotDeleteWithHistoryError,
+)
 from utils.logger import logger, stringify
 
 NEGATIVE_TYPES = {"CONSUMPTION", "WASTE"}
@@ -47,6 +52,12 @@ def get_item_movements(obj, info, **kwargs):
         "page_size": len(items),
     }
     return {"success": True, "items": items, "pagination": pagination}
+
+
+def get_archived_by(obj, info):
+    if not obj.get("archived_by_id"):
+        return None
+    return users_domain.get_user(obj["archived_by_id"])
 
 
 # --- field resolvers: movement ---
@@ -97,10 +108,26 @@ def update_shelter_inventory_item(id, data):
 
 
 def delete_shelter_inventory_item(id, user_id):
+    """Hard-delete only when the item has no movement history; otherwise the
+    caller must archive it to preserve the ledger."""
     logger.domain(f"id: {id} remove")
     try:
         item = items_data.get_shelter_inventory_item(id)
+        if items_data.count_movements(id) > 0:
+            raise CannotDeleteWithHistoryError(
+                "inventory item has movement history; archive it instead of deleting"
+            )
         return damnatio_domain.delete_row(id, 'shelter_inventory_items', item, user_id)
+    except Exception as e:
+        logger.error(e)
+        raise e
+
+
+def archive_shelter_inventory_item(id, user_id):
+    logger.domain(f"id: {id} archive by {user_id}")
+    try:
+        items_data.get_shelter_inventory_item(id)  # 404 if missing
+        return items_data.archive_shelter_inventory_item(id, user_id)
     except Exception as e:
         logger.error(e)
         raise e
@@ -143,16 +170,26 @@ def list_low_stock_items(shelter_id):
 
 
 # --- business: movement ---
-def create_shelter_inventory_movement(data, current_user_id):
+def create_shelter_inventory_movement(data, current_user_id, allow_negative=False):
+    """Record a stock movement. Blocks moves that would drive the running total
+    below zero unless `allow_negative` (an authorized override) is set."""
     logger.domain(f"data: {stringify(data)}")
     try:
         item = items_data.get_shelter_inventory_item(data.get("item_id"))
         if item is None:
             raise NotFoundError(f'no inventory item found with id {data.get("item_id")}')
+        signed = apply_sign(data["movement_type"], data["quantity"])
+        if signed < 0 and not allow_negative:
+            current = items_data.get_current_quantity(data["item_id"])
+            if current + signed < 0:
+                raise InsufficientStockError(
+                    f"movement would drop stock below zero "
+                    f"(current {current}, change {signed})"
+                )
         payload = {
             "item_id": data["item_id"],
             "movement_type": data["movement_type"],
-            "quantity": apply_sign(data["movement_type"], data["quantity"]),
+            "quantity": signed,
             "registered_by_id": current_user_id,
             "notes": data.get("notes"),
         }

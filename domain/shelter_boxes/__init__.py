@@ -8,7 +8,7 @@ import repository.shelter_box_occupancies as occupancies_data
 import domain.shelter_zones as shelter_zones_domain
 import domain.shelter_pets as shelter_pets_domain
 import domain.damnationes_memoriae as damnatio_domain
-from api.errors import NotFoundError
+from api.errors import NotFoundError, CannotDeleteWithActiveOccupancyError
 from utils.logger import logger, stringify
 
 
@@ -25,16 +25,33 @@ def get_zone(obj, info):
     return shelter_zones_data.get_shelter_zone(obj["zone_id"])
 
 
+def _needs_cleaning(obj):
+    """Empty box is NEEDS_CLEANING when a pet left after the last cleaning
+    (or it was never cleaned but has been occupied)."""
+    last_cleaned = obj.get("last_cleaned_at")
+    last_exit = None
+    for occ in occupancies_data.get_occupancies_for_box(obj["id"]):
+        ex = occ.get("exited_at")
+        if ex and (last_exit is None or ex > last_exit):
+            last_exit = ex
+    if not last_exit:
+        return False
+    # ISO-8601 strings in the same format compare correctly lexicographically.
+    return last_cleaned is None or last_exit > last_cleaned
+
+
 def get_status(obj, info):
     if obj.get("is_out_of_service"):
         return "OUT_OF_SERVICE"
     count = occupancies_data.count_active_for_box(obj["id"])
     capacity = obj.get("capacity") or 1
-    if count <= 0:
-        return "FREE"
     if count >= capacity:
         return "FULL"
-    return "OCCUPIED"
+    if count > 0:
+        return "OCCUPIED"
+    if _needs_cleaning(obj):
+        return "NEEDS_CLEANING"
+    return "AVAILABLE"
 
 
 def get_current_occupants(obj, info):
@@ -104,6 +121,10 @@ def delete_shelter_box(id, user_id):
     logger.domain(f"id: {id} remove")
     try:
         box = shelter_boxes_data.get_shelter_box(id)
+        if occupancies_data.count_active_for_box(id) > 0:
+            raise CannotDeleteWithActiveOccupancyError(
+                "box has active pet occupancy; release the pets first"
+            )
         return damnatio_domain.delete_row(id, 'shelter_boxes', box, user_id)
     except Exception as e:
         logger.error(e)

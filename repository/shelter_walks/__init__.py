@@ -140,6 +140,15 @@ def count_planned_between(shelter_id, start, end):
     ).count()
 
 
+def count_in_progress(shelter_id):
+    return db.session.query(ShelterWalk).join(
+        ShelterPet, ShelterWalk.shelter_pet_id == ShelterPet.id
+    ).filter(
+        ShelterPet.shelter_id == shelter_id,
+        ShelterWalk.status == ShelterWalkStatus.IN_PROGRESS,
+    ).count()
+
+
 def get_pets_needing_walk(shelter_id, hours=24):
     """Shelter pets senza una ShelterWalk COMPLETED nelle ultime <hours> ore."""
     logger.repository(f"shelter_id: {shelter_id} hours: {hours}")

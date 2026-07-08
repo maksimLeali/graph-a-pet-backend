@@ -20,6 +20,20 @@ def _parse_dt(value):
     return datetime.strptime(value, DATE_FMT)
 
 
+def _parse_date(value):
+    if not value:
+        return None
+    if isinstance(value, datetime):
+        return value.date()
+    from datetime import date as _date
+    if isinstance(value, _date):
+        return value
+    try:
+        return datetime.strptime(value[:10], "%Y-%m-%d").date()
+    except Exception:
+        return None
+
+
 def create_shelter_task(data):
     logger.repository(f"data: {stringify(data)}")
     try:
@@ -35,6 +49,7 @@ def create_shelter_task(data):
             status=data.get("status") or TaskStatus.PENDING.name,
             assigned_to_id=data.get("assigned_to_id"),
             scheduled_at=_parse_dt(data.get("scheduled_at")),
+            scheduled_date=_parse_date(data.get("scheduled_date") or data.get("scheduled_at")),
             is_recurring=data.get("is_recurring") or False,
             recurrence_freq=data.get("recurrence_freq"),
             recurrence_interval=data.get("recurrence_interval"),
@@ -69,6 +84,10 @@ def update_shelter_task(id, data):
             payload["scheduled_at"] = _parse_dt(payload.get("scheduled_at"))
         if "completed_at" in payload:
             payload["completed_at"] = _parse_dt(payload.get("completed_at"))
+        if "skipped_at" in payload:
+            payload["skipped_at"] = _parse_dt(payload.get("skipped_at"))
+        if "scheduled_date" in payload:
+            payload["scheduled_date"] = _parse_date(payload.get("scheduled_date"))
         if "recurrence_start" in payload:
             payload["recurrence_start"] = _parse_dt(payload.get("recurrence_start"))
         query.update(payload)
@@ -147,6 +166,15 @@ def count_completed_between(shelter_id, start, end):
     ).count()
 
 
+def count_skipped_between(shelter_id, start, end):
+    return db.session.query(ShelterTask).filter(
+        ShelterTask.shelter_id == shelter_id,
+        ShelterTask.status == TaskStatus.SKIPPED,
+        ShelterTask.skipped_at >= start,
+        ShelterTask.skipped_at < end,
+    ).count()
+
+
 def count_all(shelter_id):
     """Task operative (esclude i template ricorrenti)."""
     return db.session.query(ShelterTask).filter(
@@ -186,6 +214,27 @@ def has_occurrence_on(template_id, day_start, day_end):
         ShelterTask.scheduled_at >= day_start,
         ShelterTask.scheduled_at < day_end,
     ).count() > 0
+
+
+def has_instance_on_date(template_id, scheduled_date):
+    """Idempotency check for the cron: does an instance already exist for this
+    template on this calendar day (matches the ux_shelter_task unique index)?"""
+    return db.session.query(ShelterTask).filter(
+        ShelterTask.template_id == template_id,
+        ShelterTask.scheduled_date == _parse_date(scheduled_date),
+    ).count() > 0
+
+
+def create_task_instance(data):
+    """Create a materialized instance; returns the row, or None if a concurrent
+    run already inserted it (unique constraint violation is swallowed)."""
+    from sqlalchemy.exc import IntegrityError
+    try:
+        return create_shelter_task(data)
+    except IntegrityError as e:
+        db.session.rollback()
+        logger.repository(f"duplicate task instance skipped: {e}")
+        return None
 
 
 def delete_shelter_task(id):
