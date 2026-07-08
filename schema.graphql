@@ -133,6 +133,7 @@ type Query {
 
     # Shelter dashboard operativa
     getShelterOperationalDashboard(shelter_id: ID!): ShelterOperationalDashboardResult!
+    listShelterKpiHistory(shelter_id: ID!, days: Int = 30): ShelterKpiHistoryResult!
 }
 
 type Mutation {
@@ -219,6 +220,7 @@ type Mutation {
     # ShelterPet
     createShelterPet(data: ShelterPetCreate!): ShelterPetResult!
     createShelterPets(data: ShelterPetsCreate!): ShelterPetsResult!
+    createShelterPetsWithData(data: ShelterPetsWithDataCreate!): ShelterPetsResult!
     changeShelter(data: ChangeShelterInput!): ShelterPetResult!
     deleteShelterPet(id: ID!): DeleteResult!
 
@@ -1293,6 +1295,25 @@ input ShelterPetsCreate {
     pet_ids: [ID!]!
 }
 
+# dati di un nuovo pet creato direttamente nel canile (bulk)
+input ShelterPetData {
+    name: String!
+    birthday: String!
+    gender: Gender
+    breed: String
+    neutered: Boolean
+    chip_code: String
+    weight_kg: Float
+    coat_length: CoatLength
+    temperament: String
+}
+
+# crea più pet nuovi e li associa in blocco a un canile
+input ShelterPetsWithDataCreate {
+    shelter_id: ID!
+    pets: [ShelterPetData!]!
+}
+
 input ChangeShelterInput {
     pet_id: ID!
     shelter_id_from: ID!
@@ -1304,6 +1325,27 @@ input ChangeShelterInput {
 
 enum ShelterTaskType { CLEANING DEEP_CLEANING FEEDING MEDICATION GROOMING OTHER }
 enum TaskStatus { PENDING IN_PROGRESS COMPLETED SKIPPED }
+enum RecurrenceFreq { DAILY WEEKLY MONTHLY }
+enum Weekday { MON TUE WED THU FRI SAT SUN }
+
+# config ricorrenza (es: ogni settimana il sabato; ogni mese il primo mercoledì)
+type Recurrence {
+    freq: RecurrenceFreq!
+    interval: Int!            # ogni N (giorni/settimane/mesi)
+    weekdays: [Weekday!]      # WEEKLY: giorni; MONTHLY: giorno-settimana target
+    week_ordinal: Int         # MONTHLY: 1..5 = primo..quinto, -1 = ultimo
+    time_of_day: String       # "HH:MM"
+    start_at: String          # data inizio (ISO)
+}
+
+input RecurrenceInput {
+    freq: RecurrenceFreq!
+    interval: Int = 1
+    weekdays: [Weekday!]
+    week_ordinal: Int
+    time_of_day: String
+    start_at: String
+}
 
 type ShelterTask {
     id: ID!
@@ -1318,7 +1360,7 @@ type ShelterTask {
     completed_at: String
     completed_by: User
     is_recurring: Boolean!
-    recurrence_rule: String
+    recurrence: Recurrence
     notes: String
 }
 
@@ -1344,7 +1386,7 @@ input ShelterTaskCreate {
     assigned_to_id: ID
     scheduled_at: String
     is_recurring: Boolean = false
-    recurrence_rule: String
+    recurrence: RecurrenceInput
     notes: String
 }
 
@@ -1354,7 +1396,7 @@ input ShelterTaskUpdate {
     assigned_to_id: ID
     scheduled_at: String
     is_recurring: Boolean
-    recurrence_rule: String
+    recurrence: RecurrenceInput
     notes: String
 }
 
@@ -1851,12 +1893,16 @@ type ShelterOperationalDashboard {
     tasks_pending: Int!
     tasks_overdue: Int!
     tasks_completed_today: Int!
+    tasks_total: Int!
+    tasks_recurring: Int!
+    tasks_due_this_week: Int!
     boxes_total: Int!
     boxes_free: Int!
     boxes_occupied: Int!
     boxes_full: Int!
     boxes_out_of_service: Int!
     pets_total: Int!
+    pets_without_box: Int!
     low_stock_count: Int!
 }
 
@@ -1864,5 +1910,35 @@ type ShelterOperationalDashboardResult {
     success: Boolean!
     error: Error
     dashboard: ShelterOperationalDashboard
+}
+
+# snapshot KPI giornaliero (storico)
+type ShelterKpiSnapshot {
+    id: ID!
+    shelter_id: ID!
+    date: String!
+    walks_completed_today: Int!
+    walks_planned_today: Int!
+    pets_needing_walk: Int!
+    tasks_pending: Int!
+    tasks_overdue: Int!
+    tasks_completed_today: Int!
+    tasks_total: Int!
+    tasks_recurring: Int!
+    tasks_due_this_week: Int!
+    boxes_total: Int!
+    boxes_free: Int!
+    boxes_occupied: Int!
+    boxes_full: Int!
+    boxes_out_of_service: Int!
+    pets_total: Int!
+    pets_without_box: Int!
+    low_stock_count: Int!
+}
+
+type ShelterKpiHistoryResult {
+    success: Boolean!
+    error: Error
+    items: [ShelterKpiSnapshot]!
 }
 

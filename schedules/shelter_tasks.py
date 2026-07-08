@@ -6,12 +6,12 @@ from utils.logger import logger
 
 @ee.on('cron:daily')
 def materialize_shelter_tasks():
-    """Ogni notte materializza le occorrenze delle task ricorrenti per domani."""
+    """Ogni giorno materializza le occorrenze delle task ricorrenti per oggi."""
     try:
         created = materialize_recurring_tasks()
         if created:
             send_message_to_admin(
-                f"Materialized {created} recurring shelter task(s) for tomorrow"
+                f"Materialized {created} recurring shelter task(s) for today"
             )
     except Exception as e:
         logger.error(e)

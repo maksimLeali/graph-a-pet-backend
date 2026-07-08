@@ -36,7 +36,12 @@ def create_shelter_task(data):
             assigned_to_id=data.get("assigned_to_id"),
             scheduled_at=_parse_dt(data.get("scheduled_at")),
             is_recurring=data.get("is_recurring") or False,
-            recurrence_rule=data.get("recurrence_rule"),
+            recurrence_freq=data.get("recurrence_freq"),
+            recurrence_interval=data.get("recurrence_interval"),
+            recurrence_weekdays=data.get("recurrence_weekdays"),
+            recurrence_week_ordinal=data.get("recurrence_week_ordinal"),
+            recurrence_time=data.get("recurrence_time"),
+            recurrence_start=_parse_dt(data.get("recurrence_start")),
             template_id=data.get("template_id"),
             notes=data.get("notes"),
         )
@@ -64,6 +69,8 @@ def update_shelter_task(id, data):
             payload["scheduled_at"] = _parse_dt(payload.get("scheduled_at"))
         if "completed_at" in payload:
             payload["completed_at"] = _parse_dt(payload.get("completed_at"))
+        if "recurrence_start" in payload:
+            payload["recurrence_start"] = _parse_dt(payload.get("recurrence_start"))
         query.update(payload)
         db.session.commit()
         return {**old, **query.first().to_dict()}
@@ -137,6 +144,34 @@ def count_completed_between(shelter_id, start, end):
         ShelterTask.status == TaskStatus.COMPLETED,
         ShelterTask.completed_at >= start,
         ShelterTask.completed_at < end,
+    ).count()
+
+
+def count_all(shelter_id):
+    """Task operative (esclude i template ricorrenti)."""
+    return db.session.query(ShelterTask).filter(
+        ShelterTask.shelter_id == shelter_id,
+        ShelterTask.is_recurring == False,
+    ).count()
+
+
+def count_recurring(shelter_id):
+    """Task periodiche (template ricorrenti)."""
+    return db.session.query(ShelterTask).filter(
+        ShelterTask.shelter_id == shelter_id,
+        ShelterTask.is_recurring == True,
+    ).count()
+
+
+def count_due_between(shelter_id, start, end):
+    """Task da fare (pending/in progress) programmate nel range."""
+    return db.session.query(ShelterTask).filter(
+        ShelterTask.shelter_id == shelter_id,
+        ShelterTask.is_recurring == False,
+        ShelterTask.status.in_([TaskStatus.PENDING, TaskStatus.IN_PROGRESS]),
+        ShelterTask.scheduled_at.isnot(None),
+        ShelterTask.scheduled_at >= start,
+        ShelterTask.scheduled_at < end,
     ).count()
 
 

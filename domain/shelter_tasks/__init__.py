@@ -8,6 +8,7 @@ import domain.users as users_domain
 import domain.damnationes_memoriae as damnatio_domain
 from api.errors import NotFoundError
 from repository.shelter_tasks.models import TaskStatus
+from domain.shelter_tasks import recurrence as rec
 from utils.logger import logger, stringify
 
 DATE_FMT = "%Y-%m-%dT%H:%M:%S.%fZ"
@@ -36,6 +37,10 @@ def get_completed_by(obj, info):
     return users_domain.get_user(obj["completed_by_id"])
 
 
+def get_recurrence(obj, info):
+    return rec.build(obj)
+
+
 # --- business ---
 def create_shelter_task(data):
     logger.domain(f"data: {stringify(data)}")
@@ -47,6 +52,7 @@ def create_shelter_task(data):
             pet = shelter_pets_domain.get_shelter_pet(data.get("shelter_pet_id"))
             if pet is None:
                 raise NotFoundError(f'no shelter_pet found with id {data.get("shelter_pet_id")}')
+        data = rec.apply_to_data(dict(data))
         return shelter_tasks_data.create_shelter_task(data)
     except Exception as e:
         logger.error(e)
@@ -56,6 +62,7 @@ def create_shelter_task(data):
 def update_shelter_task(id, data):
     logger.domain(f"id: {id}\ndata: {stringify(data)}")
     try:
+        data = rec.apply_to_data(dict(data))
         clean = {k: v for k, v in data.items() if v is not None}
         return shelter_tasks_data.update_shelter_task(id, clean)
     except Exception as e:
@@ -107,39 +114,26 @@ def get_shelter_task(id):
 
 
 # --- ricorrenze (materializzazione da cron) ---
-WEEKDAYS = {"MON": 0, "TUE": 1, "WED": 2, "THU": 3, "FRI": 4, "SAT": 5, "SUN": 6}
-
-
-def _occurs_on(rule, day):
-    """Supporta 'DAILY' e 'WEEKLY:MON,WED,FRI'. Altri formati (cron) ignorati."""
-    if not rule:
-        return False
-    rule = rule.strip().upper()
-    if rule == "DAILY":
-        return True
-    if rule.startswith("WEEKLY:"):
-        days = rule.split(":", 1)[1].split(",")
-        wanted = [WEEKDAYS[d.strip()] for d in days if d.strip() in WEEKDAYS]
-        return day.weekday() in wanted
-    return False
-
-
 def materialize_recurring_tasks(target_date=None):
     """Crea record PENDING per i template ricorrenti che ricorrono in target_date
-    (default: domani). Idempotente via template_id. Ritorna il numero creato."""
+    (default: oggi). All'ora indicata dalla ricorrenza. Idempotente via
+    template_id. Ritorna il numero creato."""
     if target_date is None:
-        target_date = (datetime.today() + timedelta(days=1)).date()
+        target_date = datetime.today().date()
     day_start = datetime(target_date.year, target_date.month, target_date.day)
     day_end = day_start + timedelta(days=1)
-    scheduled_iso = day_start.strftime(DATE_FMT)
     logger.domain(f"materialize recurring tasks for {target_date}")
     created = 0
     try:
         for tpl in shelter_tasks_data.get_recurring_templates():
-            if not _occurs_on(tpl.get("recurrence_rule"), target_date):
+            if not rec.occurs_on(tpl, target_date):
                 continue
             if shelter_tasks_data.has_occurrence_on(tpl["id"], day_start, day_end):
                 continue
+            hour, minute = rec.rule_time(tpl)
+            scheduled = datetime(
+                target_date.year, target_date.month, target_date.day, hour, minute
+            )
             shelter_tasks_data.create_shelter_task({
                 "shelter_id": tpl["shelter_id"],
                 "shelter_pet_id": tpl.get("shelter_pet_id"),
@@ -148,7 +142,7 @@ def materialize_recurring_tasks(target_date=None):
                 "area": tpl.get("area"),
                 "status": TaskStatus.PENDING.name,
                 "assigned_to_id": tpl.get("assigned_to_id"),
-                "scheduled_at": scheduled_iso,
+                "scheduled_at": scheduled.strftime(DATE_FMT),
                 "is_recurring": False,
                 "template_id": tpl["id"],
                 "notes": tpl.get("notes"),

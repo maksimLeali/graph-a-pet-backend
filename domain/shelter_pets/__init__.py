@@ -48,6 +48,39 @@ def create_shelter_pets(data):
         raise e
 
 
+def create_shelter_pets_with_data(data):
+    logger.domain(f"data: {stringify(data)}")
+    try:
+        shelter_id = data.get('shelter_id')
+        shelter = shelters_domain.get_shelter(shelter_id)
+        if shelter is None:
+            raise NotFoundError(f'no shelter found with id {shelter_id}')
+        pets_in = data.get('pets') or []
+        if not pets_in:
+            raise BadRequest('pets must not be empty')
+        pets = []
+        for p in pets_in:
+            name = p.get('name')
+            birthday = p.get('birthday')
+            if not name:
+                raise BadRequest('pet name is required')
+            if not birthday:
+                raise BadRequest('pet birthday is required')
+            neutered = p.get('neutered')
+            pets.append({
+                **p,
+                'name': name,
+                'birthday': birthday,
+                'gender': p.get('gender') or 'NOT_SAID',
+                'breed': p.get('breed') or 'cross breed',
+                'neutered': True if neutered is None else neutered,
+            })
+        return shelter_pets_data.create_shelter_pets_with_data(shelter_id, pets)
+    except Exception as e:
+        logger.error(e)
+        raise e
+
+
 def change_shelter(data):
     logger.domain(f"data: {stringify(data)}")
     try:

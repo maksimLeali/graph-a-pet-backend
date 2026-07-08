@@ -6,6 +6,7 @@ from api.errors import BadRequest, NotFoundError
 from repository import db
 from utils.logger import logger, stringify
 from repository.shelter_pets.models import ShelterPet
+from repository.pets.models import Pet
 from repository.query_builder import build_query, build_count, build_where
 
 
@@ -44,6 +45,42 @@ def create_shelter_pets(data):
         db.session.add_all(shelter_pets)
         db.session.commit()
         return [sp.to_dict() for sp in shelter_pets]
+    except Exception as e:
+        db.session.rollback()
+        logger.error(e)
+        raise e
+
+
+def create_shelter_pets_with_data(shelter_id, pets):
+    logger.repository(f"shelter_id: {shelter_id} count: {len(pets)}")
+    try:
+        today = datetime.today().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+        created = []
+        for p in pets:
+            pet = Pet(
+                id=f"{uuid.uuid4()}",
+                name=p.get("name"),
+                birthday=p.get("birthday"),
+                neutered=p.get("neutered"),
+                gender=p.get("gender"),
+                breed=p.get("breed"),
+                coat_length=p.get("coat_length"),
+                temperament=p.get("temperament"),
+                weight_kg=p.get("weight_kg"),
+                chip_code=p.get("chip_code"),
+                created_at=today,
+            )
+            db.session.add(pet)
+            shelter_pet = ShelterPet(
+                id=f"{uuid.uuid4()}",
+                shelter_id=shelter_id,
+                pet_id=pet.id,
+                created_at=today,
+            )
+            db.session.add(shelter_pet)
+            created.append(shelter_pet)
+        db.session.commit()
+        return [sp.to_dict() for sp in created]
     except Exception as e:
         db.session.rollback()
         logger.error(e)

@@ -22,3 +22,22 @@ def get_shelter_operational_dashboard_resolver(obj, info, shelter_id):
             "dashboard": None,
         }
     return payload
+
+
+@convert_kwargs_to_snake_case
+@auth_middleware
+def list_shelter_kpi_history_resolver(obj, info, shelter_id, days=30):
+    logger.api(f"shelter_id: {shelter_id} days: {days}")
+    try:
+        token = info.context.headers['authorization']
+        assert_shelter_role(token, shelter_id, "STAFF")
+        items = dashboard_domain.get_kpi_history(shelter_id, days)
+        payload = {"success": True, "items": items}
+    except Exception as e:
+        logger.error(e)
+        payload = {
+            "success": False,
+            "error": format_error(e, info.context.headers['authorization']),
+            "items": [],
+        }
+    return payload

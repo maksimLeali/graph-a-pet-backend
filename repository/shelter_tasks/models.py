@@ -33,7 +33,13 @@ class ShelterTask(Base):
     completed_at = db.Column(db.DateTime, nullable=True)
     completed_by_id = db.Column(db.String, db.ForeignKey('users.id'), nullable=True)
     is_recurring = db.Column(db.Boolean, default=False)
-    recurrence_rule = db.Column(db.String(120))
+    # --- ricorrenza (template con is_recurring=True) ---
+    recurrence_freq = db.Column(db.String(10))          # DAILY | WEEKLY | MONTHLY
+    recurrence_interval = db.Column(db.Integer, default=1)  # ogni N
+    recurrence_weekdays = db.Column(db.ARRAY(db.String))    # WEEKLY: giorni; MONTHLY: giorno target
+    recurrence_week_ordinal = db.Column(db.Integer)        # MONTHLY: 1..5 = primo..quinto, -1 = ultimo
+    recurrence_time = db.Column(db.String(5))             # "HH:MM"
+    recurrence_start = db.Column(db.DateTime)             # data inizio ricorrenza
     # se materializzata da un template ricorrente, punta al task template
     template_id = db.Column(db.String, db.ForeignKey('shelter_tasks.id', ondelete='SET NULL'), nullable=True)
     notes = db.Column(db.Text)
@@ -56,7 +62,12 @@ class ShelterTask(Base):
             "completed_at": dt(self.completed_at),
             "completed_by_id": self.completed_by_id,
             "is_recurring": bool(self.is_recurring),
-            "recurrence_rule": self.recurrence_rule,
+            "recurrence_freq": self.recurrence_freq,
+            "recurrence_interval": self.recurrence_interval,
+            "recurrence_weekdays": list(self.recurrence_weekdays) if self.recurrence_weekdays else None,
+            "recurrence_week_ordinal": self.recurrence_week_ordinal,
+            "recurrence_time": self.recurrence_time,
+            "recurrence_start": dt(self.recurrence_start),
             "template_id": self.template_id,
             "notes": self.notes,
         }
