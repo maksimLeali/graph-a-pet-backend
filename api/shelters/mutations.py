@@ -1,5 +1,5 @@
 from ariadne import convert_kwargs_to_snake_case
-from domain.shelters import create_shelter, update_shelter, delete_shelter
+from domain.shelters import create_shelter, create_personal_workspace, update_shelter, delete_shelter
 from api.middlewares import auth_middleware, min_role
 from api.errors import format_error
 from repository.users.models import UserRole
@@ -12,7 +12,31 @@ from utils import get_request_user
 def create_shelter_resolver(obj, info, data):
     logger.api(f"data: {stringify(data)}")
     try:
-        shelter = create_shelter(data)
+        token = info.context.headers['authorization']
+        current_user = get_request_user(token)
+        shelter = create_shelter(data, current_user)
+        payload = {
+            "success": True,
+            "shelter": shelter,
+        }
+        logger.check(f"shelter: {stringify(shelter)}")
+    except Exception as e:
+        logger.error(e)
+        payload = {
+            "success": False,
+            "error": format_error(e, info.context.headers['authorization']),
+        }
+    return payload
+
+
+@convert_kwargs_to_snake_case
+@auth_middleware
+def create_personal_workspace_resolver(obj, info, data):
+    logger.api(f"data: {stringify(data)}")
+    try:
+        token = info.context.headers['authorization']
+        current_user = get_request_user(token)
+        shelter = create_personal_workspace(data, current_user["id"])
         payload = {
             "success": True,
             "shelter": shelter,

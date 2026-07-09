@@ -38,7 +38,6 @@ class ShelterTask(Base):
     task_type = db.Column(db.Enum(ShelterTaskType), nullable=False)
     area = db.Column(db.String(120))
     status = db.Column(db.Enum(TaskStatus), default=TaskStatus.PENDING.name)
-    assigned_to_id = db.Column(db.String, db.ForeignKey('users.id'), nullable=True)
     scheduled_at = db.Column(db.DateTime, nullable=True)
     # calendar day the instance is scheduled for; anchors cron idempotency
     scheduled_date = db.Column(db.Date, nullable=True, index=True)
@@ -71,7 +70,6 @@ class ShelterTask(Base):
             "task_type": self.task_type.name if self.task_type else None,
             "area": self.area,
             "status": self.status.name if self.status else TaskStatus.PENDING.name,
-            "assigned_to_id": self.assigned_to_id,
             "scheduled_at": dt(self.scheduled_at),
             "scheduled_date": self.scheduled_date.strftime('%Y-%m-%d') if self.scheduled_date else None,
             "completed_at": dt(self.completed_at),
@@ -88,3 +86,18 @@ class ShelterTask(Base):
             "template_id": self.template_id,
             "notes": self.notes,
         }
+
+
+class ShelterTaskAssignee(Base):
+    __tablename__ = 'shelter_task_assignees'
+    __table_args__ = (
+        db.UniqueConstraint('task_id', 'user_id', name='ux_shelter_task_assignee'),
+        {'schema': schema},
+    )
+
+    task_id = db.Column(db.String, db.ForeignKey('shelter_tasks.id', ondelete='CASCADE'),
+                        nullable=False, index=True)
+    user_id = db.Column(db.String, db.ForeignKey('users.id'), nullable=False, index=True)
+
+    def to_dict(self):
+        return {"id": self.id, "task_id": self.task_id, "user_id": self.user_id}

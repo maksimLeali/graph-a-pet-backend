@@ -1,6 +1,7 @@
 import repository.ownerships as ownerships_data
 import domain.users as users_domain
 import domain.pets as pets_domain
+import domain.notifications as notifications_domain
 from api.errors import BadRequest, NotFoundError, ForbiddenError
 import domain.damnationes_memoriae as damnatio_domain
 from utils.logger import logger, stringify
@@ -88,6 +89,67 @@ def link_pet_to_user(data):
         logger.error(e)
         raise e
         
+
+def _assert_can_invite(actor_user_id, pet_id):
+    """Inviter must already hold an ownership on the pet, or be an admin."""
+    actor = users_domain.get_user(actor_user_id)
+    if actor is not None and actor.get("role") == "ADMIN":
+        return
+    mine = ownerships_data.get_ownerships_for_user_pet(actor_user_id, pet_id)
+    if not mine:
+        raise ForbiddenError("only an existing owner can invite others to this pet")
+
+
+def invite_pet_ownership(pet_id, user_id, custody_level, actor_user_id):
+    logger.domain(f"invite pet {pet_id} to {user_id} as {custody_level} by {actor_user_id}")
+    try:
+        user = users_domain.get_user(user_id)
+        if user is None:
+            raise NotFoundError(f'no user found with id {user_id}')
+        pet = pets_domain.get_pet(pet_id)
+        if pet is None:
+            raise NotFoundError(f'no pet found with id {pet_id}')
+        if custody_level is None:
+            raise BadRequest('missing custody_level')
+        _assert_can_invite(actor_user_id, pet_id)
+        ownership = create_ownership({
+            "pet_id": pet_id,
+            "user_id": user_id,
+            "custody_level": custody_level,
+            "status": "PENDING",
+        })
+        notifications_domain.notify_pet_ownership_invite(
+            invite_id=ownership["id"],
+            user_id=user_id,
+            pet_id=pet_id,
+            pet_name=pet.get("name"),
+            role=custody_level,
+            actor_user_id=actor_user_id,
+        )
+        return ownership
+    except Exception as e:
+        logger.error(e)
+        raise e
+
+
+def _respond_to_pet_invite(id, user_id, new_status):
+    ownership = ownerships_data.get_ownership(id)
+    if ownership.get("user_id") != user_id:
+        raise ForbiddenError("only the invited user can respond to this invite")
+    if ownership.get("status") != "PENDING":
+        raise BadRequest("invite is not pending")
+    return ownerships_data.update_ownership(id, {"status": new_status})
+
+
+def accept_pet_ownership_invite(id, user_id):
+    logger.domain(f"accept pet invite {id} by {user_id}")
+    return _respond_to_pet_invite(id, user_id, "ACCEPTED")
+
+
+def reject_pet_ownership_invite(id, user_id):
+    logger.domain(f"reject pet invite {id} by {user_id}")
+    return _respond_to_pet_invite(id, user_id, "REJECTED")
+
 
 def get_pagination(common_search):
     try: 

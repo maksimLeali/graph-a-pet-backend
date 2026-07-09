@@ -13,7 +13,11 @@ class ShelterWalk(Base):
     __tablename__ = 'shelter_walks'
 
     shelter_pet_id = db.Column(db.String, db.ForeignKey('shelter_pets.id'), nullable=False, index=True)
-    walker_id = db.Column(db.String, db.ForeignKey('users.id'), nullable=False)
+    # exactly one of walker_id / shelter_person_id is set (enforced in domain layer):
+    # walker_id for an app user, shelter_person_id for a shelter contact/volunteer
+    # without an account.
+    walker_id = db.Column(db.String, db.ForeignKey('users.id'), nullable=True)
+    shelter_person_id = db.Column(db.String, db.ForeignKey('shelter_people.id'), nullable=True, index=True)
     status = db.Column(db.Enum(ShelterWalkStatus), default=ShelterWalkStatus.PLANNED.name)
     scheduled_at = db.Column(db.DateTime, nullable=True)
     started_at = db.Column(db.DateTime, nullable=True)
@@ -30,6 +34,7 @@ class ShelterWalk(Base):
             "updated_at": dt(self.updated_at),
             "shelter_pet_id": self.shelter_pet_id,
             "walker_id": self.walker_id,
+            "shelter_person_id": self.shelter_person_id,
             "status": self.status.name if self.status else ShelterWalkStatus.PLANNED.name,
             "scheduled_at": dt(self.scheduled_at),
             "started_at": dt(self.started_at),

@@ -87,10 +87,19 @@ type Query {
     # Shelter
     getShelter(id: ID!): ShelterResult!
     listShelters(commonSearch: CommonSearch = {}): PaginatedShelters!
+    discoverShelters(search: PublicShelterSearchInput): PaginatedPublicShelters!
+    getPublicShelter(id: ID!): PublicShelter
 
     # ShelterRole
     getShelterRole(id: ID!): ShelterRoleResult!
     listShelterRoles(commonSearch: CommonSearch = {}): PaginatedShelterRoles!
+    getShelterInvite(id: ID!): ShelterInviteResult!
+    listShelterPeople(shelter_id: ID!, search: CommonSearch = {}): PaginatedShelterPeople!
+    getShelterPerson(id: ID!): ShelterPerson
+    listMyOwnershipTransfers(search: CommonSearch = {}): PaginatedShelterOwnershipTransfers!
+    listShelterOwnershipTransfers(shelter_id: ID!, search: CommonSearch = {}): PaginatedShelterOwnershipTransfers!
+    listMyShelterClaimRequests(search: CommonSearch = {}): PaginatedShelterClaimRequests!
+    listShelterClaimRequests(shelter_id: ID!, search: CommonSearch = {}): PaginatedShelterClaimRequests!
 
     # ShelterPet
     getShelterPet(id: ID!): ShelterPetResult!
@@ -134,6 +143,10 @@ type Query {
     # Shelter dashboard operativa
     getShelterOperationalDashboard(shelter_id: ID!): ShelterOperationalDashboardResult!
     listShelterKpiHistory(shelter_id: ID!, days: Int = 30): ShelterKpiHistoryResult!
+
+    # Notifications
+    listMyNotifications(search: CommonSearch = {}): PaginatedNotifications!
+    getUnreadNotificationCount: Int!
 }
 
 type Mutation {
@@ -166,6 +179,9 @@ type Mutation {
         custodyLevel: CustodyLevel
     ): OwnershipResult!
     linkPetToMe(petId: ID!, custodyLevel: CustodyLevel): OwnershipResult!
+    invitePetOwnership(petId: ID!, userId: ID!, custodyLevel: CustodyLevel!): OwnershipResult!
+    acceptPetOwnershipInvite(id: ID!): OwnershipResult!
+    rejectPetOwnershipInvite(id: ID!): OwnershipResult!
 
     # HealthCard
     createHealthCard(data: HealthCardCreate!): HealthCardResult!
@@ -209,6 +225,7 @@ type Mutation {
 
     # Shelter
     createShelter(data: ShelterCreate!): ShelterResult!
+    createPersonalWorkspace(data: CreatePersonalWorkspaceInput!): ShelterResult!
     updateShelter(id: ID!, data: ShelterUpdate!): ShelterResult!
     deleteShelter(id: ID!): DeleteResult!
 
@@ -216,6 +233,21 @@ type Mutation {
     createShelterRole(data: ShelterRoleCreate!): ShelterRoleResult!
     updateShelterRole(id: ID!, data: ShelterRoleUpdate!): ShelterRoleResult!
     deleteShelterRole(id: ID!): DeleteResult!
+    createShelterInvite(data: ShelterInviteCreate!): ShelterInviteResult!
+    acceptShelterInvite(id: ID!): ShelterInviteResult!
+    rejectShelterInvite(id: ID!): ShelterInviteResult!
+    createShelterPerson(data: CreateShelterPersonInput!): ShelterPersonResult!
+    updateShelterPerson(id: ID!, data: UpdateShelterPersonInput!): ShelterPersonResult!
+    archiveShelterPerson(id: ID!): ShelterPersonResult!
+    linkShelterPersonToUser(person_id: ID!, user_id: ID!): ShelterPersonResult!
+    requestShelterOwnershipTransfer(shelter_id: ID!, to_user_id: ID!, new_role_for_previous_owner: RoleLevel): ShelterOwnershipTransferResult!
+    acceptShelterOwnershipTransfer(id: ID!): ShelterOwnershipTransferResult!
+    rejectShelterOwnershipTransfer(id: ID!): ShelterOwnershipTransferResult!
+    cancelShelterOwnershipTransfer(id: ID!): ShelterOwnershipTransferResult!
+    requestShelterClaim(shelter_id: ID!, data: ShelterClaimInput!): ShelterClaimRequestResult!
+    cancelShelterClaim(id: ID!): ShelterClaimRequestResult!
+    approveShelterClaim(id: ID!, decision_note: String): ShelterClaimRequestResult!
+    rejectShelterClaim(id: ID!, decision_note: String): ShelterClaimRequestResult!
 
     # ShelterPet
     createShelterPet(data: ShelterPetCreate!): ShelterPetResult!
@@ -275,6 +307,11 @@ type Mutation {
     archiveShelterInventoryItem(id: ID!): ShelterInventoryItemResult!
     deleteShelterInventoryItem(id: ID!): DeleteResult!
     createShelterInventoryMovement(data: ShelterInventoryMovementCreate!): ShelterInventoryMovementResult!
+
+    # Notifications
+    markNotificationAsRead(id: ID!): NotificationResult!
+    markAllNotificationsAsRead: NotificationResult!
+    dismissNotification(id: ID!): NotificationResult!
 }
 
 
@@ -335,9 +372,9 @@ input CommonSearch {
         ranges: []
         lists: []
         join: []
-        and: []
-        or: []
-        not: []
+        and: null
+        or: null
+        not: null
     }
 }
 
@@ -589,11 +626,18 @@ enum CustodyLevel {
     PET_SITTER
 }
 
+enum OwnershipStatus {
+    PENDING
+    ACCEPTED
+    REJECTED
+}
+
 type Ownership {
     id: ID!
     user: User!
     pet: Pet!
     custody_level: CustodyLevel!
+    status: OwnershipStatus!
 }
 
 type OwnershipResult {
@@ -1150,6 +1194,24 @@ type RestoredResult {
 # Shelter
 ############################
 
+enum ShelterType {
+    OFFICIAL_SHELTER
+    PERSONAL_WORKSPACE
+}
+
+enum ShelterVerificationStatus {
+    UNVERIFIED
+    PENDING_CLAIM
+    VERIFIED
+    REJECTED
+}
+
+enum ShelterVisibility {
+    PRIVATE
+    UNLISTED
+    PUBLIC
+}
+
 type Shelter {
     id: ID!
     created_at: String!
@@ -1162,6 +1224,16 @@ type Shelter {
     region: String
     district: String
     contacts: [ShelterContact]
+    type: ShelterType!
+    verification_status: ShelterVerificationStatus!
+    visibility: ShelterVisibility!
+    public_description: String
+    public_contact_email: String
+    public_contact_phone: String
+    accepts_volunteers: Boolean!
+    public_location_label: String
+    public_lat: Float
+    public_lng: Float
     roles(commonSearch: CommonSearch = {}): PaginatedShelterRoles
     pets(commonSearch: CommonSearch = {}): PaginatedShelterPets
 }
@@ -1175,6 +1247,40 @@ type ShelterResult {
     success: Boolean!
     error: Error
     shelter: Shelter
+}
+
+# Read-only public-discovery projection of Shelter: only PUBLIC + VERIFIED
+# shelters are ever returned as this type, and only their public fields are
+# exposed (no roles, pets, tasks, inventory, boxes or dashboard data).
+type PublicShelter {
+    id: ID!
+    name: String!
+    city: String
+    region: String
+    public_description: String
+    public_contact_email: String
+    public_contact_phone: String
+    logo_media_id: ID
+    accepts_volunteers: Boolean!
+    public_location_label: String
+    public_lat: Float
+    public_lng: Float
+}
+
+input PublicShelterSearchInput {
+    name: String
+    city: String
+    province_code: String
+    accepts_volunteers: Boolean
+    page: Int = 0
+    page_size: Int = 20
+}
+
+type PaginatedPublicShelters {
+    success: Boolean
+    error: Error
+    items: [PublicShelter]!
+    pagination: Pagination!
 }
 
 type PaginatedShelters {
@@ -1196,6 +1302,18 @@ input ShelterCreate {
     contacts: [ShelterContactInput] = []
 }
 
+input CreatePersonalWorkspaceInput {
+    name: String!
+    street: String
+    street_number: String
+    city: String
+    province_code: String
+    postal_code: String
+    region: String
+    district: String
+    contacts: [ShelterContactInput] = []
+}
+
 input ShelterUpdate {
     name: String
     street: String
@@ -1206,6 +1324,13 @@ input ShelterUpdate {
     region: String
     district: String
     contacts: [ShelterContactInput]
+    public_description: String
+    public_contact_email: String
+    public_contact_phone: String
+    accepts_volunteers: Boolean
+    public_location_label: String
+    public_lat: Float
+    public_lng: Float
 }
 
 input ShelterContactInput {
@@ -1254,6 +1379,188 @@ input ShelterRoleCreate {
 
 input ShelterRoleUpdate {
     role: RoleLevel
+}
+
+enum ShelterInviteStatus {
+    PENDING
+    ACCEPTED
+    REJECTED
+}
+
+type ShelterInvite {
+    id: ID!
+    created_at: String!
+    user: User!
+    shelter: Shelter!
+    role: RoleLevel!
+    status: ShelterInviteStatus!
+    invited_by: User
+}
+
+type ShelterInviteResult {
+    success: Boolean!
+    error: Error
+    shelter_invite: ShelterInvite
+}
+
+input ShelterInviteCreate {
+    shelter_id: ID!
+    user_id: ID!
+    role: RoleLevel!
+}
+
+enum ShelterPersonStatus {
+    VISITOR
+    VOLUNTEER
+    PENDING_INVITE
+    ACTIVE_USER
+    ARCHIVED
+}
+
+enum ShelterPersonSource {
+    MANUAL
+    INVITE
+    VISIT
+    VOLUNTEER_REQUEST
+    IMPORT
+}
+
+type ShelterPerson {
+    id: ID!
+    created_at: String!
+    updated_at: String
+    shelter: Shelter!
+    user: User
+    first_name: String
+    last_name: String
+    email: String
+    phone: String
+    status: ShelterPersonStatus!
+    source: ShelterPersonSource!
+    notes: String
+    created_by: User
+    archived_at: String
+    archived_by: User
+}
+
+type ShelterPersonResult {
+    success: Boolean!
+    error: Error
+    shelter_person: ShelterPerson
+}
+
+type PaginatedShelterPeople {
+    success: Boolean
+    error: Error
+    items: [ShelterPerson]!
+    pagination: Pagination!
+}
+
+input CreateShelterPersonInput {
+    shelter_id: ID!
+    user_id: ID
+    first_name: String
+    last_name: String
+    email: String
+    phone: String
+    status: ShelterPersonStatus
+    source: ShelterPersonSource
+    notes: String
+}
+
+input UpdateShelterPersonInput {
+    first_name: String
+    last_name: String
+    email: String
+    phone: String
+    status: ShelterPersonStatus
+    source: ShelterPersonSource
+    notes: String
+}
+
+
+############################
+# ShelterOwnershipTransfer
+############################
+
+enum ShelterOwnershipTransferStatus {
+    PENDING
+    ACCEPTED
+    REJECTED
+    CANCELLED
+    EXPIRED
+}
+
+type ShelterOwnershipTransfer {
+    id: ID!
+    created_at: String!
+    updated_at: String
+    shelter: Shelter!
+    from_user: User!
+    to_user: User!
+    new_role_for_previous_owner: RoleLevel
+    status: ShelterOwnershipTransferStatus!
+    accepted_at: String
+    rejected_at: String
+    cancelled_at: String
+    expires_at: String
+}
+
+type ShelterOwnershipTransferResult {
+    success: Boolean!
+    error: Error
+    shelter_ownership_transfer: ShelterOwnershipTransfer
+}
+
+type PaginatedShelterOwnershipTransfers {
+    success: Boolean
+    error: Error
+    items: [ShelterOwnershipTransfer]!
+    pagination: Pagination!
+}
+
+
+############################
+# ShelterClaimRequest
+############################
+
+enum ShelterClaimRequestStatus {
+    PENDING
+    APPROVED
+    REJECTED
+    CANCELLED
+}
+
+input ShelterClaimInput {
+    proof_data: JSON
+    message: String
+}
+
+type ShelterClaimRequest {
+    id: ID!
+    created_at: String!
+    updated_at: String
+    shelter: Shelter!
+    requester: User!
+    status: ShelterClaimRequestStatus!
+    proof_data: JSON
+    message: String
+    reviewed_by: User
+    reviewed_at: String
+    decision_note: String
+}
+
+type ShelterClaimRequestResult {
+    success: Boolean!
+    error: Error
+    shelter_claim_request: ShelterClaimRequest
+}
+
+type PaginatedShelterClaimRequests {
+    success: Boolean
+    error: Error
+    items: [ShelterClaimRequest]!
+    pagination: Pagination!
 }
 
 
@@ -1359,7 +1666,7 @@ type ShelterTask {
     task_type: ShelterTaskType!
     area: String
     status: TaskStatus!
-    assigned_to: User
+    assignees: [User!]!
     scheduled_at: String
     scheduled_date: String
     completed_at: String
@@ -1390,7 +1697,7 @@ input ShelterTaskCreate {
     shelter_box_id: ID
     task_type: ShelterTaskType!
     area: String
-    assigned_to_id: ID
+    assignee_ids: [ID!]
     scheduled_at: String
     is_recurring: Boolean = false
     recurrence: RecurrenceInput
@@ -1400,7 +1707,7 @@ input ShelterTaskCreate {
 input ShelterTaskUpdate {
     task_type: ShelterTaskType
     area: String
-    assigned_to_id: ID
+    assignee_ids: [ID!]
     scheduled_at: String
     is_recurring: Boolean
     recurrence: RecurrenceInput
@@ -1416,7 +1723,8 @@ type ShelterWalk {
     id: ID!
     created_at: String!
     shelter_pet: ShelterPet!
-    walker: User!
+    walker: User
+    walker_shelter_person: ShelterPerson
     status: ShelterWalkStatus!
     scheduled_at: String
     started_at: String
@@ -1441,6 +1749,7 @@ type PaginatedShelterWalks {
 input ShelterWalkCreate {
     shelter_pet_id: ID!
     walker_id: ID
+    shelter_person_id: ID
     scheduled_at: String
     notes: String
 }
@@ -1958,5 +2267,81 @@ type ShelterKpiHistoryResult {
     success: Boolean!
     error: Error
     items: [ShelterKpiSnapshot]!
+}
+
+############################
+# Notifications
+############################
+
+enum NotificationType {
+    TREATMENT_REMINDER
+    PET_OWNERSHIP_INVITE
+    SHELTER_INVITE
+    SHELTER_TASK_INSTANCE
+    SHELTER_JOIN_REQUEST
+    PET_BIRTHDAY
+    SHELTER_OWNERSHIP_TRANSFER
+}
+
+enum NotificationStatus {
+    UNREAD
+    READ
+    DISMISSED
+    EXPIRED
+}
+
+enum NotificationPriority {
+    LOW
+    NORMAL
+    HIGH
+    URGENT
+}
+
+enum NotificationEntityType {
+    PET
+    TREATMENT
+    OWNERSHIP
+    SHELTER
+    SHELTER_INVITE
+    SHELTER_TASK
+    SHELTER_JOIN_REQUEST
+    SHELTER_OWNERSHIP_TRANSFER
+}
+
+type Notification {
+    id: ID!
+    created_at: String!
+    updated_at: String
+    user_id: ID!
+    type: NotificationType!
+    status: NotificationStatus!
+    priority: NotificationPriority!
+    title: String!
+    message: String
+    entity_type: NotificationEntityType
+    entity_id: ID
+    action_url: String
+    actor_user_id: ID
+    shelter_id: ID
+    pet_id: ID
+    payload: JSON
+    dedupe_key: String
+    scheduled_at: String
+    read_at: String
+    dismissed_at: String
+    expires_at: String
+}
+
+type NotificationResult {
+    success: Boolean!
+    error: Error
+    notification: Notification
+}
+
+type PaginatedNotifications {
+    success: Boolean
+    error: Error
+    items: [Notification]!
+    pagination: Pagination!
 }
 

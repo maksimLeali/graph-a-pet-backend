@@ -25,6 +25,9 @@ def create_shelter(data):
             region=data.get("region"),
             district=data.get("district"),
             contacts=data.get("contacts") or [],
+            type=data.get("type") or "OFFICIAL_SHELTER",
+            verification_status=data.get("verification_status") or "VERIFIED",
+            visibility=data.get("visibility") or "PUBLIC",
             created_at=today.strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
         )
         db.session.add(shelter_model)
@@ -117,6 +120,46 @@ def get_shelter(id):
         shelter = shelter_model.to_dict()
         logger.check(f"shelter: {stringify(shelter)}")
         return shelter
+    except Exception as e:
+        logger.error(e)
+        raise e
+
+
+def get_public_shelters(name, city, province_code, accepts_volunteers, page, page_size):
+    logger.repository(
+        f"name: {name} city: {city} province_code: {province_code} "
+        f"accepts_volunteers: {accepts_volunteers} page: {page} page_size: {page_size}"
+    )
+    try:
+        query = db.session.query(Shelter).filter(
+            Shelter.visibility == "PUBLIC",
+            Shelter.verification_status == "VERIFIED",
+        )
+        if name:
+            query = query.filter(Shelter.name.ilike(f"%{name}%"))
+        if city:
+            query = query.filter(Shelter.city.ilike(f"%{city}%"))
+        if province_code:
+            query = query.filter(Shelter.province_code == province_code)
+        if accepts_volunteers:
+            query = query.filter(Shelter.accepts_volunteers.is_(True))
+        total = query.count()
+        rows = query.order_by(Shelter.name.asc()).offset(page * page_size).limit(page_size).all()
+        return [row.to_dict() for row in rows], total
+    except Exception as e:
+        logger.error(e)
+        raise e
+
+
+def get_public_shelter(id):
+    logger.repository(f"id {id}")
+    try:
+        shelter_model = Shelter.query.filter(
+            Shelter.id == id,
+            Shelter.visibility == "PUBLIC",
+            Shelter.verification_status == "VERIFIED",
+        ).first()
+        return shelter_model.to_dict() if shelter_model else None
     except Exception as e:
         logger.error(e)
         raise e

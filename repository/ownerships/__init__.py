@@ -13,9 +13,10 @@ def create_ownership(data):
     today = datetime.today()
     ownership = Ownership(
         id = f"{uuid.uuid4()}",
-        user_id=data["user_id"], 
-        pet_id=data["pet_id"], 
+        user_id=data["user_id"],
+        pet_id=data["pet_id"],
         custody_level= data['custody_level'],
+        status=data.get("status") or "ACCEPTED",
         created_at=today.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
     )
     db.session.add(ownership)
@@ -73,6 +74,15 @@ def get_total_items(common_search):
     except Exception as e:
         logger.error(e)
         raise e
+
+def get_ownerships_for_user_pet(user_id, pet_id):
+    logger.repository(f"user_id: {user_id} pet_id: {pet_id}")
+    models = db.session.query(Ownership).filter(
+        Ownership.user_id == user_id,
+        Ownership.pet_id == pet_id,
+    ).all()
+    return [m.to_dict() for m in models]
+
 
 def get_ownership(id):
     logger.repository(f"id: {id}")

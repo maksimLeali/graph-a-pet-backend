@@ -350,7 +350,14 @@
     "postal_code": "string",
     "region": "string",
     "district": "string",
-    "contacts": "json"
+    "contacts": "json",
+    "public_description": "string",
+    "public_contact_email": "string",
+    "public_contact_phone": "string",
+    "accepts_volunteers": "boolean",
+    "public_location_label": "string",
+    "public_lat": "float",
+    "public_lng": "float"
    },
    "search_columns": [
     "name",
@@ -465,6 +472,7 @@
    "columns": {
     "shelter_pet_id": "string",
     "walker_id": "string",
+    "shelter_person_id": "string",
     "status": "enum(ShelterWalkStatus)",
     "scheduled_at": "date",
     "started_at": "date",
@@ -696,6 +704,108 @@
    ],
    "alias": "sme",
    "other_table_ref": "shelter_map_element_id",
+   "children": [],
+   "inherit_delete": {}
+  },
+  "shelter_claim_requests": {
+   "enums": {
+    "ShelterClaimRequestStatus": [
+     "PENDING",
+     "APPROVED",
+     "REJECTED",
+     "CANCELLED"
+    ]
+   },
+   "columns": {
+    "shelter_id": "string",
+    "requester_user_id": "string",
+    "status": "enum(ShelterClaimRequestStatus)",
+    "proof_data": "json",
+    "message": "string",
+    "reviewed_by": "string",
+    "reviewed_at": "date",
+    "decision_note": "string"
+   },
+   "search_columns": [
+    "message"
+   ],
+   "alias": "scr",
+   "other_table_ref": "shelter_claim_request_id",
+   "children": [],
+   "inherit_delete": {}
+  },
+  "shelter_people": {
+   "enums": {
+    "ShelterPersonStatus": [
+     "VISITOR",
+     "VOLUNTEER",
+     "PENDING_INVITE",
+     "ACTIVE_USER",
+     "ARCHIVED"
+    ],
+    "ShelterPersonSource": [
+     "MANUAL",
+     "INVITE",
+     "VISIT",
+     "VOLUNTEER_REQUEST",
+     "IMPORT"
+    ]
+   },
+   "columns": {
+    "shelter_id": "string",
+    "user_id": "string",
+    "first_name": "string",
+    "last_name": "string",
+    "email": "string",
+    "phone": "string",
+    "status": "enum(ShelterPersonStatus)",
+    "source": "enum(ShelterPersonSource)",
+    "notes": "string",
+    "created_by_id": "string",
+    "archived_at": "date",
+    "archived_by_id": "string"
+   },
+   "search_columns": [
+    "first_name",
+    "last_name",
+    "email",
+    "phone"
+   ],
+   "alias": "shpe",
+   "other_table_ref": "shelter_person_id",
+   "children": [],
+   "inherit_delete": {}
+  },
+  "shelter_ownership_transfers": {
+   "enums": {
+    "ShelterOwnershipTransferStatus": [
+     "PENDING",
+     "ACCEPTED",
+     "REJECTED",
+     "CANCELLED",
+     "EXPIRED"
+    ],
+    "RoleLevel": [
+     "OWNER",
+     "MANAGER",
+     "STAFF",
+     "VOLUNTEER"
+    ]
+   },
+   "columns": {
+    "shelter_id": "string",
+    "from_user_id": "string",
+    "to_user_id": "string",
+    "new_role_for_previous_owner": "enum(RoleLevel)",
+    "status": "enum(ShelterOwnershipTransferStatus)",
+    "accepted_at": "date",
+    "rejected_at": "date",
+    "cancelled_at": "date",
+    "expires_at": "date"
+   },
+   "search_columns": [],
+   "alias": "sot",
+   "other_table_ref": "shelter_ownership_transfer_id",
    "children": [],
    "inherit_delete": {}
   }

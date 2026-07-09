@@ -4,6 +4,7 @@ from datetime import datetime
 import repository.shelter_walks as shelter_walks_data
 import domain.shelter_pets as shelter_pets_domain
 import domain.users as users_domain
+import domain.shelter_people as shelter_people_domain
 import domain.damnationes_memoriae as damnatio_domain
 from api.errors import NotFoundError, BadRequest
 from repository.shelter_walks.models import ShelterWalkStatus
@@ -19,7 +20,15 @@ def get_shelter_pet(obj, info):
 
 
 def get_walker(obj, info):
+    if not obj.get("walker_id"):
+        return None
     return users_domain.get_user(obj["walker_id"])
+
+
+def get_walker_shelter_person(obj, info):
+    if not obj.get("shelter_person_id"):
+        return None
+    return shelter_people_domain.get_shelter_person(obj["shelter_person_id"])
 
 
 # --- helpers ---
@@ -43,7 +52,15 @@ def create_shelter_walk(data, current_user_id):
         if sp is None:
             raise NotFoundError(f'no shelter_pet found with id {data.get("shelter_pet_id")}')
         payload = dict(data)
-        payload["walker_id"] = data.get("walker_id") or current_user_id
+        if data.get("shelter_person_id"):
+            # walker is a shelter contact/volunteer without an app account
+            person = shelter_people_domain.get_shelter_person(data["shelter_person_id"])
+            if person["shelter_id"] != sp["shelter_id"]:
+                raise BadRequest("shelter_person does not belong to this shelter")
+            payload["walker_id"] = None
+        else:
+            payload["walker_id"] = data.get("walker_id") or current_user_id
+            payload["shelter_person_id"] = None
         return shelter_walks_data.create_shelter_walk(payload)
     except Exception as e:
         logger.error(e)

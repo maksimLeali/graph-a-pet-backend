@@ -64,6 +64,51 @@ def link_pet_to_me_resolver(obj, info, pet_id, custody_level):
     return payload
 
 @convert_kwargs_to_snake_case
+@auth_middleware
+def invite_pet_ownership_resolver(obj, info, pet_id, user_id, custody_level):
+    logger.api(f'invite pet {pet_id} to user {user_id} as {custody_level}')
+    try:
+        token = info.context.headers['authorization']
+        current_user = get_request_user(token)
+        ownership = owsershis_domain.invite_pet_ownership(
+            pet_id, user_id, custody_level, current_user.get('id')
+        )
+        payload = {'success': True, 'ownership': ownership}
+    except Exception as e:
+        logger.error(e)
+        payload = {'success': False, "error": format_error(e, info.context.headers['authorization'])}
+    return payload
+
+
+@convert_kwargs_to_snake_case
+@auth_middleware
+def accept_pet_ownership_invite_resolver(obj, info, id):
+    logger.api(f'accept pet ownership invite {id}')
+    try:
+        current_user = get_request_user(info.context.headers['authorization'])
+        ownership = owsershis_domain.accept_pet_ownership_invite(id, current_user.get('id'))
+        payload = {'success': True, 'ownership': ownership}
+    except Exception as e:
+        logger.error(e)
+        payload = {'success': False, "error": format_error(e, info.context.headers['authorization'])}
+    return payload
+
+
+@convert_kwargs_to_snake_case
+@auth_middleware
+def reject_pet_ownership_invite_resolver(obj, info, id):
+    logger.api(f'reject pet ownership invite {id}')
+    try:
+        current_user = get_request_user(info.context.headers['authorization'])
+        ownership = owsershis_domain.reject_pet_ownership_invite(id, current_user.get('id'))
+        payload = {'success': True, 'ownership': ownership}
+    except Exception as e:
+        logger.error(e)
+        payload = {'success': False, "error": format_error(e, info.context.headers['authorization'])}
+    return payload
+
+
+@convert_kwargs_to_snake_case
 @min_role(UserRole.ADMIN.name)
 def link_pet_to_user_resolver(obj, info, user_id, pet_id, custody_level):
     logger.api(f'linking pet {pet_id} to user {user_id} as {custody_level}')

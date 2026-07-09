@@ -18,6 +18,30 @@ def get_roles_for_user_on_shelter(user_id, shelter_id):
     return [m.to_dict() for m in models]
 
 
+def get_owner_role_model(user_id, shelter_id):
+    """The ShelterRole model (not dict) where user_id holds OWNER on shelter_id, or None."""
+    return db.session.query(ShelterRole).filter(
+        ShelterRole.user_id == user_id,
+        ShelterRole.shelter_id == shelter_id,
+        ShelterRole.role == RoleLevel.OWNER,
+    ).first()
+
+
+def count_owners(shelter_id):
+    return db.session.query(ShelterRole).filter(
+        ShelterRole.shelter_id == shelter_id,
+        ShelterRole.role == RoleLevel.OWNER,
+    ).count()
+
+
+def get_owner_role_models_for_shelter(shelter_id):
+    """All ShelterRole models (not dicts) holding OWNER on shelter_id."""
+    return db.session.query(ShelterRole).filter(
+        ShelterRole.shelter_id == shelter_id,
+        ShelterRole.role == RoleLevel.OWNER,
+    ).all()
+
+
 def create_shelter_role(data):
     logger.repository(f"data: {stringify(data)}")
     try:

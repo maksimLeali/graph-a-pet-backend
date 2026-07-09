@@ -95,4 +95,15 @@ def get_media(id):
         return media.to_dict()
     except Exception as e:
         logger.error(e)
-        raise e 
+        raise e
+
+
+def get_first_media_id(ref_id, scope):
+    try:
+        media = db.session.query(Media).filter(
+            Media.ref_id == ref_id, Media.scope == scope
+        ).order_by(Media.created_at.asc()).first()
+        return media.id if media else None
+    except Exception as e:
+        logger.error(e)
+        raise e

@@ -2,6 +2,7 @@ from math import ceil
 from datetime import datetime, timedelta
 
 import repository.shelter_tasks as shelter_tasks_data
+import repository.shelter_roles as shelter_roles_data
 import domain.shelters as shelters_domain
 import domain.shelter_pets as shelter_pets_domain
 import domain.users as users_domain
@@ -25,10 +26,16 @@ def get_shelter_pet(obj, info):
     return shelter_pets_domain.get_shelter_pet(obj["shelter_pet_id"])
 
 
-def get_assigned_to(obj, info):
-    if not obj.get("assigned_to_id"):
-        return None
-    return users_domain.get_user(obj["assigned_to_id"])
+def get_assignees(obj, info):
+    ids = shelter_tasks_data.get_task_assignee_ids(obj["id"])
+    return [users_domain.get_user(uid) for uid in ids]
+
+
+def _assert_shelter_members(shelter_id, assignee_ids):
+    """Every assignee must hold a role on this shelter (canile)."""
+    for uid in dict.fromkeys(assignee_ids or []):
+        if not shelter_roles_data.get_roles_for_user_on_shelter(uid, shelter_id):
+            raise BadRequest(f"user {uid} is not a member of shelter {shelter_id}")
 
 
 def get_completed_by(obj, info):
@@ -58,6 +65,8 @@ def create_shelter_task(data):
             pet = shelter_pets_domain.get_shelter_pet(data.get("shelter_pet_id"))
             if pet is None:
                 raise NotFoundError(f'no shelter_pet found with id {data.get("shelter_pet_id")}')
+        if data.get("assignee_ids"):
+            _assert_shelter_members(data.get("shelter_id"), data.get("assignee_ids"))
         data = rec.apply_to_data(dict(data))
         return shelter_tasks_data.create_shelter_task(data)
     except Exception as e:
@@ -68,8 +77,17 @@ def create_shelter_task(data):
 def update_shelter_task(id, data):
     logger.domain(f"id: {id}\ndata: {stringify(data)}")
     try:
-        data = rec.apply_to_data(dict(data))
+        data = dict(data)
+        # assignee_ids may legitimately be [] (clear all) — keep it out of the
+        # None-stripping below and validate against the task's own shelter.
+        has_assignees = "assignee_ids" in data
+        assignee_ids = data.pop("assignee_ids", None)
+        data = rec.apply_to_data(data)
         clean = {k: v for k, v in data.items() if v is not None}
+        if has_assignees:
+            task = shelter_tasks_data.get_shelter_task(id)
+            _assert_shelter_members(task["shelter_id"], assignee_ids)
+            clean["assignee_ids"] = assignee_ids or []
         return shelter_tasks_data.update_shelter_task(id, clean)
     except Exception as e:
         logger.error(e)
@@ -162,7 +180,6 @@ def materialize_recurring_tasks(target_date=None):
                 "task_type": tpl["task_type"],
                 "area": tpl.get("area"),
                 "status": TaskStatus.PENDING.name,
-                "assigned_to_id": tpl.get("assigned_to_id"),
                 "scheduled_at": scheduled.strftime(DATE_FMT),
                 "scheduled_date": target_date.strftime("%Y-%m-%d"),
                 "is_recurring": False,
@@ -170,6 +187,10 @@ def materialize_recurring_tasks(target_date=None):
                 "notes": tpl.get("notes"),
             })
             if row is not None:
+                # inherit the template's assignee set
+                tpl_assignees = shelter_tasks_data.get_task_assignee_ids(tpl["id"])
+                if tpl_assignees:
+                    shelter_tasks_data.set_task_assignees(row["id"], tpl_assignees)
                 created += 1
         logger.check(f"materialized {created} recurring shelter tasks")
         return created

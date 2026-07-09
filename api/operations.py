@@ -70,6 +70,21 @@ from api.shelter_inventory.resolvers import shelter_inventory_item, shelter_inve
 from api.shelter_map_elements.queries import *
 from api.shelter_map_elements.mutations import *
 from api.shelter_dashboard.queries import *
+from api.notifications.queries import *
+from api.notifications.mutations import *
+from api.notifications.resolvers import notification
+from api.shelter_invites.queries import *
+from api.shelter_invites.mutations import *
+from api.shelter_invites.resolvers import shelter_invite
+from api.shelter_people.queries import *
+from api.shelter_people.mutations import *
+from api.shelter_people.resolvers import shelter_person
+from api.shelter_ownership_transfers.queries import *
+from api.shelter_ownership_transfers.mutations import *
+from api.shelter_ownership_transfers.resolvers import shelter_ownership_transfer
+from api.shelter_claim_requests.queries import *
+from api.shelter_claim_requests.mutations import *
+from api.shelter_claim_requests.resolvers import shelter_claim_request
 from domain import refresh_token
 from api.middlewares import auth_middleware
 
@@ -128,6 +143,8 @@ query.set_field("getCure", get_cure_resolver)
 query.set_field("listCures", list_cures_resolver)
 query.set_field("getShelter", get_shelter_resolver)
 query.set_field("listShelters", list_shelters_resolver)
+query.set_field("discoverShelters", discover_shelters_resolver)
+query.set_field("getPublicShelter", get_public_shelter_resolver)
 query.set_field("getShelterRole", get_shelter_role_resolver)
 query.set_field("listShelterRoles", list_shelter_roles_resolver)
 query.set_field("getShelterPet", get_shelter_pet_resolver)
@@ -155,6 +172,15 @@ query.set_field("getShelterMapElement", get_shelter_map_element_resolver)
 query.set_field("listShelterMapElements", list_shelter_map_elements_resolver)
 query.set_field("getShelterOperationalDashboard", get_shelter_operational_dashboard_resolver)
 query.set_field("listShelterKpiHistory", list_shelter_kpi_history_resolver)
+query.set_field("listMyNotifications", list_my_notifications_resolver)
+query.set_field("getUnreadNotificationCount", get_unread_notification_count_resolver)
+query.set_field("getShelterInvite", get_shelter_invite_resolver)
+query.set_field("listShelterPeople", list_shelter_people_resolver)
+query.set_field("getShelterPerson", get_shelter_person_resolver)
+query.set_field("listMyOwnershipTransfers", list_my_ownership_transfers_resolver)
+query.set_field("listShelterOwnershipTransfers", list_shelter_ownership_transfers_resolver)
+query.set_field("listMyShelterClaimRequests", list_my_shelter_claim_requests_resolver)
+query.set_field("listShelterClaimRequests", list_shelter_claim_requests_resolver)
 
 
 mutation = MutationType()
@@ -199,6 +225,7 @@ mutation.set_field("createCure", create_cure_resolver)
 mutation.set_field("updateCure", update_cure_resolver)
 mutation.set_field("deleteCure", delete_cure_resolver)
 mutation.set_field("createShelter", create_shelter_resolver)
+mutation.set_field("createPersonalWorkspace", create_personal_workspace_resolver)
 mutation.set_field("updateShelter", update_shelter_resolver)
 mutation.set_field("deleteShelter", delete_shelter_resolver)
 mutation.set_field("createShelterRole", create_shelter_role_resolver)
@@ -246,5 +273,26 @@ mutation.set_field("createShelterInventoryMovement", create_shelter_inventory_mo
 mutation.set_field("createShelterMapElement", create_shelter_map_element_resolver)
 mutation.set_field("updateShelterMapElement", update_shelter_map_element_resolver)
 mutation.set_field("deleteShelterMapElement", delete_shelter_map_element_resolver)
+mutation.set_field("markNotificationAsRead", mark_notification_as_read_resolver)
+mutation.set_field("markAllNotificationsAsRead", mark_all_notifications_as_read_resolver)
+mutation.set_field("dismissNotification", dismiss_notification_resolver)
+mutation.set_field("invitePetOwnership", invite_pet_ownership_resolver)
+mutation.set_field("acceptPetOwnershipInvite", accept_pet_ownership_invite_resolver)
+mutation.set_field("rejectPetOwnershipInvite", reject_pet_ownership_invite_resolver)
+mutation.set_field("createShelterInvite", create_shelter_invite_resolver)
+mutation.set_field("acceptShelterInvite", accept_shelter_invite_resolver)
+mutation.set_field("rejectShelterInvite", reject_shelter_invite_resolver)
+mutation.set_field("createShelterPerson", create_shelter_person_resolver)
+mutation.set_field("updateShelterPerson", update_shelter_person_resolver)
+mutation.set_field("archiveShelterPerson", archive_shelter_person_resolver)
+mutation.set_field("linkShelterPersonToUser", link_shelter_person_to_user_resolver)
+mutation.set_field("requestShelterOwnershipTransfer", request_shelter_ownership_transfer_resolver)
+mutation.set_field("acceptShelterOwnershipTransfer", accept_shelter_ownership_transfer_resolver)
+mutation.set_field("rejectShelterOwnershipTransfer", reject_shelter_ownership_transfer_resolver)
+mutation.set_field("cancelShelterOwnershipTransfer", cancel_shelter_ownership_transfer_resolver)
+mutation.set_field("requestShelterClaim", request_shelter_claim_resolver)
+mutation.set_field("cancelShelterClaim", cancel_shelter_claim_resolver)
+mutation.set_field("approveShelterClaim", approve_shelter_claim_resolver)
+mutation.set_field("rejectShelterClaim", reject_shelter_claim_resolver)
 
-object_types = [query, mutation, user, dashboard, pet, ownership, health_card, treatment, report,walk, cure, shelter, shelter_role, shelter_pet, shelter_task, shelter_walk, shelter_map, shelter_box, shelter_box_occupancy, shelter_area, shelter_zone, shelter_inventory_item, shelter_inventory_movement, walk_rating ]
+object_types = [query, mutation, user, dashboard, pet, ownership, health_card, treatment, report,walk, cure, shelter, shelter_role, shelter_pet, shelter_task, shelter_walk, shelter_map, shelter_box, shelter_box_occupancy, shelter_area, shelter_zone, shelter_inventory_item, shelter_inventory_movement, walk_rating, notification, shelter_invite, shelter_person, shelter_ownership_transfer, shelter_claim_request ]

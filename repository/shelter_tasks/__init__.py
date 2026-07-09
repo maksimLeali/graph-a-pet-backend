@@ -5,7 +5,7 @@ from sqlalchemy.exc import ProgrammingError
 from api.errors import BadRequest, NotFoundError
 from repository import db
 from utils.logger import logger, stringify
-from repository.shelter_tasks.models import ShelterTask, TaskStatus
+from repository.shelter_tasks.models import ShelterTask, ShelterTaskAssignee, TaskStatus
 from repository.query_builder import build_query, build_count
 
 
@@ -47,7 +47,6 @@ def create_shelter_task(data):
             task_type=data["task_type"],
             area=data.get("area"),
             status=data.get("status") or TaskStatus.PENDING.name,
-            assigned_to_id=data.get("assigned_to_id"),
             scheduled_at=_parse_dt(data.get("scheduled_at")),
             scheduled_date=_parse_date(data.get("scheduled_date") or data.get("scheduled_at")),
             is_recurring=data.get("is_recurring") or False,
@@ -62,7 +61,38 @@ def create_shelter_task(data):
         )
         db.session.add(shelter_task)
         db.session.commit()
+        if "assignee_ids" in data:
+            set_task_assignees(shelter_task.id, data.get("assignee_ids"))
         return shelter_task.to_dict()
+    except Exception as e:
+        db.session.rollback()
+        logger.error(e)
+        raise e
+
+
+def get_task_assignee_ids(task_id):
+    rows = db.session.query(ShelterTaskAssignee.user_id).filter(
+        ShelterTaskAssignee.task_id == task_id
+    ).all()
+    return [r[0] for r in rows]
+
+
+def set_task_assignees(task_id, user_ids):
+    """Replace-all: the given user_ids become the exact assignee set."""
+    logger.repository(f"task_id: {task_id} assignees: {stringify(user_ids)}")
+    try:
+        db.session.query(ShelterTaskAssignee).filter(
+            ShelterTaskAssignee.task_id == task_id
+        ).delete()
+        for uid in dict.fromkeys(user_ids or []):
+            db.session.add(ShelterTaskAssignee(
+                id=f"{uuid.uuid4()}",
+                created_at=datetime.today().strftime(DATE_FMT),
+                task_id=task_id,
+                user_id=uid,
+            ))
+        db.session.commit()
+        return get_task_assignee_ids(task_id)
     except Exception as e:
         db.session.rollback()
         logger.error(e)
@@ -80,6 +110,7 @@ def update_shelter_task(id, data):
             raise NotFoundError(f"no shelter_task found with id: {id}")
         old = query.first().to_dict()
         payload = dict(data)
+        assignee_ids = payload.pop("assignee_ids", None)
         if "scheduled_at" in payload:
             payload["scheduled_at"] = _parse_dt(payload.get("scheduled_at"))
         if "completed_at" in payload:
@@ -90,8 +121,11 @@ def update_shelter_task(id, data):
             payload["scheduled_date"] = _parse_date(payload.get("scheduled_date"))
         if "recurrence_start" in payload:
             payload["recurrence_start"] = _parse_dt(payload.get("recurrence_start"))
-        query.update(payload)
+        if payload:
+            query.update(payload)
         db.session.commit()
+        if assignee_ids is not None:
+            set_task_assignees(id, assignee_ids)
         return {**old, **query.first().to_dict()}
     except Exception as e:
         db.session.rollback()

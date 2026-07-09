@@ -23,3 +23,4 @@ from .shelter_box_occupancies.models import *
 from .shelter_map_elements.models import *
 from .shelter_inventory_items.models import *
 from .shelter_inventory_movements.models import *
+from .shelter_claim_requests.models import *
