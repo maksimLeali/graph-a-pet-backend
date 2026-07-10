@@ -16,6 +16,7 @@ from .shelter_roles.models import *
 from .shelter_pets.models import *
 from .shelter_tasks.models import *
 from .shelter_walks.models import *
+from .shelter_walk_ratings.models import *
 from .shelter_maps.models import *
 from .shelter_areas.models import *
 from .shelter_boxes.models import *
@@ -24,3 +25,4 @@ from .shelter_map_elements.models import *
 from .shelter_inventory_items.models import *
 from .shelter_inventory_movements.models import *
 from .shelter_claim_requests.models import *
+from .pet_weights.models import *

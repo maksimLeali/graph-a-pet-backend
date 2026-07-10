@@ -10,6 +10,9 @@ from math import ceil
 def get_pet(obj,info):
     return pets_domain.get_pet(obj['pet_id'])
 
+def get_ownerships_for_user_pet(user_id, pet_id):
+    return ownerships_data.get_ownerships_for_user_pet(user_id, pet_id)
+
 def get_user(obj, info):
     return users_domain.get_user(obj['user_id'])
 

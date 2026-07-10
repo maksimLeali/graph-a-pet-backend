@@ -107,6 +107,33 @@ def get_walk_ratings_by_walk(walk_id):
         raise e
 
 
+def get_ratings_by_pet(pet_id):
+    """All walk_ratings across every walk logged for pet_id, via
+    walk_ratings -> walks -> treatments -> health_cards -> pet_id."""
+    logger.repository(f"pet_id: {pet_id}")
+    try:
+        # lazy import: repository.treatments.models pulls in the full
+        # repository.models aggregator, which imports this module in turn
+        # (circular if done at module scope, since this package's __init__
+        # runs before "from .walk_ratings.models import *" resolves)
+        from repository.walks.models import Walk
+        from repository.treatments.models import Treatment
+        from repository.health_cards.models import HealthCard
+
+        models = (
+            db.session.query(WalkRating)
+            .join(Walk, WalkRating.walk_id == Walk.id)
+            .join(Treatment, Walk.treatment_id == Treatment.id)
+            .join(HealthCard, Treatment.health_card_id == HealthCard.id)
+            .filter(HealthCard.pet_id == pet_id)
+            .all()
+        )
+        return [m.to_dict() for m in models]
+    except Exception as e:
+        logger.error(e)
+        raise e
+
+
 def get_total_items(common_search):
     try:
         query = build_count(table="walk_ratings", filters=common_search['filters'])

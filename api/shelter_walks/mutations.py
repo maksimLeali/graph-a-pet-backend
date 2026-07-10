@@ -70,6 +70,18 @@ def complete_shelter_walk_resolver(obj, info, id, notes=None):
 
 @convert_kwargs_to_snake_case
 @auth_middleware
+def set_shelter_walk_manual_duration_resolver(obj, info, id, duration_minutes):
+    logger.api(f"id: {id} duration_minutes: {duration_minutes}")
+    try:
+        token = info.context.headers['authorization']
+        assert_shelter_role(token, shelter_walks_domain.shelter_id_for_walk(id), "STAFF")
+        return _ok(shelter_walks_domain.set_manual_duration(id, duration_minutes))
+    except Exception as e:
+        return _err(e, info)
+
+
+@convert_kwargs_to_snake_case
+@auth_middleware
 def cancel_shelter_walk_resolver(obj, info, id, reason=None):
     logger.api(f"id: {id} cancel")
     try:

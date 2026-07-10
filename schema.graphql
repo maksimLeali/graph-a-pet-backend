@@ -116,6 +116,14 @@ type Query {
     listOperationalShelterWalks(shelter_id: ID!): PaginatedShelterWalks!
     listPetsNeedingWalk(shelter_id: ID!, hours: Int = 24): PaginatedShelterPets!
 
+    # WalkingStats (chart.js-ready walk rating trend)
+    getPetWalkingStats(pet_id: ID!, period: StatsPeriod!): WalkRatingChartResult!
+    getShelterPetWalkingStats(shelter_pet_id: ID!, period: StatsPeriod!): WalkRatingChartResult!
+
+    # PetWeight (shared by personal + shelter pets, both are `pets` rows)
+    getLatestPetWeight(pet_id: ID!): PetWeightResult!
+    getPetWeightStats(pet_id: ID!, period: StatsPeriod!): PetWeightChartResult!
+
     # ShelterMap / Box / Occupancy
     getShelterMap(id: ID!): ShelterMapResult!
     listShelterMaps(commonSearch: CommonSearch = {}): PaginatedShelterMaps!
@@ -269,10 +277,13 @@ type Mutation {
     # ShelterWalk
     createShelterWalk(data: ShelterWalkCreate!): ShelterWalkResult!
     updateShelterWalk(id: ID!, data: ShelterWalkUpdate!): ShelterWalkResult!
+    setShelterWalkManualDuration(id: ID!, duration_minutes: Int!): ShelterWalkResult!
     startShelterWalk(id: ID!): ShelterWalkResult!
     completeShelterWalk(id: ID!, notes: String): ShelterWalkResult!
     cancelShelterWalk(id: ID!, reason: String): ShelterWalkResult!
     deleteShelterWalk(id: ID!): DeleteResult!
+    createShelterWalkRating(data: ShelterWalkRatingCreate!): ShelterWalkRatingResult!
+    createPetWeight(data: PetWeightCreate!): PetWeightResult!
 
     # ShelterMap / Box / Occupancy
     createShelterMap(data: ShelterMapCreate!): ShelterMapResult!
@@ -866,6 +877,64 @@ input WalkRatingCreate {
 input WalkRatingUpdate {
     type: WalkRatingType
     rating: Int
+}
+
+############################
+# WalkingStats (chart.js-ready)
+############################
+
+enum StatsPeriod { WEEKLY MONTHLY YEARLY }
+
+type WalkRatingSeries {
+    type: WalkRatingType!
+    # one entry per WalkRatingChartData.labels, null where no rating exists
+    # for that bucket (chart.js renders a gap instead of a false 0 dip)
+    data: [Float]!
+}
+
+type WalkRatingChartData {
+    labels: [String!]!
+    series: [WalkRatingSeries!]!
+}
+
+type WalkRatingChartResult {
+    success: Boolean!
+    error: Error
+    chart: WalkRatingChartData
+}
+
+############################
+# PetWeight
+############################
+
+type PetWeight {
+    id: ID!
+    created_at: String!
+    pet_id: ID!
+    weight_kg: Float!
+}
+
+type PetWeightResult {
+    success: Boolean!
+    error: Error
+    weight: PetWeight
+}
+
+input PetWeightCreate {
+    pet_id: ID!
+    weight_kg: Float!
+}
+
+type PetWeightChartData {
+    labels: [String!]!
+    # one entry per label, null where no weight was logged in that bucket
+    data: [Float]!
+}
+
+type PetWeightChartResult {
+    success: Boolean!
+    error: Error
+    chart: PetWeightChartData
 }
 
 
@@ -1738,6 +1807,7 @@ type ShelterWalk {
     cancelled_at: String
     duration_minutes: Int
     notes: String
+    ratings: [ShelterWalkRating]
 }
 
 type ShelterWalkResult {
@@ -1764,6 +1834,30 @@ input ShelterWalkCreate {
 input ShelterWalkUpdate {
     scheduled_at: String
     notes: String
+}
+
+############################
+# ShelterWalkRating (reuses WalkRatingType)
+############################
+
+type ShelterWalkRating {
+    id: ID!
+    created_at: String!
+    type: WalkRatingType!
+    rating: Int!
+    walk: ShelterWalk!
+}
+
+type ShelterWalkRatingResult {
+    success: Boolean!
+    error: Error
+    walk_rating: ShelterWalkRating
+}
+
+input ShelterWalkRatingCreate {
+    walk_id: ID!
+    type: WalkRatingType!
+    rating: Int!
 }
 
 # ShelterMap / ShelterBox / ShelterBoxOccupancy

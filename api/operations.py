@@ -49,6 +49,11 @@ from api.shelter_tasks.resolvers import shelter_task
 from api.shelter_walks.queries import *
 from api.shelter_walks.mutations import *
 from api.shelter_walks.resolvers import shelter_walk
+from api.shelter_walk_ratings.mutations import *
+from api.shelter_walk_ratings.resolvers import shelter_walk_rating
+from api.walk_stats.queries import *
+from api.pet_weights.queries import *
+from api.pet_weights.mutations import *
 from api.shelter_maps.queries import *
 from api.shelter_maps.mutations import *
 from api.shelter_maps.resolvers import shelter_map
@@ -139,6 +144,10 @@ query.set_field("listWalks", list_walks_resolver)
 query.set_field("getWalk", get_walk_resolver)   
 query.set_field("listWalkRatings", list_walk_ratings_resolver)
 query.set_field("getWalkRating", get_walk_rating_resolver)
+query.set_field("getPetWalkingStats", get_pet_walking_stats_resolver)
+query.set_field("getShelterPetWalkingStats", get_shelter_pet_walking_stats_resolver)
+query.set_field("getLatestPetWeight", get_latest_pet_weight_resolver)
+query.set_field("getPetWeightStats", get_pet_weight_stats_resolver)
 query.set_field("getCure", get_cure_resolver)
 query.set_field("listCures", list_cures_resolver)
 query.set_field("getShelter", get_shelter_resolver)
@@ -246,10 +255,13 @@ mutation.set_field("skipShelterTask", skip_shelter_task_resolver)
 mutation.set_field("deleteShelterTask", delete_shelter_task_resolver)
 mutation.set_field("createShelterWalk", create_shelter_walk_resolver)
 mutation.set_field("updateShelterWalk", update_shelter_walk_resolver)
+mutation.set_field("setShelterWalkManualDuration", set_shelter_walk_manual_duration_resolver)
 mutation.set_field("startShelterWalk", start_shelter_walk_resolver)
 mutation.set_field("completeShelterWalk", complete_shelter_walk_resolver)
 mutation.set_field("cancelShelterWalk", cancel_shelter_walk_resolver)
 mutation.set_field("deleteShelterWalk", delete_shelter_walk_resolver)
+mutation.set_field("createShelterWalkRating", create_shelter_walk_rating_resolver)
+mutation.set_field("createPetWeight", create_pet_weight_resolver)
 mutation.set_field("createShelterMap", create_shelter_map_resolver)
 mutation.set_field("updateShelterMap", update_shelter_map_resolver)
 mutation.set_field("deleteShelterMap", delete_shelter_map_resolver)
@@ -298,4 +310,4 @@ mutation.set_field("cancelShelterClaim", cancel_shelter_claim_resolver)
 mutation.set_field("approveShelterClaim", approve_shelter_claim_resolver)
 mutation.set_field("rejectShelterClaim", reject_shelter_claim_resolver)
 
-object_types = [query, mutation, user, dashboard, pet, ownership, health_card, treatment, report,walk, cure, shelter, shelter_role, shelter_pet, shelter_task, shelter_walk, shelter_map, shelter_box, shelter_box_occupancy, shelter_area, shelter_zone, shelter_inventory_item, shelter_inventory_movement, walk_rating, notification, shelter_invite, shelter_person, shelter_ownership_transfer, shelter_claim_request ]
+object_types = [query, mutation, user, dashboard, pet, ownership, health_card, treatment, report,walk, cure, shelter, shelter_role, shelter_pet, shelter_task, shelter_walk, shelter_walk_rating, shelter_map, shelter_box, shelter_box_occupancy, shelter_area, shelter_zone, shelter_inventory_item, shelter_inventory_movement, walk_rating, notification, shelter_invite, shelter_person, shelter_ownership_transfer, shelter_claim_request ]

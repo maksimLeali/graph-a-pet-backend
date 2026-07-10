@@ -123,6 +123,21 @@ def cancel_shelter_walk(id, reason=None):
         raise e
 
 
+def set_manual_duration(id, duration_minutes):
+    """Overrides duration_minutes directly and clears started_at/ended_at:
+    their absence *is* the "manual" flag the FE renders (no separate column)."""
+    logger.domain(f"id: {id} duration_minutes: {duration_minutes}")
+    try:
+        return shelter_walks_data.update_shelter_walk(id, {
+            "duration_minutes": duration_minutes,
+            "started_at": None,
+            "ended_at": None,
+        })
+    except Exception as e:
+        logger.error(e)
+        raise e
+
+
 def delete_shelter_walk(id, user_id):
     logger.domain(f"id: {id} remove")
     try:
