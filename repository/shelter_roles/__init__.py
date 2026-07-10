@@ -18,6 +18,15 @@ def get_roles_for_user_on_shelter(user_id, shelter_id):
     return [m.to_dict() for m in models]
 
 
+def get_roles_for_user(user_id):
+    """Every ShelterRole the user holds, across all shelters/workspaces."""
+    logger.repository(f"user_id: {user_id}")
+    models = db.session.query(ShelterRole).filter(
+        ShelterRole.user_id == user_id,
+    ).all()
+    return [m.to_dict() for m in models]
+
+
 def get_owner_role_model(user_id, shelter_id):
     """The ShelterRole model (not dict) where user_id holds OWNER on shelter_id, or None."""
     return db.session.query(ShelterRole).filter(

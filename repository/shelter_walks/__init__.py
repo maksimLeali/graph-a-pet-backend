@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime, timedelta
-from sqlalchemy import select, text
+from sqlalchemy import select, text, or_, and_
 from sqlalchemy.exc import ProgrammingError
 from api.errors import BadRequest, NotFoundError
 from repository import db
@@ -52,7 +52,7 @@ def update_shelter_walk(id, data):
             raise NotFoundError(f"no shelter_walk found with id: {id}")
         old = query.first().to_dict()
         payload = dict(data)
-        for k in ("scheduled_at", "started_at", "ended_at"):
+        for k in ("scheduled_at", "started_at", "ended_at", "cancelled_at"):
             if k in payload:
                 payload[k] = _parse_dt(payload.get(k))
         query.update(payload)
@@ -148,6 +148,57 @@ def count_in_progress(shelter_id):
         ShelterPet.shelter_id == shelter_id,
         ShelterWalk.status == ShelterWalkStatus.IN_PROGRESS,
     ).count()
+
+
+def get_walks_assigned_to_user(user_id, start, end, day_start, day_end):
+    """Walks assigned to user_id (as walker): planned/in progress (scheduled
+    within [start, end) or unscheduled — quick-planned walks have no
+    scheduled_at, so it must not be silently dropped), plus walks completed
+    today. Cancelled/old-completed walks are never included here."""
+    rows = db.session.query(ShelterWalk).filter(
+        ShelterWalk.walker_id == user_id,
+        or_(
+            and_(
+                ShelterWalk.status.in_([ShelterWalkStatus.PLANNED, ShelterWalkStatus.IN_PROGRESS]),
+                or_(
+                    ShelterWalk.scheduled_at.is_(None),
+                    and_(ShelterWalk.scheduled_at >= start, ShelterWalk.scheduled_at < end),
+                ),
+            ),
+            and_(
+                ShelterWalk.status == ShelterWalkStatus.COMPLETED,
+                ShelterWalk.ended_at >= day_start,
+                ShelterWalk.ended_at < day_end,
+            ),
+        ),
+    ).order_by(ShelterWalk.scheduled_at.asc()).all()
+    return [r.to_dict() for r in rows]
+
+
+def get_operational_walks(shelter_id, day_start, day_end):
+    """Operational (non-history) walks for a shelter: open walks (planned/in
+    progress, dated or not), plus walks closed (completed/cancelled) today.
+    Closed walks from previous days are excluded — they stay in the DB for
+    future history screens, just not shown here."""
+    rows = db.session.query(ShelterWalk).join(
+        ShelterPet, ShelterWalk.shelter_pet_id == ShelterPet.id
+    ).filter(
+        ShelterPet.shelter_id == shelter_id,
+        or_(
+            ShelterWalk.status.in_([ShelterWalkStatus.PLANNED, ShelterWalkStatus.IN_PROGRESS]),
+            and_(
+                ShelterWalk.status == ShelterWalkStatus.COMPLETED,
+                ShelterWalk.ended_at >= day_start,
+                ShelterWalk.ended_at < day_end,
+            ),
+            and_(
+                ShelterWalk.status == ShelterWalkStatus.CANCELLED,
+                ShelterWalk.cancelled_at >= day_start,
+                ShelterWalk.cancelled_at < day_end,
+            ),
+        ),
+    ).order_by(ShelterWalk.scheduled_at.asc()).all()
+    return [r.to_dict() for r in rows]
 
 
 def get_pets_needing_walk(shelter_id, hours=24):

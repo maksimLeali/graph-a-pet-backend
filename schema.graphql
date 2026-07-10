@@ -108,10 +108,12 @@ type Query {
     # ShelterTask
     getShelterTask(id: ID!): ShelterTaskResult!
     listShelterTasks(commonSearch: CommonSearch = {}): PaginatedShelterTasks!
+    listOperationalShelterTasks(shelter_id: ID!): PaginatedShelterTasks!
 
     # ShelterWalk
     getShelterWalk(id: ID!): ShelterWalkResult!
     listShelterWalks(commonSearch: CommonSearch = {}): PaginatedShelterWalks!
+    listOperationalShelterWalks(shelter_id: ID!): PaginatedShelterWalks!
     listPetsNeedingWalk(shelter_id: ID!, hours: Int = 24): PaginatedShelterPets!
 
     # ShelterMap / Box / Occupancy
@@ -143,6 +145,7 @@ type Query {
     # Shelter dashboard operativa
     getShelterOperationalDashboard(shelter_id: ID!): ShelterOperationalDashboardResult!
     listShelterKpiHistory(shelter_id: ID!, days: Int = 30): ShelterKpiHistoryResult!
+    getMyShelterDashboard(date_from: String!, date_to: String!): MyShelterDashboardResult!
 
     # Notifications
     listMyNotifications(search: CommonSearch = {}): PaginatedNotifications!
@@ -1667,6 +1670,7 @@ type ShelterTask {
     area: String
     status: TaskStatus!
     assignees: [User!]!
+    assignee_shelter_people: [ShelterPerson!]!
     scheduled_at: String
     scheduled_date: String
     completed_at: String
@@ -1698,6 +1702,7 @@ input ShelterTaskCreate {
     task_type: ShelterTaskType!
     area: String
     assignee_ids: [ID!]
+    assignee_shelter_person_ids: [ID!]
     scheduled_at: String
     is_recurring: Boolean = false
     recurrence: RecurrenceInput
@@ -1708,6 +1713,7 @@ input ShelterTaskUpdate {
     task_type: ShelterTaskType
     area: String
     assignee_ids: [ID!]
+    assignee_shelter_person_ids: [ID!]
     scheduled_at: String
     is_recurring: Boolean
     recurrence: RecurrenceInput
@@ -1729,6 +1735,7 @@ type ShelterWalk {
     scheduled_at: String
     started_at: String
     ended_at: String
+    cancelled_at: String
     duration_minutes: Int
     notes: String
 }
@@ -2267,6 +2274,62 @@ type ShelterKpiHistoryResult {
     success: Boolean!
     error: Error
     items: [ShelterKpiSnapshot]!
+}
+
+# Cross-shelter personal dashboard ("what do I have to do")
+############################
+
+enum ShelterInventoryAlertStatus { OUT_OF_STOCK LOW_STOCK }
+
+type MyShelterDashboardTask {
+    id: ID!
+    shelter_id: ID!
+    shelter_name: String!
+    task_type: ShelterTaskType!
+    area: String
+    status: TaskStatus!
+    is_overdue: Boolean!
+    scheduled_at: String
+    action_url: String!
+}
+
+type MyShelterDashboardWalk {
+    id: ID!
+    shelter_id: ID!
+    shelter_name: String!
+    pet_name: String!
+    status: ShelterWalkStatus!
+    scheduled_at: String
+    action_url: String!
+}
+
+type MyShelterDashboardInventoryAlert {
+    id: ID!
+    shelter_id: ID!
+    shelter_name: String!
+    name: String!
+    current_quantity: Float!
+    minimum_threshold: Float
+    status: ShelterInventoryAlertStatus!
+    action_url: String!
+}
+
+type MyShelterDashboard {
+    task_count: Int!
+    overdue_task_count: Int!
+    walk_count: Int!
+    in_progress_walk_count: Int!
+    low_stock_count: Int!
+    out_of_stock_count: Int!
+    tasks: [MyShelterDashboardTask!]!
+    walks: [MyShelterDashboardWalk!]!
+    inventory_alerts: [MyShelterDashboardInventoryAlert!]!
+}
+
+type MyShelterDashboardResult {
+    success: Boolean!
+    error: Error
+    dashboard: MyShelterDashboard
 }
 
 ############################

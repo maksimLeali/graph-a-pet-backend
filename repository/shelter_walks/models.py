@@ -22,6 +22,7 @@ class ShelterWalk(Base):
     scheduled_at = db.Column(db.DateTime, nullable=True)
     started_at = db.Column(db.DateTime, nullable=True)
     ended_at = db.Column(db.DateTime, nullable=True)
+    cancelled_at = db.Column(db.DateTime, nullable=True)
     duration_minutes = db.Column(db.Integer, nullable=True)
     notes = db.Column(db.Text)
 
@@ -39,6 +40,7 @@ class ShelterWalk(Base):
             "scheduled_at": dt(self.scheduled_at),
             "started_at": dt(self.started_at),
             "ended_at": dt(self.ended_at),
+            "cancelled_at": dt(self.cancelled_at),
             "duration_minutes": self.duration_minutes,
             "notes": self.notes,
         }

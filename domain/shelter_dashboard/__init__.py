@@ -8,9 +8,24 @@ import repository.shelter_box_occupancies as occ_data
 import repository.shelter_pets as pets_data
 import repository.shelters as shelters_data
 import repository.shelter_dashboard_snapshots as snapshots_data
+import repository.shelter_roles as shelter_roles_data
+import repository.shelter_inventory_items as inventory_items_data
 import domain.shelter_inventory as inventory_domain
 import domain.shelter_boxes as boxes_domain
+import domain.shelters as shelters_domain
+import domain.pets as pets_domain
 from utils.logger import logger
+
+DATE_FMT = "%Y-%m-%dT%H:%M:%S.%fZ"
+MANAGER_LEVEL_ROLES = {"MANAGER", "OWNER"}
+
+
+def _parse_dt(value):
+    if not value:
+        return None
+    if isinstance(value, datetime):
+        return value
+    return datetime.strptime(value, DATE_FMT)
 
 
 def _box_stats(shelter_id):
@@ -114,6 +129,122 @@ def get_kpi_history(shelter_id, days=30):
         to_date = datetime.today().date()
         from_date = to_date - timedelta(days=max(1, days) - 1)
         return snapshots_data.get_history(shelter_id, from_date, to_date)
+    except Exception as e:
+        logger.error(e)
+        raise e
+
+
+def _shelter_name(shelter_id, cache):
+    if shelter_id not in cache:
+        shelter = shelters_domain.get_shelter(shelter_id)
+        cache[shelter_id] = shelter["name"] if shelter else shelter_id
+    return cache[shelter_id]
+
+
+def get_my_shelter_dashboard(user_id, date_from, date_to, is_global_admin=False):
+    """Cross-shelter 'what do I have to do' view: tasks/walks assigned to
+    user_id, and (for MANAGER+/OWNER members) low/out-of-stock inventory,
+    across every shelter/workspace the user belongs to."""
+    logger.domain(f"user_id: {user_id} date_from: {date_from} date_to: {date_to}")
+    try:
+        start = _parse_dt(date_from)
+        end = _parse_dt(date_to)
+        now = datetime.today()
+        day_start = datetime(now.year, now.month, now.day)
+        day_end = day_start + timedelta(days=1)
+        # tasks use the shelter/app week convention (Monday-Sunday), same as
+        # get_operational_dashboard's tasks_due_this_week — not the rolling
+        # date_from/date_to window used for walks.
+        week_start = day_start - timedelta(days=day_start.weekday())
+        week_end = week_start + timedelta(days=7)
+        shelter_name_cache = {}
+
+        my_roles = shelter_roles_data.get_roles_for_user(user_id)
+        roles_by_shelter = {}
+        for r in my_roles:
+            roles_by_shelter.setdefault(r["shelter_id"], set()).add(r["role"])
+        manager_shelter_ids = [
+            sid for sid, roles in roles_by_shelter.items()
+            if is_global_admin or (roles & MANAGER_LEVEL_ROLES)
+        ]
+
+        # --- tasks assigned to me (current week only) ---
+        tasks = []
+        overdue_task_count = 0
+        for t in tasks_data.get_tasks_assigned_to_user(user_id, week_start, week_end):
+            is_overdue = (
+                t["status"] in ("PENDING", "IN_PROGRESS")
+                and bool(t.get("scheduled_at"))
+                and _parse_dt(t["scheduled_at"]) < now
+            )
+            if is_overdue:
+                overdue_task_count += 1
+            tasks.append({
+                "id": t["id"],
+                "shelter_id": t["shelter_id"],
+                "shelter_name": _shelter_name(t["shelter_id"], shelter_name_cache),
+                "task_type": t["task_type"],
+                "area": t.get("area"),
+                "status": t["status"],
+                "is_overdue": is_overdue,
+                "scheduled_at": t.get("scheduled_at"),
+                "action_url": f"/shelters/detail/{t['shelter_id']}/tasks/{t['id']}",
+            })
+
+        # --- walks assigned to me ---
+        walks = []
+        in_progress_walk_count = 0
+        for w in walks_data.get_walks_assigned_to_user(user_id, start, end, day_start, day_end):
+            shelter_pet = pets_data.get_shelter_pet(w["shelter_pet_id"])
+            shelter_id = shelter_pet["shelter_id"] if shelter_pet else None
+            pet = pets_domain.get_pet(shelter_pet["pet_id"]) if shelter_pet else None
+            if w["status"] == "IN_PROGRESS":
+                in_progress_walk_count += 1
+            walks.append({
+                "id": w["id"],
+                "shelter_id": shelter_id,
+                "shelter_name": _shelter_name(shelter_id, shelter_name_cache) if shelter_id else "",
+                "pet_name": pet["name"] if pet else "",
+                "status": w["status"],
+                "scheduled_at": w.get("scheduled_at"),
+                "action_url": f"/shelters/detail/{shelter_id}/walks/{w['id']}" if shelter_id else "",
+            })
+
+        # --- inventory alerts (MANAGER+/OWNER shelters only) ---
+        inventory_alerts = []
+        low_stock_count = 0
+        out_of_stock_count = 0
+        for sid in manager_shelter_ids:
+            low_items, _ = inventory_domain.list_low_stock_items(sid)
+            for it in low_items:
+                qty = inventory_items_data.get_current_quantity(it["id"])
+                status = "OUT_OF_STOCK" if qty <= 0 else "LOW_STOCK"
+                if status == "OUT_OF_STOCK":
+                    out_of_stock_count += 1
+                else:
+                    low_stock_count += 1
+                inventory_alerts.append({
+                    "id": it["id"],
+                    "shelter_id": sid,
+                    "shelter_name": _shelter_name(sid, shelter_name_cache),
+                    "name": it["name"],
+                    "current_quantity": qty,
+                    "minimum_threshold": it.get("minimum_threshold"),
+                    "status": status,
+                    "action_url": f"/shelters/detail/{sid}/inventory/{it['id']}/edit",
+                })
+
+        return {
+            "task_count": len(tasks),
+            "overdue_task_count": overdue_task_count,
+            "walk_count": len(walks),
+            "in_progress_walk_count": in_progress_walk_count,
+            "low_stock_count": low_stock_count,
+            "out_of_stock_count": out_of_stock_count,
+            "tasks": tasks,
+            "walks": walks,
+            "inventory_alerts": inventory_alerts,
+        }
     except Exception as e:
         logger.error(e)
         raise e

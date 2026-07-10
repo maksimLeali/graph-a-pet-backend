@@ -29,6 +29,22 @@ def list_shelter_tasks_resolver(obj, info: GraphQLResolveInfo, common_search):
 
 @convert_kwargs_to_snake_case
 @auth_middleware
+def list_operational_shelter_tasks_resolver(obj, info, shelter_id):
+    logger.api(f"shelter_id: {shelter_id}")
+    try:
+        token = info.context.headers['authorization']
+        assert_capability(token, shelter_id, Cap.READ)
+        tasks, pagination = shelter_tasks_domain.get_operational_tasks(shelter_id)
+        payload = {"success": True, "items": tasks, "pagination": pagination}
+    except Exception as e:
+        logger.error(e)
+        error = format_error(e, info.context.headers['authorization'])
+        raise GraphQLError(error.get('message'), extensions=error)
+    return payload
+
+
+@convert_kwargs_to_snake_case
+@auth_middleware
 def get_shelter_task_resolver(obj, info, id):
     logger.api(f"id: {id}")
     try:

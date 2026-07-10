@@ -91,13 +91,23 @@ class ShelterTask(Base):
 class ShelterTaskAssignee(Base):
     __tablename__ = 'shelter_task_assignees'
     __table_args__ = (
+        # exactly one of user_id / shelter_person_id is set (enforced in domain
+        # layer): user_id for an app user, shelter_person_id for a shelter
+        # contact/volunteer without an account.
         db.UniqueConstraint('task_id', 'user_id', name='ux_shelter_task_assignee'),
+        db.UniqueConstraint('task_id', 'shelter_person_id', name='ux_shelter_task_assignee_shelter_person'),
         {'schema': schema},
     )
 
     task_id = db.Column(db.String, db.ForeignKey('shelter_tasks.id', ondelete='CASCADE'),
                         nullable=False, index=True)
-    user_id = db.Column(db.String, db.ForeignKey('users.id'), nullable=False, index=True)
+    user_id = db.Column(db.String, db.ForeignKey('users.id'), nullable=True, index=True)
+    shelter_person_id = db.Column(db.String, db.ForeignKey('shelter_people.id'), nullable=True, index=True)
 
     def to_dict(self):
-        return {"id": self.id, "task_id": self.task_id, "user_id": self.user_id}
+        return {
+            "id": self.id,
+            "task_id": self.task_id,
+            "user_id": self.user_id,
+            "shelter_person_id": self.shelter_person_id,
+        }

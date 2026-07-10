@@ -6,6 +6,7 @@ import repository.shelter_roles as shelter_roles_data
 import domain.shelters as shelters_domain
 import domain.shelter_pets as shelter_pets_domain
 import domain.users as users_domain
+import domain.shelter_people as shelter_people_domain
 import domain.damnationes_memoriae as damnatio_domain
 from api.errors import NotFoundError, BadRequest
 from repository.shelter_tasks.models import TaskStatus
@@ -31,11 +32,25 @@ def get_assignees(obj, info):
     return [users_domain.get_user(uid) for uid in ids]
 
 
+def get_assignee_shelter_people(obj, info):
+    ids = shelter_tasks_data.get_task_assignee_shelter_person_ids(obj["id"])
+    return [shelter_people_domain.get_shelter_person(pid) for pid in ids]
+
+
 def _assert_shelter_members(shelter_id, assignee_ids):
     """Every assignee must hold a role on this shelter (canile)."""
     for uid in dict.fromkeys(assignee_ids or []):
         if not shelter_roles_data.get_roles_for_user_on_shelter(uid, shelter_id):
             raise BadRequest(f"user {uid} is not a member of shelter {shelter_id}")
+
+
+def _assert_shelter_people(shelter_id, shelter_person_ids):
+    """Every shelter_person assignee (contact/volunteer without an account)
+    must belong to this shelter."""
+    for pid in dict.fromkeys(shelter_person_ids or []):
+        person = shelter_people_domain.get_shelter_person(pid)
+        if person is None or person["shelter_id"] != shelter_id:
+            raise BadRequest(f"shelter_person {pid} does not belong to shelter {shelter_id}")
 
 
 def get_completed_by(obj, info):
@@ -67,6 +82,8 @@ def create_shelter_task(data):
                 raise NotFoundError(f'no shelter_pet found with id {data.get("shelter_pet_id")}')
         if data.get("assignee_ids"):
             _assert_shelter_members(data.get("shelter_id"), data.get("assignee_ids"))
+        if data.get("assignee_shelter_person_ids"):
+            _assert_shelter_people(data.get("shelter_id"), data.get("assignee_shelter_person_ids"))
         data = rec.apply_to_data(dict(data))
         return shelter_tasks_data.create_shelter_task(data)
     except Exception as e:
@@ -78,16 +95,23 @@ def update_shelter_task(id, data):
     logger.domain(f"id: {id}\ndata: {stringify(data)}")
     try:
         data = dict(data)
-        # assignee_ids may legitimately be [] (clear all) — keep it out of the
-        # None-stripping below and validate against the task's own shelter.
+        # assignee_ids/assignee_shelter_person_ids may legitimately be [] (clear
+        # all) — keep them out of the None-stripping below and validate against
+        # the task's own shelter.
         has_assignees = "assignee_ids" in data
         assignee_ids = data.pop("assignee_ids", None)
+        has_shelter_people = "assignee_shelter_person_ids" in data
+        shelter_person_ids = data.pop("assignee_shelter_person_ids", None)
         data = rec.apply_to_data(data)
         clean = {k: v for k, v in data.items() if v is not None}
-        if has_assignees:
+        if has_assignees or has_shelter_people:
             task = shelter_tasks_data.get_shelter_task(id)
-            _assert_shelter_members(task["shelter_id"], assignee_ids)
-            clean["assignee_ids"] = assignee_ids or []
+            if has_assignees:
+                _assert_shelter_members(task["shelter_id"], assignee_ids)
+                clean["assignee_ids"] = assignee_ids or []
+            if has_shelter_people:
+                _assert_shelter_people(task["shelter_id"], shelter_person_ids)
+                clean["assignee_shelter_person_ids"] = shelter_person_ids or []
         return shelter_tasks_data.update_shelter_task(id, clean)
     except Exception as e:
         logger.error(e)
@@ -189,11 +213,34 @@ def materialize_recurring_tasks(target_date=None):
             if row is not None:
                 # inherit the template's assignee set
                 tpl_assignees = shelter_tasks_data.get_task_assignee_ids(tpl["id"])
-                if tpl_assignees:
-                    shelter_tasks_data.set_task_assignees(row["id"], tpl_assignees)
+                tpl_shelter_people = shelter_tasks_data.get_task_assignee_shelter_person_ids(tpl["id"])
+                if tpl_assignees or tpl_shelter_people:
+                    shelter_tasks_data.set_task_assignees(row["id"], tpl_assignees, tpl_shelter_people)
                 created += 1
         logger.check(f"materialized {created} recurring shelter tasks")
         return created
+    except Exception as e:
+        logger.error(e)
+        raise e
+
+
+def get_operational_tasks(shelter_id):
+    """Non-history tasks view: recurring templates + current-week tasks (see
+    repository.shelter_tasks.get_operational_tasks for the exact rule)."""
+    logger.domain(f"shelter_id: {shelter_id}")
+    try:
+        now = datetime.today()
+        day_start = datetime(now.year, now.month, now.day)
+        week_start = day_start - timedelta(days=day_start.weekday())
+        week_end = week_start + timedelta(days=7)
+        tasks = shelter_tasks_data.get_operational_tasks(shelter_id, week_start, week_end)
+        pagination = {
+            "total_items": len(tasks),
+            "total_pages": 1,
+            "current_page": 0,
+            "page_size": len(tasks),
+        }
+        return (tasks, pagination)
     except Exception as e:
         logger.error(e)
         raise e

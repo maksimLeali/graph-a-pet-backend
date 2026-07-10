@@ -3,6 +3,7 @@ from graphql import GraphQLError, GraphQLResolveInfo
 import domain.shelter_walks as shelter_walks_domain
 from api.errors import format_error
 from api.middlewares import auth_middleware, assert_shelter_role
+from api.permissions import assert_capability, Cap
 from utils.logger import logger, stringify
 from utils import format_common_search
 
@@ -36,6 +37,22 @@ def get_shelter_walk_resolver(obj, info, id):
             "error": format_error(e, info.context.headers['authorization']),
             "shelter_walk": None,
         }
+    return payload
+
+
+@convert_kwargs_to_snake_case
+@auth_middleware
+def list_operational_shelter_walks_resolver(obj, info, shelter_id):
+    logger.api(f"shelter_id: {shelter_id}")
+    try:
+        token = info.context.headers['authorization']
+        assert_capability(token, shelter_id, Cap.READ)
+        walks, pagination = shelter_walks_domain.get_operational_walks(shelter_id)
+        payload = {"success": True, "items": walks, "pagination": pagination}
+    except Exception as e:
+        logger.error(e)
+        error = format_error(e, info.context.headers['authorization'])
+        raise GraphQLError(error.get('message'), extensions=error)
     return payload
 
 

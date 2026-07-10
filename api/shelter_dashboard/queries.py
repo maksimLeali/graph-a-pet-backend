@@ -3,6 +3,8 @@ import domain.shelter_dashboard as dashboard_domain
 from api.errors import format_error
 from api.middlewares import auth_middleware
 from api.permissions import assert_capability, Cap
+from repository.users.models import UserRole
+from utils import get_request_user
 from utils.logger import logger
 
 
@@ -14,6 +16,28 @@ def get_shelter_operational_dashboard_resolver(obj, info, shelter_id):
         token = info.context.headers['authorization']
         assert_capability(token, shelter_id, Cap.READ)
         dashboard = dashboard_domain.get_operational_dashboard(shelter_id)
+        payload = {"success": True, "dashboard": dashboard}
+    except Exception as e:
+        logger.error(e)
+        payload = {
+            "success": False,
+            "error": format_error(e, info.context.headers['authorization']),
+            "dashboard": None,
+        }
+    return payload
+
+
+@convert_kwargs_to_snake_case
+@auth_middleware
+def get_my_shelter_dashboard_resolver(obj, info, date_from, date_to):
+    logger.api(f"date_from: {date_from} date_to: {date_to}")
+    try:
+        token = info.context.headers['authorization']
+        me = get_request_user(token)
+        dashboard = dashboard_domain.get_my_shelter_dashboard(
+            me["id"], date_from, date_to,
+            is_global_admin=(me.get("role") == UserRole.ADMIN.name),
+        )
         payload = {"success": True, "dashboard": dashboard}
     except Exception as e:
         logger.error(e)

@@ -1,5 +1,5 @@
 from math import ceil
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import repository.shelter_walks as shelter_walks_data
 import domain.shelter_pets as shelter_pets_domain
@@ -111,7 +111,10 @@ def complete_shelter_walk(id, notes=None):
 def cancel_shelter_walk(id, reason=None):
     logger.domain(f"id: {id} cancel")
     try:
-        payload = {"status": ShelterWalkStatus.CANCELLED.name}
+        payload = {
+            "status": ShelterWalkStatus.CANCELLED.name,
+            "cancelled_at": datetime.today().strftime(DATE_FMT),
+        }
         if reason is not None:
             payload["notes"] = reason
         return shelter_walks_data.update_shelter_walk(id, payload)
@@ -140,6 +143,27 @@ def get_paginated_shelter_walks(common_search):
     try:
         pagination = get_pagination(common_search)
         walks = shelter_walks_data.get_shelter_walks(common_search)
+        return (walks, pagination)
+    except Exception as e:
+        logger.error(e)
+        raise e
+
+
+def get_operational_walks(shelter_id):
+    """Non-history walks view: open walks + walks closed today (see
+    repository.shelter_walks.get_operational_walks for the exact rule)."""
+    logger.domain(f"shelter_id: {shelter_id}")
+    try:
+        now = datetime.today()
+        day_start = datetime(now.year, now.month, now.day)
+        day_end = day_start + timedelta(days=1)
+        walks = shelter_walks_data.get_operational_walks(shelter_id, day_start, day_end)
+        pagination = {
+            "total_items": len(walks),
+            "total_pages": 1,
+            "current_page": 0,
+            "page_size": len(walks),
+        }
         return (walks, pagination)
     except Exception as e:
         logger.error(e)

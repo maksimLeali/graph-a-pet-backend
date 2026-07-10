@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime
-from sqlalchemy import select, text
+from sqlalchemy import select, text, or_, and_
 from sqlalchemy.exc import ProgrammingError
 from api.errors import BadRequest, NotFoundError
 from repository import db
@@ -61,8 +61,12 @@ def create_shelter_task(data):
         )
         db.session.add(shelter_task)
         db.session.commit()
-        if "assignee_ids" in data:
-            set_task_assignees(shelter_task.id, data.get("assignee_ids"))
+        if "assignee_ids" in data or "assignee_shelter_person_ids" in data:
+            set_task_assignees(
+                shelter_task.id,
+                data.get("assignee_ids"),
+                data.get("assignee_shelter_person_ids"),
+            )
         return shelter_task.to_dict()
     except Exception as e:
         db.session.rollback()
@@ -72,14 +76,28 @@ def create_shelter_task(data):
 
 def get_task_assignee_ids(task_id):
     rows = db.session.query(ShelterTaskAssignee.user_id).filter(
-        ShelterTaskAssignee.task_id == task_id
+        ShelterTaskAssignee.task_id == task_id,
+        ShelterTaskAssignee.user_id.isnot(None),
     ).all()
     return [r[0] for r in rows]
 
 
-def set_task_assignees(task_id, user_ids):
-    """Replace-all: the given user_ids become the exact assignee set."""
-    logger.repository(f"task_id: {task_id} assignees: {stringify(user_ids)}")
+def get_task_assignee_shelter_person_ids(task_id):
+    rows = db.session.query(ShelterTaskAssignee.shelter_person_id).filter(
+        ShelterTaskAssignee.task_id == task_id,
+        ShelterTaskAssignee.shelter_person_id.isnot(None),
+    ).all()
+    return [r[0] for r in rows]
+
+
+def set_task_assignees(task_id, user_ids, shelter_person_ids=None):
+    """Replace-all: the given user_ids/shelter_person_ids become the exact
+    assignee set (shelter_person_ids are contacts/volunteers without an app
+    account)."""
+    logger.repository(
+        f"task_id: {task_id} assignees: {stringify(user_ids)} "
+        f"shelter_person_assignees: {stringify(shelter_person_ids)}"
+    )
     try:
         db.session.query(ShelterTaskAssignee).filter(
             ShelterTaskAssignee.task_id == task_id
@@ -91,8 +109,15 @@ def set_task_assignees(task_id, user_ids):
                 task_id=task_id,
                 user_id=uid,
             ))
+        for pid in dict.fromkeys(shelter_person_ids or []):
+            db.session.add(ShelterTaskAssignee(
+                id=f"{uuid.uuid4()}",
+                created_at=datetime.today().strftime(DATE_FMT),
+                task_id=task_id,
+                shelter_person_id=pid,
+            ))
         db.session.commit()
-        return get_task_assignee_ids(task_id)
+        return get_task_assignee_ids(task_id), get_task_assignee_shelter_person_ids(task_id)
     except Exception as e:
         db.session.rollback()
         logger.error(e)
@@ -111,6 +136,7 @@ def update_shelter_task(id, data):
         old = query.first().to_dict()
         payload = dict(data)
         assignee_ids = payload.pop("assignee_ids", None)
+        assignee_shelter_person_ids = payload.pop("assignee_shelter_person_ids", None)
         if "scheduled_at" in payload:
             payload["scheduled_at"] = _parse_dt(payload.get("scheduled_at"))
         if "completed_at" in payload:
@@ -124,8 +150,16 @@ def update_shelter_task(id, data):
         if payload:
             query.update(payload)
         db.session.commit()
-        if assignee_ids is not None:
-            set_task_assignees(id, assignee_ids)
+        if assignee_ids is not None or assignee_shelter_person_ids is not None:
+            final_user_ids = (
+                assignee_ids if assignee_ids is not None else get_task_assignee_ids(id)
+            )
+            final_shelter_person_ids = (
+                assignee_shelter_person_ids
+                if assignee_shelter_person_ids is not None
+                else get_task_assignee_shelter_person_ids(id)
+            )
+            set_task_assignees(id, final_user_ids, final_shelter_person_ids)
         return {**old, **query.first().to_dict()}
     except Exception as e:
         db.session.rollback()
@@ -172,6 +206,56 @@ def get_total_items(common_search):
     except Exception as e:
         logger.error(e)
         raise e
+
+
+def get_tasks_assigned_to_user(user_id, start, end):
+    """Materialized (non-template) tasks assigned to user_id, any status
+    (pending/overdue/completed/skipped/cancelled), either scheduled within
+    [start, end) or unscheduled (no due date set — still a to-do, so it must
+    not be silently dropped)."""
+    rows = db.session.query(ShelterTask).join(
+        ShelterTaskAssignee, ShelterTaskAssignee.task_id == ShelterTask.id
+    ).filter(
+        ShelterTaskAssignee.user_id == user_id,
+        ShelterTask.is_recurring == False,
+        or_(
+            ShelterTask.scheduled_at.is_(None),
+            and_(ShelterTask.scheduled_at >= start, ShelterTask.scheduled_at < end),
+        ),
+    ).order_by(ShelterTask.scheduled_at.asc()).all()
+    return [r.to_dict() for r in rows]
+
+
+def get_operational_tasks(shelter_id, week_start, week_end):
+    """Operational (non-history) tasks view for a shelter:
+    - recurring templates are always visible (they're a rule, not a to-do
+      bound to a date);
+    - undated one-off tasks are visible while still open (pending/in
+      progress) — same "don't silently drop" convention as elsewhere;
+    - dated tasks (instances or one-off) are visible if scheduled within the
+      current week, whatever their status — closed tasks from previous weeks
+      stay in the DB for future history screens, just not shown here.
+    """
+    week_start_date = week_start.date() if hasattr(week_start, "date") else week_start
+    week_end_date = week_end.date() if hasattr(week_end, "date") else week_end
+    rows = db.session.query(ShelterTask).filter(
+        ShelterTask.shelter_id == shelter_id,
+        or_(
+            ShelterTask.is_recurring == True,
+            and_(
+                ShelterTask.is_recurring == False,
+                ShelterTask.scheduled_date.is_(None),
+                ShelterTask.status.in_([TaskStatus.PENDING, TaskStatus.IN_PROGRESS]),
+            ),
+            and_(
+                ShelterTask.is_recurring == False,
+                ShelterTask.scheduled_date.isnot(None),
+                ShelterTask.scheduled_date >= week_start_date,
+                ShelterTask.scheduled_date < week_end_date,
+            ),
+        ),
+    ).order_by(ShelterTask.scheduled_at.asc()).all()
+    return [r.to_dict() for r in rows]
 
 
 def count_by_status(shelter_id, status_names):
