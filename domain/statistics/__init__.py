@@ -75,7 +75,7 @@ def get_paginated_statistics(common_search):
 def get_statistics_by_group(date_from, date_to, group_type):
     logger.domain(f"from {date_from} to {date_to}")
     try: 
-        this_range_statistics = statistics_data.get_statistics({"filters": { "and": { "ranges" : { "date" : {"min" : date_from, "max" : date_to }}} } ,"pagination" : {"page": 0, "page_size" : 100 }, "ordering" : { "order_by": "date", "order_direction" :"asc"} })
+        this_range_statistics = statistics_data.get_statistics({"filters": { "and": { "ranges" : { "date" : {"min" : date_from, "max" : date_to }}} } ,"pagination" : {"page": 0, "page_size" : 1000 }, "ordering" : { "order_by": "date", "order_direction" :"asc"} })
         logger.info(this_range_statistics)
         statistics = {
             "labels" : [],
@@ -87,17 +87,25 @@ def get_statistics_by_group(date_from, date_to, group_type):
         }
         date_groups = {}
         for record in this_range_statistics :
+            if not record.get("date"):
+                continue
             group = pendulum.parse(record.get("date")).start_of(group_type).format("YYYY-MM-DD")
             if date_groups.get(group) == None :
                 date_groups[group]= []
             date_groups[group].append(record)
+        # i record possono avere metriche NULL: normalizzate a 0 per non far
+        # esplodere format/mean
+        def metric(record, field):
+            return record.get(field) or 0
         for key in date_groups.keys():
+            records = date_groups[key]
+            active_values = [metric(r, "active_users") for r in records]
             statistics["labels"].append(key)
-            statistics["active_users_mean"].append( "{0:.2f}".format(py_.mean_by(date_groups[key], "active_users")))
-            statistics["all_pets"].append( "{0:.2f}".format(py_.mean_by(date_groups[key], "all_pets")))
-            statistics["all_users"].append( "{0:.2f}".format(py_.mean_by(date_groups[key], "all_users")))
-            statistics["active_users_max"].append( "{0:.2f}".format(py_.max_by(date_groups[key], "active_users")["active_users"]))
-            statistics["active_users_min"].append( "{0:.2f}".format(py_.min_by(date_groups[key], "active_users")["active_users"]))
+            statistics["active_users_mean"].append( "{0:.2f}".format(py_.mean(active_values)))
+            statistics["all_pets"].append( "{0:.2f}".format(py_.mean([metric(r, "all_pets") for r in records])))
+            statistics["all_users"].append( "{0:.2f}".format(py_.mean([metric(r, "all_users") for r in records])))
+            statistics["active_users_max"].append( "{0:.2f}".format(max(active_values)))
+            statistics["active_users_min"].append( "{0:.2f}".format(min(active_values)))
         
         logger.check(stringify(statistics))
         return statistics
