@@ -88,6 +88,64 @@ def get_all_permission_keys():
     return {r[0] for r in db.session.query(Permission.key).all()}
 
 
+def create_custom_role(code, name, description, scope_type):
+    existing = db.session.query(Role).filter(Role.code == code).first()
+    if existing:
+        raise ValueError(f"role with code '{code}' already exists")
+    model = Role(
+        id=_new_id(),
+        code=code.upper(),
+        name=name,
+        description=description or None,
+        scope_type=RbacScopeType[scope_type],
+        is_system=False,
+        is_assignable=True,
+        grants_all_permissions=False,
+        created_at=_now(),
+    )
+    db.session.add(model)
+    db.session.flush()
+    return model.to_dict()
+
+
+def archive_role(role_id):
+    model = db.session.query(Role).filter(
+        Role.id == role_id,
+        Role.is_system.is_(False),
+        Role.archived_at.is_(None),
+    ).first()
+    if not model:
+        raise ValueError("role not found, is a system role, or already archived")
+    model.archived_at = _now()
+    model.updated_at = _now()
+    db.session.flush()
+    return model.to_dict()
+
+
+def list_roles_with_permissions():
+    roles = db.session.query(Role).filter(Role.archived_at.is_(None)).order_by(Role.code).all()
+    result = []
+    for role in roles:
+        perm_keys = sorted(get_permission_keys_for_roles([role.id]))
+        r = role.to_dict()
+        r["permissions"] = perm_keys
+        result.append(r)
+    return result
+
+
+def list_user_role_assignments(user_id):
+    rows = db.session.query(UserRoleAssignment, Role).join(
+        Role, UserRoleAssignment.role_id == Role.id
+    ).filter(
+        UserRoleAssignment.user_id == user_id,
+        Role.archived_at.is_(None),
+    ).order_by(UserRoleAssignment.created_at).all()
+    return [
+        {**assignment.to_dict(), "role": role.to_dict()}
+        for assignment, role in rows
+    ]
+
+
 def get_role_by_code(code):
     role = db.session.query(Role).filter(Role.code == code).first()
     return role.to_dict() if role else None

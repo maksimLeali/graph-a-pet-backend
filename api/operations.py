@@ -40,7 +40,8 @@ from api.shelters.resolvers import shelter
 from api.shelter_roles.queries import *
 from api.shelter_roles.mutations import *
 from api.shelter_roles.resolvers import shelter_role
-from api.authorization.queries import my_shelter_authorization_resolver
+from api.authorization.queries import my_shelter_authorization_resolver, list_rbac_roles_resolver, get_user_rbac_roles_resolver, list_permission_catalog_resolver
+from api.authorization.mutations import create_rbac_role_resolver, update_rbac_role_permissions_resolver, archive_rbac_role_resolver
 from api.shelter_pets.queries import *
 from api.shelter_pets.mutations import *
 from api.shelter_pets.resolvers import shelter_pet
@@ -158,6 +159,9 @@ query.set_field("getPublicShelter", get_public_shelter_resolver)
 query.set_field("getShelterRole", get_shelter_role_resolver)
 query.set_field("listShelterRoles", list_shelter_roles_resolver)
 query.set_field("myShelterAuthorization", my_shelter_authorization_resolver)
+query.set_field("listRbacRoles", list_rbac_roles_resolver)
+query.set_field("getUserRbacRoles", get_user_rbac_roles_resolver)
+query.set_field("listPermissionCatalog", list_permission_catalog_resolver)
 query.set_field("getShelterPet", get_shelter_pet_resolver)
 query.set_field("listShelterPets", list_shelter_pets_resolver)
 query.set_field("getShelterTask", get_shelter_task_resolver)
@@ -311,5 +315,8 @@ mutation.set_field("requestShelterClaim", request_shelter_claim_resolver)
 mutation.set_field("cancelShelterClaim", cancel_shelter_claim_resolver)
 mutation.set_field("approveShelterClaim", approve_shelter_claim_resolver)
 mutation.set_field("rejectShelterClaim", reject_shelter_claim_resolver)
+mutation.set_field("createRbacRole", create_rbac_role_resolver)
+mutation.set_field("updateRbacRolePermissions", update_rbac_role_permissions_resolver)
+mutation.set_field("archiveRbacRole", archive_rbac_role_resolver)
 
 object_types = [query, mutation, user, dashboard, pet, ownership, health_card, treatment, report,walk, cure, shelter, shelter_role, shelter_pet, shelter_task, shelter_walk, shelter_walk_rating, shelter_map, shelter_box, shelter_box_occupancy, shelter_area, shelter_zone, shelter_inventory_item, shelter_inventory_movement, walk_rating, notification, shelter_invite, shelter_person, shelter_ownership_transfer, shelter_claim_request ]

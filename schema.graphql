@@ -96,6 +96,9 @@ type Query {
 
     # Authorization (RBAC)
     myShelterAuthorization(shelter_id: ID!): ShelterAuthorizationResult!
+    listRbacRoles: RbacRolesResult!
+    getUserRbacRoles(user_id: ID!): UserRbacResult!
+    listPermissionCatalog: [RbacPermission!]!
     getShelterInvite(id: ID!): ShelterInviteResult!
     listShelterPeople(shelter_id: ID!, search: CommonSearch = {}): PaginatedShelterPeople!
     getShelterPerson(id: ID!): ShelterPerson
@@ -329,6 +332,11 @@ type Mutation {
     markNotificationAsRead(id: ID!): NotificationResult!
     markAllNotificationsAsRead: NotificationResult!
     dismissNotification(id: ID!): NotificationResult!
+
+    # RBAC role management (back-office)
+    createRbacRole(input: CreateRbacRoleInput!): RbacRoleMutationResult!
+    updateRbacRolePermissions(input: UpdateRbacRolePermissionsInput!): RbacRoleMutationResult!
+    archiveRbacRole(role_id: ID!): RbacRoleMutationResult!
 }
 
 
@@ -355,6 +363,66 @@ type ShelterAuthorizationResult {
     success: Boolean!
     error: Error
     authorization: ShelterAuthorization
+}
+
+type RbacRole {
+    id: ID!
+    code: String!
+    name: String!
+    scope_type: String!
+    is_system: Boolean!
+    grants_all_permissions: Boolean!
+    permissions: [String!]!
+}
+
+type RbacRolesResult {
+    success: Boolean!
+    error: Error
+    roles: [RbacRole!]!
+}
+
+type UserRbacAssignment {
+    role_code: String!
+    role_name: String!
+    scope_type: String!
+    shelter_id: ID
+    status: String!
+    valid_from: String
+    valid_until: String
+    assigned_at: String!
+}
+
+type UserRbacResult {
+    success: Boolean!
+    error: Error
+    assignments: [UserRbacAssignment!]!
+    effective_platform_permissions: [String!]!
+}
+
+type RbacPermission {
+    key: String!
+    domain: String!
+    scope_type: String!
+    risk_level: String!
+}
+
+type RbacRoleMutationResult {
+    success: Boolean!
+    error: Error
+    role: RbacRole
+}
+
+input CreateRbacRoleInput {
+    code: String!
+    name: String!
+    description: String
+    scope_type: String!
+    permission_keys: [String!]!
+}
+
+input UpdateRbacRolePermissionsInput {
+    role_id: ID!
+    permission_keys: [String!]!
 }
 
 type GenericResult {
