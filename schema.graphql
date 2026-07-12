@@ -93,6 +93,9 @@ type Query {
     # ShelterRole
     getShelterRole(id: ID!): ShelterRoleResult!
     listShelterRoles(commonSearch: CommonSearch = {}): PaginatedShelterRoles!
+
+    # Authorization (RBAC)
+    myShelterAuthorization(shelter_id: ID!): ShelterAuthorizationResult!
     getShelterInvite(id: ID!): ShelterInviteResult!
     listShelterPeople(shelter_id: ID!, search: CommonSearch = {}): PaginatedShelterPeople!
     getShelterPerson(id: ID!): ShelterPerson
@@ -178,7 +181,7 @@ type Mutation {
     updatePet(id: ID!, data: PetUpdate!): PetResult!
     deletePet(id: ID!): DeleteResult!
     addPet(pet: PetCreate!): PetResult!
-    addPetToUser(pet: PetCreate!, userId: String!): PetAddedResult!
+    addPetToUser(pet: PetCreate!, userId: String!, custodyLevel: CustodyLevel): PetAddedResult!
     addPetToMe(pet: PetCreate!, custodyLevel: CustodyLevel): PetAddedResult!
 
     # Ownership
@@ -338,6 +341,20 @@ type Error {
     errorCode: String
     message: String!
     extra: String
+}
+
+# Authorization (RBAC): effective permissions of the caller on one shelter.
+# The frontend must consume these keys, never derive capabilities from role names.
+type ShelterAuthorization {
+    shelter_id: ID!
+    membership_status: String
+    permissions: [String!]!
+}
+
+type ShelterAuthorizationResult {
+    success: Boolean!
+    error: Error
+    authorization: ShelterAuthorization
 }
 
 type GenericResult {

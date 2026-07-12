@@ -21,6 +21,12 @@ class ErrorCode:
     INVALID_RECURRENCE_RULE = "INVALID_RECURRENCE_RULE"
     CANNOT_DELETE_WITH_ACTIVE_OCCUPANCY = "CANNOT_DELETE_WITH_ACTIVE_OCCUPANCY"
     CANNOT_DELETE_WITH_HISTORY = "CANNOT_DELETE_WITH_HISTORY"
+    INVALID_AUTHORIZATION_SCOPE = "INVALID_AUTHORIZATION_SCOPE"
+    MEMBERSHIP_NOT_ACTIVE = "MEMBERSHIP_NOT_ACTIVE"
+    ROLE_NOT_ASSIGNABLE = "ROLE_NOT_ASSIGNABLE"
+    ROLE_SCOPE_MISMATCH = "ROLE_SCOPE_MISMATCH"
+    PERMISSION_ESCALATION_NOT_ALLOWED = "PERMISSION_ESCALATION_NOT_ALLOWED"
+    LAST_ADMIN_CANNOT_BE_REMOVED = "LAST_ADMIN_CANNOT_BE_REMOVED"
 
 
 class BadRequest(Exception):
@@ -88,12 +94,39 @@ class CannotDeleteWithHistoryError(DomainError):
     error_code = ErrorCode.CANNOT_DELETE_WITH_HISTORY
 
 
+class InvalidAuthorizationScopeError(DomainError):
+    http_status = 400
+    error_code = ErrorCode.INVALID_AUTHORIZATION_SCOPE
+
+class MembershipNotActiveError(DomainError):
+    http_status = 403
+    error_code = ErrorCode.MEMBERSHIP_NOT_ACTIVE
+
+class RoleNotAssignableError(DomainError):
+    http_status = 409
+    error_code = ErrorCode.ROLE_NOT_ASSIGNABLE
+
+class RoleScopeMismatchError(DomainError):
+    http_status = 409
+    error_code = ErrorCode.ROLE_SCOPE_MISMATCH
+
+class PermissionEscalationNotAllowedError(DomainError):
+    http_status = 403
+    error_code = ErrorCode.PERMISSION_ESCALATION_NOT_ALLOWED
+
+class LastAdminCannotBeRemovedError(DomainError):
+    http_status = 409
+    error_code = ErrorCode.LAST_ADMIN_CANNOT_BE_REMOVED
+
+
 errors_types = [
     AuthenticationError, ForbiddenError, NotFoundError, InternalError, BadRequest,
     DomainError, BoxFullError, BoxOutOfServiceError, PetAlreadyAssignedError,
     PetNotAssignedError, InsufficientStockError, DuplicateTaskInstanceError,
     InvalidRecurrenceRuleError, CannotDeleteWithActiveOccupancyError,
-    CannotDeleteWithHistoryError,
+    CannotDeleteWithHistoryError, InvalidAuthorizationScopeError,
+    MembershipNotActiveError, RoleNotAssignableError, RoleScopeMismatchError,
+    PermissionEscalationNotAllowedError, LastAdminCannotBeRemovedError,
 ]
 
 error_pagination = {

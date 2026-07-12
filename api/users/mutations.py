@@ -137,7 +137,7 @@ def verify_user_resolver(obj, info, email, code):
 
 @convert_kwargs_to_snake_case
 @min_role(UserRole.ADMIN.name)
-def add_pet_to_user_resolver(obj, info, pet, user_id, custody_level):
+def add_pet_to_user_resolver(obj, info, pet, user_id, custody_level="OWNER"):
     logger.api(
         f"user_id: {user_id}\n"\
         f"pet: {stringify(pet)}"

@@ -50,10 +50,15 @@ def assert_shelter_role(token, shelter_id, role: str):
     """Verifica che l'utente del token abbia almeno <role> su <shelter_id>.
     ADMIN globale passa sempre. Solleva ForbiddenError altrimenti."""
     user = get_request_user(token)
+    # shadow-compare with RBAC (log-only, grants nothing); late import avoids cycles
+    from domain.authorization.shadow import compare_shelter_decision
     if user.get("role") == UserRole.ADMIN.name:
+        compare_shelter_decision(user["id"], shelter_id, role, legacy_allowed=True)
         return user
     required = SHELTER_ROLE_LEVEL[role]
-    if get_user_shelter_level(user["id"], shelter_id) < required:
+    allowed = get_user_shelter_level(user["id"], shelter_id) >= required
+    compare_shelter_decision(user["id"], shelter_id, role, legacy_allowed=allowed)
+    if not allowed:
         logger.error(f"{user['id']} lacks shelter role {role} on {shelter_id}")
         raise ForbiddenError("insufficient shelter role")
     return user

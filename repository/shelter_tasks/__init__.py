@@ -240,20 +240,7 @@ def get_operational_tasks(shelter_id, week_start, week_end):
     week_end_date = week_end.date() if hasattr(week_end, "date") else week_end
     rows = db.session.query(ShelterTask).filter(
         ShelterTask.shelter_id == shelter_id,
-        or_(
-            ShelterTask.is_recurring == True,
-            and_(
-                ShelterTask.is_recurring == False,
-                ShelterTask.scheduled_date.is_(None),
-                ShelterTask.status.in_([TaskStatus.PENDING, TaskStatus.IN_PROGRESS]),
-            ),
-            and_(
-                ShelterTask.is_recurring == False,
-                ShelterTask.scheduled_date.isnot(None),
-                ShelterTask.scheduled_date >= week_start_date,
-                ShelterTask.scheduled_date < week_end_date,
-            ),
-        ),
+        
     ).order_by(ShelterTask.scheduled_at.asc()).all()
     return [r.to_dict() for r in rows]
 

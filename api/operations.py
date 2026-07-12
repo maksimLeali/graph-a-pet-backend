@@ -40,6 +40,7 @@ from api.shelters.resolvers import shelter
 from api.shelter_roles.queries import *
 from api.shelter_roles.mutations import *
 from api.shelter_roles.resolvers import shelter_role
+from api.authorization.queries import my_shelter_authorization_resolver
 from api.shelter_pets.queries import *
 from api.shelter_pets.mutations import *
 from api.shelter_pets.resolvers import shelter_pet
@@ -156,6 +157,7 @@ query.set_field("discoverShelters", discover_shelters_resolver)
 query.set_field("getPublicShelter", get_public_shelter_resolver)
 query.set_field("getShelterRole", get_shelter_role_resolver)
 query.set_field("listShelterRoles", list_shelter_roles_resolver)
+query.set_field("myShelterAuthorization", my_shelter_authorization_resolver)
 query.set_field("getShelterPet", get_shelter_pet_resolver)
 query.set_field("listShelterPets", list_shelter_pets_resolver)
 query.set_field("getShelterTask", get_shelter_task_resolver)

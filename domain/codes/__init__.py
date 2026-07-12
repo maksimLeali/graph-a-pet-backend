@@ -2,7 +2,6 @@ import random
 import string
 import repository.codes as codes_data
 from utils.logger import logger, stringify
-from domain.pets import get_pets
 
 from math import ceil
 from api.errors import BadRequest
@@ -88,6 +87,8 @@ def create_code(data, current_user):
                         }
                     }
             }}
+            # late import: breaks the pets -> ownerships -> users -> codes cycle
+            from domain.pets import get_pets
             pets = get_pets(pet_filters)
             if(len(pets) == 0):
                 raise BadRequest("to create a code you have to own the pet")

@@ -77,10 +77,15 @@ def user_shelter_level(user_id, shelter_id):
 def has_capability(user, shelter_id, capability):
     """True if `user` (dict) can perform `capability` on `shelter_id`.
     Global ADMIN always passes."""
-    if user.get("role") == UserRole.ADMIN.name:
-        return True
     required_role = CAPABILITY_MIN_ROLE[capability]
-    return user_shelter_level(user["id"], shelter_id) >= ROLE_LEVEL[required_role]
+    if user.get("role") == UserRole.ADMIN.name:
+        allowed = True
+    else:
+        allowed = user_shelter_level(user["id"], shelter_id) >= ROLE_LEVEL[required_role]
+    # shadow-compare with RBAC (log-only); late import avoids cycles
+    from domain.authorization.shadow import compare_shelter_decision
+    compare_shelter_decision(user["id"], shelter_id, required_role, legacy_allowed=allowed)
+    return allowed
 
 
 def assert_capability(token, shelter_id, capability):

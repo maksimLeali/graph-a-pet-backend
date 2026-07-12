@@ -3,7 +3,8 @@ from graphql import GraphQLError, GraphQLResolveInfo
 import domain.shelter_tasks as shelter_tasks_domain
 from api.errors import format_error
 from api.middlewares import auth_middleware
-from api.permissions import assert_capability, Cap
+from api.authorization.decorators import require_permission, authorize_from_token
+from domain.authorization.catalog import ShelterPermissions
 from utils.logger import logger, stringify
 from utils import format_common_search
 
@@ -28,12 +29,10 @@ def list_shelter_tasks_resolver(obj, info: GraphQLResolveInfo, common_search):
 
 
 @convert_kwargs_to_snake_case
-@auth_middleware
+@require_permission(ShelterPermissions.TASKS_READ, shelter_argument="shelter_id")
 def list_operational_shelter_tasks_resolver(obj, info, shelter_id):
     logger.api(f"shelter_id: {shelter_id}")
     try:
-        token = info.context.headers['authorization']
-        assert_capability(token, shelter_id, Cap.READ)
         tasks, pagination = shelter_tasks_domain.get_operational_tasks(shelter_id)
         payload = {"success": True, "items": tasks, "pagination": pagination}
     except Exception as e:
@@ -44,12 +43,15 @@ def list_operational_shelter_tasks_resolver(obj, info, shelter_id):
 
 
 @convert_kwargs_to_snake_case
-@auth_middleware
 def get_shelter_task_resolver(obj, info, id):
     logger.api(f"id: {id}")
     try:
         task = shelter_tasks_domain.get_shelter_task(id)
-        assert_capability(info.context.headers['authorization'], task["shelter_id"], Cap.READ)
+        authorize_from_token(
+            info.context.headers['authorization'],
+            ShelterPermissions.TASKS_READ,
+            task["shelter_id"],
+        )
         payload = {
             "success": True,
             "shelter_task": task,
