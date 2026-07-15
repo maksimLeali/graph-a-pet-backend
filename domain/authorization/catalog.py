@@ -62,6 +62,34 @@ class ShelterPermissions:
     OWNERSHIP_TRANSFER = "shelters.ownership.transfer"
     CLAIM_CREATE = "shelters.claim.create"
 
+    PETS_PUBLISH = "shelters.pets.publish"
+
+    DONATIONS_READ = "shelters.donations.read"
+    DONATIONS_READ_DETAILS = "shelters.donations.read_details"
+    DONATIONS_SETTINGS_MANAGE = "shelters.donations.settings.manage"
+    DONATIONS_ENABLE = "shelters.donations.enable"
+    DONATIONS_DISABLE = "shelters.donations.disable"
+
+    FUNDING_NEEDS_READ = "shelters.funding_needs.read"
+    FUNDING_NEEDS_CREATE = "shelters.funding_needs.create"
+    FUNDING_NEEDS_UPDATE = "shelters.funding_needs.update"
+    FUNDING_NEEDS_CLOSE = "shelters.funding_needs.close"
+
+    FUNDING_LIMITS_READ = "shelters.funding_limits.read"
+    FUNDING_LIMITS_MANAGE = "shelters.funding_limits.manage"
+    FUNDING_LIMITS_OVERRIDE = "shelters.funding_limits.override"
+
+    EXPENSES_READ = "shelters.expenses.read"
+    EXPENSES_CREATE = "shelters.expenses.create"
+    EXPENSES_UPDATE = "shelters.expenses.update"
+    EXPENSES_SUBMIT = "shelters.expenses.submit"
+    EXPENSES_APPROVE = "shelters.expenses.approve"
+
+    FINANCIAL_REPORTS_READ = "shelters.financial_reports.read"
+    FINANCIAL_REPORTS_EXPORT = "shelters.financial_reports.export"
+
+    PUBLIC_PROFILE_MANAGE = "shelters.public_profile.manage"
+
 
 class PlatformPermissions:
     # base application access, granted to every registered user
@@ -76,6 +104,29 @@ class PlatformPermissions:
     CLAIMS_REVIEW = "platform.claims.review"
     ROLES_MANAGE = "platform.roles.manage"
     AUDIT_READ = "platform.audit.read"
+
+    # donor-side (guest donor stays outside RBAC; these apply to
+    # PLATFORM_USER, the standard authenticated donor)
+    DONATIONS_CREATE = "platform.donations.create"
+    DONATIONS_READ_OWN = "platform.donations.read_own"
+    DONATIONS_REQUEST_REFUND = "platform.donations.request_refund"
+    PAYMENT_METHODS_READ_OWN = "platform.payment_methods.read_own"
+    PAYMENT_METHODS_MANAGE_OWN = "platform.payment_methods.manage_own"
+
+    # platform financial administration
+    DONATIONS_READ = "platform.donations.read"
+    DONATIONS_READ_DETAILS = "platform.donations.read_details"
+    DONATIONS_REFUND = "platform.donations.refund"
+    DONATIONS_PARTIAL_REFUND = "platform.donations.partial_refund"
+    DONATIONS_SUSPEND = "platform.donations.suspend"
+    DISPUTES_READ = "platform.disputes.read"
+    DISPUTES_MANAGE = "platform.disputes.manage"
+    CONNECTED_ACCOUNTS_READ = "platform.connected_accounts.read"
+    CONNECTED_ACCOUNTS_MANAGE = "platform.connected_accounts.manage"
+    FINANCIAL_LEDGER_READ = "platform.financial_ledger.read"
+    FINANCIAL_LEDGER_RECONCILE = "platform.financial_ledger.reconcile"
+    WEBHOOKS_READ = "platform.webhooks.read"
+    WEBHOOKS_RETRY = "platform.webhooks.retry"
 
 
 SCOPE_SHELTER = "SHELTER"
@@ -109,6 +160,17 @@ HIGH_RISK = {
     PlatformPermissions.SHELTERS_VERIFY,
     PlatformPermissions.CLAIMS_REVIEW,
     PlatformPermissions.ROLES_MANAGE,
+
+    ShelterPermissions.DONATIONS_ENABLE,
+    ShelterPermissions.DONATIONS_DISABLE,
+    ShelterPermissions.FUNDING_LIMITS_OVERRIDE,
+    ShelterPermissions.EXPENSES_APPROVE,
+    PlatformPermissions.DONATIONS_REFUND,
+    PlatformPermissions.DONATIONS_PARTIAL_REFUND,
+    PlatformPermissions.DONATIONS_SUSPEND,
+    PlatformPermissions.DISPUTES_MANAGE,
+    PlatformPermissions.CONNECTED_ACCOUNTS_MANAGE,
+    PlatformPermissions.FINANCIAL_LEDGER_RECONCILE,
 }
 
 MEDIUM_RISK = {
@@ -124,6 +186,18 @@ MEDIUM_RISK = {
     ShelterPermissions.BOXES_MANAGE,
     ShelterPermissions.MAP_UPDATE,
     PlatformPermissions.AUDIT_READ,
+
+    ShelterPermissions.DONATIONS_READ_DETAILS,
+    ShelterPermissions.DONATIONS_SETTINGS_MANAGE,
+    ShelterPermissions.FUNDING_LIMITS_MANAGE,
+    ShelterPermissions.FINANCIAL_REPORTS_READ,
+    ShelterPermissions.FINANCIAL_REPORTS_EXPORT,
+    ShelterPermissions.EXPENSES_SUBMIT,
+    PlatformPermissions.DONATIONS_READ_DETAILS,
+    PlatformPermissions.DISPUTES_READ,
+    PlatformPermissions.CONNECTED_ACCOUNTS_READ,
+    PlatformPermissions.FINANCIAL_LEDGER_READ,
+    PlatformPermissions.WEBHOOKS_RETRY,
 }
 
 
@@ -190,6 +264,7 @@ SHELTER_STAFF_PERMISSIONS = SHELTER_VOLUNTEER_PERMISSIONS + [
     P.INVENTORY_CONSUME,
     P.BOXES_ASSIGN_PET,
     P.BOXES_RELEASE_PET,
+    P.FUNDING_NEEDS_READ,  # operational visibility only — no donor/financial data
 ]
 
 SHELTER_MANAGER_PERMISSIONS = SHELTER_STAFF_PERMISSIONS + [
@@ -202,6 +277,18 @@ SHELTER_MANAGER_PERMISSIONS = SHELTER_STAFF_PERMISSIONS + [
     P.MAP_UPDATE,
     P.MEMBERS_READ,
     P.MEMBERS_INVITE,
+
+    P.DONATIONS_READ,
+    P.FUNDING_NEEDS_CREATE,
+    P.FUNDING_NEEDS_UPDATE,
+    P.FUNDING_NEEDS_CLOSE,
+    P.FUNDING_LIMITS_READ,
+    P.EXPENSES_READ,
+    P.EXPENSES_CREATE,
+    P.EXPENSES_UPDATE,
+    P.EXPENSES_SUBMIT,
+    P.PUBLIC_PROFILE_MANAGE,
+    P.PETS_PUBLISH,
 ]
 
 SHELTER_ADMIN_PERMISSIONS = SHELTER_MANAGER_PERMISSIONS + [
@@ -214,10 +301,39 @@ SHELTER_ADMIN_PERMISSIONS = SHELTER_MANAGER_PERMISSIONS + [
     P.TASKS_DELETE,        # legacy: deleteShelterTask required OWNER
     P.WALKS_DELETE,        # legacy: deleteShelterWalk required OWNER
     P.PETS_REMOVE,
+
+    P.DONATIONS_READ_DETAILS,
+    P.DONATIONS_SETTINGS_MANAGE,
+    P.DONATIONS_ENABLE,
+    P.DONATIONS_DISABLE,
+    P.FUNDING_LIMITS_MANAGE,
+    P.FUNDING_LIMITS_OVERRIDE,
+    P.EXPENSES_APPROVE,
+    P.FINANCIAL_REPORTS_READ,
+    P.FINANCIAL_REPORTS_EXPORT,
 ]
 
 PLATFORM_USER_PERMISSIONS = [
     PlatformPermissions.APP_USE,
+    PlatformPermissions.DONATIONS_CREATE,
+    PlatformPermissions.DONATIONS_READ_OWN,
+    PlatformPermissions.DONATIONS_REQUEST_REFUND,
+    PlatformPermissions.PAYMENT_METHODS_READ_OWN,
+    PlatformPermissions.PAYMENT_METHODS_MANAGE_OWN,
+]
+
+PLATFORM_FINANCE_OPERATOR_PERMISSIONS = [
+    PlatformPermissions.BACKOFFICE_ACCESS,
+    PlatformPermissions.DONATIONS_READ,
+    PlatformPermissions.DONATIONS_READ_DETAILS,
+    PlatformPermissions.DONATIONS_REFUND,
+    PlatformPermissions.DONATIONS_PARTIAL_REFUND,
+    PlatformPermissions.DISPUTES_READ,
+    PlatformPermissions.DISPUTES_MANAGE,
+    PlatformPermissions.CONNECTED_ACCOUNTS_READ,
+    PlatformPermissions.FINANCIAL_LEDGER_READ,
+    PlatformPermissions.FINANCIAL_LEDGER_RECONCILE,
+    PlatformPermissions.WEBHOOKS_READ,
 ]
 
 SYSTEM_ROLES = [
@@ -274,6 +390,19 @@ SYSTEM_ROLES = [
         "grants_all_permissions": True,
         "permissions": [],
         "legacy_role": "ADMIN",
+    },
+    {
+        # optional/future role — not backed by any legacy tier; assign
+        # explicitly to payment-support staff instead of PLATFORM_ADMIN so
+        # they get financial operations without user/role/system administration.
+        "code": "PLATFORM_FINANCE_OPERATOR",
+        "name": "Finance operator",
+        "description": "Back-office payment support: refunds, disputes, connected accounts, "
+                        "ledger reconciliation and webhook retries — no user/role/shelter administration.",
+        "scope_type": SCOPE_PLATFORM,
+        "grants_all_permissions": False,
+        "permissions": PLATFORM_FINANCE_OPERATOR_PERMISSIONS,
+        "legacy_role": None,
     },
 ]
 

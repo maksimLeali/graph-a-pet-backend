@@ -28,6 +28,19 @@ class ErrorCode:
     PERMISSION_ESCALATION_NOT_ALLOWED = "PERMISSION_ESCALATION_NOT_ALLOWED"
     LAST_ADMIN_CANNOT_BE_REMOVED = "LAST_ADMIN_CANNOT_BE_REMOVED"
 
+    # donations
+    DONATION_EXCEEDS_PET_LIMIT = "DONATION_EXCEEDS_PET_LIMIT"
+    SHELTER_NOT_VERIFIED = "SHELTER_NOT_VERIFIED"
+    SHELTER_DONATIONS_DISABLED = "SHELTER_DONATIONS_DISABLED"
+    PET_NOT_PUBLISHED = "PET_NOT_PUBLISHED"
+    STRIPE_CHARGES_NOT_ENABLED = "STRIPE_CHARGES_NOT_ENABLED"
+    STRIPE_TEST_MODE_VIOLATION = "STRIPE_TEST_MODE_VIOLATION"
+    INVALID_DONATION_AMOUNT = "INVALID_DONATION_AMOUNT"
+    FUNDING_NEED_CLOSED = "FUNDING_NEED_CLOSED"
+    EXPENSE_NOT_EDITABLE = "EXPENSE_NOT_EDITABLE"
+    RATE_LIMITED = "RATE_LIMITED"
+    DUPLICATE_WEBHOOK_EVENT = "DUPLICATE_WEBHOOK_EVENT"
+
 
 class BadRequest(Exception):
     extension = {"code": 400, "error_code": ErrorCode.VALIDATION_ERROR, "extra": None}
@@ -119,6 +132,47 @@ class LastAdminCannotBeRemovedError(DomainError):
     error_code = ErrorCode.LAST_ADMIN_CANNOT_BE_REMOVED
 
 
+class DonationExceedsPetLimitError(DomainError):
+    http_status = 409
+    error_code = ErrorCode.DONATION_EXCEEDS_PET_LIMIT
+
+class ShelterNotVerifiedError(DomainError):
+    http_status = 403
+    error_code = ErrorCode.SHELTER_NOT_VERIFIED
+
+class ShelterDonationsDisabledError(DomainError):
+    http_status = 403
+    error_code = ErrorCode.SHELTER_DONATIONS_DISABLED
+
+class PetNotPublishedError(DomainError):
+    http_status = 403
+    error_code = ErrorCode.PET_NOT_PUBLISHED
+
+class StripeChargesNotEnabledError(DomainError):
+    http_status = 409
+    error_code = ErrorCode.STRIPE_CHARGES_NOT_ENABLED
+
+class StripeTestModeViolationError(DomainError):
+    http_status = 403
+    error_code = ErrorCode.STRIPE_TEST_MODE_VIOLATION
+
+class InvalidDonationAmountError(DomainError):
+    http_status = 422
+    error_code = ErrorCode.INVALID_DONATION_AMOUNT
+
+class FundingNeedClosedError(DomainError):
+    http_status = 409
+    error_code = ErrorCode.FUNDING_NEED_CLOSED
+
+class ExpenseNotEditableError(DomainError):
+    http_status = 409
+    error_code = ErrorCode.EXPENSE_NOT_EDITABLE
+
+class RateLimitedError(DomainError):
+    http_status = 429
+    error_code = ErrorCode.RATE_LIMITED
+
+
 errors_types = [
     AuthenticationError, ForbiddenError, NotFoundError, InternalError, BadRequest,
     DomainError, BoxFullError, BoxOutOfServiceError, PetAlreadyAssignedError,
@@ -127,6 +181,10 @@ errors_types = [
     CannotDeleteWithHistoryError, InvalidAuthorizationScopeError,
     MembershipNotActiveError, RoleNotAssignableError, RoleScopeMismatchError,
     PermissionEscalationNotAllowedError, LastAdminCannotBeRemovedError,
+    DonationExceedsPetLimitError, ShelterNotVerifiedError, ShelterDonationsDisabledError,
+    PetNotPublishedError, StripeChargesNotEnabledError, StripeTestModeViolationError,
+    InvalidDonationAmountError, FundingNeedClosedError, ExpenseNotEditableError,
+    RateLimitedError,
 ]
 
 error_pagination = {

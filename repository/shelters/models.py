@@ -44,12 +44,19 @@ class Shelter(Base):
                            default=ShelterVisibility.PUBLIC.name)
     # public discovery profile (all optional; owner/manager opt in by filling them)
     public_description = db.Column(db.Text, nullable=True)
+    # sanitized rich-text (WYSIWYG) story shown on the public profile — stored
+    # already-sanitized (allowlist, see utils/html_sanitize.py) on write so
+    # render sites can output it directly; NEVER store raw client HTML here
+    public_story_html = db.Column(db.Text, nullable=True)
     public_contact_email = db.Column(db.String, nullable=True)
     public_contact_phone = db.Column(db.String, nullable=True)
     accepts_volunteers = db.Column(db.Boolean, nullable=False, default=False)
     public_location_label = db.Column(db.String, nullable=True)
     public_lat = db.Column(db.Float, nullable=True)
     public_lng = db.Column(db.Float, nullable=True)
+    # IANA timezone name — drives shelter-local calendar-month boundaries
+    # for pet donation limits (domain/donations/limits.py)
+    timezone = db.Column(db.String, nullable=False, default="UTC")
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -67,12 +74,14 @@ class Shelter(Base):
             "verification_status": self.verification_status.name if self.verification_status else ShelterVerificationStatus.VERIFIED.name,
             "visibility": self.visibility.name if self.visibility else ShelterVisibility.PUBLIC.name,
             "public_description": self.public_description,
+            "public_story_html": self.public_story_html,
             "public_contact_email": self.public_contact_email,
             "public_contact_phone": self.public_contact_phone,
             "accepts_volunteers": bool(self.accepts_volunteers),
             "public_location_label": self.public_location_label,
             "public_lat": self.public_lat,
             "public_lng": self.public_lng,
+            "timezone": self.timezone or "UTC",
             "created_at": self.created_at.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
         }
 

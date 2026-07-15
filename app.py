@@ -17,6 +17,8 @@ import schedules
 from api.medias.routes import *
 from api.translations.routes import *
 from api.blueprints import media, translations
+from api.donations.webhooks import donations_webhooks
+from stripe_connect import SAMPLE_ENABLED
 import redis
 import time
 
@@ -121,6 +123,20 @@ def graphql_server():
 
 app.register_blueprint(media)
 app.register_blueprint(translations)
+app.register_blueprint(donations_webhooks)
+
+# The original stripe_connect/ proof-of-concept (seller onboarding demo,
+# product storefront, platform subscriptions) is superseded by the real
+# donation domain above and is DB-incompatible with it (donations_core
+# migration dropped/replaced its tables — see
+# docs/stripe-connect-sample.md). Only registered if explicitly flipped on
+# locally for manual comparison; never enable in a deployed environment.
+if SAMPLE_ENABLED:
+    from stripe_connect.routes import stripe_connect_bp, storefront_bp
+    from stripe_connect.webhooks import stripe_webhooks
+    app.register_blueprint(stripe_connect_bp)
+    app.register_blueprint(storefront_bp)
+    app.register_blueprint(stripe_webhooks)
 
 if __name__ == "__main__":
     log = logging.getLogger('werkzeug')

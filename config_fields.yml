@@ -29,3 +29,12 @@ redis:
     active: ~
     host: ~
     port: ~
+stripe:
+    secret_key: ~
+    webhook_secret: ~
+    thin_webhook_secret: ~
+    sample_platform_price_id: ~
+    platform_fee_percent: ~
+    default_pet_monthly_limit_cents: ~
+    environment: ~
+    enable_legacy_sample: ~

@@ -21,20 +21,24 @@ def auth_middleware(f):
     def function_wrapper(obj: Any, info: GraphQLResolveInfo, **args):
         logger.middleware("check if user is authorized")
         try :
-            bearer = info.context.headers['authorization'].split('Bearer ')[1]
-            decoded_bearer= jwt.decode(bearer,cfg['jwt']['secret'],algorithms=["HS256"] )
-            logger.info(decoded_bearer)
-            
-            get_user(decoded_bearer['user']['id'])
-        except jwt.ExpiredSignatureError as e : 
-            logger.error(f"Token expired for user {decoded_bearer['user']['id']} ")
-            raise Exception("Token expired")
+            try :
+                bearer = info.context.headers['authorization'].split('Bearer ')[1]
+                decoded_bearer= jwt.decode(bearer,cfg['jwt']['secret'],algorithms=["HS256"] )
+                logger.info(decoded_bearer)
+
+                get_user(decoded_bearer['user']['id'])
+            except jwt.ExpiredSignatureError as e :
+                logger.error("Token expired")
+                raise AuthenticationError("Token expired")
+            except Exception as e:
+                logger.error(e)
+                raise AuthenticationError('unauthorized')
+
+            update_user_activity(decoded_bearer.get('user').get('id'))
+            return f(obj, info, **args)
         except Exception as e:
-            logger.error(e)        
-            raise AuthenticationError('unauthorized')      
-            
-        update_user_activity(decoded_bearer.get('user').get('id'))
-        return f(obj, info, **args)
+            error = format_error(e, info.context.headers['authorization'])
+            raise GraphQLError(message=error.get('message'), extensions=error)
     return function_wrapper
 
 # single source of truth lives in api.permissions

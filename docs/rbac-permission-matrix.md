@@ -53,6 +53,35 @@ volunteers executing tasks — accepted, it is the desired end state.
 | map/areas/zones/elements read | `shelters.map.read` | V |
 | map/areas/zones/elements write | `shelters.map.update` | M |
 
+## Donations / funding needs / expenses
+
+No backend entity yet (Donation, FundingNeed, Expense, FinancialReport are not
+implemented) — this section defines the permission keys and role grants ahead
+of the feature build, per `graph-a-pet-app/graph_a_pet_app_backend_summary.md`
+Donations spec. `SHELTER_VOLUNTEER` gets none of these (donor amounts, donor
+identity and financial reports must stay invisible to volunteers); volunteers
+see funding needs only through the same public interface external users use.
+
+| Backend operation (future) | Permission | Min role |
+|---|---|---|
+| view active funding needs (operational) | `shelters.funding_needs.read` | S |
+| create/update/close funding need | `shelters.funding_needs.create` / `.update` / `.close` | M |
+| view donation aggregates | `shelters.donations.read` | M |
+| view donor identity / transaction details | `shelters.donations.read_details` | A (operationally required only) |
+| configure default/override pet funding limit | `shelters.funding_limits.manage` / `.override` | A |
+| view funding limits | `shelters.funding_limits.read` | M |
+| register/update/submit expense | `shelters.expenses.create` / `.update` / `.submit` | M |
+| approve/reject expense | `shelters.expenses.approve` | A |
+| view expenses | `shelters.expenses.read` | M |
+| activate/suspend shelter donations | `shelters.donations.enable` / `.disable` | A |
+| manage public donation settings | `shelters.donations.settings.manage` | A |
+| view/export financial reports | `shelters.financial_reports.read` / `.export` | A |
+| publish shelter pets | `shelters.pets.publish` | M |
+| manage public shelter profile | `shelters.public_profile.manage` | M |
+
+Limit overrides (`shelters.funding_limits.override`) must always write an
+audit record with `reason`, `effective period`, `actor`, `timestamp`.
+
 ## People / members / roles
 
 | Backend operation | Permission | Min role |
@@ -89,6 +118,40 @@ volunteers executing tasks — accepted, it is the desired end state.
 | roles administration | `platform.roles.manage` | ADMIN |
 | audit log read | `platform.audit.read` | ADMIN |
 
+## Donor-side platform permissions (PLATFORM_USER)
+
+No backend entity yet — see the Donations section above. Guest (unauthenticated)
+donors stay outside RBAC entirely: enforced via public API rate limiting and
+payment validation, never a role.
+
+| Backend operation (future) | Permission |
+|---|---|
+| create a donation | `platform.donations.create` |
+| view own donation history | `platform.donations.read_own` |
+| request refund/transaction assistance | `platform.donations.request_refund` |
+| view own saved payment methods (masked) | `platform.payment_methods.read_own` |
+| save/manage own payment methods | `platform.payment_methods.manage_own` |
+
+## Platform financial administration
+
+`PLATFORM_ADMIN` gets these via `grants_all_permissions`. `PLATFORM_FINANCE_OPERATOR`
+(optional/future role, no legacy tier) gets a subset — payment support without
+user/role/shelter administration.
+
+| Backend operation (future) | Permission | PLATFORM_FINANCE_OPERATOR |
+|---|---|---|
+| inspect all donations | `platform.donations.read` | yes |
+| inspect donor/transaction details | `platform.donations.read_details` | yes |
+| full/partial refund | `platform.donations.refund` / `.partial_refund` | yes |
+| suspend shelter donations | `platform.donations.suspend` | no |
+| view/handle disputes | `platform.disputes.read` / `.manage` | yes |
+| view/manage connected accounts | `platform.connected_accounts.read` / `.manage` | read only |
+| read/reconcile financial ledger | `platform.financial_ledger.read` / `.reconcile` | yes |
+| read/retry webhooks | `platform.webhooks.read` / `.retry` | read only |
+
+`PLATFORM_FINANCE_OPERATOR` must never receive `platform.users.*`,
+`platform.roles.manage`, `platform.shelters.verify` or `platform.donations.suspend`.
+
 ## Legacy → RBAC role mapping (backfill)
 
 | Legacy | RBAC role | Notes |
@@ -108,3 +171,4 @@ volunteers executing tasks — accepted, it is the desired end state.
 4. `inventory.read` at STAFF (spec draft: VOLUNTEER) — legacy denied volunteers.
 5. SHELTER_ADMIN includes all SHELTER_MANAGER permissions — legacy OWNER ≥ MANAGER (cumulative hierarchy), so a single SHELTER_ADMIN role keeps parity; assigning admin+manager together is not required.
 6. `tasks.execute` / `walks.execute` at VOLUNTEER (legacy: STAFF) — intentional spec adoption, see pilot note.
+7. Donations/funding needs/expenses/financial reports have no legacy predecessor at all — no divergence to reconcile, catalog follows the spec draft directly.

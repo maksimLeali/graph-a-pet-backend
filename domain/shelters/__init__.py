@@ -2,6 +2,7 @@ import repository.shelters as shelters_data
 import repository.medias as medias_data
 from math import ceil
 from utils.logger import logger, stringify
+from utils.html_sanitize import sanitize_html
 from api.errors import ForbiddenError
 import domain.damnationes_memoriae as damnatio_domain
 import pydash as py_
@@ -10,7 +11,7 @@ import pydash as py_
 SHELTER_UPDATE_FIELDS = [
     "name", "street", "street_number", "city",
     "province_code", "postal_code", "region", "district", "contacts",
-    "public_description", "public_contact_email", "public_contact_phone",
+    "public_description", "public_story_html", "public_contact_email", "public_contact_phone",
     "accepts_volunteers", "public_location_label", "public_lat", "public_lng",
 ]
 
@@ -78,7 +79,12 @@ def update_shelter(id, data):
         f"data: {stringify(data)}"
     )
     try:
-        shelter = shelters_data.update_shelter(id, py_.pick(data, SHELTER_UPDATE_FIELDS))
+        payload = py_.pick(data, SHELTER_UPDATE_FIELDS)
+        # rich text is user-authored and shown to external users — sanitize at
+        # this trusted write boundary so render sites can trust the stored value
+        if "public_story_html" in payload:
+            payload["public_story_html"] = sanitize_html(payload["public_story_html"])
+        shelter = shelters_data.update_shelter(id, payload)
         logger.check(f"shelter: {stringify(shelter)}")
         return shelter
     except Exception as e:
@@ -138,6 +144,7 @@ def _to_public_shelter(shelter):
         "city": shelter.get("city"),
         "region": shelter.get("region"),
         "public_description": shelter.get("public_description"),
+        "public_story_html": shelter.get("public_story_html"),
         "public_contact_email": shelter.get("public_contact_email"),
         "public_contact_phone": shelter.get("public_contact_phone"),
         "logo_media_id": medias_data.get_first_media_id(shelter["id"], SHELTER_LOGO_SCOPE),

@@ -5,3 +5,6 @@ app = Flask(__name__)
 app.url_map.strict_slashes = False
 
 CORS(app, origins=["*"])
+
+from api.cli import register_cli
+register_cli(app)

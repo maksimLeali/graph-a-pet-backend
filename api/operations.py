@@ -92,6 +92,9 @@ from api.shelter_ownership_transfers.resolvers import shelter_ownership_transfer
 from api.shelter_claim_requests.queries import *
 from api.shelter_claim_requests.mutations import *
 from api.shelter_claim_requests.resolvers import shelter_claim_request
+from api.donations.queries import *
+from api.donations.mutations import *
+from api.donations.resolvers import donation, stripe_connected_account
 from domain import refresh_token
 from api.middlewares import auth_middleware
 
@@ -199,6 +202,30 @@ query.set_field("listMyOwnershipTransfers", list_my_ownership_transfers_resolver
 query.set_field("listShelterOwnershipTransfers", list_shelter_ownership_transfers_resolver)
 query.set_field("listMyShelterClaimRequests", list_my_shelter_claim_requests_resolver)
 query.set_field("listShelterClaimRequests", list_shelter_claim_requests_resolver)
+
+# Donations
+query.set_field("discoverPublicShelters", discover_public_shelters_resolver)
+query.set_field("getPublicDonationShelter", get_public_donation_shelter_resolver)
+query.set_field("listPublicShelterPets", list_public_shelter_pets_resolver)
+query.set_field("getPublicShelterPet", get_public_shelter_pet_resolver)
+query.set_field("getPublicPetFundingNeeds", get_public_pet_funding_needs_resolver)
+query.set_field("getPublicDonationAvailability", get_public_donation_availability_resolver)
+query.set_field("listMyDonations", list_my_donations_resolver)
+query.set_field("getMyDonationStatus", get_my_donation_status_resolver)
+query.set_field("listMySavedPaymentMethods", list_my_saved_payment_methods_resolver)
+query.set_field("getShelterDonationOverview", get_shelter_donation_overview_resolver)
+query.set_field("listShelterDonations", list_shelter_donations_resolver)
+query.set_field("listFundingNeeds", list_funding_needs_resolver)
+query.set_field("listPetDonationPolicies", list_pet_donation_policies_resolver)
+query.set_field("getPetDonationLimitHistory", get_pet_donation_limit_history_resolver)
+query.set_field("listShelterExpenses", list_shelter_expenses_resolver)
+query.set_field("getShelterDonationSettings", get_shelter_donation_settings_resolver)
+query.set_field("getShelterMonthlyDonationReport", get_shelter_monthly_donation_report_resolver)
+query.set_field("listPlatformDonations", list_platform_donations_resolver)
+query.set_field("listDisputes", list_disputes_resolver)
+query.set_field("listConnectedAccounts", list_connected_accounts_resolver)
+query.set_field("listFinancialMovements", list_financial_movements_resolver)
+query.set_field("listStripeWebhookEvents", list_stripe_webhook_events_resolver)
 
 
 mutation = MutationType()
@@ -319,4 +346,29 @@ mutation.set_field("createRbacRole", create_rbac_role_resolver)
 mutation.set_field("updateRbacRolePermissions", update_rbac_role_permissions_resolver)
 mutation.set_field("archiveRbacRole", archive_rbac_role_resolver)
 
-object_types = [query, mutation, user, dashboard, pet, ownership, health_card, treatment, report,walk, cure, shelter, shelter_role, shelter_pet, shelter_task, shelter_walk, shelter_walk_rating, shelter_map, shelter_box, shelter_box_occupancy, shelter_area, shelter_zone, shelter_inventory_item, shelter_inventory_movement, walk_rating, notification, shelter_invite, shelter_person, shelter_ownership_transfer, shelter_claim_request ]
+# Donations
+mutation.set_field("createGuestDonationCheckout", create_guest_donation_checkout_resolver)
+mutation.set_field("createAuthenticatedDonation", create_authenticated_donation_resolver)
+mutation.set_field("createPaymentMethodSetup", create_payment_method_setup_resolver)
+mutation.set_field("removeSavedPaymentMethod", remove_saved_payment_method_resolver)
+mutation.set_field("setDefaultPaymentMethod", set_default_payment_method_resolver)
+mutation.set_field("startShelterStripeOnboarding", start_shelter_stripe_onboarding_resolver)
+mutation.set_field("refreshShelterStripeAccount", refresh_shelter_stripe_account_resolver)
+mutation.set_field("updateShelterDonationSettings", update_shelter_donation_settings_resolver)
+mutation.set_field("createFundingNeed", create_funding_need_resolver)
+mutation.set_field("updateFundingNeed", update_funding_need_resolver)
+mutation.set_field("closeFundingNeed", close_funding_need_resolver)
+mutation.set_field("updatePetDonationLimit", update_pet_donation_limit_resolver)
+mutation.set_field("createTemporaryPetLimitOverride", create_temporary_pet_limit_override_resolver)
+mutation.set_field("createShelterExpense", create_shelter_expense_resolver)
+mutation.set_field("updateShelterExpense", update_shelter_expense_resolver)
+mutation.set_field("submitShelterExpense", submit_shelter_expense_resolver)
+mutation.set_field("approveShelterExpense", approve_shelter_expense_resolver)
+mutation.set_field("rejectShelterExpense", reject_shelter_expense_resolver)
+mutation.set_field("refundDonation", refund_donation_resolver)
+mutation.set_field("partiallyRefundDonation", partially_refund_donation_resolver)
+mutation.set_field("suspendConnectedAccount", suspend_connected_account_resolver)
+mutation.set_field("reconcileFinancialTransaction", reconcile_financial_transaction_resolver)
+mutation.set_field("retryStripeWebhookEvent", retry_stripe_webhook_event_resolver)
+
+object_types = [query, mutation, user, dashboard, pet, ownership, health_card, treatment, report,walk, cure, shelter, shelter_role, shelter_pet, shelter_task, shelter_walk, shelter_walk_rating, shelter_map, shelter_box, shelter_box_occupancy, shelter_area, shelter_zone, shelter_inventory_item, shelter_inventory_movement, walk_rating, notification, shelter_invite, shelter_person, shelter_ownership_transfer, shelter_claim_request, donation, stripe_connected_account ]

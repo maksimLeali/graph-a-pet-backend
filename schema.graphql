@@ -164,6 +164,45 @@ type Query {
     # Notifications
     listMyNotifications(search: CommonSearch = {}): PaginatedNotifications!
     getUnreadNotificationCount: Int!
+
+    # Donations — public (no authentication required).
+    # NOTE: the task asked for a query named `getPublicShelter`, but that
+    # name already exists (shelter discovery, api/shelters/queries.py) with
+    # a different, @auth_middleware-gated resolver. Renaming/repointing it
+    # would be an unrelated behavior change to an existing query, so this
+    # domain exposes its own name instead — see the Donations report for
+    # this deliberate deviation.
+    discoverPublicShelters(search: PublicShelterSearchInput): PaginatedPublicShelters!
+    getPublicDonationShelter(shelter_id: ID!): PublicShelter
+    listPublicShelterPets(shelter_id: ID!): PublicShelterPetsResult!
+    getPublicShelterPet(shelter_id: ID!, pet_id: ID!): PublicShelterPetResult!
+    getPublicPetFundingNeeds(pet_id: ID!): PetFundingNeedsResult!
+    getPublicDonationAvailability(shelter_id: ID!, pet_id: ID, funding_need_id: ID): DonationAvailabilityResult!
+
+    # Donations — donor (authenticated)
+    listMyDonations(commonSearch: CommonSearch = {}): PaginatedDonations!
+    # polled client-side (app pending-confirmation screen) every ~20s while a
+    # donation is PENDING/PROCESSING — scoped to the caller's own donation,
+    # 404s (via NotFoundError) if the id doesn't belong to them
+    getMyDonationStatus(donation_id: ID!): DonationResult!
+    listMySavedPaymentMethods: UserPaymentMethodsResult!
+
+    # Donations — shelter operations
+    getShelterDonationOverview(shelter_id: ID!): ShelterDonationOverviewResult!
+    listShelterDonations(shelter_id: ID!, commonSearch: CommonSearch = {}): PaginatedDonations!
+    listFundingNeeds(shelter_id: ID!, status: FundingNeedStatus): PetFundingNeedsResult!
+    listPetDonationPolicies(shelter_id: ID!): PetDonationPoliciesResult!
+    getPetDonationLimitHistory(pet_id: ID!): DonationLimitReservationsResult!
+    listShelterExpenses(shelter_id: ID!, status: ExpenseStatus): ShelterExpensesResult!
+    getShelterDonationSettings(shelter_id: ID!): ShelterDonationSettingsResult!
+    getShelterMonthlyDonationReport(shelter_id: ID!, year: Int!, month: Int!): ShelterMonthlyReportResult!
+
+    # Donations — platform operations
+    listPlatformDonations(commonSearch: CommonSearch = {}, shelter_id: ID, status: DonationStatus, donor_type: DonorType): PaginatedDonations!
+    listDisputes(commonSearch: CommonSearch = {}): PaginatedDonations!
+    listConnectedAccounts(environment: ConnectedAccountEnvironment): PaginatedStripeConnectedAccounts!
+    listFinancialMovements(commonSearch: CommonSearch = {}, shelter_id: ID, movement_type: FinancialMovementType): PaginatedFinancialMovements!
+    listStripeWebhookEvents(commonSearch: CommonSearch = {}, status: WebhookEventStatus, event_type: String): PaginatedStripeWebhookEvents!
 }
 
 type Mutation {
@@ -337,6 +376,35 @@ type Mutation {
     createRbacRole(input: CreateRbacRoleInput!): RbacRoleMutationResult!
     updateRbacRolePermissions(input: UpdateRbacRolePermissionsInput!): RbacRoleMutationResult!
     archiveRbacRole(role_id: ID!): RbacRoleMutationResult!
+
+    # Donations — donor mutations (guest or authenticated)
+    createGuestDonationCheckout(data: GuestDonationCheckoutInput!): DonationCheckoutResult!
+    createAuthenticatedDonation(data: AuthenticatedDonationInput!): DonationCheckoutResult!
+    createPaymentMethodSetup(data: PaymentMethodSetupInput!): PaymentMethodSetupResult!
+    removeSavedPaymentMethod(id: ID!): GenericResult!
+    setDefaultPaymentMethod(id: ID!): UserPaymentMethodResult!
+
+    # Donations — shelter mutations
+    startShelterStripeOnboarding(shelter_id: ID!, refresh_url: String!, return_url: String!): StripeOnboardingResult!
+    refreshShelterStripeAccount(shelter_id: ID!): StripeAccountRefreshResult!
+    updateShelterDonationSettings(shelter_id: ID!, data: ShelterDonationSettingsInput!): ShelterDonationSettingsResult!
+    createFundingNeed(data: FundingNeedCreateInput!): PetFundingNeedResult!
+    updateFundingNeed(id: ID!, data: FundingNeedUpdateInput!): PetFundingNeedResult!
+    closeFundingNeed(id: ID!): PetFundingNeedResult!
+    updatePetDonationLimit(data: PetDonationLimitInput!): PetDonationPolicyResult!
+    createTemporaryPetLimitOverride(data: TemporaryPetLimitOverrideInput!): PetDonationPolicyResult!
+    createShelterExpense(data: ShelterExpenseCreateInput!): ShelterExpenseResult!
+    updateShelterExpense(id: ID!, data: ShelterExpenseUpdateInput!): ShelterExpenseResult!
+    submitShelterExpense(id: ID!): ShelterExpenseResult!
+    approveShelterExpense(id: ID!): ShelterExpenseResult!
+    rejectShelterExpense(id: ID!, reason: String!): ShelterExpenseResult!
+
+    # Donations — platform mutations
+    refundDonation(donation_id: ID!, reason: String): DonationResult!
+    partiallyRefundDonation(donation_id: ID!, amount_cents: Int!, reason: String!): DonationResult!
+    suspendConnectedAccount(connected_account_id: ID!): StripeConnectedAccountResult!
+    reconcileFinancialTransaction(donation_id: ID!): ReconciliationResult!
+    retryStripeWebhookEvent(id: ID!): StripeWebhookEventResult!
 }
 
 
@@ -1385,6 +1453,8 @@ type Shelter {
     verification_status: ShelterVerificationStatus!
     visibility: ShelterVisibility!
     public_description: String
+    # sanitized rich-text (WYSIWYG) story, HTML; see PublicShelter
+    public_story_html: String
     public_contact_email: String
     public_contact_phone: String
     accepts_volunteers: Boolean!
@@ -1415,6 +1485,9 @@ type PublicShelter {
     city: String
     region: String
     public_description: String
+    # sanitized rich-text HTML composed in the backoffice WYSIWYG, safe to
+    # render directly (sanitized server-side on write, see utils/html_sanitize)
+    public_story_html: String
     public_contact_email: String
     public_contact_phone: String
     logo_media_id: ID
@@ -1482,6 +1555,8 @@ input ShelterUpdate {
     district: String
     contacts: [ShelterContactInput]
     public_description: String
+    # raw WYSIWYG HTML; sanitized server-side before persisting
+    public_story_html: String
     public_contact_email: String
     public_contact_phone: String
     accepts_volunteers: Boolean
@@ -2584,6 +2659,580 @@ type PaginatedNotifications {
     success: Boolean
     error: Error
     items: [Notification]!
+    pagination: Pagination!
+}
+
+
+############################
+# Donations
+############################
+# Graph-a-Pet donation domain (repository -> domain -> api, all frontend
+# access through this GraphQL API). Test-mode only for now — see
+# StripeConnectedAccount.environment and every Result's is_test-adjacent
+# fields. Money is always integer minor currency units (cents).
+
+enum DonationTargetType {
+    SHELTER
+    PET
+    PET_FUNDING_NEED
+}
+
+enum DonorType {
+    GUEST
+    AUTHENTICATED
+}
+
+enum DonationStatus {
+    PENDING
+    PROCESSING
+    SUCCEEDED
+    FAILED
+    CANCELED
+}
+
+enum RefundStatus {
+    NONE
+    PARTIAL
+    FULL
+}
+
+enum DisputeStatus {
+    NONE
+    OPEN
+    WON
+    LOST
+}
+
+enum FundingNeedStatus {
+    ACTIVE
+    CLOSED
+}
+
+enum ExpenseStatus {
+    DRAFT
+    SUBMITTED
+    APPROVED
+    REJECTED
+}
+
+enum FinancialMovementType {
+    GROSS_PAYMENT
+    PLATFORM_FEE
+    PROCESSING_FEE
+    SHELTER_NET
+    TRANSFER
+    PAYOUT
+    REFUND
+    DISPUTE
+    REVERSAL
+    ADJUSTMENT
+}
+
+enum WebhookEventStatus {
+    RECEIVED
+    PROCESSED
+    FAILED
+    IGNORED
+}
+
+enum ConnectedAccountEnvironment {
+    TEST
+    LIVE
+}
+
+# --- Connected accounts ---
+
+type StripeConnectedAccount {
+    id: ID!
+    shelter_id: ID!
+    # masked by the resolver for callers without shelters.donations.read_details
+    # / platform.donations.read_details — never exposed in a public URL.
+    stripe_account_id: String
+    environment: ConnectedAccountEnvironment!
+    onboarding_status: String!
+    verification_status: String!
+    charges_enabled: Boolean!
+    payouts_enabled: Boolean!
+    details_submitted: Boolean!
+    donations_enabled: Boolean!
+    # null = shelter uses the global platform default; see
+    # ShelterDonationSettings.default_pet_monthly_limit_cents for the
+    # resolved (never-null) effective value
+    default_pet_monthly_limit_cents: Int
+    is_active: Boolean!
+    last_synced_at: String
+    created_at: String!
+    updated_at: String
+}
+
+type StripeConnectedAccountResult {
+    success: Boolean!
+    error: Error
+    connected_account: StripeConnectedAccount
+}
+
+type PaginatedStripeConnectedAccounts {
+    success: Boolean
+    error: Error
+    items: [StripeConnectedAccount]!
+}
+
+type StripeOnboardingResult {
+    success: Boolean!
+    error: Error
+    connected_account: StripeConnectedAccount
+    onboarding_url: String
+}
+
+type StripeAccountRefreshResult {
+    success: Boolean!
+    error: Error
+    connected_account: StripeConnectedAccount
+    requirements: [String!]
+}
+
+# --- Public pet projection (storefront-safe fields only — never reuses
+#     the internal `Pet` type, which exposes ownerships) ---
+
+type PublicShelterPet {
+    id: ID!
+    shelter_pet_id: ID!
+    name: String!
+    birthday: String
+    gender: Gender
+    breed: String
+    coat_length: CoatLength
+    temperament: String
+    main_picture: Media
+}
+
+type PublicShelterPetResult {
+    success: Boolean!
+    error: Error
+    pet: PublicShelterPet
+}
+
+type PublicShelterPetsResult {
+    success: Boolean!
+    error: Error
+    items: [PublicShelterPet]!
+}
+
+type DonationAvailability {
+    available: Boolean!
+    reasons: [String!]!
+    remaining_pet_allowance_cents: Int
+    # this pet's effective monthly donation limit (cents); null for
+    # shelter/funding-need targets. With remaining_pet_allowance_cents the
+    # app renders a monthly progress bar + goal-reached celebration.
+    pet_monthly_limit_cents: Int
+    is_test_mode: Boolean!
+}
+
+type DonationAvailabilityResult {
+    success: Boolean!
+    error: Error
+    availability: DonationAvailability
+}
+
+# --- Funding needs ---
+
+type PetFundingNeed {
+    id: ID!
+    shelter_id: ID!
+    pet_id: ID
+    title: String!
+    description: String
+    category: String
+    currency: String!
+    target_amount_cents: Int!
+    collected_amount_cents: Int!
+    remaining_amount_cents: Int!
+    status: FundingNeedStatus!
+    starts_at: String
+    ends_at: String
+    closed_at: String
+    created_at: String!
+    updated_at: String
+}
+
+type PetFundingNeedResult {
+    success: Boolean!
+    error: Error
+    funding_need: PetFundingNeed
+}
+
+type PetFundingNeedsResult {
+    success: Boolean!
+    error: Error
+    items: [PetFundingNeed]!
+}
+
+input FundingNeedCreateInput {
+    shelter_id: ID!
+    pet_id: ID
+    title: String!
+    description: String
+    category: String
+    currency: String = "usd"
+    target_amount_cents: Int!
+    starts_at: String
+    ends_at: String
+}
+
+input FundingNeedUpdateInput {
+    title: String
+    description: String
+    category: String
+    target_amount_cents: Int
+    starts_at: String
+    ends_at: String
+}
+
+# --- Pet donation limits ---
+
+type PetDonationPolicy {
+    id: ID!
+    pet_id: ID!
+    shelter_id: ID!
+    custom_monthly_limit_cents: Int
+    is_active: Boolean!
+    temporary_override_cents: Int
+    temporary_override_reason: String
+    temporary_override_effective_at: String
+    temporary_override_expires_at: String
+    created_at: String!
+    updated_at: String
+}
+
+type PetDonationPolicyResult {
+    success: Boolean!
+    error: Error
+    policy: PetDonationPolicy
+}
+
+type PetDonationPoliciesResult {
+    success: Boolean!
+    error: Error
+    items: [PetDonationPolicy]!
+}
+
+# Reservation history doubles as "limit history" — see the design note on
+# PetDonationPolicy in repository/donations/models.py (no dedicated
+# override-log table in the task's fixed 10-model list).
+type DonationLimitReservation {
+    id: ID!
+    pet_id: ID!
+    shelter_id: ID!
+    period_start: String!
+    period_end: String!
+    amount_cents: Int!
+    status: String!
+    expires_at: String!
+    override_reason: String
+    override_expires_at: String
+    donation_id: ID
+    created_at: String!
+}
+
+type DonationLimitReservationsResult {
+    success: Boolean!
+    error: Error
+    items: [DonationLimitReservation]!
+}
+
+input PetDonationLimitInput {
+    pet_id: ID!
+    shelter_id: ID!
+    custom_monthly_limit_cents: Int
+}
+
+input TemporaryPetLimitOverrideInput {
+    pet_id: ID!
+    shelter_id: ID!
+    amount_cents: Int!
+    reason: String!
+    effective_at: String
+    expires_at: String!
+}
+
+# --- Donations ---
+
+type Donation {
+    id: ID!
+    shelter_id: ID!
+    connected_account_id: ID!
+    target_type: DonationTargetType!
+    pet_id: ID
+    funding_need_id: ID
+    reservation_id: ID
+    donor_type: DonorType!
+    donor_user_id: ID
+    # null unless the caller holds shelters.donations.read_details /
+    # platform.donations.read_details — anonymous donors stay anonymous
+    # regardless of caller permission (see api/donations/resolvers.py).
+    donor_email: String
+    currency: String!
+    gross_amount_cents: Int!
+    platform_fee_percent: Float!
+    platform_fee_amount_cents: Int!
+    processing_fee_amount_cents: Int
+    shelter_net_amount_cents: Int
+    status: DonationStatus!
+    refund_status: RefundStatus!
+    refunded_amount_cents: Int!
+    dispute_status: DisputeStatus!
+    is_test: Boolean!
+    stripe_checkout_session_id: ID
+    stripe_payment_intent_id: ID
+    created_at: String!
+    updated_at: String
+}
+
+type DonationResult {
+    success: Boolean!
+    error: Error
+    donation: Donation
+}
+
+type PaginatedDonations {
+    success: Boolean
+    error: Error
+    items: [Donation]!
+    pagination: Pagination!
+}
+
+type DonationCheckoutResult {
+    success: Boolean!
+    error: Error
+    donation: Donation
+    checkout_url: String
+}
+
+input GuestDonationCheckoutInput {
+    shelter_id: ID!
+    target_type: DonationTargetType!
+    pet_id: ID
+    funding_need_id: ID
+    amount_cents: Int!
+    currency: String = "usd"
+    success_url: String!
+    donor_email: String!
+}
+
+input AuthenticatedDonationInput {
+    shelter_id: ID!
+    target_type: DonationTargetType!
+    pet_id: ID
+    funding_need_id: ID
+    amount_cents: Int!
+    currency: String = "usd"
+    success_url: String!
+}
+
+# --- Donor saved payment methods ---
+
+type UserPaymentMethod {
+    id: ID!
+    card_brand: String
+    card_last4: String
+    card_exp_month: Int
+    card_exp_year: Int
+    is_active: Boolean!
+    created_at: String!
+}
+
+type UserPaymentMethodResult {
+    success: Boolean!
+    error: Error
+    payment_method: UserPaymentMethod
+}
+
+type UserPaymentMethodsResult {
+    success: Boolean!
+    error: Error
+    items: [UserPaymentMethod]!
+}
+
+type PaymentMethodSetupResult {
+    success: Boolean!
+    error: Error
+    setup_url: String
+}
+
+input PaymentMethodSetupInput {
+    success_url: String!
+    cancel_url: String!
+    consent_text: String!
+}
+
+# --- Shelter expenses ---
+
+type ShelterExpense {
+    id: ID!
+    shelter_id: ID!
+    pet_id: ID
+    funding_need_id: ID
+    currency: String!
+    amount_cents: Int!
+    description: String!
+    status: ExpenseStatus!
+    created_by_id: ID
+    submitted_at: String
+    approved_by_id: ID
+    approved_at: String
+    rejected_reason: String
+    created_at: String!
+    updated_at: String
+}
+
+type ShelterExpenseResult {
+    success: Boolean!
+    error: Error
+    expense: ShelterExpense
+}
+
+type ShelterExpensesResult {
+    success: Boolean!
+    error: Error
+    items: [ShelterExpense]!
+}
+
+input ShelterExpenseCreateInput {
+    shelter_id: ID!
+    pet_id: ID
+    funding_need_id: ID
+    currency: String = "usd"
+    amount_cents: Int!
+    description: String!
+}
+
+input ShelterExpenseUpdateInput {
+    amount_cents: Int
+    description: String
+    pet_id: ID
+    funding_need_id: ID
+}
+
+# --- Shelter overview / settings / reports ---
+
+type ShelterDonationOverview {
+    gross_amount_cents: Int!
+    platform_fee_amount_cents: Int!
+    processing_fee_amount_cents: Int!
+    shelter_net_amount_cents: Int!
+    refunded_amount_cents: Int!
+    disputed_amount_cents: Int!
+    declared_expenses_cents: Int!
+    unreported_funds_cents: Int!
+    active_funding_needs_count: Int!
+    pets_near_limit_count: Int!
+    pets_at_limit_count: Int!
+    connected_account: StripeConnectedAccount
+    is_test_mode: Boolean!
+}
+
+type ShelterDonationOverviewResult {
+    success: Boolean!
+    error: Error
+    overview: ShelterDonationOverview
+}
+
+type ShelterDonationSettings {
+    donations_enabled: Boolean!
+    default_pet_monthly_limit_cents: Int!
+    platform_fee_percent: Float!
+    unused_funds_policy: String!
+    environment: String!
+    connected_account: StripeConnectedAccount
+}
+
+type ShelterDonationSettingsResult {
+    success: Boolean!
+    error: Error
+    settings: ShelterDonationSettings
+}
+
+input ShelterDonationSettingsInput {
+    donations_enabled: Boolean
+    # null clears the shelter override back to the global platform default;
+    # omitting the field entirely leaves the current setting untouched.
+    default_pet_monthly_limit_cents: Int
+}
+
+type ShelterMonthlyReport {
+    year: Int!
+    month: Int!
+    gross_amount_cents: Int!
+    platform_fee_amount_cents: Int!
+    processing_fee_amount_cents: Int!
+    shelter_net_amount_cents: Int!
+    refunded_amount_cents: Int!
+    disputed_amount_cents: Int!
+    declared_expenses_cents: Int!
+    unreported_funds_cents: Int!
+}
+
+type ShelterMonthlyReportResult {
+    success: Boolean!
+    error: Error
+    report: ShelterMonthlyReport
+}
+
+# --- Ledger ---
+
+type FinancialMovement {
+    id: ID!
+    shelter_id: ID!
+    donation_id: ID
+    movement_type: FinancialMovementType!
+    amount_cents: Int!
+    currency: String!
+    stripe_object_id: String
+    description: String
+    is_test: Boolean!
+    created_at: String!
+}
+
+type PaginatedFinancialMovements {
+    success: Boolean
+    error: Error
+    items: [FinancialMovement]!
+    pagination: Pagination!
+}
+
+type ReconciliationResult {
+    success: Boolean!
+    error: Error
+    donation_id: ID!
+    is_balanced: Boolean!
+    movement_count: Int!
+}
+
+# --- Stripe webhook events ---
+
+type StripeWebhookEvent {
+    id: ID!
+    stripe_event_id: String!
+    event_type: String!
+    livemode: Boolean!
+    status: WebhookEventStatus!
+    attempts: Int!
+    last_error: String
+    processed_at: String
+    created_at: String!
+}
+
+type StripeWebhookEventResult {
+    success: Boolean!
+    error: Error
+    event: StripeWebhookEvent
+}
+
+type PaginatedStripeWebhookEvents {
+    success: Boolean
+    error: Error
+    items: [StripeWebhookEvent]!
     pagination: Pagination!
 }
 

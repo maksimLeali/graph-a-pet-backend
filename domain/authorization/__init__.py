@@ -74,6 +74,8 @@ class AuthorizationService:
         context = self._load_context(user_id, shelter_id)
         effective = self._effective_permissions(context, shelter_id, now=now)
 
+        logger.critical(f"authorization_check user={user_id} permission={permission} shelter={shelter_id} effective={effective}")
+
         if permission in effective:
             return effective
 
@@ -145,7 +147,7 @@ class AuthorizationService:
         role_ids = []
         grants_all_scopes = set()
 
-        for assignment in context["assignments"]:
+        for assignment in context["assignments"]:            
             if not self._assignment_active(assignment, now):
                 continue
             role = assignment["role"]
@@ -162,7 +164,7 @@ class AuthorizationService:
                         f"legacy shelter role without membership: user={assignment['user_id']} "
                         f"shelter={assignment['shelter_id']} role={role['code']}"
                     )
-
+            logger.critical(f'have all permissions? {role.get("grants_all_permissions")}')
             if role.get("grants_all_permissions"):
                 if role["scope_type"] == SCOPE_PLATFORM:
                     grants_all_scopes.add(SCOPE_PLATFORM)
