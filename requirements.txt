@@ -82,7 +82,7 @@ stripe==14.4.0
 telepot==12.7
 time-machine==2.14.1
 toml==0.10.2
-typing_extensions==4.16.0
+typing_extensions==4.13.2
 tzdata==2022.6
 tzlocal==4.2
 uritemplate==4.1.1
