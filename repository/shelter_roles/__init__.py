@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlalchemy.exc import ProgrammingError
 from sqlalchemy import select, text
 from api.errors import InternalError, BadRequest, NotFoundError
-from repository import db
+from repository import db, schema
 from utils.logger import logger, stringify
 from repository.shelter_roles.models import ShelterRole, RoleLevel
 from repository.query_builder import build_query, build_count, build_where
@@ -121,7 +121,7 @@ def get_filtered_shelter_roles(filters,):
     results = select(ShelterRole).from_statement(text(
         f"\
             SELECT  * \
-            FROM shelter_roles \
+            FROM { (schema + '.') if schema else '' }shelter_roles \
             { '' if len(filters)== 0 else build_where(filters) } \
         "))
     shelter_roles = db.session.execute(results).scalars()

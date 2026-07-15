@@ -4,7 +4,7 @@ from repository.query_builder import build_count, build_query
 from utils.logger import logger, stringify
 from datetime import datetime
 from .models import Statistic
-from repository import db
+from repository import db, schema
 from sqlalchemy.exc import InvalidRequestError
 
 import uuid
@@ -80,6 +80,7 @@ def get_statistics(common_search):
 def get_dashboard():
     logger.repository("getting dashboard")
     try:
+        stats_table = f"{schema}.statistics" if schema else "statistics"
         query = "SELECT \n"\
                     "\tdate_trunc('day', stats.date) AS c_date, \n"\
                     "\tROUND(AVG(stats.active_users)::NUMERIC, 2) AS active_users, \n"\
@@ -87,7 +88,7 @@ def get_dashboard():
                     "\tROUND(AVG(stats.all_pets)::NUMERIC, 2) AS all_pets, \n"\
                     "\tgen_random_uuid() as id \n"\
                 "FROM \n"\
-                    "\tstatistics stats \n"\
+                    f"\t{stats_table} stats \n"\
                 "WHERE \n"\
                     "\tCASE \n"\
                         "\t\tWHEN date_part('day', now()) < 7 then stats.date > current_date - interval '7' DAY \n"\

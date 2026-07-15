@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlalchemy.exc import ProgrammingError
 from sqlalchemy import select, text
 from api.errors import InternalError, BadRequest, NotFoundError
-from repository import db
+from repository import db, schema
 from utils.logger import logger, stringify
 from repository.ownerships.models import Ownership
 from repository.query_builder import build_query, build_count, build_where
@@ -57,7 +57,7 @@ def get_filtered_ownerships(filters,):
     results = select(Ownership).from_statement(text(
         f"\
             SELECT  * \
-            FROM ownerships \
+            FROM { (schema + '.') if schema else '' }ownerships \
             { '' if len(filters)== 0 else build_where(filters) } \
         "))
     ownerships = db.session.execute(results).scalars()

@@ -4,7 +4,7 @@ import pydash as py_
 from sqlalchemy import select, text
 from sqlalchemy.exc import ProgrammingError
 from .models import Pet, Gender
-from repository import db, inspector
+from repository import db, inspector, schema
 from repository.query_builder import build_query, build_count
 from utils import camel_to_snake
 from utils.logger import logger, stringify
@@ -113,7 +113,7 @@ def get_filtered_ownerships(filters,):
     results = select(Pet).from_statement(text(
         f"\
             SELECT  * \
-            FROM pets \
+            FROM { (schema + '.') if schema else '' }pets \
             { '' if len(filters)== 0 else build_where(filters) } \
         "))
     ownerships = db.session.execute(results).scalars()

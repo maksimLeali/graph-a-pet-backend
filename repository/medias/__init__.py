@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlalchemy.exc import ProgrammingError
 from sqlalchemy import select, text
 from api.errors import InternalError, BadRequest, NotFoundError
-from repository import db
+from repository import db, schema
 from utils.logger import logger, stringify
 from repository.medias.models import Media
 from repository.query_builder import build_query, build_count, build_where
@@ -67,7 +67,7 @@ def get_filtered_medias(filters,):
     results = select(Media).from_statement(text(
         f"\
             SELECT  * \
-            FROM medias \
+            FROM { (schema + '.') if schema else '' }medias \
             { '' if len(filters)== 0 else build_where(filters) } \
         "))
     medias = db.session.execute(results).scalars()

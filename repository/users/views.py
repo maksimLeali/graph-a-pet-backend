@@ -19,15 +19,17 @@ class UserPetsInCustody(ViewBase):
         }
 
 
+_prefix = f"{schema}." if schema and len(schema) > 0 else ""
+
 view_declaration = f"""
-CREATE OR REPLACE VIEW {schema + '.' if schema and len(schema)> 0 else  '' }user_pets_in_custody AS
+CREATE OR REPLACE VIEW {_prefix}user_pets_in_custody AS
 WITH total_pets_in_custody AS (
 	SELECT
 		usr.id AS user_id,
 		count(ows.id) AS n_pets
 	FROM
-		graph_a_pet.users usr
-	LEFT JOIN graph_a_pet.ownerships ows ON ows.user_id = usr.id
+		{_prefix}users usr
+	LEFT JOIN {_prefix}ownerships ows ON ows.user_id = usr.id
 	GROUP BY
 		usr.id
 ),
@@ -36,8 +38,8 @@ owned_pets AS (
 		usr.id AS user_id,
 		count(ows.id) AS n_pets
 	FROM
-		graph_a_pet.users usr
-	LEFT JOIN graph_a_pet.ownerships ows ON ows.user_id = usr.id
+		{_prefix}users usr
+	LEFT JOIN {_prefix}ownerships ows ON ows.user_id = usr.id
 	WHERE
 		ows.custody_level = 'OWNER'
 	GROUP BY
@@ -48,8 +50,8 @@ total_pets_on_loan AS (
 		usr.id AS user_id,
 		count(ows.id) AS n_pets
 	FROM
-		graph_a_pet.users usr
-	LEFT JOIN graph_a_pet.ownerships ows ON ows.user_id = usr.id
+		{_prefix}users usr
+	LEFT JOIN {_prefix}ownerships ows ON ows.user_id = usr.id
 	WHERE
 		ows.custody_level != 'OWNER'
 	GROUP BY
@@ -60,8 +62,8 @@ total_pets_sitting AS (
 		usr.id AS user_id,
 		count(ows.id) AS n_pets
 	FROM
-		graph_a_pet.users usr
-	LEFT JOIN graph_a_pet.ownerships ows ON ows.user_id = usr.id
+		{_prefix}users usr
+	LEFT JOIN {_prefix}ownerships ows ON ows.user_id = usr.id
 	WHERE
 		ows.custody_level = 'PET_SITTER'
 	GROUP BY
@@ -72,8 +74,8 @@ total_sub_owner AS (
 		usr.id AS user_id,
 		count(ows.id) AS n_pets
 	FROM
-		graph_a_pet.users usr
-	LEFT JOIN graph_a_pet.ownerships ows ON ows.user_id = usr.id
+		{_prefix}users usr
+	LEFT JOIN {_prefix}ownerships ows ON ows.user_id = usr.id
 	WHERE
 		ows.custody_level = 'SUB_OWNER'
 	GROUP BY
@@ -87,7 +89,7 @@ SELECT
 	COALESCE(tps.n_pets, 0) AS pet_sitting,
 	COALESCE(tso.n_pets, 0) AS sub_owner
 FROM
-	graph_a_pet.users usr
+	{_prefix}users usr
 	LEFT JOIN total_pets_in_custody tpic ON tpic.user_id = usr.id
 	LEFT JOIN owned_pets op on op.user_id = usr.id
 	LEFT JOIN total_pets_on_loan tpol on tpol.user_id = usr.id
@@ -96,4 +98,4 @@ FROM
 
 """
 
-view_drop = f"DROP VIEW IF EXISTS {schema + '.' if schema and len(schema)> 0 else  '' }user_pets_in_custody;"
+view_drop = f"DROP VIEW IF EXISTS {_prefix}user_pets_in_custody;"

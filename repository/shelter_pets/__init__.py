@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlalchemy.exc import ProgrammingError
 from sqlalchemy import select, text
 from api.errors import BadRequest, NotFoundError
-from repository import db
+from repository import db, schema
 from utils.logger import logger, stringify
 from repository.shelter_pets.models import ShelterPet
 from repository.pets.models import Pet
@@ -209,7 +209,7 @@ def get_filtered_shelter_pets(filters):
     results = select(ShelterPet).from_statement(text(
         f"\
             SELECT  * \
-            FROM shelter_pets \
+            FROM { (schema + '.') if schema else '' }shelter_pets \
             { '' if len(filters)== 0 else build_where(filters) } \
         "))
     shelter_pets = db.session.execute(results).scalars()
