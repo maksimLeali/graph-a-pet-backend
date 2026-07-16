@@ -114,6 +114,53 @@ def handle_payment_intent_succeeded(payment_intent, stripe_account_id):
 	if donation.funding_need_id:
 		funding_needs_data.increment_collected_amount(donation.funding_need_id, donation.gross_amount_cents)
 
+	_notify_shelter_members_of_donation(donation)
+
+
+def _notify_shelter_members_of_donation(donation):
+	"""Every shelter member with an account gets a DONATION_RECEIVED
+	notification (amount + pet vs shelter target). Failures are swallowed:
+	a notification bug must never fail the financial webhook processing.
+	Imports are function-level to keep this module free of domain-package
+	import cycles. Idempotent per donation+member via dedupe_key, so a
+	webhook redelivery can't double-notify."""
+	try:
+		import domain.notifications as notifications_domain
+		import repository.pets as pets_data
+		import repository.shelter_roles as shelter_roles_data
+		import repository.shelters as shelters_data
+
+		shelter = shelters_data.get_shelter(donation.shelter_id) or {}
+		pet_name = None
+		if donation.pet_id:
+			try:
+				pet = pets_data.get_pet(donation.pet_id) or {}
+				pet_name = pet.get("name")
+			except Exception:
+				pet_name = None
+
+		members = shelter_roles_data.get_roles_for_shelter_levels(
+			donation.shelter_id, ["OWNER", "MANAGER", "STAFF", "VOLUNTEER"],
+		)
+		notified = set()
+		for role in members:
+			member_user_id = role.get("user_id")
+			if not member_user_id or member_user_id in notified:
+				continue  # a user holding multiple roles gets one notification
+			notified.add(member_user_id)
+			notifications_domain.notify_donation_received(
+				donation_id=donation.id,
+				user_id=member_user_id,
+				shelter_id=donation.shelter_id,
+				shelter_name=shelter.get("name"),
+				amount_cents=donation.gross_amount_cents,
+				currency=donation.currency,
+				pet_name=pet_name,
+				is_test=donation.is_test,
+			)
+	except Exception as e:
+		logger.error(f"failed to notify shelter members for donation {donation.id}: {e}")
+
 
 def handle_payment_intent_failed(payment_intent):
 	donation = _donation_for_payment_intent(payment_intent["id"], payment_intent.get("metadata"))

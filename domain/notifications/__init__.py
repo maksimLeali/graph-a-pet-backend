@@ -84,6 +84,79 @@ def notify_shelter_invite(invite_id, user_id, shelter_id, shelter_name, role, ac
     })
 
 
+def notify_shelter_join_request(request_id, user_id, shelter_id, shelter_name, applicant_name, actor_user_id):
+    """Tells one OWNER/MANAGER that someone applied as volunteer."""
+    return notifications_data.create_if_absent({
+        "user_id": user_id,
+        "type": "SHELTER_JOIN_REQUEST",
+        "priority": "HIGH",
+        "title": f"Volunteer application for {shelter_name}",
+        "message": f"{applicant_name} wants to join {shelter_name} as a volunteer.",
+        "entity_type": "SHELTER_JOIN_REQUEST",
+        "entity_id": request_id,
+        "shelter_id": shelter_id,
+        "actor_user_id": actor_user_id,
+        "action_url": f"/shelters/detail/{shelter_id}",
+        "payload": {"shelter_name": shelter_name, "applicant_name": applicant_name},
+        "dedupe_key": f"shelter_join_request:{request_id}:{user_id}",
+    })
+
+
+def notify_shelter_join_decision(request_id, user_id, shelter_id, shelter_name, approved, actor_user_id):
+    """Tells the applicant the outcome of their volunteer application."""
+    title = (
+        f"Application approved for {shelter_name}" if approved
+        else f"Application rejected for {shelter_name}"
+    )
+    message = (
+        f"Your volunteer application for {shelter_name} was approved. Welcome!"
+        if approved else
+        f"Your volunteer application for {shelter_name} was rejected."
+    )
+    return notifications_data.create_if_absent({
+        "user_id": user_id,
+        "type": "SHELTER_JOIN_REQUEST",
+        "priority": "HIGH",
+        "title": title,
+        "message": message,
+        "entity_type": "SHELTER_JOIN_REQUEST",
+        "entity_id": request_id,
+        "shelter_id": shelter_id,
+        "actor_user_id": actor_user_id,
+        "action_url": f"/shelters/detail/{shelter_id}",
+        "payload": {"shelter_name": shelter_name, "approved": approved},
+        "dedupe_key": f"shelter_join_decision:{request_id}:{user_id}",
+    })
+
+
+def notify_donation_received(donation_id, user_id, shelter_id, shelter_name,
+                             amount_cents, currency, pet_name=None, is_test=False):
+    """Tells one shelter member that a donation came in — amount plus
+    whether it went to a specific pet or to the shelter itself."""
+    amount = f"{amount_cents / 100:.2f} {currency.upper()}"
+    target = f"for {pet_name}" if pet_name else f"to {shelter_name}"
+    prefix = "[TEST] " if is_test else ""
+    return notifications_data.create_if_absent({
+        "user_id": user_id,
+        "type": "DONATION_RECEIVED",
+        "priority": "NORMAL",
+        "title": f"{prefix}New donation {target}",
+        "message": f"{prefix}{amount} donated {target}.",
+        "entity_type": "DONATION",
+        "entity_id": donation_id,
+        "shelter_id": shelter_id,
+        "action_url": f"/shelters/detail/{shelter_id}",
+        "payload": {
+            "shelter_name": shelter_name,
+            "pet_name": pet_name,
+            "amount_cents": amount_cents,
+            "currency": currency,
+            "is_test": is_test,
+        },
+        "dedupe_key": f"donation_received:{donation_id}:{user_id}",
+    })
+
+
 def notify_shelter_ownership_transfer(transfer_id, user_id, shelter_id, shelter_name, actor_user_id):
     return notifications_data.create_if_absent({
         "user_id": user_id,

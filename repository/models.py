@@ -25,4 +25,5 @@ from .shelter_map_elements.models import *
 from .shelter_inventory_items.models import *
 from .shelter_inventory_movements.models import *
 from .shelter_claim_requests.models import *
+from .shelter_join_requests.models import *
 from .pet_weights.models import *

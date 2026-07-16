@@ -92,6 +92,9 @@ from api.shelter_ownership_transfers.resolvers import shelter_ownership_transfer
 from api.shelter_claim_requests.queries import *
 from api.shelter_claim_requests.mutations import *
 from api.shelter_claim_requests.resolvers import shelter_claim_request
+from api.shelter_join_requests.queries import *
+from api.shelter_join_requests.mutations import *
+from api.shelter_join_requests.resolvers import shelter_join_request
 from api.donations.queries import *
 from api.donations.mutations import *
 from api.donations.resolvers import donation, stripe_connected_account
@@ -202,6 +205,8 @@ query.set_field("listMyOwnershipTransfers", list_my_ownership_transfers_resolver
 query.set_field("listShelterOwnershipTransfers", list_shelter_ownership_transfers_resolver)
 query.set_field("listMyShelterClaimRequests", list_my_shelter_claim_requests_resolver)
 query.set_field("listShelterClaimRequests", list_shelter_claim_requests_resolver)
+query.set_field("getMyShelterJoinRequest", get_my_shelter_join_request_resolver)
+query.set_field("listShelterJoinRequests", list_shelter_join_requests_resolver)
 
 # Donations
 query.set_field("discoverPublicShelters", discover_public_shelters_resolver)
@@ -342,6 +347,9 @@ mutation.set_field("requestShelterClaim", request_shelter_claim_resolver)
 mutation.set_field("cancelShelterClaim", cancel_shelter_claim_resolver)
 mutation.set_field("approveShelterClaim", approve_shelter_claim_resolver)
 mutation.set_field("rejectShelterClaim", reject_shelter_claim_resolver)
+mutation.set_field("applyToShelterAsVolunteer", apply_to_shelter_as_volunteer_resolver)
+mutation.set_field("approveShelterJoinRequest", approve_shelter_join_request_resolver)
+mutation.set_field("rejectShelterJoinRequest", reject_shelter_join_request_resolver)
 mutation.set_field("createRbacRole", create_rbac_role_resolver)
 mutation.set_field("updateRbacRolePermissions", update_rbac_role_permissions_resolver)
 mutation.set_field("archiveRbacRole", archive_rbac_role_resolver)
@@ -371,4 +379,4 @@ mutation.set_field("suspendConnectedAccount", suspend_connected_account_resolver
 mutation.set_field("reconcileFinancialTransaction", reconcile_financial_transaction_resolver)
 mutation.set_field("retryStripeWebhookEvent", retry_stripe_webhook_event_resolver)
 
-object_types = [query, mutation, user, dashboard, pet, ownership, health_card, treatment, report,walk, cure, shelter, shelter_role, shelter_pet, shelter_task, shelter_walk, shelter_walk_rating, shelter_map, shelter_box, shelter_box_occupancy, shelter_area, shelter_zone, shelter_inventory_item, shelter_inventory_movement, walk_rating, notification, shelter_invite, shelter_person, shelter_ownership_transfer, shelter_claim_request, donation, stripe_connected_account ]
+object_types = [query, mutation, user, dashboard, pet, ownership, health_card, treatment, report,walk, cure, shelter, shelter_role, shelter_pet, shelter_task, shelter_walk, shelter_walk_rating, shelter_map, shelter_box, shelter_box_occupancy, shelter_area, shelter_zone, shelter_inventory_item, shelter_inventory_movement, walk_rating, notification, shelter_invite, shelter_person, shelter_ownership_transfer, shelter_claim_request, shelter_join_request, donation, stripe_connected_account ]

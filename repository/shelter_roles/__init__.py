@@ -44,6 +44,16 @@ def count_owners(shelter_id):
     ).count()
 
 
+def get_roles_for_shelter_levels(shelter_id, levels):
+    """All ShelterRole dicts on shelter_id whose role is in `levels`
+    (list of RoleLevel names, e.g. ["OWNER", "MANAGER"])."""
+    models = db.session.query(ShelterRole).filter(
+        ShelterRole.shelter_id == shelter_id,
+        ShelterRole.role.in_([RoleLevel[l] for l in levels]),
+    ).all()
+    return [m.to_dict() for m in models]
+
+
 def get_owner_role_models_for_shelter(shelter_id):
     """All ShelterRole models (not dicts) holding OWNER on shelter_id."""
     return db.session.query(ShelterRole).filter(

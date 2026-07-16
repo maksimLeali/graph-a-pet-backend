@@ -105,6 +105,8 @@ type Query {
     listMyOwnershipTransfers(search: CommonSearch = {}): PaginatedShelterOwnershipTransfers!
     listShelterOwnershipTransfers(shelter_id: ID!, search: CommonSearch = {}): PaginatedShelterOwnershipTransfers!
     listMyShelterClaimRequests(search: CommonSearch = {}): PaginatedShelterClaimRequests!
+    getMyShelterJoinRequest(shelter_id: ID!): ShelterJoinRequestResult!
+    listShelterJoinRequests(shelter_id: ID!, status: ShelterJoinRequestStatus): ShelterJoinRequestListResult!
     listShelterClaimRequests(shelter_id: ID!, search: CommonSearch = {}): PaginatedShelterClaimRequests!
 
     # ShelterPet
@@ -304,6 +306,9 @@ type Mutation {
     cancelShelterClaim(id: ID!): ShelterClaimRequestResult!
     approveShelterClaim(id: ID!, decision_note: String): ShelterClaimRequestResult!
     rejectShelterClaim(id: ID!, decision_note: String): ShelterClaimRequestResult!
+    applyToShelterAsVolunteer(shelter_id: ID!, message: String): ShelterJoinRequestResult!
+    approveShelterJoinRequest(id: ID!): ShelterJoinRequestResult!
+    rejectShelterJoinRequest(id: ID!): ShelterJoinRequestResult!
 
     # ShelterPet
     createShelterPet(data: ShelterPetCreate!): ShelterPetResult!
@@ -1788,6 +1793,37 @@ type ShelterClaimRequestResult {
     shelter_claim_request: ShelterClaimRequest
 }
 
+enum ShelterJoinRequestStatus {
+    PENDING
+    APPROVED
+    REJECTED
+    CANCELLED
+}
+
+type ShelterJoinRequest {
+    id: ID!
+    created_at: String!
+    updated_at: String
+    shelter: Shelter!
+    user: User!
+    status: ShelterJoinRequestStatus!
+    message: String
+    reviewed_by: User
+    reviewed_at: String
+}
+
+type ShelterJoinRequestResult {
+    success: Boolean!
+    error: Error
+    shelter_join_request: ShelterJoinRequest
+}
+
+type ShelterJoinRequestListResult {
+    success: Boolean!
+    error: Error
+    items: [ShelterJoinRequest]!
+}
+
 type PaginatedShelterClaimRequests {
     success: Boolean
     error: Error
@@ -2598,6 +2634,8 @@ enum NotificationType {
     SHELTER_JOIN_REQUEST
     PET_BIRTHDAY
     SHELTER_OWNERSHIP_TRANSFER
+    SHELTER_CLAIM_REQUEST
+    DONATION_RECEIVED
 }
 
 enum NotificationStatus {
@@ -2623,6 +2661,8 @@ enum NotificationEntityType {
     SHELTER_TASK
     SHELTER_JOIN_REQUEST
     SHELTER_OWNERSHIP_TRANSFER
+    SHELTER_CLAIM_REQUEST
+    DONATION
 }
 
 type Notification {
