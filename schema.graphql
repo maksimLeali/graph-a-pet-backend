@@ -380,6 +380,8 @@ type Mutation {
     # RBAC role management (back-office)
     createRbacRole(input: CreateRbacRoleInput!): RbacRoleMutationResult!
     updateRbacRolePermissions(input: UpdateRbacRolePermissionsInput!): RbacRoleMutationResult!
+    assignRbacRoleToUser(user_id: ID!, role_id: ID!, shelter_id: ID): UserRbacAssignmentResult!
+    revokeRbacRoleAssignment(assignment_id: ID!): UserRbacAssignmentResult!
     archiveRbacRole(role_id: ID!): RbacRoleMutationResult!
 
     # Donations — donor mutations (guest or authenticated)
@@ -455,6 +457,8 @@ type RbacRolesResult {
 }
 
 type UserRbacAssignment {
+    id: ID!
+    role_id: ID!
     role_code: String!
     role_name: String!
     scope_type: String!
@@ -463,6 +467,12 @@ type UserRbacAssignment {
     valid_from: String
     valid_until: String
     assigned_at: String!
+}
+
+type UserRbacAssignmentResult {
+    success: Boolean!
+    error: Error
+    assignment: UserRbacAssignment
 }
 
 type UserRbacResult {

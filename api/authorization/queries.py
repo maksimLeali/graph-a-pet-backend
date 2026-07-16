@@ -48,6 +48,8 @@ def get_user_rbac_roles_resolver(obj, info, user_id):
         result = []
         for a in assignments:
             result.append({
+                "id": a["id"],
+                "role_id": a["role_id"],
                 "role_code": a["role"]["code"],
                 "role_name": a["role"]["name"],
                 "scope_type": a["role"]["scope_type"],

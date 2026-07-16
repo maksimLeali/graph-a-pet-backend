@@ -79,11 +79,36 @@ def create_user(data):
     logger.domain(f'data: {stringify(data)}')
     try:
         user = users_data.create_user(data)
+        _assign_default_platform_role(user)
         generate_and_send_code(user);
         return user
     except Exception as e:
         logger.error(e)
         raise e
+
+
+def _assign_default_platform_role(user):
+    """Every new registration gets the PLATFORM_USER RBAC role immediately
+    (before email verification), so base permissions exist from the first
+    request. Non-fatal: a missing/unseeded role table must not block
+    signup — it only logs, and the seed/backfill CLI can repair later."""
+    try:
+        import repository.authorization as authz_data
+        from repository import db
+
+        role = authz_data.get_role_by_code("PLATFORM_USER")
+        if role is None:
+            logger.error("PLATFORM_USER role missing from roles table — run the RBAC seed CLI")
+            return
+        authz_data.ensure_user_role(user["id"], role["id"])
+        db.session.commit()
+    except Exception as e:
+        try:
+            from repository import db
+            db.session.rollback()
+        except Exception:
+            pass
+        logger.error(f"failed to assign PLATFORM_USER to new user {user.get('id')}: {e}")
 
 
 def update_user(id, data):

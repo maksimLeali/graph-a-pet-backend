@@ -41,7 +41,7 @@ from api.shelter_roles.queries import *
 from api.shelter_roles.mutations import *
 from api.shelter_roles.resolvers import shelter_role
 from api.authorization.queries import my_shelter_authorization_resolver, list_rbac_roles_resolver, get_user_rbac_roles_resolver, list_permission_catalog_resolver
-from api.authorization.mutations import create_rbac_role_resolver, update_rbac_role_permissions_resolver, archive_rbac_role_resolver
+from api.authorization.mutations import create_rbac_role_resolver, update_rbac_role_permissions_resolver, archive_rbac_role_resolver, assign_rbac_role_to_user_resolver, revoke_rbac_role_assignment_resolver
 from api.shelter_pets.queries import *
 from api.shelter_pets.mutations import *
 from api.shelter_pets.resolvers import shelter_pet
@@ -352,6 +352,8 @@ mutation.set_field("approveShelterJoinRequest", approve_shelter_join_request_res
 mutation.set_field("rejectShelterJoinRequest", reject_shelter_join_request_resolver)
 mutation.set_field("createRbacRole", create_rbac_role_resolver)
 mutation.set_field("updateRbacRolePermissions", update_rbac_role_permissions_resolver)
+mutation.set_field("assignRbacRoleToUser", assign_rbac_role_to_user_resolver)
+mutation.set_field("revokeRbacRoleAssignment", revoke_rbac_role_assignment_resolver)
 mutation.set_field("archiveRbacRole", archive_rbac_role_resolver)
 
 # Donations

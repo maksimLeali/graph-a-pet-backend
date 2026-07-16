@@ -147,6 +147,11 @@ def list_user_role_assignments(user_id):
     ]
 
 
+def get_role(role_id):
+    role = db.session.query(Role).filter(Role.id == role_id).first()
+    return role.to_dict() if role else None
+
+
 def get_role_by_code(code):
     role = db.session.query(Role).filter(Role.code == code).first()
     return role.to_dict() if role else None
@@ -241,6 +246,55 @@ def ensure_membership(shelter_id, user_id, source, status=ShelterMembershipStatu
     db.session.add(model)
     db.session.flush()
     return model.to_dict(), True
+
+
+def admin_assign_user_role(user_id, role_id, shelter_id=None, assigned_by_id=None):
+    """Explicit admin assignment. Unlike ensure_user_role (backfill-safe),
+    this DOES reactivate a previously revoked/suspended/expired row — the
+    admin is deliberately re-granting the role."""
+    q = db.session.query(UserRoleAssignment).filter(
+        UserRoleAssignment.user_id == user_id,
+        UserRoleAssignment.role_id == role_id,
+    )
+    if shelter_id is None:
+        q = q.filter(UserRoleAssignment.shelter_id.is_(None))
+    else:
+        q = q.filter(UserRoleAssignment.shelter_id == shelter_id)
+    existing = q.first()
+    if existing:
+        existing.status = UserRoleStatus.ACTIVE
+        existing.revoked_at = None
+        existing.revoked_by_id = None
+        existing.assigned_by_id = assigned_by_id
+        existing.updated_at = _now()
+        db.session.flush()
+        return existing.to_dict(), False
+    model = UserRoleAssignment(
+        id=_new_id(),
+        user_id=user_id,
+        role_id=role_id,
+        shelter_id=shelter_id,
+        status=UserRoleStatus.ACTIVE,
+        assigned_by_id=assigned_by_id,
+        created_at=_now(),
+    )
+    db.session.add(model)
+    db.session.flush()
+    return model.to_dict(), True
+
+
+def revoke_user_role_assignment(assignment_id, revoked_by_id):
+    model = db.session.query(UserRoleAssignment).filter(
+        UserRoleAssignment.id == assignment_id,
+    ).first()
+    if not model:
+        raise ValueError(f"no user role assignment found with id {assignment_id}")
+    model.status = UserRoleStatus.REVOKED
+    model.revoked_at = _now()
+    model.revoked_by_id = revoked_by_id
+    model.updated_at = _now()
+    db.session.flush()
+    return model.to_dict()
 
 
 def ensure_user_role(user_id, role_id, shelter_id=None, assigned_by_id=None):
