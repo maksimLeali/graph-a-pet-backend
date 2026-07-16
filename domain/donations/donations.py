@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from api.errors import NotFoundError
 import domain.donations.limits as limits_domain
 import repository.donations.donations as donations_data
+from utils.dates import utc_now
 
 # app polls a donation's status for at most this long (see the pending-
 # confirmation screen); a donation still PENDING past this age never
@@ -50,7 +51,7 @@ def expire_stale_pending_donations(now=None):
 	donation still PENDING here was abandoned or Stripe never got back to
 	us. Mirrors handle_payment_intent_failed: mark FAILED + release any pet
 	allowance reservation so it doesn't hold up the pet's monthly limit."""
-	cutoff = (now or datetime.utcnow()) - timedelta(minutes=PENDING_TIMEOUT_MINUTES)
+	cutoff = (now or utc_now()) - timedelta(minutes=PENDING_TIMEOUT_MINUTES)
 	stale = donations_data.list_stale_pending_donations(cutoff)
 	for donation in stale:
 		donations_data.mark_failed(donation.id)

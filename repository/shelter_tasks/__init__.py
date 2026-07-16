@@ -7,6 +7,7 @@ from repository import db
 from utils.logger import logger, stringify
 from repository.shelter_tasks.models import ShelterTask, ShelterTaskAssignee, TaskStatus
 from repository.query_builder import build_query, build_count
+from utils.dates import utc_now
 
 
 DATE_FMT = "%Y-%m-%dT%H:%M:%S.%fZ"
@@ -37,7 +38,7 @@ def _parse_date(value):
 def create_shelter_task(data):
     logger.repository(f"data: {stringify(data)}")
     try:
-        today = datetime.today()
+        today = utc_now()
         shelter_task = ShelterTask(
             id=f"{uuid.uuid4()}",
             created_at=today.strftime(DATE_FMT),
@@ -105,14 +106,14 @@ def set_task_assignees(task_id, user_ids, shelter_person_ids=None):
         for uid in dict.fromkeys(user_ids or []):
             db.session.add(ShelterTaskAssignee(
                 id=f"{uuid.uuid4()}",
-                created_at=datetime.today().strftime(DATE_FMT),
+                created_at=utc_now().strftime(DATE_FMT),
                 task_id=task_id,
                 user_id=uid,
             ))
         for pid in dict.fromkeys(shelter_person_ids or []):
             db.session.add(ShelterTaskAssignee(
                 id=f"{uuid.uuid4()}",
-                created_at=datetime.today().strftime(DATE_FMT),
+                created_at=utc_now().strftime(DATE_FMT),
                 task_id=task_id,
                 shelter_person_id=pid,
             ))

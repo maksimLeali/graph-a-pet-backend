@@ -15,6 +15,7 @@ import domain.shelter_boxes as boxes_domain
 import domain.shelters as shelters_domain
 import domain.pets as pets_domain
 from utils.logger import logger
+from utils.dates import utc_now
 
 DATE_FMT = "%Y-%m-%dT%H:%M:%S.%fZ"
 MANAGER_LEVEL_ROLES = {"MANAGER", "OWNER"}
@@ -58,7 +59,7 @@ def _box_stats(shelter_id):
 def get_operational_dashboard(shelter_id):
     logger.domain(f"operational dashboard for shelter {shelter_id}")
     try:
-        now = datetime.today()
+        now = utc_now()
         day_start = datetime(now.year, now.month, now.day)
         day_end = day_start + timedelta(days=1)
         week_start = day_start - timedelta(days=day_start.weekday())
@@ -109,7 +110,7 @@ def snapshot_all_shelters(target_date=None):
     """Storicizza i KPI operativi di ogni shelter per target_date (default oggi).
     Idempotente per (shelter, giorno). Ritorna il numero di snapshot salvati."""
     if target_date is None:
-        target_date = datetime.today().date()
+        target_date = utc_now().date()
     logger.domain(f"snapshot KPI shelters for {target_date}")
     saved = 0
     for shelter in shelters_data.get_all_shelters():
@@ -126,7 +127,7 @@ def snapshot_all_shelters(target_date=None):
 def get_kpi_history(shelter_id, days=30):
     logger.domain(f"kpi history shelter {shelter_id} days {days}")
     try:
-        to_date = datetime.today().date()
+        to_date = utc_now().date()
         from_date = to_date - timedelta(days=max(1, days) - 1)
         return snapshots_data.get_history(shelter_id, from_date, to_date)
     except Exception as e:
@@ -149,7 +150,7 @@ def get_my_shelter_dashboard(user_id, date_from, date_to, is_global_admin=False)
     try:
         start = _parse_dt(date_from)
         end = _parse_dt(date_to)
-        now = datetime.today()
+        now = utc_now()
         day_start = datetime(now.year, now.month, now.day)
         day_end = day_start + timedelta(days=1)
         # tasks use the shelter/app week convention (Monday-Sunday), same as

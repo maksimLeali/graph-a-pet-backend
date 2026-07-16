@@ -10,11 +10,12 @@ from sqlalchemy import and_, not_, select, text
 
 from repository.walks.models import Walk
 from repository import db
+from utils.dates import utc_now
 
 def create_walk(data):
     logger.repository(f"data: {stringify(data)}")
     try:
-        today = datetime.today()
+        today = utc_now()
         walk_model = Walk(
             id=str(uuid.uuid4()),
             distance_km=data["distance_km"],

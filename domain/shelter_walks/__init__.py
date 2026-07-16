@@ -10,6 +10,7 @@ from api.errors import NotFoundError, BadRequest
 from repository.shelter_walks.models import ShelterWalkStatus
 from utils import difference_in_minutes
 from utils.logger import logger, stringify
+from utils.dates import utc_now
 
 DATE_FMT = "%Y-%m-%dT%H:%M:%S.%fZ"
 
@@ -82,7 +83,7 @@ def start_shelter_walk(id):
     try:
         return shelter_walks_data.update_shelter_walk(id, {
             "status": ShelterWalkStatus.IN_PROGRESS.name,
-            "started_at": datetime.today().strftime(DATE_FMT),
+            "started_at": utc_now().strftime(DATE_FMT),
         })
     except Exception as e:
         logger.error(e)
@@ -93,7 +94,7 @@ def complete_shelter_walk(id, notes=None):
     logger.domain(f"id: {id} complete")
     try:
         walk = shelter_walks_data.get_shelter_walk(id)
-        ended = datetime.today().strftime(DATE_FMT)
+        ended = utc_now().strftime(DATE_FMT)
         payload = {
             "status": ShelterWalkStatus.COMPLETED.name,
             "ended_at": ended,
@@ -113,7 +114,7 @@ def cancel_shelter_walk(id, reason=None):
     try:
         payload = {
             "status": ShelterWalkStatus.CANCELLED.name,
-            "cancelled_at": datetime.today().strftime(DATE_FMT),
+            "cancelled_at": utc_now().strftime(DATE_FMT),
         }
         if reason is not None:
             payload["notes"] = reason
@@ -169,7 +170,7 @@ def get_operational_walks(shelter_id):
     repository.shelter_walks.get_operational_walks for the exact rule)."""
     logger.domain(f"shelter_id: {shelter_id}")
     try:
-        now = datetime.today()
+        now = utc_now()
         day_start = datetime(now.year, now.month, now.day)
         day_end = day_start + timedelta(days=1)
         walks = shelter_walks_data.get_operational_walks(shelter_id, day_start, day_end)

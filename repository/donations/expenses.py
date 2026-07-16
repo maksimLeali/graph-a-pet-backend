@@ -3,6 +3,7 @@ from datetime import datetime
 
 from repository import db
 from repository.donations.models import ShelterExpense, ExpenseStatus
+from utils.dates import utc_now
 
 
 def _new_id():
@@ -32,7 +33,7 @@ def create_expense(shelter_id, amount_cents, description, currency="usd", pet_id
 		description=description,
 		status=ExpenseStatus.DRAFT,
 		created_by_id=created_by_id,
-		created_at=datetime.utcnow(),
+		created_at=utc_now(),
 	)
 	db.session.add(model)
 	db.session.commit()
@@ -48,7 +49,7 @@ def update_draft_expense(expense_id, **fields):
 	for key in ("amount_cents", "description", "pet_id", "funding_need_id"):
 		if key in fields and fields[key] is not None:
 			setattr(model, key, fields[key])
-	model.updated_at = datetime.utcnow()
+	model.updated_at = utc_now()
 	db.session.commit()
 	return model
 
@@ -58,8 +59,8 @@ def submit_expense(expense_id):
 	if model is None:
 		return None
 	model.status = ExpenseStatus.SUBMITTED
-	model.submitted_at = datetime.utcnow()
-	model.updated_at = datetime.utcnow()
+	model.submitted_at = utc_now()
+	model.updated_at = utc_now()
 	db.session.commit()
 	return model
 
@@ -70,8 +71,8 @@ def approve_expense(expense_id, approved_by_id):
 		return None
 	model.status = ExpenseStatus.APPROVED
 	model.approved_by_id = approved_by_id
-	model.approved_at = datetime.utcnow()
-	model.updated_at = datetime.utcnow()
+	model.approved_at = utc_now()
+	model.updated_at = utc_now()
 	db.session.commit()
 	return model
 
@@ -82,8 +83,8 @@ def reject_expense(expense_id, approved_by_id, reason):
 		return None
 	model.status = ExpenseStatus.REJECTED
 	model.approved_by_id = approved_by_id
-	model.approved_at = datetime.utcnow()
+	model.approved_at = utc_now()
 	model.rejected_reason = reason
-	model.updated_at = datetime.utcnow()
+	model.updated_at = utc_now()
 	db.session.commit()
 	return model

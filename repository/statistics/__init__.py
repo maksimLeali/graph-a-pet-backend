@@ -8,6 +8,7 @@ from repository import db, schema
 from sqlalchemy.exc import InvalidRequestError
 
 import uuid
+from utils.dates import utc_now
 
 
 def create_statistic(data):
@@ -15,7 +16,7 @@ def create_statistic(data):
     try:
         statistic_model = Statistic(
             id=f"{uuid.uuid4()}",
-            date=datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
+            date=utc_now().strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
             all_users=data.get('all_users'),
             all_pets=data.get('all_pets'),
             active_users=data.get('active_users'),

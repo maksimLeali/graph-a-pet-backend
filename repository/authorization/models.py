@@ -1,6 +1,7 @@
 from enum import Enum
 from sqlalchemy.dialects.postgresql import JSONB
 from repository import db, Base
+from utils.dates import iso_z
 
 
 class RbacScopeType(Enum):
@@ -51,8 +52,8 @@ class Permission(Base):
             "description": self.description,
             "scope_type": self.scope_type.name if self.scope_type else None,
             "risk_level": self.risk_level,
-            "created_at": str(self.created_at),
-            "updated_at": str(self.updated_at) if self.updated_at else None,
+            "created_at": iso_z(self.created_at),
+            "updated_at": iso_z(self.updated_at) if self.updated_at else None,
         }
 
 
@@ -79,9 +80,9 @@ class Role(Base):
             "is_system": self.is_system,
             "is_assignable": self.is_assignable,
             "grants_all_permissions": self.grants_all_permissions,
-            "archived_at": str(self.archived_at) if self.archived_at else None,
-            "created_at": str(self.created_at),
-            "updated_at": str(self.updated_at) if self.updated_at else None,
+            "archived_at": iso_z(self.archived_at) if self.archived_at else None,
+            "created_at": iso_z(self.created_at),
+            "updated_at": iso_z(self.updated_at) if self.updated_at else None,
         }
 
 
@@ -101,7 +102,7 @@ class RolePermission(Base):
             "role_id": self.role_id,
             "permission_id": self.permission_id,
             "granted_by_id": self.granted_by_id,
-            "created_at": str(self.created_at),
+            "created_at": iso_z(self.created_at),
         }
 
 
@@ -129,13 +130,13 @@ class UserRoleAssignment(Base):
             "role_id": self.role_id,
             "shelter_id": self.shelter_id,
             "status": self.status.name if self.status else None,
-            "valid_from": str(self.valid_from) if self.valid_from else None,
-            "valid_until": str(self.valid_until) if self.valid_until else None,
+            "valid_from": iso_z(self.valid_from) if self.valid_from else None,
+            "valid_until": iso_z(self.valid_until) if self.valid_until else None,
             "assigned_by_id": self.assigned_by_id,
             "revoked_by_id": self.revoked_by_id,
-            "revoked_at": str(self.revoked_at) if self.revoked_at else None,
-            "created_at": str(self.created_at),
-            "updated_at": str(self.updated_at) if self.updated_at else None,
+            "revoked_at": iso_z(self.revoked_at) if self.revoked_at else None,
+            "created_at": iso_z(self.created_at),
+            "updated_at": iso_z(self.updated_at) if self.updated_at else None,
         }
 
 
@@ -167,12 +168,12 @@ class ShelterMembership(Base):
             "source": self.source.name if self.source else None,
             "invited_by_id": self.invited_by_id,
             "approved_by_id": self.approved_by_id,
-            "joined_at": str(self.joined_at) if self.joined_at else None,
-            "suspended_at": str(self.suspended_at) if self.suspended_at else None,
-            "left_at": str(self.left_at) if self.left_at else None,
-            "revoked_at": str(self.revoked_at) if self.revoked_at else None,
-            "created_at": str(self.created_at),
-            "updated_at": str(self.updated_at) if self.updated_at else None,
+            "joined_at": iso_z(self.joined_at) if self.joined_at else None,
+            "suspended_at": iso_z(self.suspended_at) if self.suspended_at else None,
+            "left_at": iso_z(self.left_at) if self.left_at else None,
+            "revoked_at": iso_z(self.revoked_at) if self.revoked_at else None,
+            "created_at": iso_z(self.created_at),
+            "updated_at": iso_z(self.updated_at) if self.updated_at else None,
         }
 
 
@@ -202,5 +203,5 @@ class AuthorizationAuditLog(Base):
             "after_data": self.after_data,
             "request_id": self.request_id,
             "metadata": self.meta,
-            "created_at": str(self.created_at),
+            "created_at": iso_z(self.created_at),
         }

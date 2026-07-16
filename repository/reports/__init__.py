@@ -8,12 +8,13 @@ from sqlalchemy.exc import ProgrammingError
 from repository.query_builder import build_query, build_count
 from sqlalchemy import and_, not_, select, text
 from datetime import datetime, timedelta
+from utils.dates import utc_now
 
 
 def create_report(data):
     logger.repository(f"data: {stringify(data)}")
     try:
-        today = datetime.today().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+        today = utc_now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
         report = Report(
             id=f"{uuid.uuid4()}",
             pet_id=data.get('pet_id'),
@@ -119,7 +120,7 @@ def get_daily_reports():
     try: 
         users = db.session.query(Report).filter(
             and_( 
-                 (Report.created_at> datetime.now() -timedelta(days=1) )
+                 (Report.created_at> utc_now() -timedelta(days=1) )
                 ) 
             ).all()
         logger.check(f"active users: {len(users)}")

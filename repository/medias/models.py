@@ -1,4 +1,5 @@
 from repository import db, Base
+from utils.dates import iso_z
 
 class Media(Base):
     __tablename__ = 'medias'
@@ -19,5 +20,5 @@ class Media(Base):
             "ref_id": self.ref_id,
             "main_color": self.main_color,
             "main_colors": self.main_colors,
-            "created_at": str(self.created_at)
+            "created_at": iso_z(self.created_at)
         }

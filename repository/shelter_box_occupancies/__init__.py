@@ -7,13 +7,14 @@ from repository import db
 from utils.logger import logger, stringify
 from repository.shelter_box_occupancies.models import ShelterBoxOccupancy
 from repository.query_builder import build_query, build_count
+from utils.dates import utc_now
 
 
 DATE_FMT = "%Y-%m-%dT%H:%M:%S.%fZ"
 
 
 def _now():
-    return datetime.today().strftime(DATE_FMT)
+    return utc_now().strftime(DATE_FMT)
 
 
 def get_active_occupancy_for_pet(shelter_pet_id):
@@ -47,7 +48,7 @@ def create_occupancy(box_id, shelter_pet_id, moved_by_id=None, reason=None):
             created_at=_now(),
             box_id=box_id,
             shelter_pet_id=shelter_pet_id,
-            entered_at=datetime.today(),
+            entered_at=utc_now(),
             moved_by_id=moved_by_id,
             reason=reason,
         )
@@ -71,7 +72,7 @@ def close_occupancy(occupancy_id, moved_by_id=None, reason=None):
             raise NotFoundError(f"no occupancy found with id: {occupancy_id}")
         if model.exited_at is not None:
             raise BadRequest("occupancy already closed")
-        payload = {"exited_at": datetime.today()}
+        payload = {"exited_at": utc_now()}
         if moved_by_id is not None:
             payload["moved_by_id"] = moved_by_id
         if reason is not None:
@@ -94,7 +95,7 @@ def move_pet_between_boxes(shelter_pet_id, to_box_id, moved_by_id=None, reason=N
             ShelterBoxOccupancy.exited_at.is_(None),
         ).first()
         if active is not None:
-            active.exited_at = datetime.today()
+            active.exited_at = utc_now()
             if moved_by_id is not None:
                 active.moved_by_id = moved_by_id
             if reason is not None:
@@ -104,7 +105,7 @@ def move_pet_between_boxes(shelter_pet_id, to_box_id, moved_by_id=None, reason=N
             created_at=_now(),
             box_id=to_box_id,
             shelter_pet_id=shelter_pet_id,
-            entered_at=datetime.today(),
+            entered_at=utc_now(),
             moved_by_id=moved_by_id,
             reason=reason,
         )

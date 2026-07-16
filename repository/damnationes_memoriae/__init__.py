@@ -16,6 +16,7 @@ from repository.query_builder import build_count,  build_query, build_restore, t
 import pydash as py_
 
 from config import cfg 
+from utils.dates import utc_now
 
 schema = cfg['db']['schema'] if 'schema' in cfg['db'] else None
 
@@ -23,7 +24,7 @@ schema = cfg['db']['schema'] if 'schema' in cfg['db'] else None
 def create_damnatio_memoriae(data):
     logger.repository(f'putting {data} into the damnatio memoriae')
     try:
-        today = datetime.today()
+        today = utc_now()
         damnatio_memoriae = DamnationesMemoriae(
             id=f"{uuid.uuid4()}",
             original_data=data["original_data"],

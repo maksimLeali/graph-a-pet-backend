@@ -20,6 +20,7 @@ from datetime import datetime
 import pydash as py_
 from config import cfg
 from utils import difference_in_minutes
+from utils.dates import utc_now
 
 
 @convert_kwargs_to_snake_case
@@ -101,7 +102,7 @@ def update_user(id, data):
 def update_user_activity(id):
     logger.domain(f"id: {id}")
     try:
-        user = users_data.update_user(id, {"last_activity" :datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%fZ') })
+        user = users_data.update_user(id, {"last_activity" :utc_now().strftime('%Y-%m-%dT%H:%M:%S.%fZ') })
         logger.check(f"user: {stringify(user)}")
         return user
     except Exception as e:
@@ -203,7 +204,7 @@ def login(email, password) -> str:
         logger.domain(f"verifiyg user: {user['email']}")
         if(pbkdf2_sha256.verify(password, user['password'])):
             logger.check(f"user verified : {stringify(user)}")
-            today = datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+            today = utc_now().strftime('%Y-%m-%dT%H:%M:%S.%fZ')
             users_data.update_user(user.get('id'), {"last_login": today,"last_activity":today   })
             return jwt.encode(
                 {"user": py_.omit(user, "password"),
@@ -223,7 +224,7 @@ def verify_user(email, code) -> str:
         user = users_data.get_user_from_email(email)
         logger.domain(f"verifiyg user: {user['email']}")
         code = codes_domain.user_code_validation(code, user["id"])
-        today = datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+        today = utc_now().strftime('%Y-%m-%dT%H:%M:%S.%fZ')
         minutes_valid = cfg.get('code').get('minutes_valid') 
         valid = difference_in_minutes( code.get('created_at'),today ) < minutes_valid if minutes_valid is not None else 10
 

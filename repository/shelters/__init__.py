@@ -8,12 +8,13 @@ from api.errors import NotFoundError, BadRequest
 
 from repository.shelters.models import Shelter
 from repository import db
+from utils.dates import utc_now
 
 
 def create_shelter(data):
     logger.repository(f"data: {stringify(data)}")
     try:
-        today = datetime.today()
+        today = utc_now()
         shelter_model = Shelter(
             id=str(uuid.uuid4()),
             name=data["name"],

@@ -7,10 +7,11 @@ from repository import db, schema
 from utils.logger import logger, stringify
 from repository.ownerships.models import Ownership
 from repository.query_builder import build_query, build_count, build_where
+from utils.dates import utc_now
 
 
 def create_ownership(data):
-    today = datetime.today()
+    today = utc_now()
     ownership = Ownership(
         id = f"{uuid.uuid4()}",
         user_id=data["user_id"],

@@ -1,5 +1,6 @@
 from enum import Enum
 from repository import db, Base
+from utils.dates import iso_z
 
 class FrequencyUnit(Enum):
     DAILY = "DAILY",
@@ -18,7 +19,7 @@ class Cure(Base):
     def to_dict(self):
         return {
             "id": self.id,
-            "created_at": str(self.created_at),
+            "created_at": iso_z(self.created_at),
             "treatment_id": self.treatment_id,            
             "frequency_value": self.frequency_value,
             "frequency_unit": self.frequency_unit.name if self.frequency_unit else None,

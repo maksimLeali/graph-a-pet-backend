@@ -9,6 +9,7 @@ from sqlalchemy.exc import IntegrityError
 
 from repository import db
 from repository.donations.models import StripeWebhookEvent, WebhookEventStatus
+from utils.dates import utc_now
 
 
 def _new_id():
@@ -32,7 +33,7 @@ def create_received_event(stripe_event_id, event_type, livemode, payload=None):
 		status=WebhookEventStatus.RECEIVED,
 		attempts=1,
 		payload=payload,
-		created_at=datetime.utcnow(),
+		created_at=utc_now(),
 	)
 	db.session.add(model)
 	try:
@@ -52,8 +53,8 @@ def mark_processed(event_id):
 	if model is None:
 		return None
 	model.status = WebhookEventStatus.PROCESSED
-	model.processed_at = datetime.utcnow()
-	model.updated_at = datetime.utcnow()
+	model.processed_at = utc_now()
+	model.updated_at = utc_now()
 	db.session.commit()
 	return model
 
@@ -64,7 +65,7 @@ def mark_failed(event_id, error_message):
 		return None
 	model.status = WebhookEventStatus.FAILED
 	model.last_error = str(error_message)[:2000]
-	model.updated_at = datetime.utcnow()
+	model.updated_at = utc_now()
 	db.session.commit()
 	return model
 
@@ -75,7 +76,7 @@ def mark_ignored(event_id, reason):
 		return None
 	model.status = WebhookEventStatus.IGNORED
 	model.last_error = reason
-	model.updated_at = datetime.utcnow()
+	model.updated_at = utc_now()
 	db.session.commit()
 	return model
 

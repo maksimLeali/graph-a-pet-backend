@@ -12,6 +12,7 @@ import repository.shelters.models  # noqa: F401
 # they must be importable before the mapper configures
 import repository.ownerships.models  # noqa: F401
 import repository.shelter_roles.models  # noqa: F401
+from utils.dates import utc_now
 from repository.authorization.models import (
     Permission,
     Role,
@@ -29,7 +30,7 @@ DATE_FMT = "%Y-%m-%dT%H:%M:%S.%fZ"
 
 
 def _now():
-    return datetime.utcnow()
+    return utc_now()
 
 
 def _new_id():

@@ -1,4 +1,5 @@
 from repository import db, Base
+from utils.dates import iso_z
 
 class Code(Base):
     __tablename__ = 'codes'
@@ -15,5 +16,5 @@ class Code(Base):
             "ref_table": self.ref_table,
             "scope": self.scope,
             "valid": self.valid,
-            "created_at": str(self.created_at)
+            "created_at": iso_z(self.created_at)
         }

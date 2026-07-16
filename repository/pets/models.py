@@ -1,5 +1,6 @@
 from enum import Enum
 from repository import db, Base
+from utils.dates import iso_z
 
 class Gender(Enum):
     MALE="MALE",
@@ -34,7 +35,7 @@ class Pet(Base):
         return {
             "id": self.id,
             "name": self.name,
-            "birthday": str(self.birthday) if self.birthday else None,
+            "birthday": iso_z(self.birthday) if self.birthday else None,
             "neutered": self.neutered,
             "gender": self.gender.name if self.gender else None,         
             "chip_code": self.chip_code,        
@@ -45,5 +46,5 @@ class Pet(Base):
             "diet": self.diet,        
             "intollerance": self.intollerance,        
             "disciplines": self.disciplines,        
-            "created_at": str(self.created_at)
+            "created_at": iso_z(self.created_at)
         }

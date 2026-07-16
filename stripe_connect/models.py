@@ -21,6 +21,7 @@ directly to whichever of your own tables represents "the seller" (e.g.
 Shelter, if shelters became Connect payees) and skip this table entirely.
 """
 from repository import db, Base
+from utils.dates import iso_z
 
 
 class StripeConnectedAccount(Base):
@@ -43,7 +44,7 @@ class StripeConnectedAccount(Base):
 			"display_name": self.display_name,
 			"contact_email": self.contact_email,
 			"stripe_account_id": self.stripe_account_id,
-			"created_at": str(self.created_at),
+			"created_at": iso_z(self.created_at),
 		}
 
 
@@ -70,6 +71,6 @@ class StripeSubscription(Base):
 			"price_id": self.price_id,
 			"status": self.status,
 			"cancel_at_period_end": self.cancel_at_period_end,
-			"created_at": str(self.created_at),
-			"updated_at": str(self.updated_at) if self.updated_at else None,
+			"created_at": iso_z(self.created_at),
+			"updated_at": iso_z(self.updated_at) if self.updated_at else None,
 		}

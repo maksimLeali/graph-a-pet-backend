@@ -4,13 +4,14 @@ import mimetypes
 from datetime import datetime
 from werkzeug.utils import secure_filename
 from utils.logger import logger
+from utils.dates import utc_now
 
 MEDIA_ROOT = 'media'
 
 
 def save_image(file, user_id):
     safe_user = secure_filename(str(user_id)) or 'anonymous'
-    date_dir = datetime.utcnow().strftime('%Y-%m-%d')
+    date_dir = utc_now().strftime('%Y-%m-%d')
     rel_dir = os.path.join(MEDIA_ROOT, safe_user, date_dir)
     os.makedirs(rel_dir, exist_ok=True)
 

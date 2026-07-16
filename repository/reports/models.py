@@ -1,6 +1,7 @@
 from enum import Enum
 from repository import Base, db
 from sqlalchemy.sql.sqltypes import DECIMAL as Decimal
+from utils.dates import iso_z
 
 class ReportTypes(Enum):
     MISSING="MISSING",
@@ -28,8 +29,8 @@ class Report(Base):
             "notes": self.notes,
             "latitude": float(self.latitude),
             "longitude": float(self.longitude),
-            "date": str(self.date),
-            "created_at": str(self.created_at),
-            "updated_at": str(self.updated_at)
+            "date": iso_z(self.date),
+            "created_at": iso_z(self.created_at),
+            "updated_at": iso_z(self.updated_at)
         }
     

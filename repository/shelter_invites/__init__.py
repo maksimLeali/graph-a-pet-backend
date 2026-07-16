@@ -4,6 +4,7 @@ from repository import db
 from api.errors import NotFoundError
 from utils.logger import logger, stringify
 from repository.shelter_invites.models import ShelterInvite
+from utils.dates import utc_now
 
 DATE_FMT = "%Y-%m-%dT%H:%M:%S.%fZ"
 
@@ -13,7 +14,7 @@ def create_shelter_invite(data):
     try:
         invite = ShelterInvite(
             id=f"{uuid.uuid4()}",
-            created_at=datetime.today().strftime(DATE_FMT),
+            created_at=utc_now().strftime(DATE_FMT),
             shelter_id=data["shelter_id"],
             user_id=data["user_id"],
             role=data["role"],

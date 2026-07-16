@@ -8,6 +8,7 @@ from datetime import datetime
 
 from repository import db
 from stripe_connect.models import StripeConnectedAccount, StripeSubscription
+from utils.dates import utc_now
 
 
 def _new_id():
@@ -42,7 +43,7 @@ def create_connected_account_record(display_name, contact_email, stripe_account_
 		display_name=display_name,
 		contact_email=contact_email,
 		stripe_account_id=stripe_account_id,
-		created_at=datetime.utcnow(),
+		created_at=utc_now(),
 	)
 	db.session.add(model)
 	db.session.commit()
@@ -60,14 +61,14 @@ def upsert_subscription(stripe_subscription_id, stripe_account_id, price_id, sta
 		model = StripeSubscription(
 			id=_new_id(),
 			stripe_subscription_id=stripe_subscription_id,
-			created_at=datetime.utcnow(),
+			created_at=utc_now(),
 		)
 		db.session.add(model)
 	model.stripe_account_id = stripe_account_id
 	model.price_id = price_id
 	model.status = status
 	model.cancel_at_period_end = cancel_at_period_end
-	model.updated_at = datetime.utcnow()
+	model.updated_at = utc_now()
 	db.session.commit()
 	return model
 

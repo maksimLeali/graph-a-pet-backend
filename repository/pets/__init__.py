@@ -9,6 +9,7 @@ from repository.query_builder import build_query, build_count
 from utils import camel_to_snake
 from utils.logger import logger, stringify
 from api.errors import NotFoundError, BadRequest
+from utils.dates import utc_now
 
 
 
@@ -22,7 +23,7 @@ def build_where(filters) -> str:
 
 
 def create_pet(data: dict):
-    today = datetime.today()
+    today = utc_now()
     logger.repository(stringify(data))
     try:
         pet = Pet(

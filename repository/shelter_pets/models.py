@@ -1,4 +1,5 @@
 from repository import db, Base
+from utils.dates import iso_z
 
 
 class ShelterPet(Base):
@@ -22,6 +23,6 @@ class ShelterPet(Base):
             "is_active": bool(self.is_active) if self.is_active is not None else True,
             "left_at": self.left_at.strftime('%Y-%m-%dT%H:%M:%S.%fZ') if self.left_at else None,
             "is_published": bool(self.is_published) if self.is_published is not None else False,
-            "created_at": str(self.created_at),
-            "updated_at": str(self.updated_at) if self.updated_at else None,
+            "created_at": iso_z(self.created_at),
+            "updated_at": iso_z(self.updated_at) if self.updated_at else None,
         }

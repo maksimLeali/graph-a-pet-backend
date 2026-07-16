@@ -1,6 +1,7 @@
 from repository import db, Base
 
 from datetime import datetime
+from utils.dates import iso_z
 
 class DamnationesMemoriae(Base):
     original_table =  db.Column(db.String)
@@ -11,7 +12,7 @@ class DamnationesMemoriae(Base):
     def to_dict(self) :
         return  {
             "id":  self.id,
-            "created_at":  str(self.created_at),
+            "created_at":  iso_z(self.created_at),
             "original_table": self.original_table,
             "original_data":  self.original_data,
             "restore_before": self.restore_before,

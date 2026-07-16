@@ -20,6 +20,7 @@ from api.errors import DonationExceedsPetLimitError
 import repository.donations.limits as limits_data
 import repository.donations.accounts as accounts_data
 from stripe_connect import get_default_pet_monthly_limit_cents, get_environment
+from utils.dates import utc_now
 
 RESERVATION_TTL_MINUTES = 15
 
@@ -63,7 +64,7 @@ def get_effective_limit_cents(pet_id, shelter_id, now=None):
 	"""Currently-effective temporary override, else the pet's permanent
 	custom limit, else the shelter's default, else the global platform
 	default. Never combines them."""
-	now = now or datetime.utcnow()
+	now = now or utc_now()
 	policy = limits_data.get_policy_for_pet(pet_id)
 	if policy is None:
 		return _shelter_default_limit_cents(shelter_id), None
@@ -82,7 +83,7 @@ def get_effective_limit_cents(pet_id, shelter_id, now=None):
 
 
 def get_remaining_allowance_cents(pet_id, shelter_id, shelter_timezone, now=None):
-	now = now or datetime.utcnow()
+	now = now or utc_now()
 	period_start, period_end = get_period_bounds(now, shelter_timezone)
 	limit_cents, _ = get_effective_limit_cents(pet_id, shelter_id, now)
 	reserved = limits_data.sum_active_reservations(pet_id, period_start, now)
@@ -100,7 +101,7 @@ def reserve_pet_allowance(pet_id, shelter_id, shelter_timezone, amount_cents, no
 	the pet's remaining monthly allowance; otherwise inserts and returns a
 	new ACTIVE DonationLimitReservation. Must be called BEFORE creating the
 	Stripe Checkout Session for a PET-targeted donation."""
-	now = now or datetime.utcnow()
+	now = now or utc_now()
 	period_start, period_end = get_period_bounds(now, shelter_timezone)
 
 	# held for the rest of this DB transaction — serializes concurrent

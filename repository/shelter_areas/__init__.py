@@ -7,6 +7,7 @@ from repository import db
 from utils.logger import logger, stringify
 from repository.shelter_areas.models import ShelterArea
 from repository.query_builder import build_query, build_count
+from utils.dates import utc_now
 
 
 DATE_FMT = "%Y-%m-%dT%H:%M:%S.%fZ"
@@ -15,7 +16,7 @@ DATE_FMT = "%Y-%m-%dT%H:%M:%S.%fZ"
 def create_shelter_area(data):
     logger.repository(f"data: {stringify(data)}")
     try:
-        today = datetime.today()
+        today = utc_now()
         area = ShelterArea(
             id=f"{uuid.uuid4()}",
             created_at=today.strftime(DATE_FMT),

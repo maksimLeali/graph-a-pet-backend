@@ -7,12 +7,13 @@ from repository import db, schema
 from utils.logger import logger, stringify
 from repository.codes.models import Code
 from repository.query_builder import build_query, build_count, build_where
+from utils.dates import utc_now
 
 
 def create_code(data):
     logger.repository(f'data: {stringify(data)}')
     try:
-        today = datetime.today()
+        today = utc_now()
         code = Code(
             id=f"{uuid.uuid4()}",
             code=data.get('code'),

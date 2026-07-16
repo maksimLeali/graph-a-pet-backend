@@ -8,6 +8,7 @@ from api.errors import NotFoundError, BadRequest
 
 from repository.walk_ratings.models import WalkRating, WalkRatingType
 from repository import db
+from utils.dates import utc_now
 
 
 def _coerce_type(value):
@@ -24,7 +25,7 @@ def _coerce_type(value):
 def create_walk_rating(data):
     logger.repository(f"data: {stringify(data)}")
     try:
-        today = datetime.today()
+        today = utc_now()
         walk_rating_model = WalkRating(
             id=str(uuid.uuid4()),
             walk_id=data.get("walk_id"),

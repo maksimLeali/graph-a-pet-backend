@@ -9,6 +9,7 @@ from sqlalchemy.exc import IntegrityError
 
 from repository import db
 from repository.donations.models import FinancialMovement, MovementType
+from utils.dates import utc_now
 
 
 def _new_id():
@@ -30,7 +31,7 @@ def record_movement(*, shelter_id, movement_type: str, amount_cents, donation_id
 		stripe_object_id=stripe_object_id,
 		description=description,
 		is_test=is_test,
-		created_at=datetime.utcnow(),
+		created_at=utc_now(),
 	)
 	db.session.add(model)
 	try:

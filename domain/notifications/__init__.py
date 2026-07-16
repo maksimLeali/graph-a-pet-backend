@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 
 import repository.notifications as notifications_data
 from utils.logger import logger, stringify
+from utils.dates import utc_now
 
 DATE_FMT = "%Y-%m-%dT%H:%M:%S.%fZ"
 
@@ -128,7 +129,7 @@ def generate_treatment_reminders(target_date=None):
     """One TREATMENT_REMINDER per owner for each vaccine/operation/antiparasitic
     due on target_date (default: today). Idempotent per treatment per day."""
     if target_date is None:
-        target_date = datetime.today().date()
+        target_date = utc_now().date()
     day_start = datetime(target_date.year, target_date.month, target_date.day)
     day_end = day_start + timedelta(days=1)
     day_str = target_date.strftime("%Y-%m-%d")
@@ -168,7 +169,7 @@ def generate_pet_birthdays(target_date=None):
     """One PET_BIRTHDAY per owner for each pet whose birthday falls on
     target_date (default: today). Idempotent per pet per year."""
     if target_date is None:
-        target_date = datetime.today().date()
+        target_date = utc_now().date()
     day_start = datetime(target_date.year, target_date.month, target_date.day)
     created = 0
     try:

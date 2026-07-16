@@ -10,6 +10,7 @@ import domain.shelter_pets as shelter_pets_domain
 import domain.damnationes_memoriae as damnatio_domain
 from api.errors import NotFoundError, CannotDeleteWithActiveOccupancyError
 from utils.logger import logger, stringify
+from utils.dates import utc_now
 
 
 # --- field resolvers ---
@@ -109,7 +110,7 @@ def update_shelter_box(id, data):
 def mark_box_cleaned(id):
     from datetime import datetime
     return shelter_boxes_data.update_shelter_box(id, {
-        "last_cleaned_at": datetime.today().strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
+        "last_cleaned_at": utc_now().strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
     })
 
 

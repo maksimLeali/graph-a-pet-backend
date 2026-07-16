@@ -7,6 +7,7 @@ from repository import db
 from utils.logger import logger, stringify
 from repository.shelter_claim_requests.models import ShelterClaimRequest
 from repository.query_builder import build_query, build_count
+from utils.dates import utc_now
 
 DATE_FMT = "%Y-%m-%dT%H:%M:%S.%fZ"
 
@@ -16,7 +17,7 @@ def create_claim(data):
     try:
         claim = ShelterClaimRequest(
             id=f"{uuid.uuid4()}",
-            created_at=datetime.today().strftime(DATE_FMT),
+            created_at=utc_now().strftime(DATE_FMT),
             shelter_id=data["shelter_id"],
             requester_user_id=data["requester_user_id"],
             status=data.get("status") or "PENDING",
@@ -74,7 +75,7 @@ def resolve_claim(id, status, reviewed_by, decision_note):
             raise NotFoundError(f"no shelter_claim_request found with id: {id}")
         model.status = status
         model.reviewed_by = reviewed_by
-        model.reviewed_at = datetime.today()
+        model.reviewed_at = utc_now()
         if decision_note is not None:
             model.decision_note = decision_note
         db.session.commit()

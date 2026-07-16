@@ -2,6 +2,7 @@ from enum import Enum
 from repository import db, Base
 from repository.models import *
 from sqlalchemy.dialects.postgresql import JSONB
+from utils.dates import iso_z
 
 
 class TreatmentType(Enum):
@@ -49,7 +50,7 @@ class Treatment(Base):
             "booster_id": self.booster_id,
             "type": self.type.name,
             "health_card_id": self.health_card_id,
-            "updated_at": str(self.updated_at) if self.updated_at else None,
+            "updated_at": iso_z(self.updated_at) if self.updated_at else None,
             "logs": self.logs,
             "created_at": self.created_at.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
             "duration": self.duration.name if (self.duration ) else treatmentDuration.HALF_HOUR.name

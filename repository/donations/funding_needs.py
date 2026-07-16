@@ -3,6 +3,7 @@ from datetime import datetime
 
 from repository import db
 from repository.donations.models import PetFundingNeed, FundingNeedStatus
+from utils.dates import utc_now
 
 
 def _new_id():
@@ -42,7 +43,7 @@ def create_funding_need(shelter_id, title, description=None, category=None, pet_
 		target_amount_cents=target_amount_cents,
 		starts_at=starts_at,
 		ends_at=ends_at,
-		created_at=datetime.utcnow(),
+		created_at=utc_now(),
 	)
 	db.session.add(model)
 	db.session.commit()
@@ -56,7 +57,7 @@ def update_funding_need(funding_need_id, **fields):
 	for key in ("title", "description", "category", "target_amount_cents", "starts_at", "ends_at"):
 		if key in fields and fields[key] is not None:
 			setattr(model, key, fields[key])
-	model.updated_at = datetime.utcnow()
+	model.updated_at = utc_now()
 	db.session.commit()
 	return model
 
@@ -66,8 +67,8 @@ def close_funding_need(funding_need_id):
 	if model is None:
 		return None
 	model.status = FundingNeedStatus.CLOSED
-	model.closed_at = datetime.utcnow()
-	model.updated_at = datetime.utcnow()
+	model.closed_at = utc_now()
+	model.updated_at = utc_now()
 	db.session.commit()
 	return model
 
@@ -79,6 +80,6 @@ def increment_collected_amount(funding_need_id, amount_cents):
 	if model is None:
 		return None
 	model.collected_amount_cents = (model.collected_amount_cents or 0) + amount_cents
-	model.updated_at = datetime.utcnow()
+	model.updated_at = utc_now()
 	db.session.commit()
 	return model

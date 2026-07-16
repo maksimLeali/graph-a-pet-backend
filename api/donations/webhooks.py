@@ -25,6 +25,7 @@ donations_webhooks = Blueprint("donations_webhooks", __name__, url_prefix="/dona
 
 @donations_webhooks.route("/webhooks", methods=["POST"])
 def stripe_donation_webhook():
+	logger.critical('got an event')
 	sig_header = request.headers.get("Stripe-Signature", "")
 
 	try:
@@ -33,6 +34,8 @@ def stripe_donation_webhook():
 	except Exception:
 		logger.exception("donation webhook signature verification failed")
 		return jsonify({"error": "invalid signature"}), 400
+
+	logger.critical(f"donation webhook received: id={event['id']} type={event['type']} livemode={event['livemode']}")
 
 	account = getattr(event, "account", None)
 	logger.info(

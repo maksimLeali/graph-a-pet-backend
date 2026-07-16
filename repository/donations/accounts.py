@@ -3,6 +3,7 @@ from datetime import datetime
 
 from repository import db
 from repository.donations.models import StripeConnectedAccount, ConnectedAccountEnvironment
+from utils.dates import utc_now
 
 
 def _new_id():
@@ -36,7 +37,7 @@ def create_connected_account(shelter_id, stripe_account_id, environment="TEST"):
 		stripe_account_id=stripe_account_id,
 		environment=ConnectedAccountEnvironment[environment],
 		is_active=True,
-		created_at=datetime.utcnow(),
+		created_at=utc_now(),
 	)
 	db.session.add(model)
 	db.session.commit()
@@ -61,8 +62,8 @@ def update_account_status(connected_account_id, *, onboarding_status=None, verif
 		model.payouts_enabled = payouts_enabled
 	if details_submitted is not None:
 		model.details_submitted = details_submitted
-	model.last_synced_at = datetime.utcnow()
-	model.updated_at = datetime.utcnow()
+	model.last_synced_at = utc_now()
+	model.updated_at = utc_now()
 	db.session.commit()
 	return model
 
@@ -72,7 +73,7 @@ def set_donations_enabled(connected_account_id, enabled: bool):
 	if model is None:
 		return None
 	model.donations_enabled = enabled
-	model.updated_at = datetime.utcnow()
+	model.updated_at = utc_now()
 	db.session.commit()
 	return model
 
@@ -83,7 +84,7 @@ def set_default_pet_monthly_limit(connected_account_id, cents):
 	if model is None:
 		return None
 	model.default_pet_monthly_limit_cents = cents
-	model.updated_at = datetime.utcnow()
+	model.updated_at = utc_now()
 	db.session.commit()
 	return model
 

@@ -7,11 +7,12 @@ from utils.logger import logger, stringify
 from sqlalchemy.exc import ProgrammingError
 from repository.query_builder import build_query, build_count
 from sqlalchemy import select, text
+from utils.dates import utc_now
 
 def create_health_card(data):
     logger.repository(f"data: {stringify(data)}")
     try:
-        today = datetime.today()
+        today = utc_now()
         health_card = HealthCard(
             id = f"{uuid.uuid4()}",
             pet_id = data['pet_id'],

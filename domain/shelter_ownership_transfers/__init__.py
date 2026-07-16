@@ -9,6 +9,7 @@ import domain.damnationes_memoriae as damnatio_domain
 import domain.notifications as notifications_domain
 from api.errors import BadRequest, NotFoundError, ForbiddenError
 from utils.logger import logger, stringify
+from utils.dates import utc_now
 
 
 # --- field resolvers ---
@@ -37,7 +38,7 @@ def _expire_if_due(transfer):
     expires_at = transfer["expires_at"]
     if isinstance(expires_at, str):
         expires_at = datetime.strptime(expires_at, "%Y-%m-%dT%H:%M:%S.%fZ")
-    if datetime.today() >= expires_at:
+    if utc_now() >= expires_at:
         return transfers_data.set_status(transfer["id"], "EXPIRED")
     return transfer
 

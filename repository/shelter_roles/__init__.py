@@ -7,6 +7,7 @@ from repository import db, schema
 from utils.logger import logger, stringify
 from repository.shelter_roles.models import ShelterRole, RoleLevel
 from repository.query_builder import build_query, build_count, build_where
+from utils.dates import utc_now
 
 
 def get_roles_for_user_on_shelter(user_id, shelter_id):
@@ -54,7 +55,7 @@ def get_owner_role_models_for_shelter(shelter_id):
 def create_shelter_role(data):
     logger.repository(f"data: {stringify(data)}")
     try:
-        today = datetime.today()
+        today = utc_now()
 
         role_raw = data.get("role")
         enum_value = None

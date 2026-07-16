@@ -2,6 +2,7 @@
 Used by domain/walk_stats and domain/pet_weights so both build their series
 on the same label grid (same bucket count/keys per period)."""
 from datetime import datetime, timedelta
+from utils.dates import utc_now
 
 WEEKLY = "WEEKLY"
 MONTHLY = "MONTHLY"
@@ -35,7 +36,7 @@ def bucket_key(dt, period):
 
 
 def labels_for_period(period):
-    now = datetime.today()
+    now = utc_now()
     if period == WEEKLY:
         start = now - timedelta(weeks=WEEKLY_BUCKETS - 1)
         return [

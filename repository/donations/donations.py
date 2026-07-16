@@ -3,6 +3,7 @@ from datetime import datetime
 
 from repository import db
 from repository.donations.models import Donation, DonationStatus, RefundStatus, DisputeStatus
+from utils.dates import utc_now
 
 
 def _new_id():
@@ -49,7 +50,7 @@ def create_pending_donation(*, shelter_id, connected_account_id, target_type, do
 		status=DonationStatus.PENDING,
 		is_test=is_test,
 		stripe_checkout_session_id=stripe_checkout_session_id,
-		created_at=datetime.utcnow(),
+		created_at=utc_now(),
 	)
 	db.session.add(model)
 	db.session.commit()
@@ -61,7 +62,7 @@ def set_checkout_session_id(donation_id, stripe_checkout_session_id):
 	if model is None:
 		return None
 	model.stripe_checkout_session_id = stripe_checkout_session_id
-	model.updated_at = datetime.utcnow()
+	model.updated_at = utc_now()
 	db.session.commit()
 	return model
 
@@ -72,7 +73,7 @@ def mark_processing(donation_id, stripe_payment_intent_id):
 		return None
 	model.status = DonationStatus.PROCESSING
 	model.stripe_payment_intent_id = stripe_payment_intent_id
-	model.updated_at = datetime.utcnow()
+	model.updated_at = utc_now()
 	db.session.commit()
 	return model
 
@@ -87,7 +88,7 @@ def mark_succeeded(donation_id, *, processing_fee_amount_cents, shelter_net_amou
 	model.shelter_net_amount_cents = shelter_net_amount_cents
 	if stripe_payment_intent_id:
 		model.stripe_payment_intent_id = stripe_payment_intent_id
-	model.updated_at = datetime.utcnow()
+	model.updated_at = utc_now()
 	db.session.commit()
 	return model
 
@@ -105,7 +106,7 @@ def mark_failed(donation_id):
 	if model is None:
 		return None
 	model.status = DonationStatus.FAILED
-	model.updated_at = datetime.utcnow()
+	model.updated_at = utc_now()
 	db.session.commit()
 	return model
 
@@ -115,7 +116,7 @@ def mark_canceled(donation_id):
 	if model is None:
 		return None
 	model.status = DonationStatus.CANCELED
-	model.updated_at = datetime.utcnow()
+	model.updated_at = utc_now()
 	db.session.commit()
 	return model
 
@@ -126,7 +127,7 @@ def apply_refund(donation_id, refunded_amount_cents, full: bool):
 		return None
 	model.refunded_amount_cents = refunded_amount_cents
 	model.refund_status = RefundStatus.FULL if full else RefundStatus.PARTIAL
-	model.updated_at = datetime.utcnow()
+	model.updated_at = utc_now()
 	db.session.commit()
 	return model
 
@@ -136,7 +137,7 @@ def set_dispute_status(donation_id, status: str):
 	if model is None:
 		return None
 	model.dispute_status = DisputeStatus[status]
-	model.updated_at = datetime.utcnow()
+	model.updated_at = utc_now()
 	db.session.commit()
 	return model
 

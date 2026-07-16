@@ -1,5 +1,6 @@
 from repository import db, Base
 from repository.walk_ratings.models import WalkRatingType
+from utils.dates import iso_z
 
 
 class ShelterWalkRating(Base):
@@ -11,7 +12,7 @@ class ShelterWalkRating(Base):
     def to_dict(self):
         return {
             "id": self.id,
-            "created_at": str(self.created_at),
+            "created_at": iso_z(self.created_at),
             "walk_id": self.walk_id,
             "type": self.type.name if self.type else None,
             "rating": self.rating,

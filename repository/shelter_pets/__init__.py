@@ -8,12 +8,13 @@ from utils.logger import logger, stringify
 from repository.shelter_pets.models import ShelterPet
 from repository.pets.models import Pet
 from repository.query_builder import build_query, build_count, build_where
+from utils.dates import utc_now
 
 
 def create_shelter_pet(data):
     logger.repository(f"data: {stringify(data)}")
     try:
-        today = datetime.today()
+        today = utc_now()
         shelter_pet = ShelterPet(
             id=f"{uuid.uuid4()}",
             shelter_id=data["shelter_id"],
@@ -31,7 +32,7 @@ def create_shelter_pet(data):
 def create_shelter_pets(data):
     logger.repository(f"data: {stringify(data)}")
     try:
-        today = datetime.today().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+        today = utc_now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
         shelter_id = data["shelter_id"]
         shelter_pets = [
             ShelterPet(
@@ -54,7 +55,7 @@ def create_shelter_pets(data):
 def create_shelter_pets_with_data(shelter_id, pets):
     logger.repository(f"shelter_id: {shelter_id} count: {len(pets)}")
     try:
-        today = datetime.today().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+        today = utc_now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
         created = []
         for p in pets:
             pet = Pet(
@@ -125,7 +126,7 @@ def change_shelter(pet_id, shelter_id_from, shelter_id_to, actor_id=None):
         f"transfer pet_id: {pet_id} from {shelter_id_from} to {shelter_id_to}"
     )
     try:
-        now = datetime.today()
+        now = utc_now()
         now_s = now.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
 
         old_sp = db.session.query(ShelterPet).filter(

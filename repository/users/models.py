@@ -1,5 +1,6 @@
 from enum import Enum
 from repository import db, Base
+from utils.dates import iso_z
 
 class UserRole(Enum):
      USER = "USER"
@@ -25,8 +26,8 @@ class User(Base):
             "email": self.email,
             "password": self.password,
             "role": self.role.name,
-            "created_at": str(self.created_at),
-            "updated_at": str(self.updated_at) if self.updated_at else None,
-            "last_activity": str(self.last_activity) if self.last_activity else None
+            "created_at": iso_z(self.created_at),
+            "updated_at": iso_z(self.updated_at) if self.updated_at else None,
+            "last_activity": iso_z(self.last_activity) if self.last_activity else None
         }
         

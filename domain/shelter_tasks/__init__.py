@@ -12,6 +12,7 @@ from api.errors import NotFoundError, BadRequest
 from repository.shelter_tasks.models import TaskStatus
 from domain.shelter_tasks import recurrence as rec
 from utils.logger import logger, stringify
+from utils.dates import utc_now
 
 DATE_FMT = "%Y-%m-%dT%H:%M:%S.%fZ"
 
@@ -132,7 +133,7 @@ def complete_shelter_task(id, user_id, notes=None):
         _assert_actionable_instance(shelter_tasks_data.get_shelter_task(id))
         payload = {
             "status": TaskStatus.COMPLETED.name,
-            "completed_at": datetime.today().strftime(DATE_FMT),
+            "completed_at": utc_now().strftime(DATE_FMT),
             "completed_by_id": user_id,
         }
         if notes is not None:
@@ -149,7 +150,7 @@ def skip_shelter_task(id, user_id=None, reason=None):
         _assert_actionable_instance(shelter_tasks_data.get_shelter_task(id))
         payload = {
             "status": TaskStatus.SKIPPED.name,
-            "skipped_at": datetime.today().strftime(DATE_FMT),
+            "skipped_at": utc_now().strftime(DATE_FMT),
             "skipped_by_id": user_id,
         }
         if reason is not None:
@@ -181,7 +182,7 @@ def materialize_recurring_tasks(target_date=None):
     (default: oggi). All'ora indicata dalla ricorrenza. Idempotente via
     template_id. Ritorna il numero creato."""
     if target_date is None:
-        target_date = datetime.today().date()
+        target_date = utc_now().date()
     day_start = datetime(target_date.year, target_date.month, target_date.day)
     day_end = day_start + timedelta(days=1)
     logger.domain(f"materialize recurring tasks for {target_date}")
@@ -229,7 +230,7 @@ def get_operational_tasks(shelter_id):
     repository.shelter_tasks.get_operational_tasks for the exact rule)."""
     logger.domain(f"shelter_id: {shelter_id}")
     try:
-        now = datetime.today()
+        now = utc_now()
         day_start = datetime(now.year, now.month, now.day)
         week_start = day_start - timedelta(days=day_start.weekday())
         week_end = week_start + timedelta(days=7)

@@ -3,6 +3,7 @@ from datetime import datetime
 
 from repository import db
 from repository.donations.models import UserPaymentProfile, UserPaymentMethod, PaymentMethodConsent
+from utils.dates import utc_now
 
 
 def _new_id():
@@ -16,7 +17,7 @@ def get_profile_for_user(user_id):
 def create_profile(user_id, stripe_customer_id):
 	model = UserPaymentProfile(
 		id=_new_id(), user_id=user_id, stripe_customer_id=stripe_customer_id,
-		created_at=datetime.utcnow(),
+		created_at=utc_now(),
 	)
 	db.session.add(model)
 	db.session.commit()
@@ -28,7 +29,7 @@ def set_default_payment_method(profile_id, user_payment_method_id):
 	if model is None:
 		return None
 	model.default_payment_method_id = user_payment_method_id
-	model.updated_at = datetime.utcnow()
+	model.updated_at = utc_now()
 	db.session.commit()
 	return model
 
@@ -55,7 +56,7 @@ def create_payment_method(profile_id, stripe_payment_method_id, card_brand=None,
 		card_exp_month=card_exp_month,
 		card_exp_year=card_exp_year,
 		is_active=True,
-		created_at=datetime.utcnow(),
+		created_at=utc_now(),
 	)
 	db.session.add(model)
 	db.session.commit()
@@ -67,7 +68,7 @@ def deactivate_payment_method(payment_method_id):
 	if model is None:
 		return None
 	model.is_active = False
-	model.updated_at = datetime.utcnow()
+	model.updated_at = utc_now()
 	db.session.commit()
 	return model
 
@@ -77,10 +78,10 @@ def record_consent(user_payment_method_id, consent_text, ip_address=None):
 	model = PaymentMethodConsent(
 		id=_new_id(),
 		user_payment_method_id=user_payment_method_id,
-		consented_at=datetime.utcnow(),
+		consented_at=utc_now(),
 		consent_text=consent_text,
 		ip_address=ip_address,
-		created_at=datetime.utcnow(),
+		created_at=utc_now(),
 	)
 	db.session.add(model)
 	db.session.commit()

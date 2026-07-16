@@ -7,6 +7,7 @@ from repository import db
 from utils.logger import logger, stringify
 from repository.shelter_ownership_transfers.models import ShelterOwnershipTransfer
 from repository.query_builder import build_query, build_count
+from utils.dates import utc_now
 
 DATE_FMT = "%Y-%m-%dT%H:%M:%S.%fZ"
 
@@ -16,7 +17,7 @@ def create_transfer(data):
     try:
         transfer = ShelterOwnershipTransfer(
             id=f"{uuid.uuid4()}",
-            created_at=datetime.today().strftime(DATE_FMT),
+            created_at=utc_now().strftime(DATE_FMT),
             shelter_id=data["shelter_id"],
             from_user_id=data["from_user_id"],
             to_user_id=data["to_user_id"],
@@ -56,7 +57,7 @@ def set_status(id, status, timestamp_field=None):
             raise NotFoundError(f"no shelter_ownership_transfer found with id: {id}")
         model.status = status
         if timestamp_field:
-            setattr(model, timestamp_field, datetime.today())
+            setattr(model, timestamp_field, utc_now())
         db.session.commit()
         return model.to_dict()
     except Exception as e:

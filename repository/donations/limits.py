@@ -5,6 +5,7 @@ from sqlalchemy import func, text
 
 from repository import db
 from repository.donations.models import PetDonationPolicy, DonationLimitReservation, ReservationStatus
+from utils.dates import utc_now
 
 
 def _new_id():
@@ -23,11 +24,11 @@ def upsert_custom_limit(pet_id, shelter_id, custom_monthly_limit_cents):
 	model = get_policy_for_pet(pet_id)
 	if model is None:
 		model = PetDonationPolicy(
-			id=_new_id(), pet_id=pet_id, shelter_id=shelter_id, created_at=datetime.utcnow(),
+			id=_new_id(), pet_id=pet_id, shelter_id=shelter_id, created_at=utc_now(),
 		)
 		db.session.add(model)
 	model.custom_monthly_limit_cents = custom_monthly_limit_cents
-	model.updated_at = datetime.utcnow()
+	model.updated_at = utc_now()
 	db.session.commit()
 	return model
 
@@ -36,14 +37,14 @@ def upsert_temporary_override(pet_id, shelter_id, amount_cents, reason, effectiv
 	model = get_policy_for_pet(pet_id)
 	if model is None:
 		model = PetDonationPolicy(
-			id=_new_id(), pet_id=pet_id, shelter_id=shelter_id, created_at=datetime.utcnow(),
+			id=_new_id(), pet_id=pet_id, shelter_id=shelter_id, created_at=utc_now(),
 		)
 		db.session.add(model)
 	model.temporary_override_cents = amount_cents
 	model.temporary_override_reason = reason
 	model.temporary_override_effective_at = effective_at
 	model.temporary_override_expires_at = expires_at
-	model.updated_at = datetime.utcnow()
+	model.updated_at = utc_now()
 	db.session.commit()
 	return model
 
@@ -82,7 +83,7 @@ def create_reservation(pet_id, shelter_id, period_start, period_end, amount_cent
 		expires_at=expires_at,
 		override_reason=override_reason,
 		override_expires_at=override_expires_at,
-		created_at=datetime.utcnow(),
+		created_at=utc_now(),
 	)
 	db.session.add(model)
 	db.session.commit()
@@ -101,7 +102,7 @@ def mark_reservation_consumed(reservation_id, donation_id):
 		return None
 	model.status = ReservationStatus.CONSUMED
 	model.donation_id = donation_id
-	model.updated_at = datetime.utcnow()
+	model.updated_at = utc_now()
 	db.session.commit()
 	return model
 
@@ -113,7 +114,7 @@ def release_reservation(reservation_id):
 	if model is None or model.status != ReservationStatus.ACTIVE:
 		return model
 	model.status = ReservationStatus.RELEASED
-	model.updated_at = datetime.utcnow()
+	model.updated_at = utc_now()
 	db.session.commit()
 	return model
 

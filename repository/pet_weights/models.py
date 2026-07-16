@@ -1,4 +1,5 @@
 from repository import db, Base
+from utils.dates import iso_z
 
 
 class PetWeight(Base):
@@ -9,7 +10,7 @@ class PetWeight(Base):
     def to_dict(self):
         return {
             "id": self.id,
-            "created_at": str(self.created_at),
+            "created_at": iso_z(self.created_at),
             "pet_id": self.pet_id,
             "weight_kg": self.weight_kg,
         }

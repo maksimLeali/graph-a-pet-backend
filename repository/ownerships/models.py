@@ -1,5 +1,6 @@
 from enum import Enum
 from repository import db, Base
+from utils.dates import iso_z
 class CustodyLevel(Enum):
     OWNER = "OWNER"
     SUB_OWNER = "SUB_OWNER"
@@ -27,6 +28,6 @@ class Ownership(Base):
             "pet_id": self.pet_id,
             "custody_level": self.custody_level.name,
             "status": self.status.name if self.status else OwnershipStatus.ACCEPTED.name,
-            "created_at": str(self.created_at),
-            "updated_at": str(self.updated_at) if self.updated_at else None,
+            "created_at": iso_z(self.created_at),
+            "updated_at": iso_z(self.updated_at) if self.updated_at else None,
         }

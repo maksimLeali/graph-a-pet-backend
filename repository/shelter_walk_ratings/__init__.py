@@ -7,6 +7,7 @@ from repository.shelter_walks.models import ShelterWalk
 from api.errors import BadRequest
 from repository import db
 from utils.logger import logger, stringify
+from utils.dates import utc_now
 
 
 def _coerce_type(value):
@@ -23,7 +24,7 @@ def _coerce_type(value):
 def create_shelter_walk_rating(data):
     logger.repository(f"data: {stringify(data)}")
     try:
-        today = datetime.today()
+        today = utc_now()
         shelter_walk_rating_model = ShelterWalkRating(
             id=str(uuid.uuid4()),
             walk_id=data.get("walk_id"),

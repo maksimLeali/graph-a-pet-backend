@@ -7,6 +7,7 @@ from sqlalchemy.engine import reflection
 import json
 from decimal import Decimal
 from sqlalchemy.ext.declarative import declarative_base
+from utils.dates import utc_now
 
 
 uri = f"postgresql://{cfg['db']['user']}:{cfg['db']['password']}@{cfg['db']['host']}:{cfg['db']['port']}/{cfg['db']['table']}"
@@ -22,7 +23,9 @@ class Base(db.Model):
     __abstract__= True
     __table_args__ = {'schema': schema}
     id = db.Column(db.String, primary_key=True)
-    created_at = db.Column(db.DateTime, default= datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%fZ'))
+    # callable, not a value: evaluated per-row at insert time (a plain value
+    # would freeze the import-time timestamp for every row)
+    created_at = db.Column(db.DateTime, default=utc_now)
     updated_at = db.Column(db.DateTime)
     
 ViewBase = declarative_base()

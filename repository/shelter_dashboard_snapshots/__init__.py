@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from repository import db
 from repository.shelter_dashboard_snapshots.models import ShelterKpiSnapshot, KPI_FIELDS
 from utils.logger import logger, stringify
+from utils.dates import utc_now
 
 
 def upsert_snapshot(shelter_id, snapshot_date, kpis):
@@ -18,7 +19,7 @@ def upsert_snapshot(shelter_id, snapshot_date, kpis):
         if row is None:
             row = ShelterKpiSnapshot(
                 id=f"{uuid.uuid4()}",
-                created_at=datetime.today().strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
+                created_at=utc_now().strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
                 shelter_id=shelter_id,
                 snapshot_date=snapshot_date,
                 **values,
@@ -27,7 +28,7 @@ def upsert_snapshot(shelter_id, snapshot_date, kpis):
         else:
             for f, v in values.items():
                 setattr(row, f, v)
-            row.updated_at = datetime.today().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+            row.updated_at = utc_now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
         db.session.commit()
         return row.to_dict()
     except Exception as e:

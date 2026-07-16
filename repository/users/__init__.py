@@ -10,11 +10,12 @@ from sqlalchemy import and_, not_, select, text
 
 from repository.users.models import User, UserRole
 from repository import db
+from utils.dates import utc_now
 
 def create_user(data):
     logger.repository(f"data: {stringify(data)}")
     try:
-        today = datetime.today()
+        today = utc_now()
         user_model = User(
             id=f"{uuid.uuid4()}",
             first_name=data["first_name"],
@@ -84,7 +85,7 @@ def get_all_active_users():
     try: 
         users = db.session.query(User).filter(
             and_( 
-                 (User.last_activity > datetime.now() -timedelta(days=1) )
+                 (User.last_activity > utc_now() -timedelta(days=1) )
                 ) 
             ).all()
         logger.check(f"active users: {len(users)}")
@@ -98,7 +99,7 @@ def get_all_logged_users_within_x_days(days):
     try: 
         users = User.query.filter(
             and_(
-                    (User.last_activity > datetime.now() -timedelta(days=days))
+                    (User.last_activity > utc_now() -timedelta(days=days))
                 )
             ).all()
         logger.info(f"users logged from at least {days} days: {len(users)}")

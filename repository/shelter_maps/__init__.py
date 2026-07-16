@@ -11,6 +11,7 @@ from repository.shelter_areas.models import ShelterArea
 from repository.shelter_boxes.models import ShelterBox
 from repository.shelter_map_elements.models import ShelterMapElement
 from repository.query_builder import build_query, build_count
+from utils.dates import utc_now
 
 
 DATE_FMT = "%Y-%m-%dT%H:%M:%S.%fZ"
@@ -19,7 +20,7 @@ DATE_FMT = "%Y-%m-%dT%H:%M:%S.%fZ"
 def create_shelter_map(data):
     logger.repository(f"data: {stringify(data)}")
     try:
-        today = datetime.today()
+        today = utc_now()
         shelter_map = ShelterMap(
             id=f"{uuid.uuid4()}",
             created_at=today.strftime(DATE_FMT),
@@ -138,7 +139,7 @@ def save_layout(map_id, data):
             else:
                 db.session.add(ShelterZone(
                     id=z.get("id") or f"{uuid.uuid4()}",
-                    created_at=datetime.today().strftime(DATE_FMT),
+                    created_at=utc_now().strftime(DATE_FMT),
                     map_id=map_id,
                     **{f: z.get(f) for f in ZONE_FIELDS},
                 ))
@@ -157,7 +158,7 @@ def save_layout(map_id, data):
             else:
                 db.session.add(ShelterArea(
                     id=f"{uuid.uuid4()}",
-                    created_at=datetime.today().strftime(DATE_FMT),
+                    created_at=utc_now().strftime(DATE_FMT),
                     map_id=map_id,
                     **{f: a.get(f) for f in AREA_FIELDS},
                 ))
@@ -174,7 +175,7 @@ def save_layout(map_id, data):
             else:
                 db.session.add(ShelterBox(
                     id=f"{uuid.uuid4()}",
-                    created_at=datetime.today().strftime(DATE_FMT),
+                    created_at=utc_now().strftime(DATE_FMT),
                     map_id=map_id,
                     zone_id=b["zone_id"],
                     area_id=b.get("area_id"),
@@ -196,7 +197,7 @@ def save_layout(map_id, data):
             else:
                 db.session.add(ShelterMapElement(
                     id=f"{uuid.uuid4()}",
-                    created_at=datetime.today().strftime(DATE_FMT),
+                    created_at=utc_now().strftime(DATE_FMT),
                     map_id=map_id,
                     element_type=el["element_type"],
                     x=el.get("x"), y=el.get("y"), width=el.get("width"), height=el.get("height"),

@@ -1,5 +1,6 @@
 from enum import Enum
 from repository import db, Base
+from utils.dates import iso_z
 
 class RoleLevel(Enum):
     OWNER = "OWNER"
@@ -20,6 +21,6 @@ class ShelterRole(Base):
             "user_id": self.user_id,
             "shelter_id": self.shelter_id,
             "role": self.role.name if self.role else None,
-            "created_at": str(self.created_at),
-            "updated_at": str(self.updated_at) if self.updated_at else None,
+            "created_at": iso_z(self.created_at),
+            "updated_at": iso_z(self.updated_at) if self.updated_at else None,
         }

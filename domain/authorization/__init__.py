@@ -32,6 +32,7 @@ from domain.authorization.catalog import (
     assert_valid_permission,
 )
 from utils.logger import logger
+from utils.dates import utc_now
 
 
 def _default_loader():
@@ -143,7 +144,7 @@ class AuthorizationService:
         return context
 
     def _effective_permissions(self, context, shelter_id, now=None):
-        now = now or datetime.utcnow()
+        now = now or utc_now()
         role_ids = []
         grants_all_scopes = set()
 
@@ -191,9 +192,12 @@ class AuthorizationService:
         valid_from = assignment.get("valid_from")
         valid_until = assignment.get("valid_until")
         try:
-            if valid_from and datetime.fromisoformat(str(valid_from)) > now:
+            # values are naive-UTC ISO strings with a "Z" suffix (see
+            # utils.dates.iso_z); fromisoformat can't digest the Z on
+            # py<3.11, so strip it before parsing
+            if valid_from and datetime.fromisoformat(str(valid_from).rstrip("Z")) > now:
                 return False
-            if valid_until and datetime.fromisoformat(str(valid_until)) <= now:
+            if valid_until and datetime.fromisoformat(str(valid_until).rstrip("Z")) <= now:
                 return False
         except ValueError:
             logger.error(f"unparsable validity window on user_role {assignment.get('id')}")

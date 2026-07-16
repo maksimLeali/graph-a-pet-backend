@@ -4,12 +4,13 @@ from datetime import datetime
 from repository.pet_weights.models import PetWeight
 from repository import db
 from utils.logger import logger, stringify
+from utils.dates import utc_now
 
 
 def create_pet_weight(data):
     logger.repository(f"data: {stringify(data)}")
     try:
-        today = datetime.today()
+        today = utc_now()
         model = PetWeight(
             id=str(uuid.uuid4()),
             pet_id=data.get("pet_id"),

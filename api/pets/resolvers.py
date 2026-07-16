@@ -7,6 +7,7 @@ from utils.logger import logger, stringify
 from api.errors import error_pagination
 from utils import format_common_search
 from datetime import datetime
+from utils.dates import utc_now
 
 pet = ObjectType("Pet")
 
@@ -14,7 +15,7 @@ pet = ObjectType("Pet")
 
 def years_from_now(date_str):
     input_date = datetime.strptime(date_str, "%Y-%m-%d")
-    today = datetime.today()
+    today = utc_now()
     years_passed = today.year - input_date.year
 
     # Adjust if the anniversary hasn't occurred yet this year

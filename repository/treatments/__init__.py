@@ -11,6 +11,7 @@ from repository.query_builder import build_query, build_count
 from utils import camel_to_snake
 from utils.logger import logger, stringify
 from api.errors import NotFoundError, BadRequest
+from utils.dates import utc_now
 
 
 def build_where(filters) -> str:
@@ -25,7 +26,7 @@ def build_where(filters) -> str:
 def create_treatment(data: dict):
     logger.repository(f"treatment : {stringify(data)}")
     try:
-        today = datetime.today()
+        today = utc_now()
 
         treatment = Treatment(
             id=f"{uuid.uuid4()}",

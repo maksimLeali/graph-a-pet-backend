@@ -4,6 +4,7 @@ from sqlalchemy.exc import IntegrityError
 from repository import db
 from api.errors import NotFoundError
 from utils.logger import logger, stringify
+from utils.dates import utc_now
 from repository.notifications.models import (
     Notification,
     NotificationStatus,
@@ -26,7 +27,7 @@ def _parse_dt(value):
 def create_notification(data):
     logger.repository(f"data: {stringify(data)}")
     try:
-        today = datetime.today()
+        today = utc_now()
         notification = Notification(
             id=f"{uuid.uuid4()}",
             created_at=today.strftime(DATE_FMT),
@@ -113,7 +114,7 @@ def mark_as_read(id, user_id):
             raise NotFoundError(f"no notification found with id: {id}")
         if notification.status == NotificationStatus.UNREAD:
             notification.status = NotificationStatus.READ
-            notification.read_at = datetime.today()
+            notification.read_at = utc_now()
             db.session.commit()
         return notification.to_dict()
     except Exception as e:
@@ -124,7 +125,7 @@ def mark_as_read(id, user_id):
 
 def mark_all_as_read(user_id):
     try:
-        now = datetime.today()
+        now = utc_now()
         db.session.query(Notification).filter(
             Notification.user_id == user_id,
             Notification.status == NotificationStatus.UNREAD,
@@ -149,7 +150,7 @@ def dismiss(id, user_id):
         if not notification:
             raise NotFoundError(f"no notification found with id: {id}")
         notification.status = NotificationStatus.DISMISSED
-        notification.dismissed_at = datetime.today()
+        notification.dismissed_at = utc_now()
         db.session.commit()
         return notification.to_dict()
     except Exception as e:

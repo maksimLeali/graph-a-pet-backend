@@ -22,6 +22,7 @@ from repository import db, Base
 import repository.shelters.models  # noqa: F401
 import repository.pets.models  # noqa: F401
 import repository.users.models  # noqa: F401
+from utils.dates import iso_z
 
 
 # ---------------------------------------------------------------------------
@@ -165,9 +166,9 @@ class StripeConnectedAccount(Base):
 			"donations_enabled": bool(self.donations_enabled),
 			"default_pet_monthly_limit_cents": self.default_pet_monthly_limit_cents,
 			"is_active": bool(self.is_active),
-			"last_synced_at": str(self.last_synced_at) if self.last_synced_at else None,
-			"created_at": str(self.created_at),
-			"updated_at": str(self.updated_at) if self.updated_at else None,
+			"last_synced_at": iso_z(self.last_synced_at) if self.last_synced_at else None,
+			"created_at": iso_z(self.created_at),
+			"updated_at": iso_z(self.updated_at) if self.updated_at else None,
 		}
 
 
@@ -212,11 +213,11 @@ class PetFundingNeed(Base):
 			"collected_amount_cents": self.collected_amount_cents,
 			"remaining_amount_cents": remaining,
 			"status": self.status.name if self.status else None,
-			"starts_at": str(self.starts_at) if self.starts_at else None,
-			"ends_at": str(self.ends_at) if self.ends_at else None,
-			"closed_at": str(self.closed_at) if self.closed_at else None,
-			"created_at": str(self.created_at),
-			"updated_at": str(self.updated_at) if self.updated_at else None,
+			"starts_at": iso_z(self.starts_at) if self.starts_at else None,
+			"ends_at": iso_z(self.ends_at) if self.ends_at else None,
+			"closed_at": iso_z(self.closed_at) if self.closed_at else None,
+			"created_at": iso_z(self.created_at),
+			"updated_at": iso_z(self.updated_at) if self.updated_at else None,
 		}
 
 
@@ -259,10 +260,10 @@ class PetDonationPolicy(Base):
 			"is_active": bool(self.is_active),
 			"temporary_override_cents": self.temporary_override_cents,
 			"temporary_override_reason": self.temporary_override_reason,
-			"temporary_override_effective_at": str(self.temporary_override_effective_at) if self.temporary_override_effective_at else None,
-			"temporary_override_expires_at": str(self.temporary_override_expires_at) if self.temporary_override_expires_at else None,
-			"created_at": str(self.created_at),
-			"updated_at": str(self.updated_at) if self.updated_at else None,
+			"temporary_override_effective_at": iso_z(self.temporary_override_effective_at) if self.temporary_override_effective_at else None,
+			"temporary_override_expires_at": iso_z(self.temporary_override_expires_at) if self.temporary_override_expires_at else None,
+			"created_at": iso_z(self.created_at),
+			"updated_at": iso_z(self.updated_at) if self.updated_at else None,
 		}
 
 
@@ -293,15 +294,15 @@ class DonationLimitReservation(Base):
 			"id": self.id,
 			"pet_id": self.pet_id,
 			"shelter_id": self.shelter_id,
-			"period_start": str(self.period_start),
-			"period_end": str(self.period_end),
+			"period_start": iso_z(self.period_start),
+			"period_end": iso_z(self.period_end),
 			"amount_cents": self.amount_cents,
 			"status": self.status.name if self.status else None,
-			"expires_at": str(self.expires_at),
+			"expires_at": iso_z(self.expires_at),
 			"override_reason": self.override_reason,
-			"override_expires_at": str(self.override_expires_at) if self.override_expires_at else None,
+			"override_expires_at": iso_z(self.override_expires_at) if self.override_expires_at else None,
 			"donation_id": self.donation_id,
-			"created_at": str(self.created_at),
+			"created_at": iso_z(self.created_at),
 		}
 
 
@@ -371,8 +372,8 @@ class Donation(Base):
 			"is_test": bool(self.is_test),
 			"stripe_checkout_session_id": self.stripe_checkout_session_id,
 			"stripe_payment_intent_id": self.stripe_payment_intent_id,
-			"created_at": str(self.created_at),
-			"updated_at": str(self.updated_at) if self.updated_at else None,
+			"created_at": iso_z(self.created_at),
+			"updated_at": iso_z(self.updated_at) if self.updated_at else None,
 		}
 
 
@@ -421,7 +422,7 @@ class FinancialMovement(Base):
 			"stripe_object_id": self.stripe_object_id,
 			"description": self.description,
 			"is_test": bool(self.is_test),
-			"created_at": str(self.created_at),
+			"created_at": iso_z(self.created_at),
 		}
 
 
@@ -458,12 +459,12 @@ class ShelterExpense(Base):
 			"description": self.description,
 			"status": self.status.name if self.status else None,
 			"created_by_id": self.created_by_id,
-			"submitted_at": str(self.submitted_at) if self.submitted_at else None,
+			"submitted_at": iso_z(self.submitted_at) if self.submitted_at else None,
 			"approved_by_id": self.approved_by_id,
-			"approved_at": str(self.approved_at) if self.approved_at else None,
+			"approved_at": iso_z(self.approved_at) if self.approved_at else None,
 			"rejected_reason": self.rejected_reason,
-			"created_at": str(self.created_at),
-			"updated_at": str(self.updated_at) if self.updated_at else None,
+			"created_at": iso_z(self.created_at),
+			"updated_at": iso_z(self.updated_at) if self.updated_at else None,
 		}
 
 
@@ -496,8 +497,8 @@ class StripeWebhookEvent(Base):
 			"status": self.status.name if self.status else None,
 			"attempts": self.attempts,
 			"last_error": self.last_error,
-			"processed_at": str(self.processed_at) if self.processed_at else None,
-			"created_at": str(self.created_at),
+			"processed_at": iso_z(self.processed_at) if self.processed_at else None,
+			"created_at": iso_z(self.created_at),
 		}
 
 
@@ -523,8 +524,8 @@ class UserPaymentProfile(Base):
 			"user_id": self.user_id,
 			"stripe_customer_id": self.stripe_customer_id,
 			"default_payment_method_id": self.default_payment_method_id,
-			"created_at": str(self.created_at),
-			"updated_at": str(self.updated_at) if self.updated_at else None,
+			"created_at": iso_z(self.created_at),
+			"updated_at": iso_z(self.updated_at) if self.updated_at else None,
 		}
 
 
@@ -557,8 +558,8 @@ class UserPaymentMethod(Base):
 			"card_exp_month": self.card_exp_month,
 			"card_exp_year": self.card_exp_year,
 			"is_active": bool(self.is_active),
-			"created_at": str(self.created_at),
-			"updated_at": str(self.updated_at) if self.updated_at else None,
+			"created_at": iso_z(self.created_at),
+			"updated_at": iso_z(self.updated_at) if self.updated_at else None,
 		}
 
 
@@ -577,8 +578,8 @@ class PaymentMethodConsent(Base):
 		return {
 			"id": self.id,
 			"user_payment_method_id": self.user_payment_method_id,
-			"consented_at": str(self.consented_at),
+			"consented_at": iso_z(self.consented_at),
 			"consent_text": self.consent_text,
 			"ip_address": self.ip_address,
-			"created_at": str(self.created_at),
+			"created_at": iso_z(self.created_at),
 		}

@@ -10,11 +10,12 @@ from sqlalchemy import and_, not_, select, text
 
 from repository.cures.models import Cure, FrequencyUnit
 from repository import db
+from utils.dates import utc_now
 
 def create_cure(data):
     logger.repository(f"data: {stringify(data)}")
     try:
-        today = datetime.today()
+        today = utc_now()
 
         frequency_unit = data.get("frequency_unit")
         enum_value = None

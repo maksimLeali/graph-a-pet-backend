@@ -16,6 +16,7 @@ from datetime import datetime, date, timedelta
 from calendar import monthrange
 
 from api.errors import BadRequest
+from utils.dates import utc_now
 
 DATE_FMT = "%Y-%m-%dT%H:%M:%S.%fZ"
 
@@ -50,7 +51,7 @@ def apply_to_data(data):
             except Exception:
                 start_dt = None
     if start_dt is None:
-        start_dt = datetime.today()
+        start_dt = utc_now()
 
     tod = rec.get("time_of_day")
     if tod:
