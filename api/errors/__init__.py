@@ -37,6 +37,7 @@ class ErrorCode:
     STRIPE_TEST_MODE_VIOLATION = "STRIPE_TEST_MODE_VIOLATION"
     INVALID_DONATION_AMOUNT = "INVALID_DONATION_AMOUNT"
     FUNDING_NEED_CLOSED = "FUNDING_NEED_CLOSED"
+    DONATION_EXCEEDS_FUNDING_NEED_GOAL = "DONATION_EXCEEDS_FUNDING_NEED_GOAL"
     EXPENSE_NOT_EDITABLE = "EXPENSE_NOT_EDITABLE"
     RATE_LIMITED = "RATE_LIMITED"
     DUPLICATE_WEBHOOK_EVENT = "DUPLICATE_WEBHOOK_EVENT"
@@ -163,6 +164,10 @@ class InvalidDonationAmountError(DomainError):
 class FundingNeedClosedError(DomainError):
     http_status = 409
     error_code = ErrorCode.FUNDING_NEED_CLOSED
+
+class DonationExceedsFundingNeedGoalError(DomainError):
+    http_status = 409
+    error_code = ErrorCode.DONATION_EXCEEDS_FUNDING_NEED_GOAL
 
 class ExpenseNotEditableError(DomainError):
     http_status = 409

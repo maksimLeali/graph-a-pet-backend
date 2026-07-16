@@ -2769,6 +2769,11 @@ enum FundingNeedStatus {
     CLOSED
 }
 
+enum FundingNeedUrgency {
+    NORMAL
+    URGENT
+}
+
 enum ExpenseStatus {
     DRAFT
     SUBMITTED
@@ -2910,6 +2915,11 @@ type PetFundingNeed {
     collected_amount_cents: Int!
     remaining_amount_cents: Int!
     status: FundingNeedStatus!
+    urgency: FundingNeedUrgency!
+    # monthly goal ("traguardo"): collected is zeroed by the daily cron on
+    # the 1st of the month; false = one-off campaign
+    is_recurring_monthly: Boolean!
+    last_reset_at: String
     starts_at: String
     ends_at: String
     closed_at: String
@@ -2937,6 +2947,8 @@ input FundingNeedCreateInput {
     category: String
     currency: String = "usd"
     target_amount_cents: Int!
+    urgency: FundingNeedUrgency = NORMAL
+    is_recurring_monthly: Boolean = true
     starts_at: String
     ends_at: String
 }
@@ -2946,6 +2958,8 @@ input FundingNeedUpdateInput {
     description: String
     category: String
     target_amount_cents: Int
+    urgency: FundingNeedUrgency
+    is_recurring_monthly: Boolean
     starts_at: String
     ends_at: String
 }

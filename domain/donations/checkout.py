@@ -12,12 +12,13 @@ for PET-targeted donations, the allowance is reserved (see
 domain/donations/limits.reserve_pet_allowance, which raises
 DonationExceedsPetLimitError) BEFORE the Checkout Session is created.
 """
-from api.errors import BadRequest, InvalidDonationAmountError
+from api.errors import BadRequest, InvalidDonationAmountError, DonationExceedsFundingNeedGoalError
 import domain.donations.public as public_domain
 import domain.donations.limits as limits_domain
 import domain.shelters as shelters_domain
 import repository.donations.accounts as accounts_data
 import repository.donations.donations as donations_data
+import repository.donations.funding_needs as funding_needs_data
 from stripe_connect import get_environment, get_platform_fee_percent
 from stripe_connect.service import create_donation_checkout_session
 
@@ -67,6 +68,18 @@ def create_donation_checkout(*, shelter_id, target_type, amount_cents, success_u
 
 	# availability["available"] guarantees an active connected account exists
 	account = accounts_data.get_active_connected_account(shelter_id, get_environment().upper())
+
+	if funding_need_id:
+		# monthly goal cap: never let a single donation overshoot the
+		# remaining goal amount. Best-effort pre-check (no reservation row
+		# like the pet limit): two concurrent checkouts can still overshoot
+		# slightly — acceptable for goals, unlike the hard legal pet limit.
+		need = funding_needs_data.get_funding_need(funding_need_id)
+		remaining = max(need.target_amount_cents - need.collected_amount_cents, 0)
+		if amount_cents > remaining:
+			raise DonationExceedsFundingNeedGoalError(
+				f"donation of {amount_cents} cents exceeds the remaining goal amount of {remaining} cents"
+			)
 
 	reservation = None
 	if target_type == "PET":

@@ -157,6 +157,7 @@ def create_funding_need_resolver(obj, info, data):
 			shelter_id=data["shelter_id"], title=data["title"], target_amount_cents=data["target_amount_cents"],
 			description=data.get("description"), category=data.get("category"), pet_id=data.get("pet_id"),
 			currency=data.get("currency") or "usd", starts_at=data.get("starts_at"), ends_at=data.get("ends_at"),
+			urgency=data.get("urgency"), is_recurring_monthly=data.get("is_recurring_monthly"),
 		)
 		return {"success": True, "error": None, "funding_need": funding_need}
 	except Exception as e:

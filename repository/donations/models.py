@@ -90,6 +90,11 @@ class FundingNeedStatus(enum.Enum):
 	CLOSED = "CLOSED"
 
 
+class FundingNeedUrgency(enum.Enum):
+	NORMAL = "NORMAL"
+	URGENT = "URGENT"
+
+
 class ExpenseStatus(enum.Enum):
 	DRAFT = "DRAFT"
 	SUBMITTED = "SUBMITTED"
@@ -195,6 +200,15 @@ class PetFundingNeed(Base):
 	collected_amount_cents = db.Column(db.Integer, nullable=False, default=0)
 
 	status = db.Column(db.Enum(FundingNeedStatus), nullable=False, default=FundingNeedStatus.ACTIVE)
+	# urgency is shelter-managed (app/back office), drives donation CTA
+	# hierarchy client-side; no scheduling semantics attached
+	urgency = db.Column(db.Enum(FundingNeedUrgency), nullable=False,
+						default=FundingNeedUrgency.NORMAL, server_default="NORMAL")
+	# monthly goals: collected_amount_cents is zeroed by the daily cron on
+	# the 1st of the month (see schedules/donations.py); one-off campaigns
+	# opt out with is_recurring_monthly=False
+	is_recurring_monthly = db.Column(db.Boolean, nullable=False, default=True, server_default="true")
+	last_reset_at = db.Column(db.DateTime, nullable=True)
 	starts_at = db.Column(db.DateTime, nullable=True)
 	ends_at = db.Column(db.DateTime, nullable=True)
 	closed_at = db.Column(db.DateTime, nullable=True)
@@ -213,6 +227,9 @@ class PetFundingNeed(Base):
 			"collected_amount_cents": self.collected_amount_cents,
 			"remaining_amount_cents": remaining,
 			"status": self.status.name if self.status else None,
+			"urgency": self.urgency.name if self.urgency else None,
+			"is_recurring_monthly": bool(self.is_recurring_monthly),
+			"last_reset_at": iso_z(self.last_reset_at) if self.last_reset_at else None,
 			"starts_at": iso_z(self.starts_at) if self.starts_at else None,
 			"ends_at": iso_z(self.ends_at) if self.ends_at else None,
 			"closed_at": iso_z(self.closed_at) if self.closed_at else None,

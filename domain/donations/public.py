@@ -103,7 +103,10 @@ def get_public_donation_availability(shelter_id, pet_id=None, funding_need_id=No
 		shelter_pet = shelter_pets_data.get_active_shelter_pet(pet_id, shelter_id)
 		if shelter_pet is None or not shelter_pet.is_published:
 			reasons.append("PET_NOT_PUBLISHED")
-		if shelter:
+		# the legacy monthly allowance only gates generic PET donations:
+		# goal-targeted donations (funding_need_id) are capped by the goal
+		# itself (FUNDING_NEED_GOAL_REACHED below), not by the pet limit
+		if shelter and not funding_need_id:
 			allowance = limits_domain.get_remaining_allowance_cents(pet_id, shelter_id, shelter.get("timezone") or "UTC")
 			remaining_cents = allowance["remaining_cents"]
 			# exposed alongside remaining so the app can render a monthly
@@ -117,6 +120,10 @@ def get_public_donation_availability(shelter_id, pet_id=None, funding_need_id=No
 		need = funding_needs_data.get_funding_need(funding_need_id)
 		if need is None or need.status.name != "ACTIVE":
 			reasons.append("FUNDING_NEED_NOT_ACTIVE")
+		elif need.collected_amount_cents >= need.target_amount_cents:
+			# monthly goal ("traguardo") reached — collected resets on the
+			# 1st for recurring needs (see schedules/donations.py)
+			reasons.append("FUNDING_NEED_GOAL_REACHED")
 
 	return {
 		"available": len(reasons) == 0,
