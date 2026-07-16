@@ -10,6 +10,8 @@ here so a bug never causes an infinite Stripe retry loop on an event we've
 already durably logged as FAILED (visible + retryable via
 retryStripeWebhookEvent).
 """
+import json
+
 import stripe
 from flask import Blueprint, request, jsonify
 
@@ -42,8 +44,10 @@ def stripe_donation_webhook():
 		logger.warning(f"rejecting livemode=true event {event['id']} while running in test mode")
 		return jsonify({"error": "livemode event rejected in test mode"}), 400
 
+	# stripe>=8 dropped to_dict(for_json=...); str(StripeObject) emits JSON, so
+	# json.loads(str(...)) yields a fully-nested, JSON-safe plain dict.
 	stored_event, created = webhook_events_data.create_received_event(
-		event["id"], event["type"], event["livemode"], payload=event.to_dict(for_json=True),
+		event["id"], event["type"], event["livemode"], payload=json.loads(str(event)),
 	)
 	if not created:
 		logger.info(f"duplicate webhook delivery for {event['id']}, skipping processing")
@@ -53,10 +57,10 @@ def stripe_donation_webhook():
 		# domain/donations/webhooks.py handlers use plain dict .get(...) on
 		# every field — event["data"]["object"] is a typed Stripe resource
 		# (StripeObject), which has no .get() method (only __getitem__), so
-		# it must be converted to a real dict first (same call already used
+		# it must be converted to a real dict first (same JSON round-trip used
 		# a few lines up to make the stored payload JSON-safe)
 		webhooks_domain.process_event(
-			event["type"], event["data"]["object"].to_dict(for_json=True), account,
+			event["type"], json.loads(str(event["data"]["object"])), account,
 		)
 		webhook_events_data.mark_processed(stored_event.id)
 		logger.info(f"donation webhook processed ok: id={event['id']} type={event['type']}")
