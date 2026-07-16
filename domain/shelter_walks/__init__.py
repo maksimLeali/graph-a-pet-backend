@@ -165,7 +165,7 @@ def get_paginated_shelter_walks(common_search):
         raise e
 
 
-def get_operational_walks(shelter_id):
+def get_operational_walks(shelter_id, restrict_to_user_id=None):
     """Non-history walks view: open walks + walks closed today (see
     repository.shelter_walks.get_operational_walks for the exact rule)."""
     logger.domain(f"shelter_id: {shelter_id}")
@@ -173,7 +173,8 @@ def get_operational_walks(shelter_id):
         now = utc_now()
         day_start = datetime(now.year, now.month, now.day)
         day_end = day_start + timedelta(days=1)
-        walks = shelter_walks_data.get_operational_walks(shelter_id, day_start, day_end)
+        walks = shelter_walks_data.get_operational_walks(
+            shelter_id, day_start, day_end, restrict_to_user_id)
         pagination = {
             "total_items": len(walks),
             "total_pages": 1,
@@ -186,10 +187,10 @@ def get_operational_walks(shelter_id):
         raise e
 
 
-def get_pets_needing_walk(shelter_id, hours=24):
+def get_pets_needing_walk(shelter_id, hours=24, restrict_to_user_id=None):
     logger.domain(f"shelter_id: {shelter_id} hours: {hours}")
     try:
-        pets = shelter_walks_data.get_pets_needing_walk(shelter_id, hours)
+        pets = shelter_walks_data.get_pets_needing_walk(shelter_id, hours, restrict_to_user_id)
         pagination = {
             "total_items": len(pets),
             "total_pages": 1,

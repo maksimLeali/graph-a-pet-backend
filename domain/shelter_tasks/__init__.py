@@ -225,7 +225,7 @@ def materialize_recurring_tasks(target_date=None):
         raise e
 
 
-def get_operational_tasks(shelter_id):
+def get_operational_tasks(shelter_id, restrict_to_user_id=None):
     """Non-history tasks view: recurring templates + current-week tasks (see
     repository.shelter_tasks.get_operational_tasks for the exact rule)."""
     logger.domain(f"shelter_id: {shelter_id}")
@@ -234,7 +234,8 @@ def get_operational_tasks(shelter_id):
         day_start = datetime(now.year, now.month, now.day)
         week_start = day_start - timedelta(days=day_start.weekday())
         week_end = week_start + timedelta(days=7)
-        tasks = shelter_tasks_data.get_operational_tasks(shelter_id, week_start, week_end)
+        tasks = shelter_tasks_data.get_operational_tasks(
+            shelter_id, week_start, week_end, restrict_to_user_id)
         pagination = {
             "total_items": len(tasks),
             "total_pages": 1,

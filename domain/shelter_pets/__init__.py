@@ -1,4 +1,5 @@
 import repository.shelter_pets as shelter_pets_data
+import repository.shelter_roles as shelter_roles_data
 import domain.pets as pets_domain
 import domain.shelters as shelters_domain
 from api.errors import NotFoundError, BadRequest
@@ -13,6 +14,55 @@ def get_pet(obj, info):
 
 def get_shelter(obj, info):
     return shelters_domain.get_shelter(obj['shelter_id'])
+
+
+def get_assigned_members(obj, info):
+    import domain.users as users_domain
+    ids = shelter_pets_data.get_pet_assignee_ids(obj["id"])
+    return [users_domain.get_user(uid) for uid in ids]
+
+
+def get_assigned_shelter_people(obj, info):
+    import domain.shelter_people as shelter_people_domain
+    ids = shelter_pets_data.get_pet_assignee_shelter_person_ids(obj["id"])
+    return [shelter_people_domain.get_shelter_person(pid) for pid in ids]
+
+
+def set_shelter_pet_published(shelter_pet_id, is_published):
+    """Gates public storefront/donation visibility for a shelter pet."""
+    logger.domain(f"shelter_pet_id: {shelter_pet_id} is_published: {is_published}")
+    try:
+        return shelter_pets_data.update_shelter_pet(
+            shelter_pet_id, {"is_published": bool(is_published)}
+        )
+    except Exception as e:
+        logger.error(e)
+        raise e
+
+
+def set_shelter_pet_assignees(shelter_pet_id, user_ids, shelter_person_ids=None):
+    """Replace-all assignment of shelter members to a pet. Every user must
+    hold a role on the pet's shelter; every shelter_person must belong to it."""
+    import domain.shelter_people as shelter_people_domain
+    logger.domain(
+        f"shelter_pet_id: {shelter_pet_id} user_ids: {stringify(user_ids)} "
+        f"shelter_person_ids: {stringify(shelter_person_ids)}"
+    )
+    try:
+        sp = shelter_pets_data.get_shelter_pet(shelter_pet_id)
+        shelter_id = sp["shelter_id"]
+        for uid in dict.fromkeys(user_ids or []):
+            if not shelter_roles_data.get_roles_for_user_on_shelter(uid, shelter_id):
+                raise BadRequest(f"user {uid} is not a member of shelter {shelter_id}")
+        for pid in dict.fromkeys(shelter_person_ids or []):
+            person = shelter_people_domain.get_shelter_person(pid)
+            if person is None or person["shelter_id"] != shelter_id:
+                raise BadRequest(f"shelter_person {pid} does not belong to shelter {shelter_id}")
+        shelter_pets_data.set_pet_assignees(shelter_pet_id, user_ids, shelter_person_ids)
+        return shelter_pets_data.get_shelter_pet(shelter_pet_id)
+    except Exception as e:
+        logger.error(e)
+        raise e
 
 
 def create_shelter_pet(data):

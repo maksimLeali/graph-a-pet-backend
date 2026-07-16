@@ -1,4 +1,4 @@
-from repository import db, Base
+from repository import db, Base, schema
 from utils.dates import iso_z
 
 
@@ -25,4 +25,33 @@ class ShelterPet(Base):
             "is_published": bool(self.is_published) if self.is_published is not None else False,
             "created_at": iso_z(self.created_at),
             "updated_at": iso_z(self.updated_at) if self.updated_at else None,
+        }
+
+
+class ShelterPetAssignment(Base):
+    __tablename__ = 'shelter_pet_assignments'
+    __table_args__ = (
+        # exactly one of user_id / shelter_person_id is set (enforced in domain
+        # layer): user_id for an app user, shelter_person_id for a shelter
+        # contact/volunteer without an account. Same pattern as
+        # ShelterTaskAssignee.
+        db.UniqueConstraint('shelter_pet_id', 'user_id',
+                            name='ux_shelter_pet_assignment_user'),
+        db.UniqueConstraint('shelter_pet_id', 'shelter_person_id',
+                            name='ux_shelter_pet_assignment_shelter_person'),
+        {'schema': schema},
+    )
+
+    shelter_pet_id = db.Column(db.String, db.ForeignKey('shelter_pets.id', ondelete='CASCADE'),
+                               nullable=False, index=True)
+    user_id = db.Column(db.String, db.ForeignKey('users.id'), nullable=True, index=True)
+    shelter_person_id = db.Column(db.String, db.ForeignKey('shelter_people.id'), nullable=True, index=True)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "shelter_pet_id": self.shelter_pet_id,
+            "user_id": self.user_id,
+            "shelter_person_id": self.shelter_person_id,
+            "created_at": iso_z(self.created_at),
         }

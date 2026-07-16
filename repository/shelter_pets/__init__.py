@@ -1,11 +1,11 @@
 import uuid
 from datetime import datetime
 from sqlalchemy.exc import ProgrammingError
-from sqlalchemy import select, text
+from sqlalchemy import select, text, or_
 from api.errors import BadRequest, NotFoundError
 from repository import db, schema
 from utils.logger import logger, stringify
-from repository.shelter_pets.models import ShelterPet
+from repository.shelter_pets.models import ShelterPet, ShelterPetAssignment
 from repository.pets.models import Pet
 from repository.query_builder import build_query, build_count, build_where
 from utils.dates import utc_now
@@ -240,6 +240,77 @@ def get_shelter_pet(id):
     except Exception as e:
         logger.error(e)
         raise e
+
+
+# --- pet <-> member assignments -------------------------------------------
+
+def get_pet_assignee_ids(shelter_pet_id):
+    rows = db.session.query(ShelterPetAssignment.user_id).filter(
+        ShelterPetAssignment.shelter_pet_id == shelter_pet_id,
+        ShelterPetAssignment.user_id.isnot(None),
+    ).all()
+    return [r[0] for r in rows]
+
+
+def get_pet_assignee_shelter_person_ids(shelter_pet_id):
+    rows = db.session.query(ShelterPetAssignment.shelter_person_id).filter(
+        ShelterPetAssignment.shelter_pet_id == shelter_pet_id,
+        ShelterPetAssignment.shelter_person_id.isnot(None),
+    ).all()
+    return [r[0] for r in rows]
+
+
+def set_pet_assignees(shelter_pet_id, user_ids, shelter_person_ids=None):
+    """Replace-all: the given user_ids/shelter_person_ids become the exact
+    assignee set for the pet (shelter_person_ids are contacts/volunteers
+    without an app account)."""
+    logger.repository(
+        f"shelter_pet_id: {shelter_pet_id} assignees: {stringify(user_ids)} "
+        f"shelter_person_assignees: {stringify(shelter_person_ids)}"
+    )
+    try:
+        today = utc_now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+        db.session.query(ShelterPetAssignment).filter(
+            ShelterPetAssignment.shelter_pet_id == shelter_pet_id
+        ).delete()
+        for uid in dict.fromkeys(user_ids or []):
+            db.session.add(ShelterPetAssignment(
+                id=f"{uuid.uuid4()}",
+                created_at=today,
+                shelter_pet_id=shelter_pet_id,
+                user_id=uid,
+            ))
+        for pid in dict.fromkeys(shelter_person_ids or []):
+            db.session.add(ShelterPetAssignment(
+                id=f"{uuid.uuid4()}",
+                created_at=today,
+                shelter_pet_id=shelter_pet_id,
+                shelter_person_id=pid,
+            ))
+        db.session.commit()
+        return get_pet_assignee_ids(shelter_pet_id), get_pet_assignee_shelter_person_ids(shelter_pet_id)
+    except Exception as e:
+        db.session.rollback()
+        logger.error(e)
+        raise e
+
+
+def get_assigned_shelter_pet_ids(user_id, shelter_id):
+    """Shelter-pet ids in `shelter_id` assigned to `user_id`, either directly
+    or through a ShelterPerson linked to the user's account."""
+    from repository.shelter_people.models import ShelterPerson
+    rows = db.session.query(ShelterPetAssignment.shelter_pet_id).join(
+        ShelterPet, ShelterPetAssignment.shelter_pet_id == ShelterPet.id
+    ).outerjoin(
+        ShelterPerson, ShelterPetAssignment.shelter_person_id == ShelterPerson.id
+    ).filter(
+        ShelterPet.shelter_id == shelter_id,
+        or_(
+            ShelterPetAssignment.user_id == user_id,
+            ShelterPerson.user_id == user_id,
+        ),
+    ).all()
+    return list({r[0] for r in rows})
 
 
 def delete_shelter_pet(id):

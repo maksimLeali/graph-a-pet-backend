@@ -176,12 +176,17 @@ def get_walks_assigned_to_user(user_id, start, end, day_start, day_end):
     return [r.to_dict() for r in rows]
 
 
-def get_operational_walks(shelter_id, day_start, day_end):
+def get_operational_walks(shelter_id, day_start, day_end, restrict_to_user_id=None):
     """Operational (non-history) walks for a shelter: open walks (planned/in
     progress, dated or not), plus walks closed (completed/cancelled) today.
     Closed walks from previous days are excluded — they stay in the DB for
-    future history screens, just not shown here."""
-    rows = db.session.query(ShelterWalk).join(
+    future history screens, just not shown here.
+
+    With restrict_to_user_id (volunteers) only walks the user is involved in:
+    walker (as user or linked shelter_person) OR walks of pets assigned to
+    them — so the assigned member still sees the walk's status even when
+    someone else walks their pet."""
+    query = db.session.query(ShelterWalk).join(
         ShelterPet, ShelterWalk.shelter_pet_id == ShelterPet.id
     ).filter(
         ShelterPet.shelter_id == shelter_id,
@@ -198,18 +203,38 @@ def get_operational_walks(shelter_id, day_start, day_end):
                 ShelterWalk.cancelled_at < day_end,
             ),
         ),
-    ).order_by(ShelterWalk.scheduled_at.asc()).all()
+    )
+    if restrict_to_user_id:
+        import repository.shelter_pets as shelter_pets_data
+        import repository.shelter_people as shelter_people_data
+        assigned_pet_ids = shelter_pets_data.get_assigned_shelter_pet_ids(
+            restrict_to_user_id, shelter_id)
+        person_ids = shelter_people_data.get_person_ids_for_user(
+            restrict_to_user_id, shelter_id)
+        conds = [ShelterWalk.walker_id == restrict_to_user_id]
+        if person_ids:
+            conds.append(ShelterWalk.shelter_person_id.in_(person_ids))
+        if assigned_pet_ids:
+            conds.append(ShelterWalk.shelter_pet_id.in_(assigned_pet_ids))
+        query = query.filter(or_(*conds))
+    rows = query.order_by(ShelterWalk.scheduled_at.asc()).all()
     return [r.to_dict() for r in rows]
 
 
-def get_pets_needing_walk(shelter_id, hours=24):
-    """Shelter pets senza una ShelterWalk COMPLETED nelle ultime <hours> ore."""
+def get_pets_needing_walk(shelter_id, hours=24, restrict_to_user_id=None):
+    """Shelter pets senza una ShelterWalk COMPLETED nelle ultime <hours> ore.
+    Con restrict_to_user_id (volontari) solo i pet assegnati a quell'utente."""
     logger.repository(f"shelter_id: {shelter_id} hours: {hours}")
     try:
         cutoff = utc_now() - timedelta(hours=hours)
         pets = db.session.query(ShelterPet).filter(
             ShelterPet.shelter_id == shelter_id
         ).all()
+        if restrict_to_user_id:
+            import repository.shelter_pets as shelter_pets_data
+            assigned = set(shelter_pets_data.get_assigned_shelter_pet_ids(
+                restrict_to_user_id, shelter_id))
+            pets = [p for p in pets if p.id in assigned]
         pet_ids = [p.id for p in pets]
         if not pet_ids:
             return []

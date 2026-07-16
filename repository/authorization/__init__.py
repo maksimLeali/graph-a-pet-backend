@@ -355,3 +355,66 @@ def write_audit_log(action, actor_user_id=None, target_user_id=None, shelter_id=
         # auditing must never take the main operation down
         logger.error(f"audit log write failed: {e}")
         return None
+
+
+# ---------------------------------------------------------------------------
+# Legacy ShelterRole -> RBAC sync
+# ---------------------------------------------------------------------------
+
+def sync_legacy_shelter_role(user_id, shelter_id):
+    """Make the user's RBAC state on a shelter mirror their legacy
+    ShelterRole rows (source of truth for app-side role management):
+      - ensure an ACTIVE membership when they hold at least one legacy role;
+      - ensure an ACTIVE assignment for each mapped system role;
+      - revoke system shelter-role assignments no longer backed by a legacy
+        row (custom/manually-assigned roles are untouched).
+    Commits its own transaction; call AFTER the legacy write is committed.
+    Failures are logged, never raised: legacy flows must not break if the
+    RBAC tables are missing or unseeded."""
+    from domain.authorization.catalog import LEGACY_SHELTER_ROLE_TO_RBAC
+    from repository.shelter_roles.models import ShelterRole
+
+    try:
+        legacy = db.session.query(ShelterRole).filter(
+            ShelterRole.user_id == user_id,
+            ShelterRole.shelter_id == shelter_id,
+        ).all()
+        wanted_codes = {
+            LEGACY_SHELTER_ROLE_TO_RBAC[r.role.name]
+            for r in legacy if r.role is not None
+        }
+
+        system_codes = set(LEGACY_SHELTER_ROLE_TO_RBAC.values())
+        roles = db.session.query(Role).filter(Role.code.in_(system_codes)).all()
+        role_by_code = {r.code: r for r in roles}
+        if not role_by_code:
+            logger.warning("rbac sync skipped: system shelter roles not seeded")
+            return
+
+        if wanted_codes:
+            ensure_membership(shelter_id, user_id, ShelterMembershipSource.MANUAL)
+        for code in system_codes:
+            role = role_by_code.get(code)
+            if role is None:
+                continue
+            if code in wanted_codes:
+                # legacy row is authoritative: reactivate revoked rows too
+                admin_assign_user_role(user_id, role.id, shelter_id)
+            else:
+                stale = db.session.query(UserRoleAssignment).filter(
+                    UserRoleAssignment.user_id == user_id,
+                    UserRoleAssignment.role_id == role.id,
+                    UserRoleAssignment.shelter_id == shelter_id,
+                    UserRoleAssignment.status == UserRoleStatus.ACTIVE,
+                ).all()
+                for a in stale:
+                    a.status = UserRoleStatus.REVOKED
+                    a.revoked_at = _now()
+                    a.updated_at = _now()
+        db.session.commit()
+        logger.check(
+            f"rbac synced user={user_id} shelter={shelter_id} roles={sorted(wanted_codes)}"
+        )
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"rbac legacy sync failed user={user_id} shelter={shelter_id}: {e}")

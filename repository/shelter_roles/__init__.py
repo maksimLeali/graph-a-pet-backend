@@ -87,10 +87,18 @@ def create_shelter_role(data):
         )
         db.session.add(shelter_role)
         db.session.commit()
+        _sync_rbac(shelter_role.user_id, shelter_role.shelter_id)
         return shelter_role.to_dict()
     except Exception as e:
         logger.error(e)
         raise e
+
+
+def _sync_rbac(user_id, shelter_id):
+    """Mirror legacy role changes into RBAC assignments/membership so
+    permission-first resolvers see the same reality (log-only on failure)."""
+    import repository.authorization as authz_data
+    authz_data.sync_legacy_shelter_role(user_id, shelter_id)
 
 def update_shelter_role(id, data):
     logger.repository(
@@ -111,6 +119,7 @@ def update_shelter_role(id, data):
         shelter_role_model.update(data)
         db.session.commit()
         shelter_role = {**shelter_role_old, **shelter_role_model.first().to_dict()}
+        _sync_rbac(shelter_role["user_id"], shelter_role["shelter_id"])
         logger.check(f'shelter_role: {stringify(shelter_role)}')
         return shelter_role
     except Exception as e:
@@ -164,12 +173,15 @@ def get_shelter_role(id):
 
 def delete_shelter_role(id, ):
     logger.repository(f"id: {id}  remove")
-    try: 
+    try:
         shelter_role_model = db.session.query(ShelterRole).filter(ShelterRole.id == id)
-        if not shelter_role_model:
+        existing = shelter_role_model.first()
+        if not existing:
             raise NotFoundError(f"no shelter_role found with id: {id}")
+        user_id, shelter_id = existing.user_id, existing.shelter_id
         shelter_role_model.delete()
         db.session.commit()
+        _sync_rbac(user_id, shelter_id)
         logger.check(f"deleted {id}")
     except Exception as e: 
         logger.error(e)

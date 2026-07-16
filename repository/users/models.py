@@ -26,6 +26,7 @@ class User(Base):
             "email": self.email,
             "password": self.password,
             "role": self.role.name,
+            "verified": bool(self.verified) if self.verified is not None else False,
             "created_at": iso_z(self.created_at),
             "updated_at": iso_z(self.updated_at) if self.updated_at else None,
             "last_activity": iso_z(self.last_activity) if self.last_activity else None

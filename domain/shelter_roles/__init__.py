@@ -55,6 +55,11 @@ def delete_shelter_role(id, user_id):
     try:
         shelter_role = shelter_roles_data.get_shelter_role(id)
         memoriae_id = damnatio_domain.delete_row(id, 'shelter_roles', shelter_role, user_id)
+        # damnatio bypasses the repo delete, so mirror the RBAC state here
+        import repository.authorization as authz_data
+        authz_data.sync_legacy_shelter_role(
+            shelter_role["user_id"], shelter_role["shelter_id"]
+        )
         return memoriae_id
     except Exception as e:
         logger.error(e)

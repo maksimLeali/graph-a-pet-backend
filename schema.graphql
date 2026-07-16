@@ -316,6 +316,10 @@ type Mutation {
     createShelterPetsWithData(data: ShelterPetsWithDataCreate!): ShelterPetsResult!
     changeShelter(data: ChangeShelterInput!): ShelterPetResult!
     deleteShelterPet(id: ID!): DeleteResult!
+    # replace-all: collega membri (utenti e/o shelter people) a un pet del canile
+    setShelterPetAssignees(shelter_pet_id: ID!, user_ids: [ID!], shelter_person_ids: [ID!]): ShelterPetResult!
+    # gate visibilità pubblica (vetrina/donazioni) del pet del canile
+    setShelterPetPublished(shelter_pet_id: ID!, is_published: Boolean!): ShelterPetResult!
 
     # ShelterTask
     createShelterTask(data: ShelterTaskCreate!): ShelterTaskResult!
@@ -628,6 +632,7 @@ type User {
     last_name: String!
     email: String!
     role: UserRole!
+    verified: Boolean!
     created_at: String!
     ownerships(commonSearch: CommonSearch = {}): PaginatedOwnerships
     pets_owned: Int!
@@ -687,6 +692,8 @@ input UserUpdate {
     last_name: String
     email: String
     last_activity: String
+    # solo ADMIN (updateUser): verifica manuale di un utente
+    verified: Boolean
 }
 
 
@@ -1853,6 +1860,10 @@ type ShelterPet {
     pet: Pet!
     is_active: Boolean!
     left_at: String
+    is_published: Boolean!
+    # membri collegati al pet: default suggerito quando si pianifica una walk
+    assigned_members: [User!]!
+    assigned_shelter_people: [ShelterPerson!]!
 }
 
 type ShelterPetResult {

@@ -227,7 +227,7 @@ def get_tasks_assigned_to_user(user_id, start, end):
     return [r.to_dict() for r in rows]
 
 
-def get_operational_tasks(shelter_id, week_start, week_end):
+def get_operational_tasks(shelter_id, week_start, week_end, restrict_to_user_id=None):
     """Operational (non-history) tasks view for a shelter:
     - recurring templates are always visible (they're a rule, not a to-do
       bound to a date);
@@ -239,10 +239,27 @@ def get_operational_tasks(shelter_id, week_start, week_end):
     """
     week_start_date = week_start.date() if hasattr(week_start, "date") else week_start
     week_end_date = week_end.date() if hasattr(week_end, "date") else week_end
-    rows = db.session.query(ShelterTask).filter(
+    query = db.session.query(ShelterTask).filter(
         ShelterTask.shelter_id == shelter_id,
-        
-    ).order_by(ShelterTask.scheduled_at.asc()).all()
+    )
+    if restrict_to_user_id:
+        import repository.shelter_people as shelter_people_data
+        person_ids = shelter_people_data.get_person_ids_for_user(
+            restrict_to_user_id, shelter_id)
+        # volunteers see unassigned tasks plus tasks assigned to them
+        # (directly or through their linked shelter_person)
+        has_any_assignee = db.session.query(ShelterTaskAssignee.id).filter(
+            ShelterTaskAssignee.task_id == ShelterTask.id
+        ).exists()
+        mine_conds = [ShelterTaskAssignee.user_id == restrict_to_user_id]
+        if person_ids:
+            mine_conds.append(ShelterTaskAssignee.shelter_person_id.in_(person_ids))
+        assigned_to_me = db.session.query(ShelterTaskAssignee.id).filter(
+            ShelterTaskAssignee.task_id == ShelterTask.id,
+            or_(*mine_conds),
+        ).exists()
+        query = query.filter(or_(~has_any_assignee, assigned_to_me))
+    rows = query.order_by(ShelterTask.scheduled_at.asc()).all()
     return [r.to_dict() for r in rows]
 
 

@@ -55,6 +55,16 @@ def update_shelter_person(id, data):
         raise e
 
 
+def get_person_ids_for_user(user_id, shelter_id):
+    """Ids of ShelterPerson rows in `shelter_id` linked to the app account
+    `user_id` (a member can also exist as a shelter contact)."""
+    rows = db.session.query(ShelterPerson.id).filter(
+        ShelterPerson.shelter_id == shelter_id,
+        ShelterPerson.user_id == user_id,
+    ).all()
+    return [r[0] for r in rows]
+
+
 def get_shelter_person(id):
     logger.repository(f"id: {id}")
     model = ShelterPerson.query.get(id)

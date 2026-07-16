@@ -48,3 +48,21 @@ def register_cli(app):
             db.session.rollback()
             logger.error(f"rbac seed failed: {e}")
             raise click.ClickException(str(e))
+
+    @app.cli.command("backfill-rbac")
+    def backfill_rbac():
+        """Mirror every legacy ShelterRole row into RBAC assignments and
+        memberships (idempotent; run seed-rbac first). Repairs users created
+        before the automatic sync on ShelterRole create/update/delete."""
+        from repository import db
+        from repository.shelter_roles.models import ShelterRole
+        import repository.authorization as authz_data
+
+        pairs = {
+            (r.user_id, r.shelter_id)
+            for r in db.session.query(ShelterRole).all()
+            if r.user_id and r.shelter_id
+        }
+        for user_id, shelter_id in sorted(pairs):
+            authz_data.sync_legacy_shelter_role(user_id, shelter_id)
+        click.echo(f"rbac backfill complete: {len(pairs)} (user, shelter) pair(s)")

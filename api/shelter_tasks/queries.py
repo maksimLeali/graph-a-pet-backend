@@ -4,9 +4,10 @@ import domain.shelter_tasks as shelter_tasks_domain
 from api.errors import format_error
 from api.middlewares import auth_middleware
 from api.authorization.decorators import require_permission, authorize_from_token
+from api.permissions import is_restricted_to_assigned
 from domain.authorization.catalog import ShelterPermissions
 from utils.logger import logger, stringify
-from utils import format_common_search
+from utils import format_common_search, get_request_user
 
 
 @convert_kwargs_to_snake_case
@@ -33,7 +34,10 @@ def list_shelter_tasks_resolver(obj, info: GraphQLResolveInfo, common_search):
 def list_operational_shelter_tasks_resolver(obj, info, shelter_id):
     logger.api(f"shelter_id: {shelter_id}")
     try:
-        tasks, pagination = shelter_tasks_domain.get_operational_tasks(shelter_id)
+        # VOLUNTEER: solo task senza assegnatari o assegnate a lei/lui
+        user = get_request_user(info.context.headers['authorization'])
+        restrict_to = user["id"] if is_restricted_to_assigned(user, shelter_id) else None
+        tasks, pagination = shelter_tasks_domain.get_operational_tasks(shelter_id, restrict_to)
         payload = {"success": True, "items": tasks, "pagination": pagination}
     except Exception as e:
         logger.error(e)

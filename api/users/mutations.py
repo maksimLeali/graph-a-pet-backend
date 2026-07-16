@@ -77,7 +77,8 @@ def update_me_resolver(obj, info, data):
     try:
         token =  info.context.headers['authorization']
         current_user = get_request_user(token)
-        
+        # la verifica manuale è riservata all'ADMIN (updateUser)
+        data.pop('verified', None)
         user = update_user(current_user.get('id'), data)
         payload = {
             "success": True,

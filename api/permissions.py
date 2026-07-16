@@ -74,6 +74,15 @@ def user_shelter_level(user_id, shelter_id):
     return max(levels) if levels else 0
 
 
+def is_restricted_to_assigned(user, shelter_id):
+    """True when the user only sees what is assigned to them on this shelter:
+    highest role below STAFF (i.e. VOLUNTEER). Global ADMIN is never
+    restricted."""
+    if user.get("role") == UserRole.ADMIN.name:
+        return False
+    return user_shelter_level(user["id"], shelter_id) < ROLE_LEVEL["STAFF"]
+
+
 def has_capability(user, shelter_id, capability):
     """True if `user` (dict) can perform `capability` on `shelter_id`.
     Global ADMIN always passes."""
