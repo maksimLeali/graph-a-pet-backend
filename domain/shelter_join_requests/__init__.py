@@ -14,13 +14,13 @@ import repository.shelter_roles as shelter_roles_data
 from api.errors import BadRequest, ForbiddenError, NotFoundError
 from utils.logger import logger, stringify
 
-REVIEWER_LEVELS = ["OWNER", "MANAGER"]
-
-
 def _assert_reviewer(user_id, shelter_id):
-    roles = shelter_roles_data.get_roles_for_user_on_shelter(user_id, shelter_id)
-    if not any(r.get("role") in REVIEWER_LEVELS for r in roles):
-        raise ForbiddenError("only an OWNER or MANAGER of this shelter can review join requests")
+    from domain.authorization import authorization_service
+    from domain.authorization.catalog import ShelterPermissions
+    if not authorization_service.can(
+        user_id, ShelterPermissions.MEMBERS_INVITE, shelter_id=shelter_id
+    ):
+        raise ForbiddenError("reviewing join requests requires shelters.members.invite")
 
 
 def apply_as_volunteer(shelter_id, user_id, message=None):
@@ -31,7 +31,9 @@ def apply_as_volunteer(shelter_id, user_id, message=None):
             raise NotFoundError(f"no shelter found with id {shelter_id}")
         if not shelter.get("accepts_volunteers"):
             raise BadRequest("this shelter is not accepting volunteers")
-        if shelter_roles_data.get_roles_for_user_on_shelter(user_id, shelter_id):
+        import repository.authorization as authz_data
+        membership = authz_data.get_membership(user_id, shelter_id)
+        if membership and membership["status"] == "ACTIVE":
             raise BadRequest("you are already a member of this shelter")
 
         # idempotent: re-applying while pending returns the same request
@@ -51,11 +53,15 @@ def apply_as_volunteer(shelter_id, user_id, message=None):
             or applicant.get("email")
             or "Someone"
         )
-        reviewers = shelter_roles_data.get_roles_for_shelter_levels(shelter_id, REVIEWER_LEVELS)
-        for role in reviewers:
+        import repository.authorization as authz_data
+        from domain.authorization.catalog import ShelterPermissions
+        reviewer_ids = authz_data.get_user_ids_with_permission_on_shelter(
+            shelter_id, ShelterPermissions.MEMBERS_INVITE
+        )
+        for reviewer_id in reviewer_ids:
             notifications_domain.notify_shelter_join_request(
                 request_id=join_request["id"],
-                user_id=role["user_id"],
+                user_id=reviewer_id,
                 shelter_id=shelter_id,
                 shelter_name=shelter.get("name"),
                 applicant_name=applicant_name,

@@ -96,6 +96,8 @@ type Query {
 
     # Authorization (RBAC)
     myShelterAuthorization(shelter_id: ID!): ShelterAuthorizationResult!
+    backofficeAccessContext: BackofficeAccessContext!
+    backofficeShelterAccess(shelter_id: ID!): BackofficeShelterAccess!
     listRbacRoles: RbacRolesResult!
     getUserRbacRoles(user_id: ID!): UserRbacResult!
     listPermissionCatalog: [RbacPermission!]!
@@ -108,6 +110,8 @@ type Query {
     getMyShelterJoinRequest(shelter_id: ID!): ShelterJoinRequestResult!
     listShelterJoinRequests(shelter_id: ID!, status: ShelterJoinRequestStatus): ShelterJoinRequestListResult!
     listShelterClaimRequests(shelter_id: ID!, search: CommonSearch = {}): PaginatedShelterClaimRequests!
+    # back-office review queue (platform.claims.review)
+    listPlatformShelterClaimRequests(search: CommonSearch = {}): PaginatedShelterClaimRequests!
 
     # ShelterPet
     getShelterPet(id: ID!): ShelterPetResult!
@@ -273,6 +277,7 @@ type Mutation {
     # Media
     updateMedia(id: ID!, data: MediaUpdate!): MediaResult!
     createMedia(data: MediaCreate!): MediaResult!
+    deleteMedia(id: ID!): DeleteResult!
 
     # Code
     createCode(data: CodeCreate!): CodeResult!
@@ -306,6 +311,10 @@ type Mutation {
     cancelShelterClaim(id: ID!): ShelterClaimRequestResult!
     approveShelterClaim(id: ID!, decision_note: String): ShelterClaimRequestResult!
     rejectShelterClaim(id: ID!, decision_note: String): ShelterClaimRequestResult!
+    # requester replaces documents on a PENDING claim (after a change request)
+    updateShelterClaimDocuments(id: ID!, documents: JSON!): ShelterClaimRequestResult!
+    # reviewer flags one document as not acceptable (platform.claims.review)
+    requestShelterClaimDocumentChange(id: ID!, document_id: String!, note: String): ShelterClaimRequestResult!
     applyToShelterAsVolunteer(shelter_id: ID!, message: String): ShelterJoinRequestResult!
     approveShelterJoinRequest(id: ID!): ShelterJoinRequestResult!
     rejectShelterJoinRequest(id: ID!): ShelterJoinRequestResult!
@@ -436,6 +445,31 @@ type ShelterAuthorization {
     shelter_id: ID!
     membership_status: String
     permissions: [String!]!
+    # informational only — the UI must authorize on `permissions`
+    roles: [String!]!
+    # derives from ShelterOwnership, never from a role
+    is_technical_owner: Boolean!
+}
+
+# Bootstrap del back office multi-rifugio: permission platform effettive +
+# tutti e soli i rifugi accessibili (membership ACTIVE, assignment attivo,
+# shelters.backoffice.access). `roles` è informativo, mai autorizzativo.
+type BackofficeShelterAccess {
+    shelter: Shelter!
+    membership_status: String
+    roles: [String!]!
+    permissions: [String!]!
+    # derives from ShelterOwnership, never from a role
+    is_technical_owner: Boolean!
+    # MEMBERSHIP | PLATFORM_ADMIN — canale con cui l'utente accede al rifugio
+    access_mode: String!
+    # true se i privilegi platform aggiungono permission oltre la membership
+    platform_override_active: Boolean!
+}
+
+type BackofficeAccessContext {
+    platform_permissions: [String!]!
+    shelters: [BackofficeShelterAccess!]!
 }
 
 type ShelterAuthorizationResult {
@@ -631,7 +665,7 @@ type User {
     first_name: String!
     last_name: String!
     email: String!
-    role: UserRole!
+    role: UserRole! @deprecated(reason: "Authorization is permission-based (RBAC). Use platform permissions from backofficeAccessContext / myShelterAuthorization; this field is informational only and will be removed.")
     verified: Boolean!
     created_at: String!
     ownerships(commonSearch: CommonSearch = {}): PaginatedOwnerships

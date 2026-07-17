@@ -1,6 +1,8 @@
 from ariadne import convert_kwargs_to_snake_case
 import domain.shelter_invites as shelter_invites_domain
-from api.middlewares import auth_middleware, min_shelter_role
+from api.middlewares import auth_middleware
+from api.authorization.decorators import require_permission
+from domain.authorization.catalog import ShelterPermissions
 from api.errors import format_error
 from utils import get_request_user
 from utils.logger import logger, stringify
@@ -19,7 +21,7 @@ def _err(e, info):
 
 
 @convert_kwargs_to_snake_case
-@min_shelter_role("MANAGER")
+@require_permission(ShelterPermissions.MEMBERS_INVITE, shelter_argument="shelter_id")
 def create_shelter_invite_resolver(obj, info, data):
     logger.api(f"data: {stringify(data)}")
     try:

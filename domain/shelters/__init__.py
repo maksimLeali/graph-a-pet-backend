@@ -28,8 +28,12 @@ def _assert_visibility_allowed(visibility, verification_status, actor_user):
     is a global admin (manual approval)."""
     if visibility != "PUBLIC":
         return
-    is_admin = bool(actor_user) and actor_user.get("role") == "ADMIN"
-    if verification_status != "VERIFIED" and not is_admin:
+    from domain.authorization import authorization_service
+    from domain.authorization.catalog import PlatformPermissions
+    can_verify = bool(actor_user) and authorization_service.can(
+        actor_user.get("id"), PlatformPermissions.SHELTERS_VERIFY
+    )
+    if verification_status != "VERIFIED" and not can_verify:
         raise ForbiddenError("PUBLIC visibility requires a verified shelter or admin approval")
 
 
@@ -54,6 +58,7 @@ def create_personal_workspace(data, current_user_id):
     try:
         # late import: domain.shelter_roles imports domain.shelters
         import domain.shelter_roles as shelter_roles_domain
+        import domain.shelter_ownerships as ownership_service
         payload = dict(data)
         for field in PERSONAL_WORKSPACE_ADDRESS_FIELDS:
             payload.setdefault(field, "")
@@ -66,6 +71,12 @@ def create_personal_workspace(data, current_user_id):
             "shelter_id": shelter["id"],
             "role": "OWNER",
         })
+        ownership_service.add_owner(
+            shelter_id=shelter["id"],
+            user_id=current_user_id,
+            source="WORKSPACE_CREATOR",
+            created_by_id=current_user_id,
+        )
         logger.check(f"personal workspace: {stringify(shelter)}")
         return shelter
     except Exception as e:

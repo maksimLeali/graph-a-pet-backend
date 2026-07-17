@@ -3,12 +3,14 @@ import domain.codes as codes_domain
 from utils.logger import logger
 from utils import format_common_search, get_request_user
 
-from api.middlewares import min_role, RoleLevel, auth_middleware
+from api.middlewares import auth_middleware
+from api.authorization.decorators import require_permission
+from domain.authorization.catalog import PlatformPermissions
 from api.errors import format_error, error_pagination
 
 
 @convert_kwargs_to_snake_case
-@min_role(RoleLevel.ADMIN.name)
+@require_permission(PlatformPermissions.CONTENT_MANAGE, platform=True)
 def list_codes_resolver(obj, info, common_search):
     try:
         common_search= format_common_search(common_search)

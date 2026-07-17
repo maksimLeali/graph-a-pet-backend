@@ -4,7 +4,6 @@ from ariadne import convert_kwargs_to_snake_case
 from domain.walks import create_walk, update_walk, delete_walk
 from api.middlewares import auth_middleware
 from api.errors import format_error
-from repository.users.models import UserRole
 from utils.logger import logger, stringify
 from utils import get_request_user
 

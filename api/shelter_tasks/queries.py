@@ -4,7 +4,8 @@ import domain.shelter_tasks as shelter_tasks_domain
 from api.errors import format_error
 from api.middlewares import auth_middleware
 from api.authorization.decorators import require_permission, authorize_from_token
-from api.permissions import is_restricted_to_assigned
+from api.authorization.tenant import require_tenant_common_search
+from domain.authorization import authorization_service
 from domain.authorization.catalog import ShelterPermissions
 from utils.logger import logger, stringify
 from utils import format_common_search, get_request_user
@@ -14,8 +15,13 @@ from utils import format_common_search, get_request_user
 @auth_middleware
 def list_shelter_tasks_resolver(obj, info: GraphQLResolveInfo, common_search):
     logger.api(f"common_search: {stringify(common_search)}")
-    common_search = format_common_search(common_search)
     try:
+        # chiusura falla cross-tenant: platform admin globale, altrimenti
+        # ricerca vincolata a un singolo shelter con shelters.tasks.read
+        require_tenant_common_search(
+            info, common_search, ShelterPermissions.TASKS_READ
+        )
+        common_search = format_common_search(common_search)
         tasks, pagination = shelter_tasks_domain.get_paginated_shelter_tasks(common_search)
         payload = {
             "success": True,
@@ -36,7 +42,9 @@ def list_operational_shelter_tasks_resolver(obj, info, shelter_id):
     try:
         # VOLUNTEER: solo task senza assegnatari o assegnate a lei/lui
         user = get_request_user(info.context.headers['authorization'])
-        restrict_to = user["id"] if is_restricted_to_assigned(user, shelter_id) else None
+        restrict_to = None if authorization_service.can(
+            user["id"], ShelterPermissions.TASKS_CREATE, shelter_id=shelter_id
+        ) else user["id"]
         tasks, pagination = shelter_tasks_domain.get_operational_tasks(shelter_id, restrict_to)
         payload = {"success": True, "items": tasks, "pagination": pagination}
     except Exception as e:

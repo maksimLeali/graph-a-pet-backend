@@ -3,7 +3,9 @@ from ariadne import convert_kwargs_to_snake_case
 import domain.walk_stats as walk_stats_domain
 import domain.ownerships as ownerships_domain
 import domain.shelter_pets as shelter_pets_domain
-from api.middlewares import auth_middleware, assert_shelter_role
+from api.middlewares import auth_middleware
+from api.authorization.decorators import authorize_from_token
+from domain.authorization.catalog import ShelterPermissions
 from api.errors import format_error, ForbiddenError
 from utils import get_request_user
 from utils.logger import logger
@@ -43,7 +45,7 @@ def get_shelter_pet_walking_stats_resolver(obj, info, shelter_pet_id, period):
     try:
         token = info.context.headers['authorization']
         shelter_pet = shelter_pets_domain.get_shelter_pet(shelter_pet_id)
-        assert_shelter_role(token, shelter_pet["shelter_id"], "STAFF")
+        authorize_from_token(token, ShelterPermissions.WALKS_READ, shelter_id=shelter_pet["shelter_id"])
         chart = walk_stats_domain.get_shelter_pet_walking_stats(shelter_pet_id, period)
         return {"success": True, "chart": chart}
     except Exception as e:

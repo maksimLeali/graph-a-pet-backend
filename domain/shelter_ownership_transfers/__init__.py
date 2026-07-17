@@ -55,8 +55,12 @@ def request_transfer(shelter_id, to_user_id, new_role_for_previous_owner, actor_
         f"new_role: {new_role_for_previous_owner} by {actor_user_id}"
     )
     try:
-        if shelter_roles_data.get_owner_role_model(actor_user_id, shelter_id) is None:
-            raise ForbiddenError("only the current OWNER can request an ownership transfer")
+        import domain.shelter_ownerships as ownership_service
+        if not ownership_service.is_active_owner(actor_user_id, shelter_id):
+            # transition fallback: shelters created before the ownership
+            # backfill still track ownership in legacy shelter_roles
+            if shelter_roles_data.get_owner_role_model(actor_user_id, shelter_id) is None:
+                raise ForbiddenError("only the current owner can request an ownership transfer")
         if to_user_id == actor_user_id:
             raise BadRequest("cannot transfer ownership to yourself")
         destination = users_domain.get_user(to_user_id)
@@ -92,6 +96,7 @@ def accept_transfer(id, actor_user_id):
         # late import: domain.shelter_roles imports domain.shelters, and this
         # module is imported by domain.shelters-adjacent flows too
         import domain.shelter_roles as shelter_roles_domain
+        import domain.shelter_ownerships as ownership_service
 
         transfer = _expire_if_due(transfers_data.get_transfer(id))
         _assert_pending(transfer)
@@ -127,6 +132,24 @@ def accept_transfer(id, actor_user_id):
                     previous_owner_role.id, 'shelter_roles',
                     previous_owner_role.to_dict(), actor_user_id,
                 )
+
+        # technical ownership moves atomically; the previous owner may keep an
+        # RBAC role on the shelter but never keeps ownership
+        if ownership_service.is_active_owner(from_user_id, shelter_id):
+            ownership_service.transfer_ownership(
+                shelter_id=shelter_id,
+                from_user_id=from_user_id,
+                to_user_id=to_user_id,
+                actor_user_id=actor_user_id,
+            )
+        else:
+            # legacy transfer created before the ownership backfill ran
+            ownership_service.add_owner(
+                shelter_id=shelter_id,
+                user_id=to_user_id,
+                source="OWNERSHIP_TRANSFER",
+                created_by_id=actor_user_id,
+            )
 
         return transfers_data.set_status(id, "ACCEPTED", "accepted_at")
     except Exception as e:

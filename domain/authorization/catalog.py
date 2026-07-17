@@ -13,6 +13,10 @@ class ShelterPermissions:
     READ = "shelters.read"
     UPDATE = "shelters.update"
 
+    # gate d'ingresso all'area operativa del back office per il singolo
+    # rifugio; NON sostituisce le permission funzionali (tasks.read, ...)
+    BACKOFFICE_ACCESS = "shelters.backoffice.access"
+
     MEMBERS_READ = "shelters.members.read"
     MEMBERS_INVITE = "shelters.members.invite"
     MEMBERS_REMOVE = "shelters.members.remove"
@@ -25,6 +29,8 @@ class ShelterPermissions:
     PEOPLE_CREATE = "shelters.people.create"
     PEOPLE_UPDATE = "shelters.people.update"
     PEOPLE_ARCHIVE = "shelters.people.archive"
+    PEOPLE_DELETE = "shelters.people.delete"
+    PEOPLE_LINK_USER = "shelters.people.link_user"
 
     PETS_READ = "shelters.pets.read"
     PETS_CREATE = "shelters.pets.create"
@@ -99,11 +105,18 @@ class PlatformPermissions:
 
     USERS_READ = "platform.users.read"
     USERS_UPDATE = "platform.users.update"
+    USERS_DELETE = "platform.users.delete"
     SHELTERS_READ = "platform.shelters.read"
     SHELTERS_VERIFY = "platform.shelters.verify"
+    SHELTERS_MANAGE = "platform.shelters.manage"
     CLAIMS_REVIEW = "platform.claims.review"
     ROLES_MANAGE = "platform.roles.manage"
     AUDIT_READ = "platform.audit.read"
+    STATISTICS_READ = "platform.statistics.read"
+    # global administration of pet-domain entities (pets, cures, walks,
+    # ratings, medias, health cards, codes, pet ownerships) from the back
+    # office; replaces the legacy min_role(ADMIN) catch-all
+    CONTENT_MANAGE = "platform.content.manage"
 
     # donor-side (guest donor stays outside RBAC; these apply to
     # PLATFORM_USER, the standard authenticated donor)
@@ -157,9 +170,12 @@ HIGH_RISK = {
     ShelterPermissions.MEMBERS_REMOVE,
     ShelterPermissions.OWNERSHIP_TRANSFER,
     PlatformPermissions.USERS_UPDATE,
+    PlatformPermissions.USERS_DELETE,
     PlatformPermissions.SHELTERS_VERIFY,
+    PlatformPermissions.SHELTERS_MANAGE,
     PlatformPermissions.CLAIMS_REVIEW,
     PlatformPermissions.ROLES_MANAGE,
+    PlatformPermissions.CONTENT_MANAGE,
 
     ShelterPermissions.DONATIONS_ENABLE,
     ShelterPermissions.DONATIONS_DISABLE,
@@ -175,6 +191,7 @@ HIGH_RISK = {
 
 MEDIUM_RISK = {
     PlatformPermissions.BACKOFFICE_ACCESS,
+    ShelterPermissions.BACKOFFICE_ACCESS,
     ShelterPermissions.UPDATE,
     ShelterPermissions.MEMBERS_INVITE,
     ShelterPermissions.TASKS_DELETE,
@@ -186,6 +203,7 @@ MEDIUM_RISK = {
     ShelterPermissions.BOXES_MANAGE,
     ShelterPermissions.MAP_UPDATE,
     PlatformPermissions.AUDIT_READ,
+    PlatformPermissions.STATISTICS_READ,
 
     ShelterPermissions.DONATIONS_READ_DETAILS,
     ShelterPermissions.DONATIONS_SETTINGS_MANAGE,
@@ -268,6 +286,7 @@ SHELTER_STAFF_PERMISSIONS = SHELTER_VOLUNTEER_PERMISSIONS + [
 ]
 
 SHELTER_MANAGER_PERMISSIONS = SHELTER_STAFF_PERMISSIONS + [
+    P.BACKOFFICE_ACCESS,  # manager+ entrano nel back office del proprio rifugio
     P.PEOPLE_UPDATE,
     P.PEOPLE_ARCHIVE,
     P.INVENTORY_RESTOCK,
@@ -298,9 +317,12 @@ SHELTER_ADMIN_PERMISSIONS = SHELTER_MANAGER_PERMISSIONS + [
     P.ROLES_ASSIGN,
     P.ROLES_MANAGE,
     P.OWNERSHIP_TRANSFER,
+    P.CLAIM_CREATE,        # workspace owner requests official verification
     P.TASKS_DELETE,        # legacy: deleteShelterTask required OWNER
     P.WALKS_DELETE,        # legacy: deleteShelterWalk required OWNER
     P.PETS_REMOVE,
+    P.PEOPLE_DELETE,       # legacy: deleteShelterPerson required OWNER
+    P.PEOPLE_LINK_USER,    # legacy: linkShelterPersonToUser required OWNER
 
     P.DONATIONS_READ_DETAILS,
     P.DONATIONS_SETTINGS_MANAGE,

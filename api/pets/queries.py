@@ -3,11 +3,13 @@ import domain.pets as pets_domain
 from utils.logger import logger, stringify
 from utils import format_common_search, get_request_user
 from api.errors import InternalError, error_pagination, format_error
-from api.middlewares import min_role, RoleLevel, auth_middleware
+from api.middlewares import auth_middleware
+from api.authorization.decorators import require_permission
+from domain.authorization.catalog import PlatformPermissions
 
 
 @convert_kwargs_to_snake_case
-@min_role(RoleLevel.ADMIN.name)
+@require_permission(PlatformPermissions.CONTENT_MANAGE, platform=True)
 def list_pets_resolver(obj, info, common_search):
     logger.api(f"common_search: {stringify(common_search)}")
     try:

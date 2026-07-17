@@ -2,7 +2,10 @@ from ariadne import convert_kwargs_to_snake_case
 from graphql import GraphQLError, GraphQLResolveInfo
 import domain.shelter_inventory as inventory_domain
 from api.errors import format_error
-from api.middlewares import auth_middleware, assert_shelter_role
+from api.middlewares import auth_middleware
+from api.authorization.decorators import authorize_from_token
+from api.authorization.tenant import require_tenant_common_search
+from domain.authorization.catalog import ShelterPermissions
 from utils.logger import logger, stringify
 from utils import format_common_search
 
@@ -11,8 +14,11 @@ from utils import format_common_search
 @auth_middleware
 def list_shelter_inventory_items_resolver(obj, info: GraphQLResolveInfo, common_search):
     logger.api(f"common_search: {stringify(common_search)}")
-    common_search = format_common_search(common_search)
     try:
+        require_tenant_common_search(
+            info, common_search, ShelterPermissions.INVENTORY_READ
+        )
+        common_search = format_common_search(common_search)
         items, pagination = inventory_domain.get_paginated_items(common_search)
         payload = {"success": True, "items": items, "pagination": pagination}
     except Exception as e:
@@ -43,8 +49,11 @@ def get_shelter_inventory_item_resolver(obj, info, id):
 @auth_middleware
 def list_shelter_inventory_movements_resolver(obj, info: GraphQLResolveInfo, common_search):
     logger.api(f"common_search: {stringify(common_search)}")
-    common_search = format_common_search(common_search)
     try:
+        require_tenant_common_search(
+            info, common_search, ShelterPermissions.INVENTORY_READ
+        )
+        common_search = format_common_search(common_search)
         movements, pagination = inventory_domain.get_paginated_movements(common_search)
         payload = {"success": True, "items": movements, "pagination": pagination}
     except Exception as e:
@@ -60,7 +69,7 @@ def list_low_stock_items_resolver(obj, info, shelter_id):
     logger.api(f"shelter_id: {shelter_id}")
     try:
         token = info.context.headers['authorization']
-        assert_shelter_role(token, shelter_id, "STAFF")
+        authorize_from_token(token, ShelterPermissions.INVENTORY_READ, shelter_id=shelter_id)
         items, pagination = inventory_domain.list_low_stock_items(shelter_id)
         payload = {"success": True, "items": items, "pagination": pagination}
     except Exception as e:

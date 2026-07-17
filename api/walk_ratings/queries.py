@@ -3,7 +3,7 @@ import domain.walk_ratings as walk_ratings_domain
 from utils.logger import logger, stringify
 from utils import format_common_search, get_request_user
 from api.errors import error_pagination, format_error
-from api.middlewares import min_role, RoleLevel, auth_middleware
+from api.middlewares import auth_middleware
 
 
 # custody levels that grant a user access to a pet's data

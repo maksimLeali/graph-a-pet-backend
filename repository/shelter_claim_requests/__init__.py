@@ -65,6 +65,18 @@ def set_status(id, status):
         raise e
 
 
+def update_proof_data(id, proof_data):
+    model = db.session.query(ShelterClaimRequest).filter(
+        ShelterClaimRequest.id == id
+    ).first()
+    if not model:
+        raise NotFoundError(f"no claim request found with id: {id}")
+    model.proof_data = proof_data
+    model.updated_at = utc_now()
+    db.session.commit()
+    return model.to_dict()
+
+
 def resolve_claim(id, status, reviewed_by, decision_note):
     """Admin decision (approve/reject): status + review metadata in one go."""
     try:

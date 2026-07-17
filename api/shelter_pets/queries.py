@@ -3,6 +3,8 @@ from graphql import GraphQLError, GraphQLResolveInfo
 import domain.shelter_pets as shelter_pets_domain
 from api.errors import format_error
 from api.middlewares import auth_middleware
+from api.authorization.tenant import require_tenant_common_search
+from domain.authorization.catalog import ShelterPermissions
 from utils.logger import logger, stringify
 from utils import format_common_search
 
@@ -11,8 +13,11 @@ from utils import format_common_search
 @auth_middleware
 def list_shelter_pets_resolver(obj, info: GraphQLResolveInfo, common_search):
     logger.api(f"common_search: {stringify(common_search)}")
-    common_search = format_common_search(common_search)
     try:
+        require_tenant_common_search(
+            info, common_search, ShelterPermissions.PETS_READ
+        )
+        common_search = format_common_search(common_search)
         shelter_pets, pagination = shelter_pets_domain.get_paginated_shelter_pets(common_search)
         payload = {
             "success": True,

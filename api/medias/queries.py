@@ -2,12 +2,13 @@ from ariadne import convert_kwargs_to_snake_case
 import domain.medias as medias_domain
 from utils.logger import logger
 from utils import format_common_search
-from api.middlewares import min_role, RoleLevel
+from api.authorization.decorators import require_permission
+from domain.authorization.catalog import PlatformPermissions
 from api.errors import format_error, error_pagination
 
 
 @convert_kwargs_to_snake_case
-# @min_role(RoleLevel.ADMIN.name)
+# @require_permission(PlatformPermissions.CONTENT_MANAGE, platform=True)
 def list_medias_resolver(obj, info, common_search):
     try:
         common_search= format_common_search(common_search)
@@ -28,7 +29,7 @@ def list_medias_resolver(obj, info, common_search):
     return payload
 
 @convert_kwargs_to_snake_case
-@min_role(RoleLevel.ADMIN.name)
+@require_permission(PlatformPermissions.CONTENT_MANAGE, platform=True)
 def get_media_resolver(obj, info, id):
     try:
         media = medias_domain.get_media(id)

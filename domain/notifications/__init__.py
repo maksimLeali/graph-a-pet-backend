@@ -197,6 +197,39 @@ def notify_shelter_claim_decision(claim_id, user_id, shelter_id, shelter_name, a
     })
 
 
+def notify_shelter_claim_document_change(claim_id, user_id, shelter_id, shelter_name,
+                                         document_id, note, actor_user_id):
+    """A reviewer asked to replace one verification document. Reuses the
+    SHELTER_CLAIM_REQUEST type (no enum migration); the app branches on
+    payload.kind to open the document-replacement flow."""
+    title = f"Document update requested for {shelter_name}"
+    message = (
+        f"A reviewer asked you to replace a verification document for {shelter_name}."
+        + (f" Note: {note}" if note else "")
+    )
+    return notifications_data.create_if_absent({
+        "user_id": user_id,
+        "type": "SHELTER_CLAIM_REQUEST",
+        "priority": "HIGH",
+        "title": title,
+        "message": message,
+        "entity_type": "SHELTER_CLAIM_REQUEST",
+        "entity_id": claim_id,
+        "shelter_id": shelter_id,
+        "actor_user_id": actor_user_id,
+        "action_url": f"/shelters/detail/{shelter_id}/verification",
+        "payload": {
+            "kind": "DOCUMENT_CHANGE_REQUESTED",
+            "shelter_name": shelter_name,
+            "document_id": document_id,
+            "note": note,
+        },
+        # per-document dedupe: a second change request on the same document
+        # replaces nothing but a different document notifies again
+        "dedupe_key": f"shelter_claim_doc_change:{claim_id}:{document_id}",
+    })
+
+
 # --- cron generation (idempotent via dedupe_key) ---
 def generate_treatment_reminders(target_date=None):
     """One TREATMENT_REMINDER per owner for each vaccine/operation/antiparasitic

@@ -77,6 +77,88 @@ def get_permission_keys_for_roles(role_ids):
     return {r[0] for r in rows}
 
 
+def list_user_shelter_access(user_id):
+    """Every shelter where the user holds at least one ACTIVE shelter-scoped
+    role assignment, with the shelter row, the membership (may be None for
+    pre-RBAC legacy rows) and the active role codes. Validity windows are NOT
+    filtered here — the AuthorizationService applies them when computing the
+    effective permissions; role codes returned here are informational only."""
+    from repository.shelters.models import Shelter
+
+    rows = (
+        db.session.query(UserRoleAssignment, Role, Shelter)
+        .join(Role, UserRoleAssignment.role_id == Role.id)
+        .join(Shelter, Shelter.id == UserRoleAssignment.shelter_id)
+        .filter(
+            UserRoleAssignment.user_id == user_id,
+            UserRoleAssignment.status == UserRoleStatus.ACTIVE,
+            UserRoleAssignment.shelter_id.isnot(None),
+            Role.archived_at.is_(None),
+        )
+        .order_by(Shelter.name)
+        .all()
+    )
+    by_shelter = {}
+    for assignment, role, shelter in rows:
+        entry = by_shelter.setdefault(
+            shelter.id,
+            {"shelter": shelter.to_dict(), "role_codes": [], "assignments": []},
+        )
+        if role.code not in entry["role_codes"]:
+            entry["role_codes"].append(role.code)
+        entry["assignments"].append({**assignment.to_dict(), "role": role.to_dict()})
+
+    memberships = db.session.query(ShelterMembership).filter(
+        ShelterMembership.user_id == user_id,
+        ShelterMembership.shelter_id.in_(list(by_shelter.keys())) if by_shelter else db.false(),
+    ).all()
+    membership_by_shelter = {m.shelter_id: m.to_dict() for m in memberships}
+    for shelter_id, entry in by_shelter.items():
+        entry["membership"] = membership_by_shelter.get(shelter_id)
+    return list(by_shelter.values())
+
+
+def get_active_member_user_ids(shelter_id):
+    """User ids with an ACTIVE membership on the shelter (notification use)."""
+    rows = db.session.query(ShelterMembership).filter(
+        ShelterMembership.shelter_id == shelter_id,
+        ShelterMembership.status == ShelterMembershipStatus.ACTIVE,
+    ).all()
+    return sorted({m.user_id for m in rows})
+
+
+def get_user_ids_with_permission_on_shelter(shelter_id, permission_key):
+    """User ids holding an ACTIVE shelter-scoped assignment on shelter_id whose
+    role grants `permission_key` (directly or via grants_all_permissions).
+    Membership status and validity windows are not applied — callers use this
+    for notifications, not authorization decisions."""
+    role_ids = {
+        rp.role_id
+        for rp in (
+            db.session.query(RolePermission)
+            .join(Permission, RolePermission.permission_id == Permission.id)
+            .filter(Permission.key == permission_key)
+            .all()
+        )
+    }
+    grants_all_ids = {
+        r.id
+        for r in db.session.query(Role).filter(
+            Role.grants_all_permissions.is_(True),
+            Role.scope_type == RbacScopeType.SHELTER,
+        ).all()
+    }
+    role_ids |= grants_all_ids
+    if not role_ids:
+        return []
+    assignments = db.session.query(UserRoleAssignment).filter(
+        UserRoleAssignment.shelter_id == shelter_id,
+        UserRoleAssignment.status == UserRoleStatus.ACTIVE,
+        UserRoleAssignment.role_id.in_(list(role_ids)),
+    ).all()
+    return sorted({a.user_id for a in assignments})
+
+
 def get_membership(user_id, shelter_id):
     m = db.session.query(ShelterMembership).filter(
         ShelterMembership.user_id == user_id,

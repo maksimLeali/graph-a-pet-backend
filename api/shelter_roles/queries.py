@@ -3,6 +3,8 @@ from graphql import GraphQLError, GraphQLResolveInfo
 import domain.shelter_roles as shelter_roles_domain
 from api.errors import format_error, error_pagination
 from api.middlewares import auth_middleware
+from api.authorization.tenant import require_tenant_common_search
+from domain.authorization.catalog import ShelterPermissions
 from utils.logger import logger, stringify
 from utils import format_common_search
 
@@ -11,8 +13,11 @@ from utils import format_common_search
 @auth_middleware
 def list_shelter_roles_resolver(obj, info: GraphQLResolveInfo, common_search):
     logger.api(f"common_search: {stringify(common_search)}")
-    common_search = format_common_search(common_search)
     try:
+        # tenant scoping: membri del rifugio (shelters.read) o platform admin;
+        # la lista espone gli utenti membri, mai cross-tenant
+        require_tenant_common_search(info, common_search, ShelterPermissions.READ)
+        common_search = format_common_search(common_search)
         shelter_roles, pagination = shelter_roles_domain.get_paginated_shelter_roles(common_search)
         payload = {
             "success": True,

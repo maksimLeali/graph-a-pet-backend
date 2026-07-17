@@ -3,7 +3,11 @@ from graphql import GraphQLError, GraphQLResolveInfo
 import domain.shelter_occupancies as occupancies_domain
 import domain.shelter_pets as shelter_pets_domain
 from api.errors import format_error, NotFoundError
-from api.middlewares import auth_middleware, assert_shelter_role
+from api.middlewares import auth_middleware
+from api.authorization.decorators import authorize_from_token
+from domain.authorization.catalog import ShelterPermissions
+from api.authorization.tenant import require_tenant_common_search, MAP_SCOPE
+from domain.authorization.catalog import ShelterPermissions
 from utils.logger import logger, stringify
 from utils import format_common_search
 
@@ -12,8 +16,11 @@ from utils import format_common_search
 @auth_middleware
 def list_shelter_box_occupancies_resolver(obj, info: GraphQLResolveInfo, common_search):
     logger.api(f"common_search: {stringify(common_search)}")
-    common_search = format_common_search(common_search)
     try:
+        require_tenant_common_search(
+            info, common_search, ShelterPermissions.BOXES_READ, alt_scopes=MAP_SCOPE
+        )
+        common_search = format_common_search(common_search)
         items, pagination = occupancies_domain.get_paginated_occupancies(common_search)
         payload = {"success": True, "items": items, "pagination": pagination}
     except Exception as e:
@@ -32,7 +39,7 @@ def get_current_box_for_pet_resolver(obj, info, shelter_pet_id):
         sp = shelter_pets_domain.get_shelter_pet(shelter_pet_id)
         if sp is None:
             raise NotFoundError(f"no shelter_pet found with id {shelter_pet_id}")
-        assert_shelter_role(token, sp["shelter_id"], "STAFF")
+        authorize_from_token(token, ShelterPermissions.BOXES_READ, shelter_id=sp["shelter_id"])
         box = occupancies_domain.get_current_box_for_pet(shelter_pet_id)
         payload = {"success": True, "box": box}
     except Exception as e:

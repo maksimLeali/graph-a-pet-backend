@@ -2,7 +2,9 @@ from ariadne import convert_kwargs_to_snake_case
 from graphql import GraphQLError, GraphQLResolveInfo
 import domain.shelter_ownership_transfers as transfers_domain
 from api.errors import format_error, error_pagination
-from api.middlewares import auth_middleware, assert_shelter_role
+from api.middlewares import auth_middleware
+from api.authorization.decorators import authorize_from_token
+from domain.authorization.catalog import ShelterPermissions
 from utils import get_request_user, format_common_search
 from utils.logger import logger, stringify
 
@@ -34,7 +36,7 @@ def list_shelter_ownership_transfers_resolver(obj, info: GraphQLResolveInfo, she
     logger.api(f"shelter_id: {shelter_id} search: {stringify(search)}")
     try:
         token = info.context.headers['authorization']
-        assert_shelter_role(token, shelter_id, "OWNER")
+        authorize_from_token(token, ShelterPermissions.OWNERSHIP_TRANSFER, shelter_id=shelter_id)
         common_search = format_common_search(search or {})
         items, pagination = transfers_domain.list_shelter_transfers(shelter_id, common_search)
         payload = {"success": True, "items": items, "pagination": pagination}

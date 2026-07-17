@@ -3,10 +3,11 @@ from utils.logger import logger, stringify
 from api.errors import format_error, error_pagination
 from utils import format_common_search
 import domain.health_cards as health_cards_domain
-from api.middlewares import min_role, RoleLevel
+from api.authorization.decorators import require_permission
+from domain.authorization.catalog import PlatformPermissions
 
 @convert_kwargs_to_snake_case
-@min_role(RoleLevel.ADMIN.name)
+@require_permission(PlatformPermissions.CONTENT_MANAGE, platform=True)
 def  list_health_cards_resolver(obj, info, common_search):
     logger.api(f"common_search: {stringify(common_search)}")
     try:
@@ -29,7 +30,7 @@ def  list_health_cards_resolver(obj, info, common_search):
     return payload
 
 @convert_kwargs_to_snake_case
-@min_role(RoleLevel.ADMIN.name)
+@require_permission(PlatformPermissions.CONTENT_MANAGE, platform=True)
 def get_health_card_resolver(obj, info, id):
     logger.api(f"id: {id}")
     try:

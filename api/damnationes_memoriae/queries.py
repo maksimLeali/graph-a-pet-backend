@@ -1,14 +1,15 @@
 from ariadne import convert_kwargs_to_snake_case
 from graphql import GraphQLError, GraphQLResolveInfo
 import domain.damnationes_memoriae as damnationes_memoriae_domain
-from repository.users.models import UserRole
 from api.errors import ForbiddenError, format_error, error_pagination
-from api.middlewares import auth_middleware, min_role
+from api.middlewares import auth_middleware
+from api.authorization.decorators import require_permission
+from domain.authorization.catalog import PlatformPermissions
 from utils.logger import logger, stringify
 from utils import format_common_search
 
 @convert_kwargs_to_snake_case
-@min_role(UserRole.ADMIN.name)
+@require_permission(PlatformPermissions.AUDIT_READ, platform=True)
 def list_damnationes_memoriae_resolver(obj, info: GraphQLResolveInfo, common_search):
     logger.api(f"common_search: {stringify(common_search)}")
     common_search= format_common_search(common_search)
@@ -28,7 +29,7 @@ def list_damnationes_memoriae_resolver(obj, info: GraphQLResolveInfo, common_sea
     return payload
 
 @convert_kwargs_to_snake_case
-@min_role(UserRole.ADMIN.name)
+@require_permission(PlatformPermissions.AUDIT_READ, platform=True)
 def get_damnatio_memoriae_resolver(obj, info, id):
     logger.api(f"id: {id}")
     try:

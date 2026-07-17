@@ -1,7 +1,9 @@
 from ariadne import convert_kwargs_to_snake_case
 import domain.shelter_walks as shelter_walks_domain
-from api.middlewares import auth_middleware, assert_shelter_role
-from api.permissions import assert_capability, Cap, is_restricted_to_assigned
+from api.middlewares import auth_middleware
+from api.authorization.decorators import authorize_from_token
+from domain.authorization import authorization_service
+from domain.authorization.catalog import ShelterPermissions
 from api.errors import format_error, ForbiddenError
 from utils import get_request_user
 from utils.logger import logger, stringify
@@ -25,8 +27,9 @@ def assert_staff_or_own_walk(token, walk_id):
     linked shelter_person. Returns the user dict."""
     walk = shelter_walks_domain.get_shelter_walk(walk_id)
     shelter_id = shelter_walks_domain.shelter_id_for_shelter_pet(walk["shelter_pet_id"])
-    user = assert_capability(token, shelter_id, Cap.READ)
-    if not is_restricted_to_assigned(user, shelter_id):
+    user = authorize_from_token(token, ShelterPermissions.WALKS_READ, shelter_id=shelter_id)
+    # WALKS_CANCEL (staff+) grants action on any walk; volunteers act on their own only
+    if authorization_service.can(user["id"], ShelterPermissions.WALKS_CANCEL, shelter_id=shelter_id):
         return user
     if walk.get("walker_id") == user["id"]:
         return user
@@ -46,8 +49,8 @@ def create_shelter_walk_resolver(obj, info, data):
     try:
         token = info.context.headers['authorization']
         shelter_id = shelter_walks_domain.shelter_id_for_shelter_pet(data["shelter_pet_id"])
-        me = assert_capability(token, shelter_id, Cap.READ)
-        if is_restricted_to_assigned(me, shelter_id):
+        me = authorize_from_token(token, ShelterPermissions.WALKS_READ, shelter_id=shelter_id)
+        if not authorization_service.can(me["id"], ShelterPermissions.WALKS_CREATE, shelter_id=shelter_id):
             # volunteers plan only for pets assigned to them, as their own walker
             import repository.shelter_pets as shelter_pets_data
             assigned = shelter_pets_data.get_assigned_shelter_pet_ids(me["id"], shelter_id)
@@ -67,7 +70,7 @@ def update_shelter_walk_resolver(obj, info, id, data):
     logger.api(f"id: {id} data: {stringify(data)}")
     try:
         token = info.context.headers['authorization']
-        assert_shelter_role(token, shelter_walks_domain.shelter_id_for_walk(id), "STAFF")
+        authorize_from_token(token, ShelterPermissions.WALKS_CREATE, shelter_id=shelter_walks_domain.shelter_id_for_walk(id))
         return _ok(shelter_walks_domain.update_shelter_walk(id, data))
     except Exception as e:
         return _err(e, info)
@@ -127,7 +130,7 @@ def delete_shelter_walk_resolver(obj, info, id):
     logger.api(f"id: {id} remove")
     try:
         token = info.context.headers['authorization']
-        assert_shelter_role(token, shelter_walks_domain.shelter_id_for_walk(id), "OWNER")
+        authorize_from_token(token, ShelterPermissions.WALKS_DELETE, shelter_id=shelter_walks_domain.shelter_id_for_walk(id))
         me = get_request_user(token)
         memoriae_id = shelter_walks_domain.delete_shelter_walk(id, me["id"])
         return {"success": True, "id": memoriae_id}

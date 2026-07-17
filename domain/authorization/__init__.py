@@ -73,11 +73,22 @@ class AuthorizationService:
         self._validate_scope(permission, shelter_id)
 
         context = self._load_context(user_id, shelter_id)
-        effective = self._effective_permissions(context, shelter_id, now=now)
+        effective, membership_keys = self._effective_permissions(
+            context, shelter_id, now=now, return_detail=True
+        )
 
         logger.critical(f"authorization_check user={user_id} permission={permission} shelter={shelter_id} effective={effective}")
 
         if permission in effective:
+            # operazione sensibile concessa dal SOLO privilegio platform (non
+            # dalla membership del rifugio): va in audit — è un platform admin
+            # che opera su un rifugio non suo
+            if (
+                shelter_id
+                and permission in HIGH_RISK
+                and permission not in membership_keys
+            ):
+                self._audit_platform_privilege_use(user_id, permission, shelter_id)
             return effective
 
         if context["membership_blocked"]:
@@ -102,6 +113,33 @@ class AuthorizationService:
         context = self._load_context(user_id, shelter_id)
         membership = context["membership"]
         return membership["status"] if membership else None
+
+    def shelter_access_breakdown(self, user_id, shelter_id, now=None):
+        """Come l'utente accede a uno shelter: canale membership (assignment
+        shelter-scoped attivi) vs privilegio platform. Non crea mai membership
+        o ruoli impliciti: è una pura lettura."""
+        now = now or utc_now()
+        context = self._load_context(user_id, shelter_id)
+        effective, membership_keys = self._effective_permissions(
+            context, shelter_id, now=now, return_detail=True
+        )
+        shelter_role_codes = []
+        for assignment in context["assignments"]:
+            if (
+                assignment["shelter_id"] == shelter_id
+                and self._assignment_active(assignment, now)
+                and not context["membership_blocked"]
+            ):
+                code = assignment["role"]["code"]
+                if code not in shelter_role_codes:
+                    shelter_role_codes.append(code)
+        return {
+            "effective": effective,
+            "membership_permissions": membership_keys,
+            "membership": context["membership"],
+            "membership_blocked": context["membership_blocked"],
+            "shelter_role_codes": shelter_role_codes,
+        }
 
     # -- internals ----------------------------------------------------------
 
@@ -143,12 +181,23 @@ class AuthorizationService:
             g._rbac_cache[cache_key] = context
         return context
 
-    def _effective_permissions(self, context, shelter_id, now=None):
-        now = now or utc_now()
-        role_ids = []
-        grants_all_scopes = set()
+    def _effective_permissions(self, context, shelter_id, now=None,
+                               return_detail=False):
+        """Union of the permission keys granted by the active assignments.
 
-        for assignment in context["assignments"]:            
+        With return_detail=True also returns the subset granted through the
+        SHELTER-scoped assignments (the "membership channel"): everything else
+        was granted through platform privileges (e.g. PLATFORM_ADMIN
+        grants_all). The split drives access_mode and the sensitive-operation
+        audit for platform admins acting on shelters they are not members of.
+        """
+        now = now or utc_now()
+        shelter_role_ids = []
+        platform_role_ids = []
+        grants_all_scopes = set()
+        shelter_grants_all = False
+
+        for assignment in context["assignments"]:
             if not self._assignment_active(assignment, now):
                 continue
             role = assignment["role"]
@@ -165,7 +214,6 @@ class AuthorizationService:
                         f"legacy shelter role without membership: user={assignment['user_id']} "
                         f"shelter={assignment['shelter_id']} role={role['code']}"
                     )
-            logger.critical(f'have all permissions? {role.get("grants_all_permissions")}')
             if role.get("grants_all_permissions"):
                 if role["scope_type"] == SCOPE_PLATFORM:
                     grants_all_scopes.add(SCOPE_PLATFORM)
@@ -173,16 +221,30 @@ class AuthorizationService:
                 elif assignment["shelter_id"] == shelter_id:
                     # shelter-scoped grants-all only covers its own shelter
                     grants_all_scopes.add(SCOPE_SHELTER)
+                    shelter_grants_all = True
                 continue
-            role_ids.append(role["id"])
+            if is_platform_role:
+                platform_role_ids.append(role["id"])
+            else:
+                shelter_role_ids.append(role["id"])
 
-        effective = set(self.loader.get_permission_keys_for_roles(role_ids))
+        membership_keys = set(
+            self.loader.get_permission_keys_for_roles(shelter_role_ids)
+        )
+        effective = membership_keys | set(
+            self.loader.get_permission_keys_for_roles(platform_role_ids)
+        )
         if grants_all_scopes:
             from domain.authorization.catalog import ALL_PERMISSION_KEYS
             for key in ALL_PERMISSION_KEYS:
                 key_scope = SCOPE_PLATFORM if key.startswith("platform.") else SCOPE_SHELTER
                 if key_scope in grants_all_scopes:
                     effective.add(key)
+                    # grants-all su assignment DI QUESTO shelter = canale membership
+                    if shelter_grants_all and key_scope == SCOPE_SHELTER:
+                        membership_keys.add(key)
+        if return_detail:
+            return effective, membership_keys
         return effective
 
     @staticmethod
@@ -203,6 +265,22 @@ class AuthorizationService:
             logger.error(f"unparsable validity window on user_role {assignment.get('id')}")
             return False
         return True
+
+    def _audit_platform_privilege_use(self, user_id, permission, shelter_id):
+        try:
+            self.loader.write_audit_log(
+                action="PLATFORM_ADMIN_SENSITIVE_OPERATION",
+                actor_user_id=user_id,
+                shelter_id=shelter_id,
+                metadata={
+                    "permission": permission,
+                    "access_mode": "PLATFORM_ADMIN",
+                },
+            )
+            from repository import db
+            db.session.commit()
+        except Exception as e:
+            logger.error(f"failed to audit platform privilege use: {e}")
 
     def _audit_sensitive_denial(self, user_id, permission, shelter_id):
         try:

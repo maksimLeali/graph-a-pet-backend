@@ -3,11 +3,12 @@ import domain.reports as reports_domain
 from utils.logger import logger, stringify
 from utils import format_common_search
 from api.errors import InternalError, error_pagination, format_error
-from api.middlewares import min_role, RoleLevel
+from api.authorization.decorators import require_permission
+from domain.authorization.catalog import PlatformPermissions
 
 
 @convert_kwargs_to_snake_case
-@min_role(RoleLevel.USER.name)
+@require_permission(PlatformPermissions.APP_USE, platform=True)
 def list_reports_resolver(obj, info, common_search):
     logger.api(f"common_search: {stringify(common_search)}")
     try:
@@ -31,7 +32,7 @@ def list_reports_resolver(obj, info, common_search):
 
 
 @convert_kwargs_to_snake_case
-@min_role(RoleLevel.USER.name)
+@require_permission(PlatformPermissions.APP_USE, platform=True)
 def get_report_resolver(obj, info, id):
     logger.api(f"id: {id}")
     try:

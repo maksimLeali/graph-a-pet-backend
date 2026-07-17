@@ -103,7 +103,12 @@ def restore_memoriae(id, user, force= False):
             message= f'can\'t restore {id} becouse it was cancelled automatically by another entity'
             logger.error(message)
             raise BadRequest(message)
-        if user['role'] != UserRole.ADMIN and memoriae['deleted_by'] != user['id'] :
+        from domain.authorization import authorization_service
+        from domain.authorization.catalog import PlatformPermissions
+        can_restore_any = authorization_service.can(
+            user['id'], PlatformPermissions.CONTENT_MANAGE
+        )
+        if not can_restore_any and memoriae['deleted_by'] != user['id'] :
             message= f"{user['id']}({user['role']}) can't restore {id}"
             logger.error(message)
             raise BadRequest(message)

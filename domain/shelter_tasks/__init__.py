@@ -41,7 +41,7 @@ def get_assignee_shelter_people(obj, info):
 def _assert_shelter_members(shelter_id, assignee_ids):
     """Every assignee must hold a role on this shelter (canile)."""
     for uid in dict.fromkeys(assignee_ids or []):
-        if not shelter_roles_data.get_roles_for_user_on_shelter(uid, shelter_id):
+        if not _is_active_member(uid, shelter_id):
             raise BadRequest(f"user {uid} is not a member of shelter {shelter_id}")
 
 
@@ -274,3 +274,11 @@ def get_pagination(common_search):
     except Exception as e:
         logger.error(e)
         raise e
+
+
+def _is_active_member(user_id, shelter_id):
+    """ACTIVE RBAC membership on the shelter (legacy shelter_roles no longer
+    consulted)."""
+    import repository.authorization as authz_data
+    membership = authz_data.get_membership(user_id, shelter_id)
+    return bool(membership) and membership["status"] == "ACTIVE"

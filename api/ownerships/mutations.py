@@ -1,8 +1,9 @@
 from ariadne import convert_kwargs_to_snake_case
 from api.errors import format_error
-from api.middlewares import min_role, auth_middleware
+from api.middlewares import auth_middleware
+from api.authorization.decorators import require_permission
+from domain.authorization.catalog import PlatformPermissions
 import domain.ownerships as owsershis_domain
-from repository.users.models import UserRole
 from utils import get_request_user
 from utils.logger import logger
 
@@ -23,7 +24,7 @@ def update_ownership_resolver(obj, info, id, data):
     return payload
 
 @convert_kwargs_to_snake_case
-@min_role(UserRole.ADMIN.name)
+@require_permission(PlatformPermissions.CONTENT_MANAGE, platform=True)
 def delete_ownership_resolver(obj, info, id):
     logger.api(f"id{id}  remove")
     try: 
@@ -109,7 +110,7 @@ def reject_pet_ownership_invite_resolver(obj, info, id):
 
 
 @convert_kwargs_to_snake_case
-@min_role(UserRole.ADMIN.name)
+@require_permission(PlatformPermissions.CONTENT_MANAGE, platform=True)
 def link_pet_to_user_resolver(obj, info, user_id, pet_id, custody_level):
     logger.api(f'linking pet {pet_id} to user {user_id} as {custody_level}')
     try :

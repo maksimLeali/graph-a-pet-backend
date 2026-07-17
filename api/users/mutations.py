@@ -2,14 +2,15 @@
 
 from ariadne import convert_kwargs_to_snake_case
 from domain.users import create_user, update_user, login, add_pet_to_user, delete_user, verify_user, regenerate_code
-from api.middlewares import auth_middleware, min_role
+from api.middlewares import auth_middleware
+from api.authorization.decorators import require_permission
+from domain.authorization.catalog import PlatformPermissions
 from api.errors import format_error, NotFoundError
-from repository.users.models import UserRole
 from utils import get_request_user
 from utils.logger import logger, stringify
 
 @convert_kwargs_to_snake_case
-@min_role(UserRole.ADMIN.name)
+@require_permission(PlatformPermissions.USERS_UPDATE, platform=True)
 def create_user_resolver(obj, info, data):
     logger.api(f"data {stringify(data)}")
     try:
@@ -46,7 +47,7 @@ def signup_resolver(obj, info, data):
     return payload
 
 @convert_kwargs_to_snake_case
-@min_role(UserRole.ADMIN.name)
+@require_permission(PlatformPermissions.USERS_UPDATE, platform=True)
 def update_user_resolver(obj, info, id, data):
     logger.api(
         f"id: {id}\n"\
@@ -69,7 +70,7 @@ def update_user_resolver(obj, info, id, data):
     return payload
 
 @convert_kwargs_to_snake_case
-@min_role(UserRole.USER.name)
+@require_permission(PlatformPermissions.APP_USE, platform=True)
 def update_me_resolver(obj, info, data):
     logger.api(
         f"data: {stringify(data)}"
@@ -137,7 +138,7 @@ def verify_user_resolver(obj, info, email, code):
     return payload
 
 @convert_kwargs_to_snake_case
-@min_role(UserRole.ADMIN.name)
+@require_permission(PlatformPermissions.CONTENT_MANAGE, platform=True)
 def add_pet_to_user_resolver(obj, info, pet, user_id, custody_level="OWNER"):
     logger.api(
         f"user_id: {user_id}\n"\
@@ -185,7 +186,7 @@ def add_pet_to_me_resolver(obj, info, pet, custody_level):
     return payload
 
 @convert_kwargs_to_snake_case
-@min_role(UserRole.ADMIN.name)
+@require_permission(PlatformPermissions.USERS_DELETE, platform=True)
 def delete_user_resolver(obj, info, id):
     logger.api(f"id{id}  remove")
     try: 

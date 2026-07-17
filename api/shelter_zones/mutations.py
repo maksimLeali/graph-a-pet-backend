@@ -1,7 +1,9 @@
 from ariadne import convert_kwargs_to_snake_case
 import domain.shelter_zones as shelter_zones_domain
 import domain.shelter_maps as shelter_maps_domain
-from api.middlewares import auth_middleware, assert_shelter_role
+from api.middlewares import auth_middleware
+from api.authorization.decorators import authorize_from_token
+from domain.authorization.catalog import ShelterPermissions
 from api.errors import format_error
 from utils import get_request_user
 from utils.logger import logger, stringify
@@ -26,7 +28,7 @@ def create_shelter_zone_resolver(obj, info, data):
     try:
         token = info.context.headers['authorization']
         shelter_map = shelter_maps_domain.get_shelter_map(data["map_id"])
-        assert_shelter_role(token, shelter_map["shelter_id"], "MANAGER")
+        authorize_from_token(token, ShelterPermissions.MAP_UPDATE, shelter_id=shelter_map["shelter_id"])
         return _ok(shelter_zones_domain.create_shelter_zone(data))
     except Exception as e:
         return _err(e, info)
@@ -38,7 +40,7 @@ def update_shelter_zone_resolver(obj, info, id, data):
     logger.api(f"id: {id}")
     try:
         token = info.context.headers['authorization']
-        assert_shelter_role(token, shelter_zones_domain.shelter_id_for_zone(id), "MANAGER")
+        authorize_from_token(token, ShelterPermissions.MAP_UPDATE, shelter_id=shelter_zones_domain.shelter_id_for_zone(id))
         return _ok(shelter_zones_domain.update_shelter_zone(id, data))
     except Exception as e:
         return _err(e, info)
@@ -50,7 +52,7 @@ def delete_shelter_zone_resolver(obj, info, id):
     logger.api(f"id: {id} remove")
     try:
         token = info.context.headers['authorization']
-        assert_shelter_role(token, shelter_zones_domain.shelter_id_for_zone(id), "OWNER")
+        authorize_from_token(token, ShelterPermissions.MAP_UPDATE, shelter_id=shelter_zones_domain.shelter_id_for_zone(id))
         me = get_request_user(token)
         memoriae_id = shelter_zones_domain.delete_shelter_zone(id, me["id"])
         return {"success": True, "id": memoriae_id}

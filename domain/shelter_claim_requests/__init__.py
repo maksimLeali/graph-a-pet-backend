@@ -55,6 +55,36 @@ def _assert_pending(claim):
 
 
 # --- business ---
+def _normalize_documents(proof_data):
+    """Canonical shape for verification documents inside proof_data:
+    {"documents": [{id, media_id, url, description, status, reviewer_note}]}.
+    New/resubmitted documents are SUBMITTED with no reviewer note; media rows
+    themselves are untouched (the media system stays as-is)."""
+    import uuid as _uuid
+    if not isinstance(proof_data, dict):
+        return proof_data
+    documents = proof_data.get("documents")
+    if documents is None:
+        return proof_data
+    if not isinstance(documents, list) or len(documents) == 0:
+        raise BadRequest("at least one verification document is required")
+    normalized = []
+    for doc in documents:
+        if not isinstance(doc, dict) or not doc.get("media_id"):
+            raise BadRequest("each document needs an uploaded media")
+        if not (doc.get("description") or "").strip():
+            raise BadRequest("each document needs a description")
+        normalized.append({
+            "id": doc.get("id") or f"{_uuid.uuid4()}",
+            "media_id": doc["media_id"],
+            "url": doc.get("url"),
+            "description": doc["description"].strip(),
+            "status": "SUBMITTED",
+            "reviewer_note": None,
+        })
+    return {**proof_data, "documents": normalized}
+
+
 def request_claim(shelter_id, data, actor_user_id):
     logger.domain(f"shelter_id: {shelter_id} data: {stringify(data)} by {actor_user_id}")
     try:
@@ -68,7 +98,7 @@ def request_claim(shelter_id, data, actor_user_id):
         claim = claims_data.create_claim({
             "shelter_id": shelter_id,
             "requester_user_id": actor_user_id,
-            "proof_data": (data or {}).get("proof_data"),
+            "proof_data": _normalize_documents((data or {}).get("proof_data")),
             "message": (data or {}).get("message"),
         })
         # marks the shelter as under review; reverted if the claim doesn't succeed
@@ -107,6 +137,7 @@ def approve_claim(id, decision_note, actor_user_id):
     try:
         # late import: domain.shelter_roles imports domain.shelters
         import domain.shelter_roles as shelter_roles_domain
+        import domain.shelter_ownerships as ownership_service
 
         claim = claims_data.get_claim(id)
         _assert_pending(claim)
@@ -135,6 +166,23 @@ def approve_claim(id, decision_note, actor_user_id):
                 "shelter_id": shelter_id,
                 "role": "OWNER",
             })
+
+        # technical ownership moves to the approved requester; the claim
+        # supersedes any previous owner (e.g. the platform-imported creator)
+        ownership_service.add_owner(
+            shelter_id=shelter_id,
+            user_id=requester_id,
+            source="CLAIM_APPROVAL",
+            created_by_id=actor_user_id,
+        )
+        for ownership in ownership_service.list_active_owners(shelter_id):
+            if ownership["user_id"] != requester_id:
+                ownership_service.remove_owner(
+                    shelter_id=shelter_id,
+                    user_id=ownership["user_id"],
+                    actor_user_id=actor_user_id,
+                    status="ENDED",
+                )
 
         updated = claims_data.resolve_claim(id, "APPROVED", actor_user_id, decision_note)
 
@@ -188,6 +236,59 @@ def reject_claim(id, decision_note, actor_user_id):
         raise e
 
 
+def update_claim_documents(id, documents, actor_user_id):
+    """The requester replaces/fixes documents on a still-PENDING claim (e.g.
+    after a reviewer asked for a change). Resubmitted documents go back to
+    SUBMITTED and lose the reviewer note."""
+    logger.domain(f"update documents on claim {id} by {actor_user_id}")
+    try:
+        claim = claims_data.get_claim(id)
+        if claim.get("requester_user_id") != actor_user_id:
+            raise ForbiddenError("only the requester can update this claim's documents")
+        _assert_pending(claim)
+        proof_data = _normalize_documents(
+            {**(claim.get("proof_data") or {}), "documents": documents}
+        )
+        return claims_data.update_proof_data(id, proof_data)
+    except Exception as e:
+        logger.error(e)
+        raise e
+
+
+def request_document_change(id, document_id, note, actor_user_id):
+    """A platform reviewer flags one document as not acceptable: the document
+    goes CHANGE_REQUESTED with the reviewer note and the requester is
+    notified so the app can offer the replacement flow."""
+    logger.domain(f"request document change on claim {id} doc {document_id} by {actor_user_id}")
+    try:
+        claim = claims_data.get_claim(id)
+        _assert_pending(claim)
+        proof_data = dict(claim.get("proof_data") or {})
+        documents = list(proof_data.get("documents") or [])
+        target = next((d for d in documents if d.get("id") == document_id), None)
+        if target is None:
+            raise NotFoundError(f"no document {document_id} on claim {id}")
+        target["status"] = "CHANGE_REQUESTED"
+        target["reviewer_note"] = (note or "").strip() or None
+        proof_data["documents"] = documents
+        updated = claims_data.update_proof_data(id, proof_data)
+
+        shelter = shelters_domain.get_shelter(claim["shelter_id"]) or {}
+        notifications_domain.notify_shelter_claim_document_change(
+            claim_id=id,
+            user_id=claim["requester_user_id"],
+            shelter_id=claim["shelter_id"],
+            shelter_name=shelter.get("name"),
+            document_id=document_id,
+            note=target["reviewer_note"],
+            actor_user_id=actor_user_id,
+        )
+        return updated
+    except Exception as e:
+        logger.error(e)
+        raise e
+
+
 def get_claim(id):
     return claims_data.get_claim(id)
 
@@ -202,6 +303,24 @@ def list_my_claims(user_id, common_search):
             "total_items": total,
             "total_pages": ceil(total / page_size) if page_size else 0,
             "current_page": pagination.get("page", 0),
+            "page_size": page_size,
+        }
+    except Exception as e:
+        logger.error(e)
+        raise e
+
+
+def list_platform_claims(common_search):
+    """Cross-tenant claim list for the back office (platform.claims.review)."""
+    logger.domain(f"common_search: {stringify(common_search)}")
+    try:
+        items = claims_data.get_shelter_claims(common_search)
+        total = claims_data.get_total_items(common_search)
+        page_size = common_search["pagination"]["page_size"]
+        return items, {
+            "total_items": total,
+            "total_pages": ceil(total / page_size) if page_size else 0,
+            "current_page": common_search["pagination"]["page"],
             "page_size": page_size,
         }
     except Exception as e:

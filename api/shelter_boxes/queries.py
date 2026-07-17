@@ -3,6 +3,8 @@ from graphql import GraphQLError, GraphQLResolveInfo
 import domain.shelter_boxes as shelter_boxes_domain
 from api.errors import format_error
 from api.middlewares import auth_middleware
+from api.authorization.tenant import require_tenant_common_search, MAP_SCOPE
+from domain.authorization.catalog import ShelterPermissions
 from utils.logger import logger, stringify
 from utils import format_common_search
 
@@ -11,8 +13,11 @@ from utils import format_common_search
 @auth_middleware
 def list_shelter_boxes_resolver(obj, info: GraphQLResolveInfo, common_search):
     logger.api(f"common_search: {stringify(common_search)}")
-    common_search = format_common_search(common_search)
     try:
+        require_tenant_common_search(
+            info, common_search, ShelterPermissions.BOXES_READ, alt_scopes=MAP_SCOPE
+        )
+        common_search = format_common_search(common_search)
         boxes, pagination = shelter_boxes_domain.get_paginated_shelter_boxes(common_search)
         payload = {"success": True, "items": boxes, "pagination": pagination}
     except Exception as e:

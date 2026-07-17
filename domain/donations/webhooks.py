@@ -127,7 +127,6 @@ def _notify_shelter_members_of_donation(donation):
 	try:
 		import domain.notifications as notifications_domain
 		import repository.pets as pets_data
-		import repository.shelter_roles as shelter_roles_data
 		import repository.shelters as shelters_data
 
 		shelter = shelters_data.get_shelter(donation.shelter_id) or {}
@@ -139,15 +138,9 @@ def _notify_shelter_members_of_donation(donation):
 			except Exception:
 				pet_name = None
 
-		members = shelter_roles_data.get_roles_for_shelter_levels(
-			donation.shelter_id, ["OWNER", "MANAGER", "STAFF", "VOLUNTEER"],
-		)
-		notified = set()
-		for role in members:
-			member_user_id = role.get("user_id")
-			if not member_user_id or member_user_id in notified:
-				continue  # a user holding multiple roles gets one notification
-			notified.add(member_user_id)
+		import repository.authorization as authz_data
+		member_user_ids = authz_data.get_active_member_user_ids(donation.shelter_id)
+		for member_user_id in member_user_ids:
 			notifications_domain.notify_donation_received(
 				donation_id=donation.id,
 				user_id=member_user_id,

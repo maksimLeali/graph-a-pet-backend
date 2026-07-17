@@ -40,7 +40,7 @@ from api.shelters.resolvers import shelter
 from api.shelter_roles.queries import *
 from api.shelter_roles.mutations import *
 from api.shelter_roles.resolvers import shelter_role
-from api.authorization.queries import my_shelter_authorization_resolver, list_rbac_roles_resolver, get_user_rbac_roles_resolver, list_permission_catalog_resolver
+from api.authorization.queries import my_shelter_authorization_resolver, list_rbac_roles_resolver, get_user_rbac_roles_resolver, list_permission_catalog_resolver, backoffice_access_context_resolver, backoffice_shelter_access_resolver
 from api.authorization.mutations import create_rbac_role_resolver, update_rbac_role_permissions_resolver, archive_rbac_role_resolver, assign_rbac_role_to_user_resolver, revoke_rbac_role_assignment_resolver
 from api.shelter_pets.queries import *
 from api.shelter_pets.mutations import *
@@ -165,6 +165,8 @@ query.set_field("getPublicShelter", get_public_shelter_resolver)
 query.set_field("getShelterRole", get_shelter_role_resolver)
 query.set_field("listShelterRoles", list_shelter_roles_resolver)
 query.set_field("myShelterAuthorization", my_shelter_authorization_resolver)
+query.set_field("backofficeAccessContext", backoffice_access_context_resolver)
+query.set_field("backofficeShelterAccess", backoffice_shelter_access_resolver)
 query.set_field("listRbacRoles", list_rbac_roles_resolver)
 query.set_field("getUserRbacRoles", get_user_rbac_roles_resolver)
 query.set_field("listPermissionCatalog", list_permission_catalog_resolver)
@@ -205,6 +207,7 @@ query.set_field("listMyOwnershipTransfers", list_my_ownership_transfers_resolver
 query.set_field("listShelterOwnershipTransfers", list_shelter_ownership_transfers_resolver)
 query.set_field("listMyShelterClaimRequests", list_my_shelter_claim_requests_resolver)
 query.set_field("listShelterClaimRequests", list_shelter_claim_requests_resolver)
+query.set_field("listPlatformShelterClaimRequests", list_platform_shelter_claim_requests_resolver)
 query.set_field("getMyShelterJoinRequest", get_my_shelter_join_request_resolver)
 query.set_field("listShelterJoinRequests", list_shelter_join_requests_resolver)
 
@@ -260,6 +263,7 @@ mutation.set_field("updateReport", update_report_resolver)
 mutation.set_field("respondToReport", respond_to_report_resolver)
 mutation.set_field("updateMedia", update_media_resolver)
 mutation.set_field("createMedia", create_media_resolver)
+mutation.set_field("deleteMedia", delete_media_resolver)
 mutation.set_field("createCode", create_code_resolver)
 mutation.set_field("checkCode", check_code_resolver)
 mutation.set_field("restoreMemoriae", restore_memoriae_resolver)
@@ -349,6 +353,8 @@ mutation.set_field("requestShelterClaim", request_shelter_claim_resolver)
 mutation.set_field("cancelShelterClaim", cancel_shelter_claim_resolver)
 mutation.set_field("approveShelterClaim", approve_shelter_claim_resolver)
 mutation.set_field("rejectShelterClaim", reject_shelter_claim_resolver)
+mutation.set_field("updateShelterClaimDocuments", update_shelter_claim_documents_resolver)
+mutation.set_field("requestShelterClaimDocumentChange", request_shelter_claim_document_change_resolver)
 mutation.set_field("applyToShelterAsVolunteer", apply_to_shelter_as_volunteer_resolver)
 mutation.set_field("approveShelterJoinRequest", approve_shelter_join_request_resolver)
 mutation.set_field("rejectShelterJoinRequest", reject_shelter_join_request_resolver)

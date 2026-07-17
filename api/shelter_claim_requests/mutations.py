@@ -1,8 +1,9 @@
 from ariadne import convert_kwargs_to_snake_case
 import domain.shelter_claim_requests as claims_domain
-from api.middlewares import auth_middleware, min_role
+from api.middlewares import auth_middleware
+from api.authorization.decorators import require_permission
+from domain.authorization.catalog import PlatformPermissions
 from api.errors import format_error
-from repository.users.models import UserRole
 from utils import get_request_user
 from utils.logger import logger, stringify
 
@@ -43,7 +44,7 @@ def cancel_shelter_claim_resolver(obj, info, id):
 
 
 @convert_kwargs_to_snake_case
-@min_role(UserRole.ADMIN.name)
+@require_permission(PlatformPermissions.CLAIMS_REVIEW, platform=True)
 def approve_shelter_claim_resolver(obj, info, id, decision_note=None):
     logger.api(f"id: {id} approve")
     try:
@@ -54,11 +55,33 @@ def approve_shelter_claim_resolver(obj, info, id, decision_note=None):
 
 
 @convert_kwargs_to_snake_case
-@min_role(UserRole.ADMIN.name)
+@require_permission(PlatformPermissions.CLAIMS_REVIEW, platform=True)
 def reject_shelter_claim_resolver(obj, info, id, decision_note=None):
     logger.api(f"id: {id} reject")
     try:
         me = get_request_user(info.context.headers['authorization'])
         return _ok(claims_domain.reject_claim(id, decision_note, me["id"]))
+    except Exception as e:
+        return _err(e, info)
+
+
+@convert_kwargs_to_snake_case
+@auth_middleware
+def update_shelter_claim_documents_resolver(obj, info, id, documents):
+    logger.api(f"id: {id} update documents")
+    try:
+        me = get_request_user(info.context.headers['authorization'])
+        return _ok(claims_domain.update_claim_documents(id, documents, me["id"]))
+    except Exception as e:
+        return _err(e, info)
+
+
+@convert_kwargs_to_snake_case
+@require_permission(PlatformPermissions.CLAIMS_REVIEW, platform=True)
+def request_shelter_claim_document_change_resolver(obj, info, id, document_id, note=None):
+    logger.api(f"id: {id} document: {document_id} request change")
+    try:
+        me = get_request_user(info.context.headers['authorization'])
+        return _ok(claims_domain.request_document_change(id, document_id, note, me["id"]))
     except Exception as e:
         return _err(e, info)

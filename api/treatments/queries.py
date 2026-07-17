@@ -3,7 +3,7 @@ import domain.treatments as treatments_domain
 from utils.logger import logger, stringify
 from utils import format_common_search, get_request_user
 from api.errors import InternalError, error_pagination, format_error
-from api.middlewares import min_role, RoleLevel, auth_middleware
+from api.middlewares import auth_middleware
 
 
 @convert_kwargs_to_snake_case

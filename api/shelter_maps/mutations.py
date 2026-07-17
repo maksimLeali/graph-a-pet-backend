@@ -1,6 +1,8 @@
 from ariadne import convert_kwargs_to_snake_case
 import domain.shelter_maps as shelter_maps_domain
-from api.middlewares import auth_middleware, min_shelter_role, assert_shelter_role
+from api.middlewares import auth_middleware
+from api.authorization.decorators import authorize_from_token, require_permission
+from domain.authorization.catalog import ShelterPermissions
 from api.errors import format_error
 from utils import get_request_user
 from utils.logger import logger, stringify
@@ -19,7 +21,7 @@ def _err(e, info):
 
 
 @convert_kwargs_to_snake_case
-@min_shelter_role("MANAGER")
+@require_permission(ShelterPermissions.MAP_UPDATE, shelter_argument="shelter_id")
 def create_shelter_map_resolver(obj, info, data):
     logger.api(f"data: {stringify(data)}")
     try:
@@ -35,7 +37,7 @@ def update_shelter_map_resolver(obj, info, id, data):
     try:
         token = info.context.headers['authorization']
         shelter_map = shelter_maps_domain.get_shelter_map(id)
-        assert_shelter_role(token, shelter_map["shelter_id"], "MANAGER")
+        authorize_from_token(token, ShelterPermissions.MAP_UPDATE, shelter_id=shelter_map["shelter_id"])
         return _ok(shelter_maps_domain.update_shelter_map(id, data))
     except Exception as e:
         return _err(e, info)
@@ -48,7 +50,7 @@ def save_shelter_map_layout_resolver(obj, info, map_id, data):
     try:
         token = info.context.headers['authorization']
         shelter_map = shelter_maps_domain.get_shelter_map(map_id)
-        assert_shelter_role(token, shelter_map["shelter_id"], "MANAGER")
+        authorize_from_token(token, ShelterPermissions.MAP_UPDATE, shelter_id=shelter_map["shelter_id"])
         return _ok(shelter_maps_domain.save_layout(map_id, data))
     except Exception as e:
         return _err(e, info)
@@ -61,7 +63,7 @@ def delete_shelter_map_resolver(obj, info, id):
     try:
         token = info.context.headers['authorization']
         shelter_map = shelter_maps_domain.get_shelter_map(id)
-        assert_shelter_role(token, shelter_map["shelter_id"], "OWNER")
+        authorize_from_token(token, ShelterPermissions.MAP_UPDATE, shelter_id=shelter_map["shelter_id"])
         me = get_request_user(token)
         memoriae_id = shelter_maps_domain.delete_shelter_map(id, me["id"])
         return {"success": True, "id": memoriae_id}

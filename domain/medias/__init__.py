@@ -1,5 +1,6 @@
 from io import BytesIO
 import repository.medias as medias_data
+import domain.damnationes_memoriae as damnatio_domain
 from utils.logger import logger, stringify
 
 from math import ceil
@@ -89,8 +90,18 @@ def update_media(id, data):
         logger.error(e)
         raise e
 
+def delete_media(id, user_id):
+    logger.domain(f"id {id} remove ")
+    try:
+        media = medias_data.get_media(id)
+        damnatio_id = damnatio_domain.delete_row(id, 'medias', media, user_id)
+        return damnatio_id
+    except Exception as e:
+        logger.error(e)
+        raise e
+
 def get_medias(common_search):
-    try: 
+    try:
         return medias_data.get_medias(common_search)
     except Exception as e:
         logger.error(e)

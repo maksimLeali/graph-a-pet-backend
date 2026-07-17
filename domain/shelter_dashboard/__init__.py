@@ -8,7 +8,6 @@ import repository.shelter_box_occupancies as occ_data
 import repository.shelter_pets as pets_data
 import repository.shelters as shelters_data
 import repository.shelter_dashboard_snapshots as snapshots_data
-import repository.shelter_roles as shelter_roles_data
 import repository.shelter_inventory_items as inventory_items_data
 import domain.shelter_inventory as inventory_domain
 import domain.shelter_boxes as boxes_domain
@@ -18,7 +17,6 @@ from utils.logger import logger
 from utils.dates import utc_now
 
 DATE_FMT = "%Y-%m-%dT%H:%M:%S.%fZ"
-MANAGER_LEVEL_ROLES = {"MANAGER", "OWNER"}
 
 
 def _parse_dt(value):
@@ -142,10 +140,10 @@ def _shelter_name(shelter_id, cache):
     return cache[shelter_id]
 
 
-def get_my_shelter_dashboard(user_id, date_from, date_to, is_global_admin=False):
+def get_my_shelter_dashboard(user_id, date_from, date_to):
     """Cross-shelter 'what do I have to do' view: tasks/walks assigned to
-    user_id, and (for MANAGER+/OWNER members) low/out-of-stock inventory,
-    across every shelter/workspace the user belongs to."""
+    user_id, and (for members holding shelters.inventory.read) low/out-of-stock
+    inventory, across every shelter/workspace the user belongs to."""
     logger.domain(f"user_id: {user_id} date_from: {date_from} date_to: {date_to}")
     try:
         start = _parse_dt(date_from)
@@ -160,13 +158,18 @@ def get_my_shelter_dashboard(user_id, date_from, date_to, is_global_admin=False)
         week_end = week_start + timedelta(days=7)
         shelter_name_cache = {}
 
-        my_roles = shelter_roles_data.get_roles_for_user(user_id)
-        roles_by_shelter = {}
-        for r in my_roles:
-            roles_by_shelter.setdefault(r["shelter_id"], set()).add(r["role"])
+        # RBAC: the inventory section only covers shelters where the user can
+        # actually read inventory (platform grants_all included)
+        import repository.authorization as authz_data
+        from domain.authorization import authorization_service
+        from domain.authorization.catalog import ShelterPermissions
+        access = authz_data.list_user_shelter_access(user_id)
         manager_shelter_ids = [
-            sid for sid, roles in roles_by_shelter.items()
-            if is_global_admin or (roles & MANAGER_LEVEL_ROLES)
+            entry["shelter"]["id"] for entry in access
+            if authorization_service.can(
+                user_id, ShelterPermissions.INVENTORY_READ,
+                shelter_id=entry["shelter"]["id"],
+            )
         ]
 
         # --- tasks assigned to me (current week only) ---

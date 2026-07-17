@@ -3,7 +3,10 @@ from graphql import GraphQLError, GraphQLResolveInfo
 import domain.shelter_walks as shelter_walks_domain
 from api.errors import format_error
 from api.middlewares import auth_middleware
-from api.permissions import assert_capability, Cap, is_restricted_to_assigned
+from api.authorization.tenant import require_tenant_common_search, SHELTER_PET_SCOPE
+from domain.authorization.catalog import ShelterPermissions
+from api.authorization.decorators import authorize_from_token
+from domain.authorization import authorization_service
 from utils.logger import logger, stringify
 from utils import format_common_search
 
@@ -12,8 +15,11 @@ from utils import format_common_search
 @auth_middleware
 def list_shelter_walks_resolver(obj, info: GraphQLResolveInfo, common_search):
     logger.api(f"common_search: {stringify(common_search)}")
-    common_search = format_common_search(common_search)
     try:
+        require_tenant_common_search(
+            info, common_search, ShelterPermissions.WALKS_READ, alt_scopes=SHELTER_PET_SCOPE
+        )
+        common_search = format_common_search(common_search)
         walks, pagination = shelter_walks_domain.get_paginated_shelter_walks(common_search)
         payload = {"success": True, "items": walks, "pagination": pagination}
     except Exception as e:
@@ -47,8 +53,10 @@ def list_operational_shelter_walks_resolver(obj, info, shelter_id):
     try:
         token = info.context.headers['authorization']
         # VOLUNTEER: solo walk sue o di pet assegnati a lei/lui
-        user = assert_capability(token, shelter_id, Cap.READ)
-        restrict_to = user["id"] if is_restricted_to_assigned(user, shelter_id) else None
+        user = authorize_from_token(token, ShelterPermissions.WALKS_READ, shelter_id=shelter_id)
+        restrict_to = None if authorization_service.can(
+            user["id"], ShelterPermissions.WALKS_CREATE, shelter_id=shelter_id
+        ) else user["id"]
         walks, pagination = shelter_walks_domain.get_operational_walks(shelter_id, restrict_to)
         payload = {"success": True, "items": walks, "pagination": pagination}
     except Exception as e:
@@ -65,8 +73,10 @@ def list_pets_needing_walk_resolver(obj, info, shelter_id, hours=24):
     try:
         token = info.context.headers['authorization']
         # VOLUNTEER può leggere, ma vede solo i pet assegnati a lui
-        user = assert_capability(token, shelter_id, Cap.READ)
-        restrict_to = user["id"] if is_restricted_to_assigned(user, shelter_id) else None
+        user = authorize_from_token(token, ShelterPermissions.WALKS_READ, shelter_id=shelter_id)
+        restrict_to = None if authorization_service.can(
+            user["id"], ShelterPermissions.WALKS_CREATE, shelter_id=shelter_id
+        ) else user["id"]
         pets, pagination = shelter_walks_domain.get_pets_needing_walk(shelter_id, hours, restrict_to)
         payload = {"success": True, "items": pets, "pagination": pagination}
     except Exception as e:

@@ -3,8 +3,9 @@ from domain.walk_ratings import create_walk_rating, update_walk_rating, delete_w
 from utils import get_request_user
 from utils.logger import logger, stringify
 from api.errors import format_error
-from repository.users.models import UserRole
-from api.middlewares import min_role, auth_middleware
+from api.middlewares import auth_middleware
+from api.authorization.decorators import require_permission
+from domain.authorization.catalog import PlatformPermissions
 
 
 @convert_kwargs_to_snake_case
@@ -50,7 +51,7 @@ def update_walk_rating_resolver(obj, info, id, data):
 
 
 @convert_kwargs_to_snake_case
-@min_role(UserRole.ADMIN.name)
+@require_permission(PlatformPermissions.CONTENT_MANAGE, platform=True)
 def delete_walk_rating_resolver(obj, info, id):
     logger.api(f"id{id}  remove")
     try:

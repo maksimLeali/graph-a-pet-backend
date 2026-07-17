@@ -1,17 +1,16 @@
 from ariadne import convert_kwargs_to_snake_case
 import domain.shelter_pets as shelter_pets_domain
 from domain.shelter_pets import create_shelter_pet, create_shelter_pets, create_shelter_pets_with_data, change_shelter, delete_shelter_pet
-from api.middlewares import auth_middleware, min_role, assert_shelter_role
-from api.authorization.decorators import authorize_from_token
-from domain.authorization.catalog import ShelterPermissions
+from api.middlewares import auth_middleware
+from api.authorization.decorators import authorize_from_token, require_permission
+from domain.authorization.catalog import ShelterPermissions, PlatformPermissions
 from api.errors import format_error
-from repository.users.models import UserRole
 from utils.logger import logger, stringify
 from utils import get_request_user
 
 
 @convert_kwargs_to_snake_case
-@auth_middleware
+@require_permission(ShelterPermissions.PETS_CREATE, shelter_argument="shelter_id")
 def create_shelter_pet_resolver(obj, info, data):
     logger.api(f"data: {stringify(data)}")
     try:
@@ -30,7 +29,7 @@ def create_shelter_pet_resolver(obj, info, data):
 
 
 @convert_kwargs_to_snake_case
-@auth_middleware
+@require_permission(ShelterPermissions.PETS_CREATE, shelter_argument="shelter_id")
 def create_shelter_pets_resolver(obj, info, data):
     logger.api(f"data: {stringify(data)}")
     try:
@@ -49,7 +48,7 @@ def create_shelter_pets_resolver(obj, info, data):
 
 
 @convert_kwargs_to_snake_case
-@auth_middleware
+@require_permission(ShelterPermissions.PETS_CREATE, shelter_argument="shelter_id")
 def create_shelter_pets_with_data_resolver(obj, info, data):
     logger.api(f"data: {stringify(data)}")
     try:
@@ -74,8 +73,8 @@ def change_shelter_resolver(obj, info, data):
     try:
         token = info.context.headers['authorization']
         # STAFF+ required on BOTH source and destination shelters
-        assert_shelter_role(token, data["shelter_id_from"], "STAFF")
-        assert_shelter_role(token, data["shelter_id_to"], "STAFF")
+        authorize_from_token(token, ShelterPermissions.PETS_UPDATE, shelter_id=data["shelter_id_from"])
+        authorize_from_token(token, ShelterPermissions.PETS_UPDATE, shelter_id=data["shelter_id_to"])
         me = get_request_user(token)
         shelter_pet = change_shelter(data, me["id"])
         payload = {
@@ -149,7 +148,7 @@ def set_shelter_pet_assignees_resolver(obj, info, shelter_pet_id, user_ids=None,
 
 
 @convert_kwargs_to_snake_case
-@min_role(UserRole.ADMIN.name)
+@require_permission(PlatformPermissions.SHELTERS_MANAGE, platform=True)
 def delete_shelter_pet_resolver(obj, info, id):
     logger.api(f"id {id} remove")
     try:

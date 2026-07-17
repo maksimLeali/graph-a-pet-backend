@@ -1,14 +1,15 @@
 from ariadne import convert_kwargs_to_snake_case
 from graphql import GraphQLError, GraphQLResolveInfo
 import domain.statistics as statistics_domain
-from repository.users.models import UserRole
 from api.errors import ForbiddenError, format_error, error_pagination
-from api.middlewares import auth_middleware, min_role
+from api.middlewares import auth_middleware
+from api.authorization.decorators import require_permission
+from domain.authorization.catalog import PlatformPermissions
 from utils.logger import logger, stringify
 from utils import format_common_search
 
 @convert_kwargs_to_snake_case
-@min_role(UserRole.ADMIN.name)
+@require_permission(PlatformPermissions.STATISTICS_READ, platform=True)
 def list_statistics_resolver(obj, info: GraphQLResolveInfo, common_search):
     logger.api(f"common_search: {stringify(common_search)}")
     common_search= format_common_search(common_search)
@@ -29,7 +30,7 @@ def list_statistics_resolver(obj, info: GraphQLResolveInfo, common_search):
 
 
 @convert_kwargs_to_snake_case
-@min_role(UserRole.ADMIN.name)
+@require_permission(PlatformPermissions.STATISTICS_READ, platform=True)
 def get_statistics_by_group(obj, info, date_from, date_to, group):
     logger.api(f"from {date_from} to {date_to} grouped {group}")
     try:
@@ -48,7 +49,7 @@ def get_statistics_by_group(obj, info, date_from, date_to, group):
     return payload
 
 @convert_kwargs_to_snake_case
-@min_role(UserRole.ADMIN.name)
+@require_permission(PlatformPermissions.STATISTICS_READ, platform=True)
 def get_statistic_resolver(obj, info, id):
     logger.api(f"id: {id}")
     try:
@@ -68,7 +69,7 @@ def get_statistic_resolver(obj, info, id):
     return payload
 
 @convert_kwargs_to_snake_case
-@min_role(UserRole.ADMIN.name)
+@require_permission(PlatformPermissions.STATISTICS_READ, platform=True)
 def get_real_time_statistic_resolver(obj, info):
     logger.api(f"real time statistics ")
     try:
@@ -89,7 +90,7 @@ def get_real_time_statistic_resolver(obj, info):
 
 
 @convert_kwargs_to_snake_case
-@min_role(UserRole.ADMIN.name)
+@require_permission(PlatformPermissions.STATISTICS_READ, platform=True)
 def dashboard_resolver(obj, info):
     logger.api('dashboard')
     try: 

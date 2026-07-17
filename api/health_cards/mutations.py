@@ -3,10 +3,11 @@ from utils.logger import logger, stringify
 from api.errors import format_error
 
 from domain.health_cards import update_health_card, create_health_card
-from api.middlewares import min_role, RoleLevel
+from api.authorization.decorators import require_permission
+from domain.authorization.catalog import PlatformPermissions
 
 @convert_kwargs_to_snake_case
-@min_role(RoleLevel.USER.name)
+@require_permission(PlatformPermissions.APP_USE, platform=True)
 def update_health_card_resolver(obj, info, id, data):
     logger.api(
         f"id: {id}"\
@@ -29,7 +30,7 @@ def update_health_card_resolver(obj, info, id, data):
     return payload
 
 @convert_kwargs_to_snake_case
-@min_role(RoleLevel.USER.name)
+@require_permission(PlatformPermissions.APP_USE, platform=True)
 def create_health_card_resolver(obj, info, data): 
     logger.api(f"data: {stringify(data)}")
     try: 

@@ -1,14 +1,15 @@
 from ariadne import convert_kwargs_to_snake_case
 from domain.shelters import create_shelter, create_personal_workspace, update_shelter, delete_shelter
-from api.middlewares import auth_middleware, min_role
+from api.middlewares import auth_middleware
+from api.authorization.decorators import require_permission
+from domain.authorization.catalog import PlatformPermissions
 from api.errors import format_error
-from repository.users.models import UserRole
 from utils.logger import logger, stringify
 from utils import get_request_user
 
 
 @convert_kwargs_to_snake_case
-@auth_middleware
+@require_permission(PlatformPermissions.SHELTERS_MANAGE, platform=True)
 def create_shelter_resolver(obj, info, data):
     logger.api(f"data: {stringify(data)}")
     try:
@@ -76,7 +77,7 @@ def update_shelter_resolver(obj, info, id, data):
 
 
 @convert_kwargs_to_snake_case
-@min_role(UserRole.ADMIN.name)
+@require_permission(PlatformPermissions.SHELTERS_MANAGE, platform=True)
 def delete_shelter_resolver(obj, info, id):
     logger.api(f"id {id} remove")
     logger.critical(f"id {id} remove")

@@ -94,9 +94,11 @@ def link_pet_to_user(data):
         
 
 def _assert_can_invite(actor_user_id, pet_id):
-    """Inviter must already hold an ownership on the pet, or be an admin."""
-    actor = users_domain.get_user(actor_user_id)
-    if actor is not None and actor.get("role") == "ADMIN":
+    """Inviter must already hold an ownership on the pet, or hold the
+    platform content administration permission."""
+    from domain.authorization import authorization_service
+    from domain.authorization.catalog import PlatformPermissions
+    if authorization_service.can(actor_user_id, PlatformPermissions.CONTENT_MANAGE):
         return
     mine = ownerships_data.get_ownerships_for_user_pet(actor_user_id, pet_id)
     if not mine:
